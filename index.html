@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+    <title>Document</title>
+    <script defer src="boundle.js"></script>
+    <style>
+        canvas {
+				position: fixed;
+				top: 0px;
+				left: 0px;
+				pointer-events: none;
+				background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%),
+					linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%);
+				background-size: 16px 16px;
+				background-position: 0 0, 8px 8px;
+				background-repeat: repeat;
+			}
+            img{
+                display: none;
+            }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <img id="dog" src="https://picx.zhimg.com/v2-156bde726c8bd16cd52b369579bde83b_l.jpg?source=32738c0c"/>
+</body>
+</html>
