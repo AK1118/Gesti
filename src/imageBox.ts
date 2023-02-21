@@ -9,7 +9,14 @@ class ImageBox {
 	public selected: boolean = false;
 	private scale: number = 1;
 	private dragButton: DragButton;
-	private image: any;
+	/**
+	 * 提供 @CanvasRenderingContext2D 渲染的数据
+	 */
+	private image: HTMLOrSVGImageElement | HTMLVideoElement | HTMLCanvasElement | ImageBitmap | OffscreenCanvas;
+	/**
+	 * 外层传入的 @XImage 原始数据
+	 */
+	private ximage:XImage;
 	private key: string | number = +new Date();
 	private isMirror: boolean = false;
 	public disabled: boolean = false;
@@ -23,6 +30,7 @@ class ImageBox {
 	}
 	constructor(image: XImage) {
 		this.image = image.data;
+		this.ximage=image;
 		this.rect = new Rect(image.toJson());
 		this.beforeRect=this.rect.copy();
 	}

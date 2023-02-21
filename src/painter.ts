@@ -63,7 +63,7 @@
 	arc(x:number, y:number, radius:number, start:number, end:number) {
 		this.paint.arc(x, y, radius, start, end);
 	}
-	drawImage(image:HTMLImageElement|SVGImageElement|HTMLVideoElement|HTMLCanvasElement|ImageBitmap|OffscreenCanvas, x:number, y:number, width:number, height:number) {
+	drawImage(image: HTMLOrSVGImageElement | HTMLVideoElement | HTMLCanvasElement | ImageBitmap | OffscreenCanvas, x:number, y:number, width:number, height:number) {
 		this.paint.drawImage(image, -width / 2, -height / 2, width, height);
 	}
 	scale(a:number, b:number) {

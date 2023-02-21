@@ -47,7 +47,6 @@ class Rect {
     setPotision(x: number, y: number): void {
         this.position.x=x;
         this.position.y=y;
-        //this.position.setXY(x, y);
     }
     setScale(scale: number): void {
         this.size.width *= scale;
@@ -58,7 +57,15 @@ class Rect {
         this.size.height = height;
     }
     setAngle(angle: number): void {
-        this.angle = angle;
+        /**
+         * 在设置角度同时，以45度为矫正参考，吸附
+         */
+        let _angle=+angle.toFixed(2);
+        this.angle = _angle;
+        const _45=0.78;
+        const limit=0.1;
+        const scale=(this.angle/0.78)>>0;
+        this.angle=Math.abs(_angle-scale*_45)<limit?scale*_45:_angle;
     }
     get getAngle(): number {
         return this.angle;

@@ -1,6 +1,11 @@
 declare const uni: any;
 declare const wx:any;
 
+declare interface Size{
+    width:number,
+    height:number,
+}
+
 declare interface CanvasRenderingContext2D {
     draw(): void;
 }
