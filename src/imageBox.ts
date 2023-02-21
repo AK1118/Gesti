@@ -14,6 +14,7 @@ class ImageBox {
 	private isMirror: boolean = false;
 	public disabled: boolean = false;
 	public rect: Rect;
+	public beforeRect:Rect;
 	set setDragButton(dragButton: DragButton) {
 		this.dragButton = dragButton;
 	}
@@ -23,8 +24,12 @@ class ImageBox {
 	constructor(image: XImage) {
 		this.image = image.data;
 		this.rect = new Rect(image.toJson());
+		this.beforeRect=this.rect.copy();
 	}
-	public drawImage(paint: Painter): void {
+	public update(paint:Painter){
+		this.drawImage(paint)
+	}
+	private drawImage(paint: Painter): void {
 		paint.beginPath();
 		paint.save();
 		paint.translate(this.rect.position.x, this.rect.position.y);
@@ -55,15 +60,9 @@ class ImageBox {
 		paint.stroke();
 	}
 	private drawAnchorpoint(paint: Painter): void {
-		const pw: number = 3,
-			ph: number = 3;
 		const rect: Rect = this.rect;
-		const w: number = rect.size.width,
-			h: number = rect.size.height;
 		const x: number = rect.position.x,
 			y: number = rect.position.y;
-		const half_w: number = w >> 1,
-			half_h: number = h >> 1;
 
 		if (this.dragButton == null) {
 			this.dragButton = new DragButton(this);
@@ -91,7 +90,6 @@ class ImageBox {
 		 */
 		const vertexs:Point[]=this.getVertex();
 		const checkPoint = ():number => {
-			console.log(vertexs,eventPosition)
 			const len = vertexs.length;
 			for (let i = 0; i < len; i++) {
 				const point = vertexs[i];
@@ -133,6 +131,22 @@ class ImageBox {
 		//console.log("up",this.rect.position)
 		/*在抬起鼠标时，ImageBox还没有被Calcel，为再次聚焦万向按钮做刷新数据*/
 		this.dragButton .update(this);
+	}
+	public enlarge() {
+		this.scale = 1;
+		this.scale += .1;
+		this.doScale();
+	}
+	public narrow() {
+		this.scale = 1;
+		this.scale -= .1;
+		this.doScale();
+	}
+	doScale() {
+		this.rect.size.width*= this.scale;
+		this.rect.size.height *= this.scale;
+		/*每次改变大小后都需要刷新按钮的数据*/
+		this.dragButton.update(this);
 	}
 }
 

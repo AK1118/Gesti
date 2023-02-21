@@ -5,13 +5,13 @@ class XImage{
     x:number=0;
     y:number=0;
     scale:number=1;
-    constructor(params:{data:any,width:number,height:number,scale:number}){
+    constructor(params:createImageOptions){
         const {data,width,height,scale}=params;
         if(!data||!width||!height)throw Error("宽或高不能为0");
-		this.data=data;
-		this.width=width;
-		this.height=height;
-		this.scale=scale||1;
+        this.data=data;
+        this.width=width;
+        this.height=height;
+        this.scale=scale||1;
     }
     toJson():rectparams{
 		return {

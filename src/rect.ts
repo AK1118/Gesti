@@ -23,6 +23,7 @@ class Size {
 
 class Rect {
     public onDrag: onDragFunction;
+    public beforeDrag:onDragFunction;
     public angle: number=0;
     public vertex: Vertex;
     public position: Vector;

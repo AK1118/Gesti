@@ -30,9 +30,20 @@ declare class Vector {
     copy(): Vector;
     set(v: Vector): void;
     setXY(x: number, y: number): void;
+    toJson():{x:number,y:number};
+    toArray():number[];
     static dist(v1: Vector, v2: Vector): number;
     static mag(v: Vector): number;
     static sub(v1: Vector, v2: Vector): Vector;
+}
+
+declare interface createImageOptions{
+    data?:HTMLImageElement|SVGImageElement|HTMLVideoElement|HTMLCanvasElement|Blob|ImageData|ImageBitmap|OffscreenCanvas,options?:createImageOptions,
+    width?:number,
+    height?:number,
+    scale?:number,
+    maxScale?:number,
+    minScale?:number,
 }
 
 declare interface GestiEventParams{v:Vector|Vector[],sub(v:Vector):Vector}

@@ -16,6 +16,7 @@ class Drag {
     }
     update(position: Vector|any): void {
         if (this.rect == null) return;
+        if(this.rect.beforeDrag!=null)this.rect.beforeDrag(this.rect);
         this.rect.position.setXY(
             ~~(position.x + this.offset.offsetx),
             ~~(position.y + this.offset.offsety)

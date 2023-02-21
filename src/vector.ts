@@ -54,6 +54,15 @@ class Vector{
 		this.x = x;
 		this.y = y;
 	}
+	toJson():{x:number,y:number}{
+		return {
+			x:this.x,
+			y:this.y,
+		}
+	}
+	toArray():number[]{
+		return [this.x,this.y];
+	}
 	static dist(v1:Vector, v2:Vector) {
 		let sub = Vector.sub(v1, v2);
 		return Vector.mag(sub);

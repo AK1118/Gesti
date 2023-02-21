@@ -21,7 +21,7 @@ class ImageToolkit {
     private eventHandler: GestiEvent;
     private eventHandlerState: EventHandlerState = EventHandlerState.up;
     private drag: Drag = new Drag();
-    private gesture: Gesture;
+    private gesture: Gesture=new Gesture();
     private selectedImageBox: ImageBox = null;
     private isMultiple = false;
     private offset: Vector;
@@ -42,7 +42,7 @@ class ImageToolkit {
     private bindEvent(): void {
         this.eventHandler = new GestiEventManager().getEvent(this);
         if (this.eventHandler == null) return;
-        this.eventHandler.down(this.down).move(this.move).up(this.up);
+        this.eventHandler.down(this.down).move(this.move).up(this.up).wheel(this.wheel);
     }
     private cancelEvent(): void {
         if (this.eventHandler == null) return;
@@ -51,7 +51,6 @@ class ImageToolkit {
     public down(v: GestiEventParams): void {
         this.eventHandlerState = EventHandlerState.down;
         const event: Vector | Vector[] = this.correctEventPosition(v);
-
         if (this.selectedImageBox ?? false) {
             if (Array.isArray(event)) {
                 return this.gesture.onStart(this.selectedImageBox, event);
@@ -75,7 +74,7 @@ class ImageToolkit {
             const event: Vector | Vector[] = this.correctEventPosition(v);
             //手势
             if (Array.isArray(event)) {
-                //this.gesture
+                this.gesture.update(event);
                 this.update();
                 return;
             }
@@ -92,21 +91,27 @@ class ImageToolkit {
         }
     }
 
-    public wheel(v: GestiEventParams): void {
-
+    public wheel(e:WheelEvent): void {
+        const {
+			deltaY
+		} = e;
+		if (this.selectedImageBox != null) {
+			if (deltaY < 0)
+				this.selectedImageBox.enlarge();
+			else this.selectedImageBox.narrow();
+		}
+		this.update();
 
     }
     private correctEventPosition(vector: GestiEventParams): Vector | Vector[] {
-        let _vector: Vector[];
+        let _vector: Vector[]=new Array<Vector>;
         if (Array.isArray(vector)) {
             vector.map((item: Vector) => {
                 _vector.push(item.sub(this.offset));
             });
+            return _vector;
         }
-        else {
-            return vector.sub(this.offset);
-        }
-        return _vector;
+         return vector.sub(this.offset);
     }
     private checkFuncButton(eventPosition: Vector): boolean {
         const _dragButton:DragButton|boolean=this.selectedImageBox.checkFuncButton(eventPosition);
@@ -120,18 +125,17 @@ class ImageToolkit {
         }
         this.selectedImageBox.cancel();
         this.drag.cancel();
-        //this.gesture.cancel();
+        this.gesture.cancel();
         this.selectedImageBox=null;
         return false;
     }
     private update() {
         this.paint.clearRect(0, 0, this.canvasRect.size.width, this.canvasRect.size.height);
         this.imageBoxList.forEach((item: ImageBox) => {
-            if (!item.disabled) item.drawImage(this.paint);
+            if (!item.disabled) item.update(this.paint);
         })
     }
     public addImage(ximage: XImage): void {
-        const scale: number = .5;
         if (ximage.constructor.name != "XImage") throw Error("不是XImage类");
         const image: XImage = ximage;
         image.width *= image.scale;

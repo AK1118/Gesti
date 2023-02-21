@@ -9,40 +9,38 @@ interface GestiController{
    wheel(e:Event):void;
 }
 
-class GestiControllerImpl implements GestiController{
-    down(e: Event): void {
-        throw new Error("Method not implemented.");
-    }
-    up(e: Event): void {
-        throw new Error("Method not implemented.");
-    }
-    move(e: Event): void {
-        throw new Error("Method not implemented.");
-    }
-    wheel(e: Event): void {
-        throw new Error("Method not implemented.");
-    }
-}
+
+
 class Gesti{
     public controller:GestiController;
     private kit:ImageToolkit;
     public static XImage=XImage;
     constructor(){}
-    init(paint:CanvasRenderingContext2D,rect:rectparams){
+    public init(paint:CanvasRenderingContext2D,rect:rectparams){
         this.kit=new ImageToolkit(paint,rect);
     }
-    addImage(ximage:XImage):void{
-        this.kit.addImage(ximage);
+    public async addImage(ximage:XImage|Promise<XImage>):Promise<boolean>{
+        if(ximage.constructor.name=='Promise'){
+            const _ximage=await ximage;
+            this.kit.addImage(_ximage);
+            return true;
+        }
+        //使用any类型强制转换
+        const _ximage:any=ximage;
+        this.kit.addImage(_ximage);
+        return true;
     }
-    public async createImage(image:HTMLImageElement|SVGImageElement|HTMLVideoElement|HTMLCanvasElement|Blob|ImageData|ImageBitmap|OffscreenCanvas):Promise<XImage>{
-        const bimp=await createImageBitmap(image);
-        return new Promise(r=>{
+    public createImage(image:HTMLImageElement|SVGImageElement|HTMLVideoElement|HTMLCanvasElement|Blob|ImageData|ImageBitmap|OffscreenCanvas,options?:createImageOptions):Promise<XImage>{
+        return new Promise(async (r)=>{
+            const bimp=await createImageBitmap(image);
             const {width,height}=bimp;
             const ximage=new XImage({
                 data:bimp,
-                width:width,
-                height:height,
-                scale:1
+                width:options?.width ||width,
+                height:options?.height||height,
+                scale:options?.scale || 1,
+                maxScale:options?.maxScale||10,
+                minScale:options?.minScale||.1,
             });
             r(ximage)
         });
@@ -65,26 +63,31 @@ gesti.init(g,{
 const image=new XImage(
     {data:img,
     width:img.width,
-height:img.height,
-scale:1,}
+    height:img.height,
+    scale:1,}
 );
-
+const a=gesti.createImage(img)
+gesti.addImage(a)
+gesti.addImage(gesti.createImage(img,{
+    scale:.5
+}))
 gesti.createImage(img).then(e=>{
     gesti.addImage(e)
-})
-
-const netWorkSrc="https://picx.zhimg.com/v2-156bde726c8bd16cd52b369579bde83b_l.jpg?source=32738c0c";
-const nimg=new Image();
-nimg.src=netWorkSrc;
-const bimp:Promise<ImageBitmap>=createImageBitmap(nimg);
-gesti.addImage(image);
-bimp.then((image:ImageBitmap)=>{
-    
-    gesti.addImage(new XImage(
-        {data:image,
-        width:image.width,
-    height:image.height,
-    scale:1,}
-    ))
 });
+
+
+// const netWorkSrc="https://picx.zhimg.com/v2-156bde726c8bd16cd52b369579bde83b_l.jpg?source=32738c0c";
+// const nimg=new Image();
+// nimg.src=netWorkSrc;
+// const bimp:Promise<ImageBitmap>=createImageBitmap(nimg);
+// gesti.addImage(image);
+
+// bimp.then((image:ImageBitmap)=>{
+//     gesti.addImage(new XImage(
+//         {data:image,
+//         width:image.width,
+//     height:image.height,
+//     scale:1,}
+//     ))
+// });
 // export default new Gesti();
