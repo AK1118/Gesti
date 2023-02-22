@@ -1,5 +1,6 @@
 declare const uni: any;
 declare const wx:any;
+declare var document:Document;
 
 declare interface Size{
     width:number,
@@ -14,8 +15,8 @@ declare interface Offset{
     offsety:number
 }
 declare interface rectparams{
-    x:number,
-    y:number,
+    x?:number,
+    y?:number,
     width:number,
     height:number,
 }
@@ -54,25 +55,5 @@ declare interface createImageOptions{
 declare interface GestiEventParams{v:Vector|Vector[],sub(v:Vector):Vector}
 
 declare interface GestiEventFunction{
-    (GestiEventParams):void;
+    (params:GestiEventParams):void;
 }
-
-// declare interface XImage{
-//     data:any;
-//     width:number;
-//     height:number;
-//     x:number;
-//     y:number;
-//     scale:number;
-//     toJson():rect;
-// }
-
-// declare class Ximage{
-//     data:any;
-//     width:number;
-//     height:number;
-//     x:number;
-//     y:number;
-//     scale:number;
-//     new(params:{data:any,width:number,height:number,scale:number}):XImage;
-// }

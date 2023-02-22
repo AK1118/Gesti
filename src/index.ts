@@ -11,14 +11,36 @@ interface GestiController {
 }
 
 
-
+/**
+ * 初始化该 @Gesti 实例时，由于平台不确定，用户必须传入 @CanvasRenderingContext2D 画笔作为
+ */
 class Gesti {
     public controller: GestiController;
     private kit: ImageToolkit;
     public static XImage = XImage;
-    constructor() { }
-    public init(paint: CanvasRenderingContext2D, rect: rectparams) {
-        this.kit = new ImageToolkit(paint, rect);
+    static debug:boolean=false;
+    /*
+     * @description 初始化 @Gesti 所代理的画布高宽，在h5端可直接传入 HTMLCanvasElement 自动解析高宽
+     * @param @CanvasRenderingContext2D paint 
+     * @param rect
+     */
+    public init(canvas:HTMLCanvasElement=null,paint: CanvasRenderingContext2D=null,rect:{
+        x?:number,
+        y?:number,
+        width:number,
+        height:number,
+    }=null) {
+        if(!canvas&&!rect)throw Error("未指定Canvas大小或Canvas节点")
+        if(typeof(document)!="undefined"&&canvas){
+            const canvasRect:DOMRect=canvas.getBoundingClientRect();
+            if(canvasRect){
+                const g=canvas.getContext("2d");
+                this.kit = new ImageToolkit(g, canvasRect);
+                return;
+            }
+        }
+        if(rect)
+         this.kit = new ImageToolkit(paint, rect);
     }
     public async addImage(ximage: XImage | Promise<XImage>): Promise<boolean> {
         if (ximage.constructor.name == 'Promise') {
@@ -48,31 +70,13 @@ class Gesti {
     }
 }
 
+export default Gesti;
+
 const canvas:HTMLCanvasElement = document.querySelector("canvas");
 const g = canvas.getContext("2d");
-// canvas.width = window.innerWidth;
-// canvas.height = window.innerHeight;
 const gesti = new Gesti();
 const img: HTMLImageElement = document.querySelector("#dog");
-gesti.init(g, {
-    x: 0,
-    y: 0,
-    width: canvas.width,
-    height: canvas.height,
-});
-
-const image = new XImage(
-    {
-        data: img,
-        width: img.width,
-        height: img.height,
-        scale: 1,
-    }
-);
-
-
-
-
+gesti.init(canvas);
 
 for(let i=0;i<2;i++){
     gesti.addImage(gesti.createImage(img))
@@ -89,26 +93,3 @@ document.getElementById("save").addEventListener("click",()=>{
     const d:HTMLImageElement=document.querySelector("#result");
     d.src='';
 })
-// gesti.addImage(gesti.createImage(img, {
-//     scale: .5
-// }))
-// gesti.createImage(img).then(e => {
-//     gesti.addImage(e)
-// });
-
-
-// const netWorkSrc="https://picx.zhimg.com/v2-156bde726c8bd16cd52b369579bde83b_l.jpg?source=32738c0c";
-// const nimg=new Image();
-// nimg.src=netWorkSrc;
-// const bimp:Promise<ImageBitmap>=createImageBitmap(nimg);
-// gesti.addImage(image);
-
-// bimp.then((image:ImageBitmap)=>{
-//     gesti.addImage(new XImage(
-//         {data:image,
-//         width:image.width,
-//     height:image.height,
-//     scale:1,}
-//     ))
-// });
-// export default new Gesti();

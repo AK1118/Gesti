@@ -6,7 +6,7 @@ module.exports={
     entry:"./src/index.ts",
     output:{
         path:path.resolve(__dirname,"dist"),
-        filename:"boundle.js",
+        filename:"index.js",
     },
     devtool:"source-map",
     devServer:{

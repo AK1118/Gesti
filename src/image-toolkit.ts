@@ -4,6 +4,7 @@ import DragButton from "./dragbutton";
 import GestiEventManager, { GestiEvent } from "./event";
 import Gesture from "./gesture";
 import ImageBox from "./imageBox";
+import Gesti from "./index";
 import Painter from "./painter";
 import Rect from "./rect";
 import Vector from "./vector";
@@ -34,7 +35,7 @@ class ImageToolkit {
             width,
             height
         } = rect;
-        this.offset = new Vector(offsetx, offsety);
+        this.offset = new Vector(offsetx||0, offsety||0);
         this.canvasRect = new Rect(rect);
         this.paint = new Painter(paint);
         this.bindEvent();
@@ -43,12 +44,14 @@ class ImageToolkit {
         this.eventHandler = new GestiEventManager().getEvent(this);
         if (this.eventHandler == null) return;
         this.eventHandler.down(this.down).move(this.move).up(this.up).wheel(this.wheel);
+        this.debug(["Event Bind,",this.eventHandler]);
     }
     private cancelEvent(): void {
         if (this.eventHandler == null) return;
         this.eventHandler.disable();
     }
     public down(v: GestiEventParams): void {
+        this.debug(["Event Down,",v]);
         this.eventHandlerState = EventHandlerState.down;
         const event: Vector | Vector[] = this.correctEventPosition(v);
         if (this.selectedImageBox ?? false) {
@@ -70,6 +73,7 @@ class ImageToolkit {
         this.update();
     }
     public move(v: GestiEventParams): void {
+        this.debug(["Event Move,",v]);
         if (this.eventHandlerState === EventHandlerState.down) {
             const event: Vector | Vector[] = this.correctEventPosition(v);
             //手势
@@ -84,6 +88,7 @@ class ImageToolkit {
         this.update();
     }
     public up(v: GestiEventParams): void {
+        this.debug(["Event Up,",v]);
         this.eventHandlerState = EventHandlerState.up;
         this.drag.cancel();
         if(this.selectedImageBox??false){
@@ -130,12 +135,14 @@ class ImageToolkit {
         return false;
     }
     private update() {
+        this.debug("Update the Canvas");
         this.paint.clearRect(0, 0, this.canvasRect.size.width, this.canvasRect.size.height);
         this.imageBoxList.forEach((item: ImageBox) => {
             if (!item.disabled) item.update(this.paint);
         })
     }
     public addImage(ximage: XImage): void {
+        this.debug("Add a Ximage");
         if (ximage.constructor.name != "XImage") throw Error("不是XImage类");
         const image: XImage = ximage;
         image.width *= image.scale;
@@ -145,7 +152,12 @@ class ImageToolkit {
         const imageBox: ImageBox = new ImageBox(image);
         this.imageBoxList.push(imageBox);
         this.update();
-
+    }
+    private debug(message:any):void{
+        if(!Gesti.debug)return;
+        if(Array.isArray(message))
+        console.warn("Gesti debug: ",...message);
+        else  console.warn("Gesti debug: ",message);
     }
 }
 export default ImageToolkit;
