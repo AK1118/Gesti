@@ -90,9 +90,9 @@ class GestiMouseEvent implements GestiEvent {
     constructor(kit: ImageToolkit) {
         this.kit = kit;
     }
-    disabled: boolean;
+    disabled: boolean = false;
     disable(): void {
-        throw new Error("Method not implemented.");
+       this.disabled=true;
     }
     twoFingers(touches: TouchList): Vector[] {
         return [];

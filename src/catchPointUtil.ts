@@ -16,6 +16,8 @@ class CatchPointUtil{
         const len:number=imageBoxList.length-1;
         for(let i=len;i>=0;i--){
             const item:ImageBox=imageBoxList[i];
+            //隐藏过后不需要检测位置
+            if(item.disabled)continue;
             if(CatchPointUtil.inArea(item.rect,position)){
                 return item;
             }

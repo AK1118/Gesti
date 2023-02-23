@@ -1,6 +1,14 @@
+import GestiControllerImpl from "./controller";
 import ImageToolkit from "./image-toolkit";
-import Save from "./save";
 import XImage from "./ximage";
+
+export interface GestiController {
+    kit:ImageToolkit;
+    down(e: Event): void;
+    up(e: Event): void;
+    move(e: Event): void;
+    wheel(e: Event): void;
+}
 
 export interface createImageOptions {
     data?: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions,
@@ -11,22 +19,17 @@ export interface createImageOptions {
     minScale?: number,
 }
 
-interface GestiController {
-    down(e: Event): void;
-    up(e: Event): void;
-    move(e: Event): void;
-    wheel(e: Event): void;
-}
-
 
 /**
  * 初始化该 @Gesti 实例时，由于平台不确定，用户必须传入 @CanvasRenderingContext2D 画笔作为
  */
 class Gesti {
-    public controller: GestiController;
     private kit: ImageToolkit;
     public static XImage = XImage;
     static debug: boolean = false;
+    get controller():GestiController{
+        return new GestiControllerImpl(this.kit);
+    }
     /*
      * @description 初始化 @Gesti 所代理的画布高宽，在h5端可直接传入 HTMLCanvasElement 自动解析高宽
      * @param @CanvasRenderingContext2D paint 
@@ -50,6 +53,11 @@ class Gesti {
         if (rect)
             this.kit = new ImageToolkit(paint, rect);
     }
+    /**
+     * @description 添加 @XImage 到canvas里面
+     * @param @XImage 
+     * @returns 
+     */
     public async addImage(ximage: XImage | Promise<XImage>): Promise<boolean> {
         if (ximage.constructor.name == 'Promise') {
             const _ximage = await ximage;
@@ -61,6 +69,12 @@ class Gesti {
         this.kit.addImage(_ximage);
         return true;
     }
+    /**
+     * @description 根据传入的image生成一个 @ImageBitmap 实例，拿到图片的宽高数据，创建XImage对象
+     * @param image 
+     * @param options 
+     * @returns Promise< @XImage >
+     */
     public createImage(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions): Promise<XImage> {
         return new Promise(async (r, e) => {
             try {
@@ -85,42 +99,53 @@ class Gesti {
 export default Gesti;
 
 
-const canvas: HTMLCanvasElement = document.querySelector("canvas");
-const g = canvas.getContext("2d");
-const gesti = new Gesti();
-const img: HTMLImageElement = document.querySelector("#dog");
-gesti.init(canvas);
 
-for (let i = 0; i < 2; i++) {
-    gesti.addImage(gesti.createImage(img))
-}
 
-document.getElementById("save").addEventListener("click", () => {
-    // gesti.toBlob().then(e => {
-    //     console.log(e)
-    //     console.log(gesti.createImage(e))
-    //     //gesti.addImage();
-    // });
-    // const save=new Save();
-    const imageData:ImageData=g.getImageData(0,0,canvas.width,canvas.height);
-     const blob=new Blob([imageData.data.buffer],{type:'image/png'});
-    console.log(new File([blob],"测试.png",{type:blob.type}))
-    const link = document.createElement('a');
-//     canvas.toBlob((blobs)=>{
-//             link.href =URL.createObjectURL(blobs);
-//     link.download="canvas图片"+(+new Date());
 
-//    // document.body.appendChild(link);
-//     link.click();
-//     })
-//     link.href = canvas.toDataURL();
-//     link.download="canvas图片"+(+new Date());
 
-//    // document.body.appendChild(link);
-//     link.click();
-    // console.log(blob);
-     //gesti.addImage(gesti.createImage(blob))
-    const base64=canvas.toDataURL('image/png',1.0);
-    const d:HTMLImageElement=document.querySelector("#result");
-    d.src=base64;
-})
+
+// const canvas: HTMLCanvasElement = document.querySelector("canvas");
+// const g = canvas.getContext("2d");
+// const gesti = new Gesti();
+// const img: HTMLImageElement = document.querySelector("#dog");
+// gesti.init(canvas);
+
+// for (let i = 0; i < 2; i++) {
+//     gesti.addImage(gesti.createImage(img))
+// }
+
+// const controller:GestiController=gesti.controller;
+
+
+// window.addEventListener('touchstart',(e)=>{
+//     controller.down(e);
+// })
+// window.addEventListener('touchmove',(e)=>{
+//     controller.move(e);
+// })
+// window.addEventListener('touchend',(e)=>{
+//     controller.up(e);
+// })
+
+// window.addEventListener('mousedown',(e)=>{
+//     controller.down(e);
+// })
+// window.addEventListener('mousemove',(e)=>{
+//     controller.move(e);
+// })
+// window.addEventListener('mouseup',(e)=>{
+//     controller.up(e);
+// })
+// window.addEventListener('wheel',(e)=>{
+//     controller.wheel(e);
+// })
+
+// document.getElementById("save").addEventListener("click", () => {
+//     const imageData:ImageData=g.getImageData(0,0,canvas.width,canvas.height);
+//      const blob=new Blob([imageData.data.buffer],{type:'image/png'});
+//     console.log(new File([blob],"测试.png",{type:blob.type}))
+//     const link = document.createElement('a');
+//     const base64=canvas.toDataURL('image/png',1.0);
+//     const d:HTMLImageElement=document.querySelector("#result");
+//     d.src=base64;
+// })

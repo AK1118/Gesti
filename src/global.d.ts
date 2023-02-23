@@ -1,7 +1,7 @@
 declare const uni: any;
 declare const wx:any;
 declare var document:Document;
-
+declare interface EventHandle{}
 declare interface Size{
     width:number,
     height:number,

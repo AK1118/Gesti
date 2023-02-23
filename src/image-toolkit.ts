@@ -46,7 +46,7 @@ class ImageToolkit {
         this.eventHandler.down(this.down).move(this.move).up(this.up).wheel(this.wheel);
         this.debug(["Event Bind,", this.eventHandler]);
     }
-    private cancelEvent(): void {
+    public cancelEvent(): void {
         if (this.eventHandler == null) return;
         this.eventHandler.disable();
     }
@@ -153,15 +153,6 @@ class ImageToolkit {
         this.imageBoxList.push(imageBox);
         this.update();
     }
-    // public toBlob(params: { x?: number, y?: number, width?: number, height?: number, type?: "image/jpeg" | "image/png" | "image/jpg" }): Promise<Blob> {
-    //     return new Promise(async (r, e) => {
-    //         try {
-    //             const data = this.paint.getImageData(params?.x || 0, params?.y || 0, params?.width || this.canvasRect.size.width, params?.height || this.canvasRect.size.height);
-    //             const blob = new Blob([data.data], { type: params?.type || "image/png" });
-    //             r(blob);
-    //         } catch (_e) { e(_e) }
-    //     });
-    // }
     private debug(message: any): void {
         if (!Gesti.debug) return;
         if (Array.isArray(message))
