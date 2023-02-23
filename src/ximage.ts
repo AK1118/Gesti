@@ -1,3 +1,5 @@
+import { createImageOptions } from "./index";
+
 class XImage{
     data:any;
     width:number=0;

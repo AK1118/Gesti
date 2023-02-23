@@ -1,12 +1,11 @@
 {
   "name": "gesti",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "",
   "main": "dist/index.esm.js",
   "module": "dist/index.amd.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "test": "jest",
     "build": "rollup --config",
     "dev": "webpack-dev-server --mode development"
   },
@@ -17,6 +16,16 @@
       "types": "./dist/types/index.d.ts"
     }
   },
+  "keywords": [
+    "贴纸",
+    "图片贴图",
+    "图片旋转",
+    "图片",
+    "贴图",
+    "图片拖拽缩放",
+    "轻型",
+	  "微信小程序贴纸编辑"
+  ],
   "files": [
     "dist"
   ],

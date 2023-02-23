@@ -89,7 +89,7 @@ class Save{
 	 * @param {string} canvasId
 	 * @param {Object} size
 	 */
-	getImageDataOnUniapp(canvasId:string,size:Size){
+	private getImageDataOnUniapp(canvasId:string,size:Size){
 		const {width,height}=size;
 		return new Promise((resolve,reject)=>{
 			try{

@@ -7,6 +7,7 @@ import ImageBox from "./imageBox";
 import Gesti from "./index";
 import Painter from "./painter";
 import Rect from "./rect";
+import Save from "./save";
 import Vector from "./vector";
 import XImage from "./ximage";
 
@@ -16,13 +17,12 @@ enum EventHandlerState {
     move
 }
 
-
 class ImageToolkit {
     private imageBoxList: Array<ImageBox> = new Array<ImageBox>();
     private eventHandler: GestiEvent;
     private eventHandlerState: EventHandlerState = EventHandlerState.up;
     private drag: Drag = new Drag();
-    private gesture: Gesture=new Gesture();
+    private gesture: Gesture = new Gesture();
     private selectedImageBox: ImageBox = null;
     private isMultiple = false;
     private offset: Vector;
@@ -35,7 +35,7 @@ class ImageToolkit {
             width,
             height
         } = rect;
-        this.offset = new Vector(offsetx||0, offsety||0);
+        this.offset = new Vector(offsetx || 0, offsety || 0);
         this.canvasRect = new Rect(rect);
         this.paint = new Painter(paint);
         this.bindEvent();
@@ -44,14 +44,14 @@ class ImageToolkit {
         this.eventHandler = new GestiEventManager().getEvent(this);
         if (this.eventHandler == null) return;
         this.eventHandler.down(this.down).move(this.move).up(this.up).wheel(this.wheel);
-        this.debug(["Event Bind,",this.eventHandler]);
+        this.debug(["Event Bind,", this.eventHandler]);
     }
     private cancelEvent(): void {
         if (this.eventHandler == null) return;
         this.eventHandler.disable();
     }
     public down(v: GestiEventParams): void {
-        this.debug(["Event Down,",v]);
+        this.debug(["Event Down,", v]);
         this.eventHandlerState = EventHandlerState.down;
         const event: Vector | Vector[] = this.correctEventPosition(v);
         if (this.selectedImageBox ?? false) {
@@ -73,7 +73,7 @@ class ImageToolkit {
         this.update();
     }
     public move(v: GestiEventParams): void {
-        this.debug(["Event Move,",v]);
+        this.debug(["Event Move,", v]);
         if (this.eventHandlerState === EventHandlerState.down) {
             const event: Vector | Vector[] = this.correctEventPosition(v);
             //手势
@@ -88,50 +88,50 @@ class ImageToolkit {
         this.update();
     }
     public up(v: GestiEventParams): void {
-        this.debug(["Event Up,",v]);
+        this.debug(["Event Up,", v]);
         this.eventHandlerState = EventHandlerState.up;
         this.drag.cancel();
-        if(this.selectedImageBox??false){
+        if (this.selectedImageBox ?? false) {
             this.selectedImageBox.onUp(this.paint);
         }
     }
 
-    public wheel(e:WheelEvent): void {
+    public wheel(e: WheelEvent): void {
         const {
-			deltaY
-		} = e;
-		if (this.selectedImageBox != null) {
-			if (deltaY < 0)
-				this.selectedImageBox.enlarge();
-			else this.selectedImageBox.narrow();
-		}
-		this.update();
+            deltaY
+        } = e;
+        if (this.selectedImageBox != null) {
+            if (deltaY < 0)
+                this.selectedImageBox.enlarge();
+            else this.selectedImageBox.narrow();
+        }
+        this.update();
 
     }
     private correctEventPosition(vector: GestiEventParams): Vector | Vector[] {
-        let _vector: Vector[]=new Array<Vector>;
+        let _vector: Vector[] = new Array<Vector>;
         if (Array.isArray(vector)) {
             vector.map((item: Vector) => {
                 _vector.push(item.sub(this.offset));
             });
             return _vector;
         }
-         return vector.sub(this.offset);
+        return vector.sub(this.offset);
     }
     private checkFuncButton(eventPosition: Vector): boolean {
-        const _dragButton:DragButton|boolean=this.selectedImageBox.checkFuncButton(eventPosition);
-        const dragButton:any=_dragButton;
-        if(dragButton.constructor.name=="DragButton"){
-            const button:DragButton=dragButton;
+        const _dragButton: DragButton | boolean = this.selectedImageBox.checkFuncButton(eventPosition);
+        const dragButton: any = _dragButton;
+        if (dragButton.constructor.name == "DragButton") {
+            const button: DragButton = dragButton;
             button.onSelected();
-            this.drag.catchImageBox(button.rect,eventPosition);
+            this.drag.catchImageBox(button.rect, eventPosition);
             return true;
-            
+
         }
         this.selectedImageBox.cancel();
         this.drag.cancel();
         this.gesture.cancel();
-        this.selectedImageBox=null;
+        this.selectedImageBox = null;
         return false;
     }
     private update() {
@@ -153,11 +153,20 @@ class ImageToolkit {
         this.imageBoxList.push(imageBox);
         this.update();
     }
-    private debug(message:any):void{
-        if(!Gesti.debug)return;
-        if(Array.isArray(message))
-        console.warn("Gesti debug: ",...message);
-        else  console.warn("Gesti debug: ",message);
+    // public toBlob(params: { x?: number, y?: number, width?: number, height?: number, type?: "image/jpeg" | "image/png" | "image/jpg" }): Promise<Blob> {
+    //     return new Promise(async (r, e) => {
+    //         try {
+    //             const data = this.paint.getImageData(params?.x || 0, params?.y || 0, params?.width || this.canvasRect.size.width, params?.height || this.canvasRect.size.height);
+    //             const blob = new Blob([data.data], { type: params?.type || "image/png" });
+    //             r(blob);
+    //         } catch (_e) { e(_e) }
+    //     });
+    // }
+    private debug(message: any): void {
+        if (!Gesti.debug) return;
+        if (Array.isArray(message))
+            console.warn("Gesti debug: ", ...message);
+        else console.warn("Gesti debug: ", message);
     }
 }
 export default ImageToolkit;
