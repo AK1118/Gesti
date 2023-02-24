@@ -26,9 +26,11 @@ export interface createImageOptions {
 class Gesti {
     private kit: ImageToolkit;
     public static XImage = XImage;
-    static debug: boolean = false;
     get controller():GestiController{
         return new GestiControllerImpl(this.kit);
+    }
+    set debug(value:boolean){
+        this.kit.isDebug=true;
     }
     /*
      * @description 初始化 @Gesti 所代理的画布高宽，在h5端可直接传入 HTMLCanvasElement 自动解析高宽
@@ -94,51 +96,54 @@ class Gesti {
             }
         });
     }
+    /**
+     * 手动刷新画布
+     */
+    public update(){
+        this.kit.update();
+    }
 }
 
 export default Gesti;
 
 
 
+const canvas: HTMLCanvasElement = document.querySelector("canvas");
+const gesti = new Gesti();
+const img: HTMLImageElement = document.querySelector("#dog");
+gesti.init(canvas);
+gesti.addImage(gesti.createImage(img))
+setTimeout(()=>{
+    gesti.addImage(gesti.createImage(img))
+},100)
+setTimeout(()=>{
+    gesti.addImage(gesti.createImage(img))
+},200)
+const controller:GestiController=gesti.controller;
 
 
+window.addEventListener('touchstart',(e)=>{
+    controller.down(e);
+})
+window.addEventListener('touchmove',(e)=>{
+    controller.move(e);
+})
+window.addEventListener('touchend',(e)=>{
+    controller.up(e);
+})
 
-
-// const canvas: HTMLCanvasElement = document.querySelector("canvas");
-// const g = canvas.getContext("2d");
-// const gesti = new Gesti();
-// const img: HTMLImageElement = document.querySelector("#dog");
-// gesti.init(canvas);
-
-// for (let i = 0; i < 2; i++) {
-//     gesti.addImage(gesti.createImage(img))
-// }
-
-// const controller:GestiController=gesti.controller;
-
-
-// window.addEventListener('touchstart',(e)=>{
-//     controller.down(e);
-// })
-// window.addEventListener('touchmove',(e)=>{
-//     controller.move(e);
-// })
-// window.addEventListener('touchend',(e)=>{
-//     controller.up(e);
-// })
-
-// window.addEventListener('mousedown',(e)=>{
-//     controller.down(e);
-// })
-// window.addEventListener('mousemove',(e)=>{
-//     controller.move(e);
-// })
-// window.addEventListener('mouseup',(e)=>{
-//     controller.up(e);
-// })
-// window.addEventListener('wheel',(e)=>{
-//     controller.wheel(e);
-// })
+window.addEventListener('mousedown',(e)=>{
+    controller.down(e);
+})
+window.addEventListener('mousemove',(e)=>{
+    controller.move(e);
+})
+window.addEventListener('mouseup',(e)=>{
+    controller.up(e);
+})
+window.addEventListener('wheel',(e)=>{
+    controller.wheel(e);
+})
 
 // document.getElementById("save").addEventListener("click", () => {
 //     const imageData:ImageData=g.getImageData(0,0,canvas.width,canvas.height);

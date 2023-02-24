@@ -16,12 +16,41 @@ class ImageBox {
 	/**
 	 * 外层传入的 @XImage 原始数据
 	 */
-	private ximage:XImage;
-	private key: string | number = +new Date();
+	private ximage: XImage;
+	public key: string | number = +new Date();
 	private isMirror: boolean = false;
 	public disabled: boolean = false;
 	public rect: Rect;
-	public beforeRect:Rect;
+	public beforeRect: Rect;
+	private layer: number = 0;
+	/**
+	 * @description 是否冻结锁住，锁住过后无法进行任何操作，除截图外
+	 */
+	private _lock:boolean=false;
+	/**
+	 * @description 锁住
+	 */
+	public lock():void{
+		this._lock=true;
+	}
+	/**
+	 * @description 解锁
+	 */
+	public deblock(){
+		this._lock=false;
+	}
+	/**
+	 * @description 查看是否锁住
+	 */
+	get isLock():boolean{
+		return this._lock;
+	}
+	set setLayer(layer: number) {
+		this.layer = layer;
+	}
+	get getLayer(): number {
+		return this.layer;
+	}
 	set setDragButton(dragButton: DragButton) {
 		this.dragButton = dragButton;
 	}
@@ -30,11 +59,11 @@ class ImageBox {
 	}
 	constructor(image: XImage) {
 		this.image = image.data;
-		this.ximage=image;
+		this.ximage = image;
 		this.rect = new Rect(image.toJson());
-		this.beforeRect=this.rect.copy();
+		this.beforeRect = this.rect.copy();
 	}
-	public update(paint:Painter){
+	public update(paint: Painter) {
 		this.drawImage(paint)
 	}
 	private drawImage(paint: Painter): void {
@@ -61,12 +90,16 @@ class ImageBox {
 		paint.closePath();
 	}
 	private drawStroke(paint: Painter): void {
-		paint.lineWidth = 1;
+		paint.lineWidth = 2;
 		paint.strokeStyle = "#fff";
 		paint.strokeRect(-this.rect.size.width >> 1, -this.rect.size.height >> 1, this.rect.size.width + 1, this.rect.size.height +
 			1);
 		paint.stroke();
 	}
+	/**
+	 * @description 渲染出拖拽按钮以及其他功能点
+	 * @param paint 
+	 */
 	private drawAnchorpoint(paint: Painter): void {
 		const rect: Rect = this.rect;
 		const x: number = rect.position.x,
@@ -79,7 +112,7 @@ class ImageBox {
 			const len = Vector.mag(rect.size.toVector());
 			const newx = Math.cos(this.rect.getAngle + this.dragButton.getOldAngle) * (len >> 1) + x;
 			const newy = Math.sin(this.rect.getAngle + this.dragButton.getOldAngle) * (len >> 1) + y;
-			
+
 			this.dragButton.rect.setPotision(~~newx, ~~newy);
 		}
 		this.dragButton.draw(paint);
@@ -91,13 +124,13 @@ class ImageBox {
 		 */
 		const isSelectDragButton: boolean = CatchPointUtil.checkInsideArc(button.rect.position, eventPosition, button
 			.radius);
-		if(isSelectDragButton)return button;
-		
+		if (isSelectDragButton) return button;
+
 		/**
 		 * 没有选中拖拽按钮判断点击了哪个功能按钮
 		 */
-		const vertexs:Point[]=this.getVertex();
-		const checkPoint = ():number => {
+		const vertexs: Point[] = this.getVertex();
+		const checkPoint = (): number => {
 			const len = vertexs.length;
 			for (let i = 0; i < len; i++) {
 				const point = vertexs[i];
@@ -105,7 +138,7 @@ class ImageBox {
 			}
 			return -1;
 		}
-		const selectedPointNdx:number = checkPoint();
+		const selectedPointNdx: number = checkPoint();
 
 		if (selectedPointNdx == -1) return false;
 		switch (selectedPointNdx) {
@@ -114,19 +147,19 @@ class ImageBox {
 			case 1: {
 				this.hide();
 			}
-			break;
-		case 3: {
-			this.isMirror = !this.isMirror;
-		}
-		break;
+				break;
+			case 3: {
+				this.isMirror = !this.isMirror;
+			}
+				break;
 		}
 		return true;
 		//	const isSelectDragButton:boolean
 	}
-	public hide(){
-		this.disabled=true;
+	public hide() {
+		this.disabled = true;
 	}
-	public getVertex():Point[]{
+	public getVertex(): Point[] {
 		return this.rect.vertex.getPoints();
 	}
 	public onSelected() {
@@ -138,7 +171,7 @@ class ImageBox {
 	public onUp(paint: Painter) {
 		//console.log("up",this.rect.position)
 		/*在抬起鼠标时，ImageBox还没有被Calcel，为再次聚焦万向按钮做刷新数据*/
-		this.dragButton .update(this);
+		this.dragButton.update(this);
 	}
 	public enlarge() {
 		this.scale = 1;
@@ -151,7 +184,7 @@ class ImageBox {
 		this.doScale();
 	}
 	doScale() {
-		this.rect.size.width*= this.scale;
+		this.rect.size.width *= this.scale;
 		this.rect.size.height *= this.scale;
 		/*每次改变大小后都需要刷新按钮的数据*/
 		this.dragButton.update(this);

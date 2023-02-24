@@ -60,12 +60,13 @@ class Rect {
         /**
          * 在设置角度同时，以45度为矫正参考，吸附
          */
-        let _angle=+angle.toFixed(2);
-        this.angle = _angle;
-        const _45=0.78;
-        const limit=0.1;
-        const scale=(this.angle/0.78)>>0;
-        this.angle=Math.abs(_angle-scale*_45)<limit?scale*_45:_angle;
+        // let _angle=+angle.toFixed(2);
+        // this.angle = _angle;
+        // const _45=0.78;
+        // const limit=0.1;
+        // const scale=(this.angle/0.78)>>0;
+        // this.angle=Math.abs(_angle-scale*_45)<limit?scale*_45:_angle;
+        this.angle=angle;
     }
     get getAngle(): number {
         return this.angle;

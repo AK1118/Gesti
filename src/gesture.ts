@@ -1,8 +1,10 @@
 import ImageBox from "./imageBox";
 import Rect from "./rect";
 import Vector from "./vector";
-import XImage from "./ximage";
 
+/**
+ * 该类为手势判断类，需要整改
+ */
 class Gesture{
     private imageBox:ImageBox=null;
     private oldRect:Rect=null;
@@ -14,6 +16,7 @@ class Gesture{
         if(Array.isArray(touches)&&touches.length==2) return true;
         return false; 
     }
+	public onDown():void{}
     public onStart(imageBox:ImageBox,start:Vector[]){
         this.imageBox = imageBox;
 		this.oldRect = this.imageBox.rect.copy();

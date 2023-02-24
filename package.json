@@ -1,6 +1,6 @@
 {
   "name": "gesti",
-  "version": "1.1.2",
+  "version": "1.1.4",
   "description": "一个运行飞快的前端Canvas贴图工具",
   "main": "dist/index.esm.js",
   "module": "dist/index.amd.js",
@@ -24,7 +24,7 @@
     "贴图",
     "图片拖拽缩放",
     "轻型",
-	  "微信小程序贴纸编辑"
+    "微信小程序贴纸编辑"
   ],
   "files": [
     "dist"
@@ -32,7 +32,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/preset-typescript": "^7.18.6",
+    "@babel/preset-typescript": "^7.21.0",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-typescript": "^11.0.0",

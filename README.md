@@ -16,18 +16,30 @@
 
 - [效果图](#效果图)
 - [Gesti](#gesti)
-    - [安装](#安装)
-    - [引入使用](#引入使用)
-    - [初始化](#初始化)
-    - [加入图片](#加入图片)
-- [Gesti\[方法\]](#gesti方法)
-    - [init](#init)
-    - [addImage](#addimage)
-    - [createImage](#createimage)
-- [Gesti\[属性\]](#gesti属性)
-    - [Gesti.debug](#gestidebug)
-    - [Gesti.XImage](#gestiximage)
+		- [安装](#安装)
+		- [引入使用](#引入使用)
+		- [初始化](#初始化)
+		- [加入图片](#加入图片)
+- [API](#api)
+	- [Gesti\[方法\]](#gesti方法)
+			- [init](#init)
+			- [addImage](#addimage)
+			- [createImage](#createimage)
+			- [update](#update)
+	- [Gesti\[属性\]](#gesti属性)
+			- [debug](#debug)
+			- [Gesti.XImage](#gestiximage)
+			- [Gesti.controller](#gesticontroller)
+	- [GestiController](#gesticontroller-1)
+			- [down](#down)
+			- [up](#up)
+			- [move](#move)
+			- [wheel](#wheel)
 - [保存](#保存)
+- [在 微信小程序 | uniapp 端使用](#在-微信小程序--uniapp-端使用)
+- [示例](#示例)
+			- [HTML](#html)
+			- [JavaScript 或 Typescript](#javascript-或-typescript)
 
 
 ### 安装
@@ -49,14 +61,11 @@
 	//image 类型详情请参考API,传入一个 <img>也适用
 	gesti.addImage(gesti.createImage(image));
 
-#API
+# API
 
-# Gesti[方法]
+## Gesti[方法]
 
-### init
-- 初始化 Gesti 时调用，共3个可选参数
-- canvas 和 paint 必须二选一，且没有传入canvas时，必须传入paint 和 rect.
-
+#### init
 
 	init(canvas?: HTMLCanvasElement, paint?: CanvasRenderingContext2D, rect?: {
         x?: number;
@@ -65,33 +74,40 @@
         height: number;
     }): void;
 
-*** 在H5端，推荐您直接传入一个canvas即可***
+- 初始化 Gesti 时调用，共3个可选参数
+- canvas 和 paint 必须二选一，且没有传入canvas时，必须传入paint 和 rect.
 
-### addImage
-- 添加一张图片到canvas里面
+***在H5端，推荐您直接传入一个canvas即可***
 
+#### addImage
 
 	addImage(ximage: XImage | Promise<XImage>): 	Promise<boolean>;
 
-### createImage
-- 传入图片，创建一个XImage,并返回一个Promise<XImage>
+- 添加一张图片到canvas里面
+
+#### createImage
 
 
 	createImage(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions): Promise<XImage>;
 
+- 传入图片，创建一个XImage,并返回一个Promise <XImage>
 
-# Gesti[属性]
 
-### Gesti.debug
+#### update
+
+	update():void;
+
+- 手动刷新画布
+
+## Gesti[属性]
+
+#### debug
+
+	debug:boolean
+
 - 值为true时开启
-
-
-	static debug:boolean
-
-
-### Gesti.XImage
-- 传入到Gesti里面的类型
-
+	
+#### Gesti.XImage
 
 	declare class XImage {
 		data: any;
@@ -109,6 +125,68 @@
 		};
 	}
 
+- 传入到Gesti里面的类型
+
+#### Gesti.controller
+
+	get controller:GestiController;
+
+- 自定义鼠标|手指事件时使用
+- 详情请查看 - [controller](#GestiController)
+
+## GestiController
+
+#### down
+
+	down(e: MouseEvent | Event | EventHandle): void;
+
+- 鼠标|手指点击事件时调用
+
+#### up
+
+	up(e: MouseEvent | Event | EventHandle): void;
+
+- 鼠标|手指抬起事件时调用
+
+#### move
+
+	move(e: MouseEvent | Event | EventHandle): void;
+
+- 鼠标|手指移动事件时调用
+
+#### wheel
+
+	wheel(e: MouseEvent | Event | EventHandle): void;
+
+- 鼠标滚轮事件时调用
+
+
+
 # 保存
 
 - 该库只是为您提供了canvas的代理操作，并没有改变canvas的任何原有API，所以您可以使用canvas自带的API进行存储。
+
+# 在 微信小程序 | uniapp 端使用
+- 微信小程序端我无法监听屏幕事件，但是您可以使用我提供的  [GestiController](#gesticontroller-1)  实现自定义事件。为canvas提供事件并在方法里面调用 [GestiController](#gesticontroller-1) 的各个方法。
+- 如果您的uniapp运行在H5端，那您无需担心任何问题，如果您在其他端，请参考以上微信小程序方案
+
+
+# 示例
+
+***用它，没有多麻烦。***
+
+####  HTML
+
+	<canvas id="canvas" width="300" height="300"></canvas>
+    <img  id="img" src=""/>
+
+#### JavaScript 或 Typescript
+
+	const canvas: HTMLCanvasElement = document.querySelector("canvas");
+	const gesti = new Gesti();
+	const img: HTMLImageElement = document.querySelector("#img");
+	gesti.init(canvas);
+	gesti.addImage(gesti.createImage(img))
+
+
+***不是吗？***

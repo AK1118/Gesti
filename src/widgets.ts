@@ -3,6 +3,7 @@ import Painter from "./painter";
 /*使用Canvas渲染一些小部件*/
 class Widgets {
     /**
+     * @description 拖拽按钮
      * @param {Object} paint
      * @param {Vector} offset
      */
@@ -26,6 +27,11 @@ class Widgets {
         paint.fill();
     }
 
+    /**
+     * @description 镜像翻转
+     * @param paint 
+     * @param offset 
+     */
     public static drawMirror(paint: Painter, offset: Offset): void {
         const scale = .3;
         const {
@@ -52,7 +58,63 @@ class Widgets {
         paint.fill();
     }
 
+
+    /**
+     * @description 删除
+     * @param paint 
+     * @param offset 
+     */
     public static drawClose(paint: Painter, offset: Offset): void {
+        const scale = .7;
+        const {
+            offsetx,
+            offsety
+        } = offset;
+
+        paint.beginPath();
+        paint.strokeStyle = "#c1c1c1";
+        paint.lineWidth = 2;
+        paint.moveTo(0 * scale + offsetx, 0 * scale + offsety);
+        paint.lineTo(10 * scale + offsetx, 10 * scale + offsety);
+        paint.moveTo(10 * scale + offsetx, 0 * scale + offsety);
+        paint.lineTo(0 * scale + offsetx, 10 * scale + offsety);
+        paint.stroke();
+        paint.lineWidth = 1;
+        paint.closePath();
+    }
+
+
+    /**
+     * @description 上锁
+     * @param paint 
+     * @param offset 
+     */
+    public static drawLock(paint: Painter, offset: Offset) {
+        const scale = .7;
+        const {
+            offsetx,
+            offsety
+        } = offset;
+
+        paint.beginPath();
+        paint.strokeStyle = "#c1c1c1";
+        paint.lineWidth = 2;
+        paint.moveTo(0 * scale + offsetx, 0 * scale + offsety);
+        paint.lineTo(10 * scale + offsetx, 10 * scale + offsety);
+        paint.moveTo(10 * scale + offsetx, 0 * scale + offsety);
+        paint.lineTo(0 * scale + offsetx, 10 * scale + offsety);
+        paint.stroke();
+        paint.lineWidth = 1;
+        paint.closePath();
+    }
+
+
+    /**
+     * @description 解锁
+     * @param paint 
+     * @param offset 
+     */
+    public static drawDeLock(paint: Painter, offset: Offset) {
         const scale = .7;
         const {
             offsetx,

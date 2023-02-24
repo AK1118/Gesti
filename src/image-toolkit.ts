@@ -4,10 +4,8 @@ import DragButton from "./dragbutton";
 import GestiEventManager, { GestiEvent } from "./event";
 import Gesture from "./gesture";
 import ImageBox from "./imageBox";
-import Gesti from "./index";
 import Painter from "./painter";
 import Rect from "./rect";
-import Save from "./save";
 import Vector from "./vector";
 import XImage from "./ximage";
 
@@ -28,6 +26,7 @@ class ImageToolkit {
     private offset: Vector;
     private canvasRect: Rect;
     private paint: Painter;
+    public isDebug: boolean = false;
     constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
         const {
             x: offsetx,
@@ -63,14 +62,37 @@ class ImageToolkit {
 
         const selectedImageBox: ImageBox = CatchPointUtil.catchImageBox(this.imageBoxList, event);
         if (selectedImageBox ?? false) {
+            /**
+             * 如果对象属于封锁状态，永远不会被选中
+             */
+            if(selectedImageBox.isLock)return;
+
+            this.debug(["选中了", selectedImageBox]);
             if (!this.isMultiple && (this.selectedImageBox ?? false)) {
                 this.selectedImageBox.cancel();
             }
             this.selectedImageBox = selectedImageBox;
+            this.arrangeLayer(selectedImageBox);
             this.selectedImageBox.onSelected();
             this.drag.catchImageBox(this.selectedImageBox.rect, event);
         }
         this.update();
+    }
+    /**
+     * @description 传入 @ImageBox 对象，设置该对象的layer层级
+     * @param selectedImageBox 
+     */
+    private arrangeLayer(selectedImageBox: ImageBox): void {
+       // selectedImageBox.setLayer = 1;
+        /**
+         * 层级重构算法，使用换位
+         * 如选中了第3个 @ImageBox ，就将第3个和第一个互换位置
+         */
+        const ndx=this.imageBoxList.findIndex((item:ImageBox)=>item.key===selectedImageBox.key);
+        const len=this.imageBoxList.length-1;
+        let temp=this.imageBoxList[len];
+        this.imageBoxList[len]=selectedImageBox;
+        this.imageBoxList[ndx]=temp;
     }
     public move(v: GestiEventParams): void {
         this.debug(["Event Move,", v]);
@@ -94,6 +116,7 @@ class ImageToolkit {
         if (this.selectedImageBox ?? false) {
             this.selectedImageBox.onUp(this.paint);
         }
+        this.update();
     }
 
     public wheel(e: WheelEvent): void {
@@ -134,7 +157,7 @@ class ImageToolkit {
         this.selectedImageBox = null;
         return false;
     }
-    private update() {
+    public update() {
         this.debug("Update the Canvas");
         this.paint.clearRect(0, 0, this.canvasRect.size.width, this.canvasRect.size.height);
         this.imageBoxList.forEach((item: ImageBox) => {
@@ -151,10 +174,12 @@ class ImageToolkit {
         image.y = this.canvasRect.size.height >> 1;
         const imageBox: ImageBox = new ImageBox(image);
         this.imageBoxList.push(imageBox);
-        this.update();
+        setTimeout(() => {
+            this.update();
+        }, 100)
     }
     private debug(message: any): void {
-        if (!Gesti.debug) return;
+        if (!this.isDebug) return;
         if (Array.isArray(message))
             console.warn("Gesti debug: ", ...message);
         else console.warn("Gesti debug: ", message);
