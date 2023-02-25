@@ -53,9 +53,13 @@ class ImageToolkit {
         this.debug(["Event Down,", v]);
         this.eventHandlerState = EventHandlerState.down;
         const event: Vector | Vector[] = this.correctEventPosition(v);
+
+        //手势解析处理
+        this.gesture.onDown(this.selectedImageBox, event);
+
         if (this.selectedImageBox ?? false) {
             if (Array.isArray(event)) {
-                return this.gesture.onStart(this.selectedImageBox, event);
+               return this.gesture.onDown(this.selectedImageBox, event);// return this.gesture.onStart(this.selectedImageBox, event);
             }
             if (this.checkFuncButton(event)) return;
         }
@@ -65,7 +69,7 @@ class ImageToolkit {
             /**
              * 如果对象属于封锁状态，永远不会被选中
              */
-            if(selectedImageBox.isLock)return;
+            if (selectedImageBox.isLock) return;
 
             this.debug(["选中了", selectedImageBox]);
             if (!this.isMultiple && (this.selectedImageBox ?? false)) {
@@ -83,21 +87,23 @@ class ImageToolkit {
      * @param selectedImageBox 
      */
     private arrangeLayer(selectedImageBox: ImageBox): void {
-       // selectedImageBox.setLayer = 1;
+        // selectedImageBox.setLayer = 1;
         /**
          * 层级重构算法，使用换位
          * 如选中了第3个 @ImageBox ，就将第3个和第一个互换位置
          */
-        const ndx=this.imageBoxList.findIndex((item:ImageBox)=>item.key===selectedImageBox.key);
-        const len=this.imageBoxList.length-1;
-        let temp=this.imageBoxList[len];
-        this.imageBoxList[len]=selectedImageBox;
-        this.imageBoxList[ndx]=temp;
+        const ndx = this.imageBoxList.findIndex((item: ImageBox) => item.key === selectedImageBox.key);
+        const len = this.imageBoxList.length - 1;
+        let temp = this.imageBoxList[len];
+        this.imageBoxList[len] = selectedImageBox;
+        this.imageBoxList[ndx] = temp;
     }
     public move(v: GestiEventParams): void {
         this.debug(["Event Move,", v]);
         if (this.eventHandlerState === EventHandlerState.down) {
             const event: Vector | Vector[] = this.correctEventPosition(v);
+            //手势解析处理
+            this.gesture.onMove(this.selectedImageBox, event);
             //手势
             if (Array.isArray(event)) {
                 this.gesture.update(event);
@@ -111,7 +117,10 @@ class ImageToolkit {
     }
     public up(v: GestiEventParams): void {
         this.debug(["Event Up,", v]);
+        const event: Vector | Vector[] = this.correctEventPosition(v);
         this.eventHandlerState = EventHandlerState.up;
+        //手势解析处理
+        this.gesture.onUp(this.selectedImageBox,event);
         this.drag.cancel();
         if (this.selectedImageBox ?? false) {
             this.selectedImageBox.onUp(this.paint);
