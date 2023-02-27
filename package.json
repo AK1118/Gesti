@@ -9,6 +9,10 @@
     "build": "rollup --config",
     "dev": "webpack-dev-server --mode development"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AK1118/Gesti"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.esm.js",
