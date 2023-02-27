@@ -108,42 +108,42 @@ export default Gesti;
 
 
 
-const canvas: HTMLCanvasElement = document.querySelector("canvas");
-const gesti = new Gesti();
-const img: HTMLImageElement = document.querySelector("#dog");
-gesti.init(canvas);
-gesti.addImage(gesti.createImage(img))
-setTimeout(()=>{
-    gesti.addImage(gesti.createImage(img))
-},100)
-setTimeout(()=>{
-    gesti.addImage(gesti.createImage(img))
-},200)
-const controller:GestiController=gesti.controller;
+// const canvas: HTMLCanvasElement = document.querySelector("canvas");
+// const gesti = new Gesti();
+// const img: HTMLImageElement = document.querySelector("#dog");
+// gesti.init(canvas);
+// gesti.addImage(gesti.createImage(img))
+// setTimeout(()=>{
+//     gesti.addImage(gesti.createImage(img))
+// },100)
+// setTimeout(()=>{
+//     gesti.addImage(gesti.createImage(img))
+// },200)
+// const controller:GestiController=gesti.controller;
 
 
-window.addEventListener('touchstart',(e)=>{
-    controller.down(e);
-})
-window.addEventListener('touchmove',(e)=>{
-    controller.move(e);
-})
-window.addEventListener('touchend',(e)=>{
-    controller.up(e);
-})
+// window.addEventListener('touchstart',(e)=>{
+//     controller.down(e);
+// })
+// window.addEventListener('touchmove',(e)=>{
+//     controller.move(e);
+// })
+// window.addEventListener('touchend',(e)=>{
+//     controller.up(e);
+// })
 
-window.addEventListener('mousedown',(e)=>{
-    controller.down(e);
-})
-window.addEventListener('mousemove',(e)=>{
-    controller.move(e);
-})
-window.addEventListener('mouseup',(e)=>{
-    controller.up(e);
-})
-window.addEventListener('wheel',(e)=>{
-    controller.wheel(e);
-})
+// window.addEventListener('mousedown',(e)=>{
+//     controller.down(e);
+// })
+// window.addEventListener('mousemove',(e)=>{
+//     controller.move(e);
+// })
+// window.addEventListener('mouseup',(e)=>{
+//     controller.up(e);
+// })
+// window.addEventListener('wheel',(e)=>{
+//     controller.wheel(e);
+// })
 
 // document.getElementById("save").addEventListener("click", () => {
 //     const imageData:ImageData=g.getImageData(0,0,canvas.width,canvas.height);

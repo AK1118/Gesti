@@ -140,19 +140,7 @@ class Gesture{
 	private onDbClick(imageBox:ImageBox,start:Vector|Vector[]):void{
 		
 	}
-    // public onStart(imageBox:ImageBox,start:Vector[]){
-    //     this.imageBox = imageBox;
-	// 	this.oldRect = this.imageBox.rect.copy();
-	// 	this.start = start;
-	// 	/**
-	// 	 * 解构得到两个 @Vector ,算出它们的距离，并赋值给 @oldDist
-	// 	 */
-	// 	const [a, b] = this.start;
-	// 	this.oldDist = Vector.dist(a, b);
-	// 	const v = Vector.sub(a, b);
-	// 	this.oldAngle = Math.atan2(v.y, v.x) - this.imageBox.rect.getAngle;
-    // }
-    public cancel(){
+    public cancel(): void{
 		if(this.operate==null)return;
 		this.operate.cancel();
     }
