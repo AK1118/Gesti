@@ -73,6 +73,9 @@ class Vector{
 	static sub(v1:Vector, v2:Vector) {
 		return new Vector(v1.x - v2.x, v1.y - v2.y);
 	}
+	static add(v1:Vector, v2:Vector) {
+		return new Vector(v1.x + v2.x, v1.y + v2.y);
+	}
 }
 
 export default Vector;

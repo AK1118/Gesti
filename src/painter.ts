@@ -1,7 +1,7 @@
 /*
 	使用代理模式重写Painter，兼容原生Painter
 */
- class Painter {
+ class Painter implements Painter{
     paint:CanvasRenderingContext2D=null;
 	constructor(paint:CanvasRenderingContext2D) {
 		this.paint = paint;

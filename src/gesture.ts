@@ -54,6 +54,10 @@ class TwoFingerOperate implements Operate{
 
 
 /**
+ * 添加点击事件时触发
+ */
+type listenCallback=(imageBox:ImageBox,position:Vector|Vector[])=>void;
+/**
  * 该类为手势判断类
  * 点击
  * 抬起
@@ -62,6 +66,7 @@ class TwoFingerOperate implements Operate{
  * 长按
  * 
  * ！！！ 双击和长按等手势只支持单指
+ * ！！！待优化，单击和双击存在竞争问题
  */
 class Gesture{
 	//判断长按事件，间隔时长
@@ -78,6 +83,10 @@ class Gesture{
 	private pressVector:Vector;
 	//抬起屏幕的坐标
 	private upVector:Vector;
+	private clickEventList:Array<listenCallback>=new Array<listenCallback>();
+	private dbclickEventList:Array<listenCallback>=new Array<listenCallback>();
+	private longpressEventList:Array<listenCallback>=new Array<listenCallback>();
+	private twoTouchEventList:Array<listenCallback>=new Array<listenCallback>();
 	private operate:Operate=null;
     private isTwoFingers(touches:Vector|Vector[]):boolean{
         if(Array.isArray(touches)&&touches.length==2) return true;
@@ -94,6 +103,8 @@ class Gesture{
 			this.onLonePress(imageBox,position);
 		}else if(this.isDbClick){
 			this.onDbClick(imageBox,position);
+		}else{
+			this.onClick(imageBox,position);
 		}
 		
 	}
@@ -125,20 +136,43 @@ class Gesture{
 	 * @param imageBox 
 	 * @param start 
 	 */
-	private onTwoFingers(imageBox:ImageBox,start:Vector|Vector[]){
+	private onTwoFingers(imageBox:ImageBox,position:Vector|Vector[]){
 		this.operate=new TwoFingerOperate();
-		this.operate.onStart(imageBox,start);
+		this.operate.onStart(imageBox,position);
+		this.twoTouchEventList.forEach((listenCallback:listenCallback)=>{
+			listenCallback(imageBox,position);
+		})
 	}
 	/**
 	 * @description 长按操作
 	 * @param imageBox 
 	 * @param start 
 	 */
-	private onLonePress(imageBox:ImageBox,start:Vector|Vector[]){
-
+	private onLonePress(imageBox:ImageBox,position:Vector|Vector[]){
+		this.longpressEventList.forEach((listenCallback:listenCallback)=>{
+			listenCallback(imageBox,position);
+		})
 	}
-	private onDbClick(imageBox:ImageBox,start:Vector|Vector[]):void{
-		
+	private onDbClick(imageBox:ImageBox,position:Vector|Vector[]):void{
+		this.dbclickEventList.forEach((listenCallback:listenCallback)=>{
+			listenCallback(imageBox,position);
+		})
+	}
+	private onClick(imageBox:ImageBox,position:Vector|Vector[]){
+		this.clickEventList.forEach((listenCallback:listenCallback)=>{
+			listenCallback(imageBox,position);
+		})
+	}
+	/**
+	 * @description 添加监听事件
+	 * @param gestiType 
+	 * @param listenCallback 
+	 */
+	public addListenGesti(gestiType:"click"|"longpress"|"dbclick"|'twotouch',listenCallback:listenCallback){
+		if(gestiType==='click')this.clickEventList.push(listenCallback);
+		if(gestiType==='longpress')this.longpressEventList.push(listenCallback);
+		if(gestiType==='dbclick')this.dbclickEventList.push(listenCallback);
+		if(gestiType==="twotouch")this.twoTouchEventList.push(listenCallback);
 	}
     public cancel(): void{
 		if(this.operate==null)return;

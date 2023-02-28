@@ -41,6 +41,7 @@ declare class Vector {
     static dist(v1: Vector, v2: Vector): number;
     static mag(v: Vector): number;
     static sub(v1: Vector, v2: Vector): Vector;
+    static add(v1: Vector, v2: Vector): Vector;
 }
 
 declare interface GestiEventParams{v:Vector|Vector[],sub(v:Vector):Vector}

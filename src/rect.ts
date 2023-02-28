@@ -28,8 +28,13 @@ class Rect {
     public vertex: Vertex;
     public position: Vector;
     public size: Size;
-    constructor(params: rectparams) {
-        const { width, height, x, y } = params;
+    constructor(params?: rectparams) {
+        const { width, height, x, y } = params||{
+            x:0,
+            y:0,
+            width:0,
+            height:0,
+        };
         this.size = new Size(width, height);
         this.position = new Vector(x || 0, y || 0);
     }
