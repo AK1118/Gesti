@@ -26,7 +26,30 @@ class Widgets {
         paint.closePath();
         paint.fill();
     }
-
+    /**
+         * @description 拖拽按钮
+         * @param {Object} paint
+         * @param {Vector} offset
+         */
+    public static drawRotate(paint: Painter, offset: Offset): void {
+        const scale = .08;
+        paint.lineWidth=2;
+        const {
+            offsetx,
+            offsety
+        } = offset;
+        // 填充三角形
+        paint.beginPath();
+        paint.fillStyle = "#c1c1c1";
+        paint.arc(offsetx,offsety,4,0,Math.PI*.6);
+        paint.stroke();
+        paint.closePath();
+        paint.beginPath();
+        paint.fillStyle = "#c1c1c1";
+        paint.arc(offsetx,offsety,4,Math.PI,Math.PI*1.6);
+        paint.stroke();
+        paint.closePath();
+    }
     /**
      * @description 镜像翻转
      * @param paint 
@@ -79,7 +102,7 @@ class Widgets {
         paint.moveTo(10 * scale + offsetx, 0 * scale + offsety);
         paint.lineTo(0 * scale + offsetx, 10 * scale + offsety);
         paint.stroke();
-        paint.lineWidth = 1;
+        
         paint.closePath();
     }
 
@@ -98,10 +121,10 @@ class Widgets {
 
         paint.beginPath();
         paint.strokeStyle = "#c1c1c1";
-        paint.lineWidth = 1;
-        paint.arc(5+offsetx,offsety+3,3,Math.PI,0);
-        paint.strokeRect(offsetx,offsety+4,10,6);
-        paint.strokeRect(offsetx+4,offsety+6,2,2);
+        paint.lineWidth = 1.5;
+        paint.arc(5 + offsetx, offsety + 3, 3, Math.PI, 0);
+        paint.strokeRect(offsetx, offsety + 4, 10, 6);
+        paint.strokeRect(offsetx + 4, offsety + 6, 2, 2);
         paint.stroke();
         paint.closePath();
     }
@@ -118,13 +141,12 @@ class Widgets {
             offsetx,
             offsety
         } = offset;
-
         paint.beginPath();
         paint.strokeStyle = "#c1c1c1";
-        paint.lineWidth = 1;
-        paint.arc(5+offsetx,offsety+2,3,Math.PI,0);
-        paint.strokeRect(offsetx,offsety+6,10,6);
-        paint.strokeRect(offsetx+4,offsety+7,2,2);
+        paint.lineWidth = 1.5;
+        paint.arc(5 + offsetx, offsety + 2, 3, Math.PI, 0);
+        paint.strokeRect(offsetx, offsety + 6, 10, 6);
+        paint.strokeRect(offsetx + 4, offsety + 7, 2, 2);
         paint.stroke();
         paint.closePath();
     }

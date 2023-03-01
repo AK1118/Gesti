@@ -115,6 +115,9 @@ gesti.init(canvas);
 gesti.addImage(gesti.createImage(img,{
     scale:.5,
 }))
+gesti.addImage(gesti.createImage(img,{
+    scale:.5,
+}))
 // const controller:GestiController=gesti.controller;
 
 

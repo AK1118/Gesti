@@ -1,3 +1,4 @@
+import CatchPointUtil from "./catchPointUtil";
 import { FuncButtonTrigger } from "./enums";
 import ImageBox from "./imageBox";
 import Painter from "./painter";
@@ -17,6 +18,7 @@ export interface RenderObject {
     onSelected(): void;
     //相对坐标，相对于画布在translate
     relativeRect: Rect;
+    disabled:boolean;
 }
 
 //按钮抽象类
@@ -24,12 +26,23 @@ export abstract class Button implements RenderObject {
     constructor(master:ImageBox){
         this.master=master;
     }
+    //隐藏
+    disabled: boolean=false;
     rect: Rect=new Rect();
     key: string | number;
     relativeRect: Rect=new Rect();
     master: ImageBox;
     radius: number=10;
     oldAngle: number;
+    //是否能被锁住
+    private canBeeLocking:boolean=true;
+    //能被锁住就不是自由的
+    get isFree():boolean{
+        return !this.canBeeLocking;
+    }
+    set free(canBeeLocking:boolean){
+        this.canBeeLocking=!canBeeLocking;
+    }
     public init(percentage:[x:number,y:number]){
         this.setRelativePosition(percentage);
         this.setAbsolutePosition();
@@ -37,7 +50,7 @@ export abstract class Button implements RenderObject {
     }
     abstract trigger:FuncButtonTrigger
     abstract setMaster(master: RenderObject): void;
-    abstract effect(): void;
+    abstract effect(rect?:Rect): void;
     abstract updatePosition(vector: Vector): void;
     abstract draw(paint: Painter): void;
     abstract update(paint: Painter): void;
@@ -50,7 +63,12 @@ export abstract class Button implements RenderObject {
     }
     public setAbsolutePosition(vector?:Vector){
         this.rect.position=vector||this.getAbsolutePosition;
-    } 
+    }
+    public isInArea(event:Vector):boolean{
+        if(this.master.isLock&&this.canBeeLocking)return false;
+        return CatchPointUtil.checkInsideArc(this.rect.position, event, this
+            .radius);
+    }
     /**
      * @description
      * @param percentage ,占比值，四个点坐标

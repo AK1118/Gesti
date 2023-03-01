@@ -1,6 +1,8 @@
-import { MirrorButton } from "./buttons";
+import { CloseButton, MirrorButton, RotateButton } from "./buttons";
+import DelockButton from "./buttons/delockButton";
+import DragButton from "./buttons/dragbutton";
+import LockButton from "./buttons/lockbutton";
 import CatchPointUtil from "./catchPointUtil";
-import DragButton from "./dragbutton";
 import { Button, RenderObject } from "./interfaces";
 import Painter from "./painter";
 import Rect from "./rect";
@@ -10,7 +12,6 @@ import XImage from "./ximage";
 class ImageBox implements RenderObject {
 	public selected: boolean = false;
 	private scale: number = 1;
-	private dragButton: DragButton;
 	/**
 	 * 提供 @CanvasRenderingContext2D 渲染的数据
 	 */
@@ -32,10 +33,13 @@ class ImageBox implements RenderObject {
 		this.ximage = image;
 		this.rect = new Rect(image.toJson());
 		this.beforeRect = this.rect.copy();
-		this.dragButton = new DragButton(this);
 		this.funcButton = [
 			new DragButton(this),
 			new MirrorButton(this),
+			new CloseButton(this),
+			new RotateButton(this),
+			new LockButton(this),
+			new DelockButton(this),
 		];
 		this.relativeRect = new Rect({
 			x: 0,
@@ -55,12 +59,14 @@ class ImageBox implements RenderObject {
 	 */
 	public lock(): void {
 		this._lock = true;
+		this.onLock();
 	}
 	/**
 	 * @description 解锁
 	 */
 	public deblock() {
 		this._lock = false;
+		this.onDelock();
 	}
 	/**
 	 * @description 查看是否锁住
@@ -74,12 +80,6 @@ class ImageBox implements RenderObject {
 	get getLayer(): number {
 		return this.layer;
 	}
-	set setDragButton(dragButton: DragButton) {
-		this.dragButton = dragButton;
-	}
-	get getDragButton(): DragButton {
-		return this.dragButton;
-	}
 	public mirror() {
 		this.isMirror = !this.isMirror;
 	}
@@ -91,6 +91,20 @@ class ImageBox implements RenderObject {
 	}
 	onSelect(): void {
 
+	}
+	//当被锁定时触发
+	private onLock(){
+		//锁定时，自由的按钮不会消失,反之会显示
+		this.funcButton.forEach((button: Button) => {
+			button.disabled=!button.isFree;
+		});
+	}
+	//解锁时触发
+	private onDelock(){
+		//解锁时，自由的按钮消失,反之会显示
+		this.funcButton.forEach((button: Button) => {
+			button.disabled=button.isFree;
+		});
 	}
 	private drawImage(paint: Painter): void {
 		paint.beginPath();
@@ -127,28 +141,21 @@ class ImageBox implements RenderObject {
 	 * @param paint 
 	 */
 	private updateFuncButton(paint: Painter): void {
-
-
-
 		const rect: Rect = this.rect;
 		const x: number = rect.position.x,
 			y: number = rect.position.y;
 
-		if (this.selected) {
 			const len = Vector.mag(rect.size.toVector());
 			this.funcButton.forEach((button: Button) => {
-				const angle=this.rect.getAngle+button.oldAngle;
-				const newx = Math.cos(angle) * (len >> 1)+x;
-				const newy = Math.sin(angle) * (len >> 1)+y;
+				if(button.disabled)return;
+				const angle = this.rect.getAngle + button.oldAngle;
+				const newx = Math.cos(angle) * (len >> 1) + x;
+				const newy = Math.sin(angle) * (len >> 1) + y;
 				const vector = new Vector(~~newx, ~~newy);
+				if(this.isLock&&(!button.isFree)){}
 				button.updatePosition(vector);
 				button.update(paint);
-				//paint.fillRect(newx-this.rect.position.x,newy-this.rect.position.y,button.radius,10)
 			});
-
-			//this.dragButton.updatePosition(vector);
-		}
-		//this.dragButton.update(paint);
 	}
 	/**
 	 * @description
@@ -165,62 +172,9 @@ class ImageBox implements RenderObject {
 		 * 遍历功能键
 		 */
 		const button: Button = this.funcButton.find((button: Button) => {
-		//	console.log(button.rect.position, eventPosition, this.rect.position);
-			return CatchPointUtil.checkInsideArc(button.rect.position, eventPosition, button
-				.radius);
+			return button.isInArea(eventPosition);
 		});
-		console.log("拿到对象",button);
-		if (button) {
-			return button;
-		}
-		return false;
-		// const button: DragButton = this.dragButton;
-		// /**
-		//  * 选中拖拽按钮直接返回拖拽按钮
-		//  */
-		// const isSelectDragButton: boolean = CatchPointUtil.checkInsideArc(button.rect.position, eventPosition, button
-		// 	.radius);
-
-		// //在被锁定时，
-		// if (isSelectDragButton && !this.isLock) return button;
-
-		// /**
-		//  * 没有选中拖拽按钮判断点击了哪个功能按钮
-		//  */
-		// const vertexs: Point[] = this.getVertex();
-		// const checkPoint = (): number => {
-		// 	const len = vertexs.length;
-		// 	for (let i = 0; i < len; i++) {
-		// 		const point = vertexs[i];
-		// 		if (CatchPointUtil.checkInsideArc(point, eventPosition, button.radius)) return i;
-		// 	}
-		// 	return -1;
-		// }
-		// const selectedPointNdx: number = checkPoint();
-
-		// if (selectedPointNdx == -1) return false;
-
-
-		// switch (selectedPointNdx) {
-		// 	case 0:
-		// 		break;
-		// 	case 1: {
-		// 		//隐藏，没有删除
-		// 		this.hide();
-		// 	}
-		// 		break;
-		// 	case 2: {
-		// 		//解锁
-		// 		this.deblock();
-		// 	}; break;
-		// 	case 3: {
-		// 		//镜像反转
-		// 		this.isMirror = !this.isMirror;
-		// 	}
-		// 		break;
-		// }
-		// return true;
-		//	const isSelectDragButton:boolean
+		return button;
 	}
 	public hide() {
 		this.disabled = true;
@@ -250,13 +204,14 @@ class ImageBox implements RenderObject {
 		this.doScale();
 	}
 	doScale() {
+		if(this.isLock)return;
 		this.rect.size.width *= this.scale;
 		this.rect.size.height *= this.scale;
 		this.onChanged();
 	}
 	/*每次改变大小后都需要刷新按钮的数据*/
 	public onChanged() {
-		this.funcButton.forEach((item:Button)=>{
+		this.funcButton.forEach((item: Button) => {
 			item.setMaster(this);
 		})
 	}

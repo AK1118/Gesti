@@ -1,6 +1,5 @@
 import CatchPointUtil from "./catchPointUtil";
 import Drag from "./drag";
-import DragButton from "./dragbutton";
 import { FuncButtonTrigger } from "./enums";
 import GestiEventManager, { GestiEvent } from "./event";
 import Gesture from "./gesture";
@@ -55,7 +54,7 @@ class ImageToolkit {
      */
     public addListening():void{
         this.gesture.addListenGesti("click",(imageBox:ImageBox,position:Vector)=>{
-           // console.log("点击",position);
+          //  console.log("点击",imageBox);
         });
         this.gesture.addListenGesti("dbclick",(imageBox:ImageBox,position:Vector)=>{
           //  console.log("双击",position);
@@ -123,7 +122,6 @@ class ImageToolkit {
         this.update();
     }
     public up(v: GestiEventParams): void {
-        console.log("抬起")
         this.debug(["Event Up,", v]);
         const event: Vector | Vector[] = this.correctEventPosition(v);
         this.eventHandlerState = EventHandlerState.up;
@@ -181,11 +179,10 @@ class ImageToolkit {
         //确保是按钮
         if(result instanceof Button){
             const button:Button=result;
-            if(button.trigger=FuncButtonTrigger.drag){
+            if(button.trigger==FuncButtonTrigger.drag){
                 button.onSelected();
                 this.drag.catchImageBox(button.rect, eventPosition);
-                
-            }else  if(button.trigger=FuncButtonTrigger.click){
+            }else  if(button.trigger==FuncButtonTrigger.click){
                 button.effect();
             }
             return true;
