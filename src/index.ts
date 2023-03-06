@@ -108,16 +108,18 @@ export default Gesti;
 
 
 
-const canvas: HTMLCanvasElement = document.querySelector("canvas");
-const gesti = new Gesti();
-const img: HTMLImageElement = document.querySelector("#dog");
-gesti.init(canvas);
-gesti.addImage(gesti.createImage(img,{
-    scale:.5,
-}))
-gesti.addImage(gesti.createImage(img,{
-    scale:.5,
-}))
+// const canvas: HTMLCanvasElement = document.querySelector("canvas");
+// const gesti = new Gesti();
+// const img: HTMLImageElement = document.querySelector("#dog");
+// gesti.init(canvas);
+// gesti.addImage(gesti.createImage(img,{
+//     scale:.5,
+// }))
+// gesti.addImage(gesti.createImage(img,{
+//     scale:.5,
+//     width:90,
+//     height:90,
+// }))
 // const controller:GestiController=gesti.controller;
 
 

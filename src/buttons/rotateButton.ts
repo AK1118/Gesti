@@ -91,6 +91,7 @@ class RotateButton extends Button {
                 offsetx: 0 ,
                 offsety: halfHeight*2+10
             });
+
     }
 }
 

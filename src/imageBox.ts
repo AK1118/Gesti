@@ -93,17 +93,17 @@ class ImageBox implements RenderObject {
 
 	}
 	//当被锁定时触发
-	private onLock(){
+	private onLock() {
 		//锁定时，自由的按钮不会消失,反之会显示
 		this.funcButton.forEach((button: Button) => {
-			button.disabled=!button.isFree;
+			button.disabled = !button.isFree;
 		});
 	}
 	//解锁时触发
-	private onDelock(){
+	private onDelock() {
 		//解锁时，自由的按钮消失,反之会显示
 		this.funcButton.forEach((button: Button) => {
-			button.disabled=button.isFree;
+			button.disabled = button.isFree;
 		});
 	}
 	private drawImage(paint: Painter): void {
@@ -145,17 +145,25 @@ class ImageBox implements RenderObject {
 		const x: number = rect.position.x,
 			y: number = rect.position.y;
 
-			const len = Vector.mag(rect.size.toVector());
-			this.funcButton.forEach((button: Button) => {
-				if(button.disabled)return;
-				const angle = this.rect.getAngle + button.oldAngle;
+		const len = Vector.mag(rect.size.toVector());
+		this.funcButton.forEach((button: Button) => {
+			if (button.disabled) return;
+			const angle = this.rect.getAngle + button.oldAngle;
+			const newx = Math.cos(angle) * (len >> 1) + x;
+			const newy = Math.sin(angle) * (len >> 1) + y;
+			const vector = new Vector(~~newx, ~~newy);
+			// if (this.isLock && (!button.isFree)) { }
+			button.updatePosition(vector);
+			button.update(paint);
+			paint.fillStyle = "red";
+
+			{
+				const angle = this.rect.getAngle - button.oldAngle;
 				const newx = Math.cos(angle) * (len >> 1) + x;
 				const newy = Math.sin(angle) * (len >> 1) + y;
-				const vector = new Vector(~~newx, ~~newy);
-				if(this.isLock&&(!button.isFree)){}
-				button.updatePosition(vector);
-				button.update(paint);
-			});
+				paint.fillRect(button.rect.position.x - newx, button.rect.position.y - newy, 2, 2)
+			}
+		});
 	}
 	/**
 	 * @description
@@ -204,7 +212,7 @@ class ImageBox implements RenderObject {
 		this.doScale();
 	}
 	doScale() {
-		if(this.isLock)return;
+		if (this.isLock) return;
 		this.rect.size.width *= this.scale;
 		this.rect.size.height *= this.scale;
 		this.onChanged();
