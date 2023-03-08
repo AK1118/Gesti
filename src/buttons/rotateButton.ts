@@ -1,6 +1,6 @@
 import { FuncButtonTrigger } from "../enums";
 import ImageBox from "../imageBox";
-import { Button } from "../interfaces";
+import Button from "../base/button";
 import Painter from "../painter";
 import Rect from "../rect";
 import Vector from "../vector";
@@ -20,7 +20,7 @@ class RotateButton extends Button {
     constructor(master: ImageBox) {
         super(master);
         this.init({
-            percentage:[0,.8]
+            percentage: [0, .8]
         });
         this.initScale();
         this.rect.onDrag = (newRect: Rect) => {
@@ -42,7 +42,7 @@ class RotateButton extends Button {
     private initScale() {
         this.oldRadius = Vector.mag(this.relativeRect.position);
     }
-    effect(newRect:Rect): void {
+    effect(newRect: Rect): void {
 
         /**
          * @param {ImageRect} newRect 新的万向点Rect三个月还有
@@ -51,9 +51,15 @@ class RotateButton extends Button {
         const oldRect = this.oldImageBoxRect;
         const offsetx = newRect.position.x - oldRect.position.x,
             offsety = newRect.position.y - oldRect.position.y;
-        /*等比例缩放*/
-        const scale = Vector.mag(new Vector(offsetx, offsety)) / this.oldRadius;
-        const angle = Math.atan2(offsety, offsetx) - this.oldAngle;
+        let angle = Math.atan2(offsety, offsetx) - this.oldAngle;
+        //辅助旋转
+        {
+            let _angle = +angle.toFixed(2);
+            const _45 = 0.78;
+            const limit = 0.1;
+            const scale = (angle / 0.78) >> 0;
+            angle = Math.abs(_angle - scale * _45) < limit ? scale * _45 : _angle;
+        }
         this.master.rect.setAngle(angle);
     }
     public get getOldAngle(): number {
@@ -73,7 +79,7 @@ class RotateButton extends Button {
         this.disable = false;
     }
     draw(paint: Painter) {
-        
+
         if (this.disable) return;
         const {
             width,
@@ -84,16 +90,16 @@ class RotateButton extends Button {
         const halfWidth = width >> 1,
             halfHeight = height >> 1;
 
-            paint.beginPath();
-            paint.fillStyle = "#fff";
-            paint.arc(this.relativeRect.position.x, this.relativeRect.position.y, 10, 0, Math.PI * 2);
-            paint.closePath();
-            paint.fill();
-            Widgets.drawRotate(paint, {
-                offsetx: this.relativeRect.position.x ,
-                offsety: this.relativeRect.position.y,
-            });
-           // paint.fillRect(this.rect.position.x-this.master.rect.position.x,this.rect.position.y-this.master.rect.position.y,10,10);
+        paint.beginPath();
+        paint.fillStyle = "#fff";
+        paint.arc(this.relativeRect.position.x, this.relativeRect.position.y, 10, 0, Math.PI * 2);
+        paint.closePath();
+        paint.fill();
+        Widgets.drawRotate(paint, {
+            offsetx: this.relativeRect.position.x,
+            offsety: this.relativeRect.position.y,
+        });
+        // paint.fillRect(this.rect.position.x-this.master.rect.position.x,this.rect.position.y-this.master.rect.position.y,10,10);
     }
 }
 

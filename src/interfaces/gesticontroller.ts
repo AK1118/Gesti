@@ -1,11 +1,104 @@
-import ImageToolkit from "../image-toolkit";
 
-interface GestiController {
-    kit:ImageToolkit;
-    down(e: Event): void;
-    up(e: Event): void;
-    move(e: Event): void;
-    wheel(e: Event): void;
+
+//图层控制器
+interface LayerController{
+    /**
+     * 图层向下移动一位
+     */
+    layerLower():void;
+    /**
+     * 图层向上移动一位
+     */
+    layerRise():void;
+    /**
+     * 置于最顶层
+     */
+    layerTop():void;
+    /**
+     * 置于最底层
+     */
+    layerBottom():void;
+    /**
+     * 解锁图层
+     */
+    deLock():void;
+    /**
+     * 锁定图层
+     */
+    lock():void;
+}
+
+//画布控制器
+interface ImageToolKitController{
+    /**
+     * 回退操作
+     */
+    fallback():void;
+    /**
+     * 取消刚刚的回退
+     */
+    cancelFallback():void;
+    /**
+     * 刷新画布
+     */
+    update():void;
+}
+/**
+ * 控制器类，提供接口供给用户使用
+ */
+interface GestiController extends LayerController,ImageToolKitController{
+    /**
+     * @description 鼠标/手指按下时调用
+     * @param e 
+     */
+     down(e: Event): void;
+      /**
+     * @description 鼠标/手指抬起时调用
+     * @param e 
+     */
+     up(e: Event): void;
+      /**
+     * @description 鼠标/手指移动时调用
+     * @param e 
+     */
+     move(e: Event): void;
+      /**
+     * @description 鼠标滚轮时调用
+     * @param e 
+     */
+     wheel(e: Event): void;
+     /**
+      * 取消原有事件控制权
+      * 值得注意: 当调用该方法后，画布所有的手势监听都会消失。也就是说您不能再点击选取画布，除非您主动调用控制器的down/up/move/wheel方法恢复功能。
+      * 栗子：
+      * 
+      *     window.addEventListener('touchstart',(e)=>{
+                controller.down(e);
+            })
+            window.addEventListener('touchmove',(e)=>{
+                controller.move(e);
+            })
+            window.addEventListener('touchend',(e)=>{
+                controller.up(e);
+            })
+            
+            //根据您的需求添加
+
+            window.addEventListener('mousedown',(e)=>{
+                controller.down(e);
+            })
+            window.addEventListener('mousemove',(e)=>{
+                controller.move(e);
+            })
+            window.addEventListener('mouseup',(e)=>{
+                controller.up(e);
+            })
+            window.addEventListener('wheel',(e)=>{
+                controller.wheel(e);
+            })
+      */
+     cancelEvent():void;
+    
 }
 
 export default GestiController;

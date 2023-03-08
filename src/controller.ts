@@ -3,16 +3,47 @@ import GestiController from "./interfaces/gesticontroller";
 import Vector from "./vector";
 
 
+
 class GestiControllerImpl implements GestiController{
 	/**
 	 * @ImageToolkit
 	 * @private
 	 */
-	public kit:ImageToolkit;
+	private kit:ImageToolkit;
 	constructor(kit:ImageToolkit) {
         //使用控制器时，取消原有控制
-        kit.cancelEvent();
+       // kit.cancelEvent();
 		this.kit = kit;
+	}
+	layerLower(): void {
+		this.kit.layerLower();
+	}
+	layerRise(): void {
+		this.kit.layerRise();
+	}
+	layerTop(): void {
+		this.kit.layerTop();
+	}
+	layerBottom(): void {
+		this.kit.layerBottom();
+	}
+	update(): void {
+		this.kit.update();
+	}
+	cancelEvent(): void {
+		this.kit.cancelEvent();
+	}
+	deLock(): void {
+		this.kit.deLock();
+	}
+	lock(): void {
+		this.kit.lock();
+	}
+	fallback(): void {
+		this.kit.fallback();
+	}
+	cancelFallback(): void {
+		this.kit.cancelFallback();
 	}
 	/**
 	 * @param {Event} e
@@ -20,7 +51,7 @@ class GestiControllerImpl implements GestiController{
 	 * @public
 	 */
 	public  down(e:MouseEvent|Event|EventHandle) {
-		this.eventTransForm(e,this.kit.down);
+		this.eventTransForm(e,this.kit.onDown);
 	}
 	/**
 	 * @param {Event} e
@@ -28,7 +59,7 @@ class GestiControllerImpl implements GestiController{
 	 * @public
 	 */
 	public move(e:MouseEvent|Event|EventHandle) {
-		this.eventTransForm(e,this.kit.move)
+		this.eventTransForm(e,this.kit.onMove)
 	}
 	/**
 	 * @param {Event} e
@@ -36,7 +67,7 @@ class GestiControllerImpl implements GestiController{
 	 * @public
 	 */
 	public up(e:MouseEvent|Event|EventHandle) {
-		this.eventTransForm(e,this.kit.up,"changedTouches")
+		this.eventTransForm(e,this.kit.onUp,"changedTouches")
 	}
 	/**
 	 * @param {Event} e
@@ -46,7 +77,7 @@ class GestiControllerImpl implements GestiController{
 	public wheel(e:MouseEvent|Event|EventHandle){
 		//只有Pc端有
 		if('touches' in e)return;
-		this.kit.wheel.bind(this.kit)(e);
+		this.kit.onWheel.bind(this.kit)(e);
 	}
 	/**
 	 * @param {Event} e

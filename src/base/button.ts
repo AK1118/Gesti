@@ -1,25 +1,11 @@
-import CatchPointUtil from "./catchPointUtil";
-import { FuncButtonTrigger } from "./enums";
-import ImageBox from "./imageBox";
-import Painter from "./painter";
-import Rect from "./rect";
-import Vector from "./vector";
-/**
- * 在页面上渲染的对象
- */
-export interface RenderObject {
-    key: string | number;
-    /**
-     * 世界坐标，相对于画布的坐标
-     */
-    rect: Rect;
-    draw(paint: Painter): void;
-    update(paint: Painter): void;
-    onSelected(): void;
-    //相对坐标，相对于画布在translate
-    relativeRect: Rect;
-    disabled: boolean;
-}
+import CatchPointUtil from "../catchPointUtil";
+import { FuncButtonTrigger } from "../enums";
+import ImageBox from "../imageBox";
+import RenderObject from "../interfaces/render-object";
+import Painter from "../painter";
+import Rect from "../rect";
+import Vector from "../vector";
+
 
 //按钮抽象类
 export abstract class Button implements RenderObject {
@@ -66,7 +52,6 @@ export abstract class Button implements RenderObject {
         this.oldAngle = Math.atan2(~~this.relativeRect.position.y, ~~this.relativeRect.position.x);
         //相对定位到中心的距离
         this.originDistance = Vector.mag(this.relativeRect.position);
-        console.log(this.relativeRect.position);
 
         let scaleWidth=0,scaleHeight=0;
         if(this.relativeRect.position.x!=0){
@@ -81,7 +66,6 @@ export abstract class Button implements RenderObject {
         */
        // this.scaleWithMaster = new Vector(scaleWidth == 1 ? 0 : scaleWidth, scaleHeight == 1 ? 0 : scaleHeight);
         this.scaleWithMaster = new Vector(scaleWidth,scaleHeight);
-        console.log("初始化距离", this.originDistance, "对立比例", this.scaleWithMaster, "VECTOR", this.relativeRect.position);
     }
     abstract trigger: FuncButtonTrigger
     abstract setMaster(master: RenderObject): void;
@@ -127,3 +111,5 @@ export abstract class Button implements RenderObject {
         this.relativeRect.position = position;
     }
 }
+
+export default Button;

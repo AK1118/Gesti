@@ -45,7 +45,6 @@ class TwoFingerOperate implements Operate{
 		const newWidth = this.oldRect.size.width * scale,
 			newHeight = this.oldRect.size.height * scale;
 		this.imageBox.rect.setSize(newWidth, newHeight);
-
 		const v = Vector.sub(a, b);
 		const angle = Math.atan2(v.y, v.x) - this.oldAngle;
 		this.imageBox.rect.setAngle(angle);

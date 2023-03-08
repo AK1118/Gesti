@@ -1,10 +1,12 @@
+import Button from "./base/button";
 import CatchPointUtil from "./catchPointUtil";
 import Drag from "./drag";
 import { FuncButtonTrigger } from "./enums";
 import GestiEventManager, { GestiEvent } from "./event";
 import Gesture from "./gesture";
 import ImageBox from "./imageBox";
-import { Button } from "./interfaces";
+import GestiController from "./interfaces/gesticontroller";
+import RenderObject from "./interfaces/render-object";
 import Painter from "./painter";
 import Rect from "./rect";
 import Vector from "./vector";
@@ -16,18 +18,44 @@ enum EventHandlerState {
     move
 }
 
-class ImageToolkit {
+/**
+ * 图层操作枚举
+ */
+enum LayerOperationType {
+    //下降一层
+    lower,
+    //上升一层
+    rise,
+    //至于顶层
+    top,
+    //至于底层
+    bottom,
+}
+
+class ImageToolkit implements GestiController {
+    //所有图层集合
     private imageBoxList: Array<ImageBox> = new Array<ImageBox>();
+    //手势监听器
     private eventHandler: GestiEvent;
+    //手势状态
     private eventHandlerState: EventHandlerState = EventHandlerState.up;
+    //拖拽代理器
     private drag: Drag = new Drag();
+    //手势处理识别器
     private gesture: Gesture = new Gesture();
+    //当前选中的图层
     private selectedImageBox: ImageBox = null;
+    //是否所选图层
     private isMultiple = false;
+    //canvas偏移量
     private offset: Vector;
+    //画布矩形大小
     private canvasRect: Rect;
+    //画笔代理类 canvasContext 2d
     private paint: Painter;
+    //是否debug模式
     public isDebug: boolean = false;
+    private tool: _Tools = new _Tools();
     constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
         const {
             x: offsetx,
@@ -40,38 +68,77 @@ class ImageToolkit {
         this.paint = new Painter(paint);
         this.bindEvent();
     }
+    layerLower(): void {
+        this.tool.arrangeLayer(this.imageBoxList, this.selectedImageBox, LayerOperationType.lower);
+    }
+    layerRise(): void {
+        this.tool.arrangeLayer(this.imageBoxList, this.selectedImageBox, LayerOperationType.rise);
+    }
+    layerTop(): void {
+        this.tool.arrangeLayer(this.imageBoxList, this.selectedImageBox, LayerOperationType.top);
+    }
+    layerBottom(): void {
+        this.tool.arrangeLayer(this.imageBoxList, this.selectedImageBox, LayerOperationType.bottom);
+    }
+    deLock(): void {
+        this.selectedImageBox.deblock();
+    }
+    lock(): void {
+        this.selectedImageBox.lock();
+    }
+    fallback(): void {
+        throw new Error("Method not implemented.");
+    }
+    cancelFallback(): void {
+        throw new Error("Method not implemented.");
+    }
+    //无须实现
+    down(e: Event): void {
+        throw new Error("Method not implemented.");
+    }
+    //无须实现
+    up(e: Event): void {
+        throw new Error("Method not implemented.");
+    }
+    //无须实现
+    move(e: Event): void {
+        throw new Error("Method not implemented.");
+    }
+    //无须实现
+    wheel(e: Event): void {
+        throw new Error("Method not implemented.");
+    }
     private bindEvent(): void {
         this.eventHandler = new GestiEventManager().getEvent(this);
         if (this.eventHandler == null) return;
-        this.eventHandler.down(this.down).move(this.move).up(this.up).wheel(this.wheel);
+        this.eventHandler.down(this.onDown).move(this.onMove).up(this.onUp).wheel(this.onWheel);
         this.addListening();
         this.debug(["Event Bind,", this.eventHandler]);
-        
     }
     /**
      * 添加手势的动作，长按，双击，点击等
      * @description 只有在选中对象时该监听才生效
      */
-    public addListening():void{
-        this.gesture.addListenGesti("click",(imageBox:ImageBox,position:Vector)=>{
-          //  console.log("点击",imageBox);
+    public addListening(): void {
+        this.gesture.addListenGesti("click", (imageBox: ImageBox, position: Vector) => {
+            //  console.log("点击",imageBox);
         });
-        this.gesture.addListenGesti("dbclick",(imageBox:ImageBox,position:Vector)=>{
-          //  console.log("双击",position);
+        this.gesture.addListenGesti("dbclick", (imageBox: ImageBox, position: Vector) => {
+            //  console.log("双击",position);
         })
-        this.gesture.addListenGesti("longpress",(imageBox:ImageBox,position:Vector)=>{
-           // console.log("长按",position);
+        this.gesture.addListenGesti("longpress", (imageBox: ImageBox, position: Vector) => {
+            // console.log("长按",position);
         })
-        this.gesture.addListenGesti("twotouch",(imageBox:ImageBox,position:Vector)=>{
+        this.gesture.addListenGesti("twotouch", (imageBox: ImageBox, position: Vector) => {
             //console.log("二指",position);
-            this.gesture.onDown(this.selectedImageBox, position);
+           // this.gesture.onDown(this.selectedImageBox, position);
         });
     }
     public cancelEvent(): void {
         if (this.eventHandler == null) return;
         this.eventHandler.disable();
     }
-    public down(v: GestiEventParams): void {
+    public onDown(v: GestiEventParams): void {
         this.debug(["Event Down,", v]);
         this.eventHandlerState = EventHandlerState.down;
         const event: Vector | Vector[] = this.correctEventPosition(v);
@@ -81,11 +148,11 @@ class ImageToolkit {
 
         if (this.selectedImageBox ?? false) {
             if (Array.isArray(event)) {
-               return;
+                return;
             }
             if (this.checkFuncButton(event)) return;
         }
-        
+
         /**
          * 检测是否点击到ImageBox对象
          */
@@ -96,15 +163,15 @@ class ImageToolkit {
                 this.selectedImageBox.cancel();
             }
             this.selectedImageBox = selectedImageBox;
-            this.arrangeLayer(selectedImageBox);
+            //选中后变为选中状态
             this.selectedImageBox.onSelected();
             //不允许在锁定时被拖拽选中进行操作
-            if(!selectedImageBox.isLock)
+            if (!selectedImageBox.isLock)
                 this.drag.catchImageBox(this.selectedImageBox.rect, event);
         }
         this.update();
     }
-    public move(v: GestiEventParams): void {
+    public onMove(v: GestiEventParams): void {
         this.debug(["Event Move,", v]);
         if (this.eventHandlerState === EventHandlerState.down) {
             const event: Vector | Vector[] = this.correctEventPosition(v);
@@ -121,20 +188,20 @@ class ImageToolkit {
         }
         this.update();
     }
-    public up(v: GestiEventParams): void {
+    public onUp(v: GestiEventParams): void {
         this.debug(["Event Up,", v]);
         const event: Vector | Vector[] = this.correctEventPosition(v);
         this.eventHandlerState = EventHandlerState.up;
         //手势解析处理
-        this.gesture.onUp(this.selectedImageBox,event);
+        this.gesture.onUp(this.selectedImageBox, event);
         this.drag.cancel();
         if (this.selectedImageBox ?? false) {
             this.selectedImageBox.onUp(this.paint);
         }
-        this.update();
+        setTimeout(()=>this.update(),100)
     }
 
-    public wheel(e: WheelEvent): void {
+    public onWheel(e: WheelEvent): void {
         const {
             deltaY
         } = e;
@@ -145,22 +212,6 @@ class ImageToolkit {
         }
         this.update();
 
-    }
-    /**
-     * @description 传入 @ImageBox 对象，设置该对象的layer层级
-     * @param selectedImageBox 
-     */
-    private arrangeLayer(selectedImageBox: ImageBox): void {
-        // selectedImageBox.setLayer = 1;
-        /**
-         * 层级重构算法，使用换位
-         * 如选中了第3个 @ImageBox ，就将第3个和第一个互换位置
-         */
-        const ndx = this.imageBoxList.findIndex((item: ImageBox) => item.key === selectedImageBox.key);
-        const len = this.imageBoxList.length - 1;
-        let temp = this.imageBoxList[len];
-        this.imageBoxList[len] = selectedImageBox;
-        this.imageBoxList[ndx] = temp;
     }
     private correctEventPosition(vector: GestiEventParams): Vector | Vector[] {
         let _vector: Vector[] = new Array<Vector>;
@@ -177,20 +228,21 @@ class ImageToolkit {
         const result: any = _button;
 
         //确保是按钮
-        if(result instanceof Button){
-            const button:Button=result;
-            if(button.trigger==FuncButtonTrigger.drag){
+        if (result instanceof Button) {
+            const button: Button = result;
+            if (button.trigger == FuncButtonTrigger.drag) {
                 button.onSelected();
                 this.drag.catchImageBox(button.rect, eventPosition);
-            }else  if(button.trigger==FuncButtonTrigger.click){
+            } else if (button.trigger == FuncButtonTrigger.click) {
                 button.effect();
             }
             return true;
         }
-        this.selectedImageBox.cancel();
+       
         this.drag.cancel();
         this.gesture.cancel();
-        this.selectedImageBox = null;
+        // this.selectedImageBox.cancel();
+        // this.selectedImageBox = null;
         return false;
     }
     public update() {
@@ -219,6 +271,50 @@ class ImageToolkit {
         if (Array.isArray(message))
             console.warn("Gesti debug: ", ...message);
         else console.warn("Gesti debug: ", message);
+    }
+}
+
+
+class _Tools {
+    /**
+     * @description 传入 @ImageBox 对象，设置该对象的layer层级
+     * @param selectedImageBox 
+     */
+    public arrangeLayer(imageBoxList: Array<RenderObject>, selectedImageBox: ImageBox, operationType: LayerOperationType): void {
+        /**
+         * 层级重构算法，使用换位
+         * 如选中了第3个 @ImageBox ，就将第3个和第一个互换位置
+         */
+        const ndx = imageBoxList.findIndex((item: ImageBox) => item.key === selectedImageBox.key);
+        const len = imageBoxList.length-1;
+        // 0为底部   len为顶部
+        switch (operationType) {
+            case LayerOperationType.top: {
+                let temp = imageBoxList[len];
+                imageBoxList[len] = selectedImageBox;
+                imageBoxList[ndx] = temp;
+            }; break;
+            case LayerOperationType.bottom: {
+                let temp = imageBoxList[0];
+                imageBoxList[0] = selectedImageBox;
+                imageBoxList[ndx] = temp;
+            }; break;
+            case LayerOperationType.rise: {
+                if (ndx == len) break;
+                let temp = imageBoxList[ndx + 1];
+                imageBoxList[ndx + 1] = selectedImageBox;
+                imageBoxList[ndx] = temp;
+            }; break;
+            case LayerOperationType.lower: {
+                console.log(ndx)
+                if (ndx==0) break;
+                console.log("捡")
+                const temp = imageBoxList[ndx - 1];
+                imageBoxList[ndx - 1] = selectedImageBox;
+                imageBoxList[ndx] = temp;
+                
+            }; break;
+        }
     }
 }
 export default ImageToolkit;

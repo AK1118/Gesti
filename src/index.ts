@@ -18,30 +18,32 @@ gesti.addImage(gesti.createImage(img,{
 gesti.addImage(gesti.createImage(img,{
     scale:.5,
     width:100,
-    height:10,
+    height:30,
 }))
 const controller:GestiController=gesti.controller;
 
+// window.addEventListener('touchstart',(e)=>{
+//     controller.down(e);
+// })
+// window.addEventListener('touchmove',(e)=>{
+//     controller.move(e);
+// })
+// window.addEventListener('touchend',(e)=>{
+//     controller.up(e);
+// })
 
-window.addEventListener('touchstart',(e)=>{
-    controller.down(e);
-})
-window.addEventListener('touchmove',(e)=>{
-    controller.move(e);
-})
-window.addEventListener('touchend',(e)=>{
-    controller.up(e);
-})
-
-window.addEventListener('mousedown',(e)=>{
-    controller.down(e);
-})
-window.addEventListener('mousemove',(e)=>{
-    controller.move(e);
-})
-window.addEventListener('mouseup',(e)=>{
-    controller.up(e);
-})
-window.addEventListener('wheel',(e)=>{
-    controller.wheel(e);
+// window.addEventListener('mousedown',(e)=>{
+//     controller.down(e);
+// })
+// window.addEventListener('mousemove',(e)=>{
+//     controller.move(e);
+// })
+// window.addEventListener('mouseup',(e)=>{
+//     controller.up(e);
+// })
+// window.addEventListener('wheel',(e)=>{
+//     controller.wheel(e);
+// })
+document.querySelector("#save").addEventListener("click",(e)=>{
+    controller.lock();
 })
