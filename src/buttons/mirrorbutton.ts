@@ -19,7 +19,9 @@ class MirrorButton extends Button {
     master: ImageBox;
     constructor(master: ImageBox) {
         super(master);
-        this.init([-.5, .5]);
+        this.init({
+            percentage:[-.5, .5]
+        });
     }
     /**
      * @description 相对坐标为以父对象为原点的定位
@@ -34,6 +36,7 @@ class MirrorButton extends Button {
     updatePosition(vector: Vector): void {
         // this.setRelativePosition([-.5,.5]);
         //this.setAbsolutePosition(vector);
+        this.updateRelativePosition();
         this.setAbsolutePosition(vector);
     }
     setMaster(master: ImageBox): void {

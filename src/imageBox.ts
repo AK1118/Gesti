@@ -145,24 +145,17 @@ class ImageBox implements RenderObject {
 		const x: number = rect.position.x,
 			y: number = rect.position.y;
 
-		const len = Vector.mag(rect.size.toVector());
+		//const len =  Vector.mag(rect.size.toVector());
 		this.funcButton.forEach((button: Button) => {
+			const len:number=button.originDistance;
 			if (button.disabled) return;
 			const angle = this.rect.getAngle + button.oldAngle;
-			const newx = Math.cos(angle) * (len >> 1) + x;
-			const newy = Math.sin(angle) * (len >> 1) + y;
+			const newx = Math.cos(angle) *len + x;
+			const newy = Math.sin(angle) *len + y;
 			const vector = new Vector(~~newx, ~~newy);
 			// if (this.isLock && (!button.isFree)) { }
 			button.updatePosition(vector);
 			button.update(paint);
-			paint.fillStyle = "red";
-
-			{
-				const angle = this.rect.getAngle - button.oldAngle;
-				const newx = Math.cos(angle) * (len >> 1) + x;
-				const newy = Math.sin(angle) * (len >> 1) + y;
-				paint.fillRect(button.rect.position.x - newx, button.rect.position.y - newy, 2, 2)
-			}
 		});
 	}
 	/**
@@ -222,6 +215,12 @@ class ImageBox implements RenderObject {
 		this.funcButton.forEach((item: Button) => {
 			item.setMaster(this);
 		})
+	}
+	/**
+	 * 世界坐标居中
+	 */
+	public center(){
+
 	}
 }
 

@@ -19,7 +19,7 @@ class DragButton extends Button {
     key: string | number = +new Date();
     constructor(master: ImageBox) {
         super(master);
-        this.init([.5, .5]);
+        this.init({percentage:[.5, .5]});
         this.initScale();
         this.rect.onDrag = (newRect: Rect) => {
             /*拖拽缩放*/
@@ -28,6 +28,7 @@ class DragButton extends Button {
         }
     }
     updatePosition(vector: Vector): void {
+        this.updateRelativePosition();
         this.setAbsolutePosition(vector);
     }
     setMaster(master: ImageBox): void {
@@ -37,7 +38,7 @@ class DragButton extends Button {
      * 为拖拽改变大小初始化
      */
     private initScale() {
-        this.setRelativePosition([.5, .5]);
+        this.setRelativePositionRect([.5, .5]);
         this.oldRadius = Vector.mag(this.relativeRect.position);
     }
     effect(newRect: Rect): void {

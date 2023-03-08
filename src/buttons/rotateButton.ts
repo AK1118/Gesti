@@ -19,7 +19,9 @@ class RotateButton extends Button {
     key: string | number = +new Date();
     constructor(master: ImageBox) {
         super(master);
-        this.init([0,1]);
+        this.init({
+            percentage:[0,.8]
+        });
         this.initScale();
         this.rect.onDrag = (newRect: Rect) => {
             /*拖拽缩放*/
@@ -28,6 +30,7 @@ class RotateButton extends Button {
         }
     }
     updatePosition(vector: Vector): void {
+        this.updateRelativePosition();
         this.setAbsolutePosition(vector);
     }
     setMaster(master: ImageBox): void {
@@ -37,8 +40,6 @@ class RotateButton extends Button {
      * 为拖拽改变大小初始化
      */
     private initScale() {
-        this.setRelativePosition([0,1]);
-        let oldButtonRect: Rect;
         this.oldRadius = Vector.mag(this.relativeRect.position);
     }
     effect(newRect:Rect): void {
@@ -72,6 +73,7 @@ class RotateButton extends Button {
         this.disable = false;
     }
     draw(paint: Painter) {
+        
         if (this.disable) return;
         const {
             width,
@@ -84,14 +86,14 @@ class RotateButton extends Button {
 
             paint.beginPath();
             paint.fillStyle = "#fff";
-            paint.arc(0, halfHeight*2+10, 10, 0, Math.PI * 2);
+            paint.arc(this.relativeRect.position.x, this.relativeRect.position.y, 10, 0, Math.PI * 2);
             paint.closePath();
             paint.fill();
             Widgets.drawRotate(paint, {
-                offsetx: 0 ,
-                offsety: halfHeight*2+10
+                offsetx: this.relativeRect.position.x ,
+                offsety: this.relativeRect.position.y,
             });
-
+           // paint.fillRect(this.rect.position.x-this.master.rect.position.x,this.rect.position.y-this.master.rect.position.y,10,10);
     }
 }
 

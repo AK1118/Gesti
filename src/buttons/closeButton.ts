@@ -17,9 +17,12 @@ class CloseButton extends Button {
     master: ImageBox;
     constructor(master: ImageBox) {
         super(master);
-        this.init([.5, -.5]);
+        this.init({
+            percentage:[.5, -.5]
+        });
     }
     updatePosition(vector: Vector): void {
+        this.updateRelativePosition();
         this.setAbsolutePosition(vector);
     }
     setMaster(master: ImageBox): void {

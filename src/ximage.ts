@@ -1,4 +1,4 @@
-import { createImageOptions } from "./index";
+import { createImageOptions } from "./gesti";
 
 class XImage{
     data:any;

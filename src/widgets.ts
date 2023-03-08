@@ -33,7 +33,7 @@ class Widgets {
          */
     public static drawRotate(paint: Painter, offset: Offset): void {
         const scale = .08;
-        paint.lineWidth=2;
+        paint.lineWidth=1;
         const {
             offsetx,
             offsety
@@ -96,7 +96,7 @@ class Widgets {
 
         paint.beginPath();
         paint.strokeStyle = "#c1c1c1";
-        paint.lineWidth = 2;
+        paint.lineWidth = 1;
         paint.moveTo(0 * scale + offsetx, 0 * scale + offsety);
         paint.lineTo(10 * scale + offsetx, 10 * scale + offsety);
         paint.moveTo(10 * scale + offsetx, 0 * scale + offsety);
@@ -121,7 +121,7 @@ class Widgets {
 
         paint.beginPath();
         paint.strokeStyle = "#c1c1c1";
-        paint.lineWidth = 1.5;
+        paint.lineWidth = 1;
         paint.arc(5 + offsetx, offsety + 3, 3, Math.PI, 0);
         paint.strokeRect(offsetx, offsety + 4, 10, 6);
         paint.strokeRect(offsetx + 4, offsety + 6, 2, 2);
@@ -143,7 +143,7 @@ class Widgets {
         } = offset;
         paint.beginPath();
         paint.strokeStyle = "#c1c1c1";
-        paint.lineWidth = 1.5;
+        paint.lineWidth = 1;
         paint.arc(5 + offsetx, offsety + 2, 3, Math.PI, 0);
         paint.strokeRect(offsetx, offsety + 6, 10, 6);
         paint.strokeRect(offsetx + 4, offsety + 7, 2, 2);

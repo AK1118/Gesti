@@ -1,5 +1,5 @@
 import ImageToolkit from "./image-toolkit";
-import { GestiController } from "./index";
+import GestiController from "./interfaces/gesticontroller";
 import Vector from "./vector";
 
 
