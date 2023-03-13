@@ -1,5 +1,7 @@
 import Gesti from "./gesti";
 import GestiController from "./interfaces/gesticontroller";
+import Recorder from "./recorder";
+import { Debounce, Throttle } from "./utils";
 
 export default Gesti;
 
@@ -8,18 +10,18 @@ const gesti = new Gesti();
 const img: HTMLImageElement = document.querySelector("#dog");
 gesti.init(canvas);
 gesti.addImage(gesti.createImage(img,{
-    scale:.5,
+    scale:.1,
 }))
-gesti.addImage(gesti.createImage(img,{
-    scale:.5,
-    width:90,
-    height:90,
-}))
-gesti.addImage(gesti.createImage(img,{
-    scale:.5,
-    width:100,
-    height:30,
-}))
+// gesti.addImage(gesti.createImage(img,{
+//     scale:.5,
+//     width:90,
+//     height:90,
+// }))
+// gesti.addImage(gesti.createImage(img,{
+//     scale:.5,
+//     width:100,
+//     height:30,
+// }))
 const controller:GestiController=gesti.controller;
 
 // window.addEventListener('touchstart',(e)=>{
@@ -44,6 +46,16 @@ const controller:GestiController=gesti.controller;
 // window.addEventListener('wheel',(e)=>{
 //     controller.wheel(e);
 // })
-document.querySelector("#save").addEventListener("click",(e)=>{
-    controller.lock();
-})
+const debounce=Debounce((arg)=>{console.log("卧槽",arg)},1000);
+const throttle=Throttle((arg)=>{console.log("卧槽",arg)},1000);
+
+// document.querySelector("#save").addEventListener("click",(e)=>{
+//     //controller.lock();
+//    // throttle(new Date());
+//    controller.fallback();
+// })
+window.onkeydown=(e)=>{
+    // console.log(e.keyCode);
+  if(e.keyCode==90)controller.fallback();
+  if(e.keyCode==88)controller.cancelFallback();
+}

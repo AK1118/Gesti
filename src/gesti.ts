@@ -5,7 +5,7 @@ import XImage from "./ximage";
 
 
 
- interface createImageOptions {
+interface createImageOptions {
     data?: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions,
     width?: number,
     height?: number,
@@ -13,6 +13,7 @@ import XImage from "./ximage";
     maxScale?: number,
     minScale?: number,
 }
+
 export {
     createImageOptions,
 }
@@ -23,11 +24,11 @@ export {
 class Gesti {
     private kit: ImageToolkit;
     public static XImage = XImage;
-    get controller():GestiController{
+    get controller(): GestiController {
         return new GestiControllerImpl(this.kit);
     }
-    set debug(value:boolean){
-        this.kit.isDebug=true;
+    set debug(value: boolean) {
+        this.kit.isDebug = true;
     }
     /*
      * @description 初始化 @Gesti 所代理的画布高宽，在h5端可直接传入 HTMLCanvasElement 自动解析高宽
@@ -96,7 +97,7 @@ class Gesti {
     /**
      * 手动刷新画布
      */
-    public update(){
+    public update() {
         this.kit.update();
     }
 }

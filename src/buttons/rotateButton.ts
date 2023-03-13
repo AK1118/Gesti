@@ -1,6 +1,6 @@
 import { FuncButtonTrigger } from "../enums";
 import ImageBox from "../imageBox";
-import Button from "../base/button";
+import Button from "../abstract/button";
 import Painter from "../painter";
 import Rect from "../rect";
 import Vector from "../vector";
@@ -13,7 +13,7 @@ class RotateButton extends Button {
     private oldImageBoxRect: Rect = null;
     private oldRadius: number = 0;
     public oldAngle: number = 0;
-    public radius: number = 20;
+    public radius: number = 10;
     private disable: boolean = false;
     public relativeRect: Rect;
     key: string | number = +new Date();

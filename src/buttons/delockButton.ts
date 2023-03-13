@@ -1,6 +1,6 @@
 import { FuncButtonTrigger } from "../enums";
 import ImageBox from "../imageBox";
-import Button from "../base/button";
+import Button from "../abstract/button";
 import Painter from "../painter";
 import Rect from "../rect";
 import Vector from "../vector";

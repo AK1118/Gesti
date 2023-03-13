@@ -1,4 +1,5 @@
-import Button from "./base/button";
+import Button from "./abstract/button";
+import OperationObserver from "./abstract/operation-observer";
 import { CloseButton, MirrorButton, RotateButton } from "./buttons";
 import DelockButton from "./buttons/delockButton";
 import DragButton from "./buttons/dragbutton";
@@ -10,7 +11,7 @@ import Rect from "./rect";
 import Vector from "./vector";
 import { Point } from "./vertex";
 import XImage from "./ximage";
-class ImageBox implements RenderObject {
+class ImageBox extends OperationObserver implements RenderObject {
 	public selected: boolean = false;
 	private scale: number = 1;
 	/**
@@ -30,10 +31,11 @@ class ImageBox implements RenderObject {
 	private funcButton: Array<Button> = new Array<Button>();
 
 	constructor(image: XImage) {
+		super();
 		this.image = image.data;
 		this.ximage = image;
 		this.rect = new Rect(image.toJson());
-		this.beforeRect = this.rect.copy();
+		//this.beforeRect = this.rect.copy();
 		this.funcButton = [
 			new DragButton(this),
 			new MirrorButton(this),
@@ -48,6 +50,7 @@ class ImageBox implements RenderObject {
 			width: this.rect.size.width,
 			height: this.rect.size.height,
 		});
+		this.addObserver(this);
 	}
 	relativeRect: Rect;
 	/**
@@ -89,9 +92,6 @@ class ImageBox implements RenderObject {
 	}
 	draw(paint: Painter): void {
 		this.drawImage(paint);
-	}
-	onSelect(): void {
-
 	}
 	//当被锁定时触发
 	private onLock() {
@@ -191,7 +191,7 @@ class ImageBox implements RenderObject {
 		this.selected = false;
 	}
 	public onUp(paint: Painter) {
-		//console.log("up",this.rect.position)
+		console.log("up",this.rect.key)
 		/*在抬起鼠标时，ImageBox还没有被Calcel，为再次聚焦万向按钮做刷新数据*/
 		this.onChanged();
 	}
@@ -223,6 +223,7 @@ class ImageBox implements RenderObject {
 	public center(){
 
 	}
+	public didChangePosition(position: globalThis.Vector): void {}
 }
 
 

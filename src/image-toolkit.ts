@@ -1,4 +1,4 @@
-import Button from "./base/button";
+import Button from "./abstract/button";
 import CatchPointUtil from "./catchPointUtil";
 import Drag from "./drag";
 import { FuncButtonTrigger } from "./enums";
@@ -6,8 +6,10 @@ import GestiEventManager, { GestiEvent } from "./event";
 import Gesture from "./gesture";
 import ImageBox from "./imageBox";
 import GestiController from "./interfaces/gesticontroller";
+import RecorderInterface from "./interfaces/recorder";
 import RenderObject from "./interfaces/render-object";
 import Painter from "./painter";
+import Recorder from "./recorder";
 import Rect from "./rect";
 import Vector from "./vector";
 import XImage from "./ximage";
@@ -55,6 +57,8 @@ class ImageToolkit implements GestiController {
     private paint: Painter;
     //是否debug模式
     public isDebug: boolean = false;
+    //记录操作
+    private recorder: RecorderInterface = Recorder.getInstance();
     private tool: _Tools = new _Tools();
     constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
         const {
@@ -86,12 +90,16 @@ class ImageToolkit implements GestiController {
     lock(): void {
         this.selectedImageBox.lock();
     }
-    fallback(): void {
-        throw new Error("Method not implemented.");
+    async fallback() {
+       const rect=await  this.recorder.fallback();
+       this.tool.fallbackImageBox(this.imageBoxList,rect,this);
     }
-    cancelFallback(): void {
-        throw new Error("Method not implemented.");
+    async cancelFallback(){
+        const rect=await  this.recorder.cancelFallback();
+        this.tool.fallbackImageBox(this.imageBoxList,rect,this);
     }
+   
+    
     //无须实现
     down(e: Event): void {
         throw new Error("Method not implemented.");
@@ -131,7 +139,7 @@ class ImageToolkit implements GestiController {
         })
         this.gesture.addListenGesti("twotouch", (imageBox: ImageBox, position: Vector) => {
             //console.log("二指",position);
-           // this.gesture.onDown(this.selectedImageBox, position);
+            // this.gesture.onDown(this.selectedImageBox, position);
         });
     }
     public cancelEvent(): void {
@@ -197,8 +205,10 @@ class ImageToolkit implements GestiController {
         this.drag.cancel();
         if (this.selectedImageBox ?? false) {
             this.selectedImageBox.onUp(this.paint);
+            //鼠标|手指抬起时提交一次操作
+            this.recorder.commit();
         }
-        setTimeout(()=>this.update(),100)
+        setTimeout(() => this.update(), 100)
     }
 
     public onWheel(e: WheelEvent): void {
@@ -238,7 +248,7 @@ class ImageToolkit implements GestiController {
             }
             return true;
         }
-       
+
         this.drag.cancel();
         this.gesture.cancel();
         // this.selectedImageBox.cancel();
@@ -286,7 +296,7 @@ class _Tools {
          * 如选中了第3个 @ImageBox ，就将第3个和第一个互换位置
          */
         const ndx = imageBoxList.findIndex((item: ImageBox) => item.key === selectedImageBox.key);
-        const len = imageBoxList.length-1;
+        const len = imageBoxList.length - 1;
         // 0为底部   len为顶部
         switch (operationType) {
             case LayerOperationType.top: {
@@ -307,14 +317,25 @@ class _Tools {
             }; break;
             case LayerOperationType.lower: {
                 console.log(ndx)
-                if (ndx==0) break;
+                if (ndx == 0) break;
                 console.log("捡")
                 const temp = imageBoxList[ndx - 1];
                 imageBoxList[ndx - 1] = selectedImageBox;
                 imageBoxList[ndx] = temp;
-                
+
             }; break;
         }
+    }
+
+    public fallbackImageBox(imageBoxList: Array<RenderObject>,rect:Rect,kit:ImageToolkit){
+        if(rect==null)return;
+        const ndx=imageBoxList.findIndex((item:ImageBox)=>{
+             return item.rect.key==rect.key;
+        });
+        if(ndx!=-1){
+            imageBoxList[ndx].rect.set(rect);
+        }
+        kit.update();
     }
 }
 export default ImageToolkit;
