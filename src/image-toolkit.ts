@@ -333,7 +333,10 @@ class _Tools {
              return item.rect.key==rect.key;
         });
         if(ndx!=-1){
+            ( imageBoxList[ndx] as ImageBox).removeObserver();
             imageBoxList[ndx].rect.set(rect);
+            ( imageBoxList[ndx] as ImageBox).addObserver( imageBoxList[ndx]);
+
         }
         kit.update();
     }

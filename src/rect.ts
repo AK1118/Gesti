@@ -81,20 +81,24 @@ class Rect extends ObserverObj{
         return this._angle;
     }
     public set position(position: Vector) {
+        this.beforeReport(position,"position");
         this._position = position;
         this.report(position,"position");
     }
     public setScale(scale: number): void {
-        this._size.width *= scale;
-        this._size.height *= scale;
+        this.beforeReport(scale,"scale");
+        this._size.width *= ~~scale;
+        this._size.height *= ~~scale;
         this.report(scale,"scale");
     }
     public setSize(width: number, height: number): void {
-        this._size.width = width;
-        this._size.height = height;
+        this.beforeReport(this._size,"size");
+        this._size.width =~~ width;
+        this._size.height = ~~height;
         this.report(this._size,"size");
     }
     public setAngle(angle: number): void {
+        this.beforeReport(angle,"angle");
         this._angle = angle;
         this.report(angle,"angle");
     }
@@ -107,25 +111,16 @@ class Rect extends ObserverObj{
     private report(value: any, type: "size" | "angle" | "scale" | "position"): void {
         if (this.observer == null) return;
         this.observer.report(value,type);
-        // switch (type) {
-        //     case "size":
-        //         this.observer.didChangeSize(value);
-        //         break;
-        //     case "angle":
-        //         this.observer.didChangeAngle(value);
-        //         break;
-
-        //     case "scale":
-        //         this.observer.didChangeScale(value);
-        //         break;
-
-        //     case "position":
-        //         this.observer.didChangePosition(value);
-        //         break;
-
-        //     default:
-        //         break;
-        // }
+    }
+    /**
+     * @description 向观察者汇报自己的变化情况之前
+     * @param value 
+     * @param type 
+     * @returns 
+     */
+    private beforeReport(value: any, type: "size" | "angle" | "scale" | "position"): void {
+        if (this.observer == null) return;
+        this.observer.beforeReport(value,type);
     }
     public copy(key?:string) {
         return new Rect({

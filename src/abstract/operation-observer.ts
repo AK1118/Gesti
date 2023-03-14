@@ -6,6 +6,7 @@ import Rect from "../rect";
 
 interface OperationObserverType {
     report(value: any, type: "size" | "angle" | "scale" | "position"): void;
+    beforeReport(value: any, type: "size" | "angle" | "scale" | "position"):void;
     didChangeAngle(angle: number): void;
     didChangeSize(size: Size): void;
     didChangePosition(position: Vector): void;
@@ -33,13 +34,15 @@ class Observer {
     report(value: any, type: "size" | "angle" | "scale" | "position"): void {
         this.master.report(value,type);
     }
+    beforeReport(value: any, type: "size" | "angle" | "scale" | "position"): void {
+        this.master.beforeReport(value,type);
+    }
 }
 
 /**
  * 如果需要撤销操作，组件必须继承该抽象类实现
  */
 abstract class OperationObserver implements OperationObserverType {
-   
     private obj: RenderObject;
     private recorder: RecorderInterface = Recorder.getInstance();
     /**
@@ -54,9 +57,12 @@ abstract class OperationObserver implements OperationObserverType {
      * 记录,先粗略copy对象存储，后如需优化可以转json存储
      */
     public record(){
-        this.recorder.setBefore(this.obj.rect);
-        this.recorder.setNow(this.obj.rect);
+        // this.recorder.setBefore(this.obj.rect);
+         this.recorder.setNow(this.obj.rect);
         console.log("记录")
+    }
+    beforeReport(value: any, type: "size" | "angle" | "scale" | "position"): void {
+        this.recorder.setCache(this.obj.rect);
     }
     /**
      * 汇报观察情况，调用对应函数
