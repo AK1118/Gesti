@@ -1,4 +1,5 @@
 import Button from "./abstract/button";
+import { RecordNode } from "./abstract/operation-observer";
 import CatchPointUtil from "./catchPointUtil";
 import Drag from "./drag";
 import { FuncButtonTrigger } from "./enums";
@@ -91,12 +92,12 @@ class ImageToolkit implements GestiController {
         this.selectedImageBox.lock();
     }
     async fallback() {
-       const rect=await  this.recorder.fallback();
-       this.tool.fallbackImageBox(this.imageBoxList,rect,this);
+       const node:RecordNode=await  this.recorder.fallback();
+       this.tool.fallbackImageBox(this.imageBoxList,node,this);
     }
     async cancelFallback(){
-        const rect=await  this.recorder.cancelFallback();
-        this.tool.fallbackImageBox(this.imageBoxList,rect,this);
+        const node:RecordNode=await  this.recorder.cancelFallback();
+        this.tool.fallbackImageBox(this.imageBoxList,node,this);
     }
    
     
@@ -318,7 +319,6 @@ class _Tools {
             case LayerOperationType.lower: {
                 console.log(ndx)
                 if (ndx == 0) break;
-                console.log("捡")
                 const temp = imageBoxList[ndx - 1];
                 imageBoxList[ndx - 1] = selectedImageBox;
                 imageBoxList[ndx] = temp;
@@ -327,16 +327,19 @@ class _Tools {
         }
     }
 
-    public fallbackImageBox(imageBoxList: Array<RenderObject>,rect:Rect,kit:ImageToolkit){
-        if(rect==null)return;
-        const ndx=imageBoxList.findIndex((item:ImageBox)=>{
-             return item.rect.key==rect.key;
+    public fallbackImageBox(imageBoxList: Array<RenderObject>,node:RecordNode,kit:ImageToolkit){
+        if(node==null)return;
+        const obj=imageBoxList.find((item:ImageBox)=>{
+             return item.key==node.key;
         });
-        if(ndx!=-1){
-            ( imageBoxList[ndx] as ImageBox).removeObserver();
-            imageBoxList[ndx].rect.set(rect);
-            ( imageBoxList[ndx] as ImageBox).addObserver( imageBoxList[ndx]);
-
+        console.log("找到",obj,node)
+        if(obj){
+            switch(node.type){
+                case "position":obj.rect.position=node.data;break;
+                case "angle":obj.rect.setAngle(node.data);break;
+                case "scale":obj.rect.setScale(node.data);break;
+                case "size":obj.rect.setSize(node.data.width,node.data.height);break;
+            }
         }
         kit.update();
     }

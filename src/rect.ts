@@ -1,4 +1,4 @@
-import {  ObserverObj } from "./abstract/operation-observer";
+import {  ObserverObj, OperationType } from "./abstract/operation-observer";
 import RecorderInterface from "./interfaces/recorder";
 import Recorder from "./recorder";
 import Vector from "./vector";
@@ -108,7 +108,7 @@ class Rect extends ObserverObj{
      * @param type 
      * @returns 
      */
-    private report(value: any, type: "size" | "angle" | "scale" | "position"): void {
+    private report(value: any, type: keyof OperationType): void {
         if (this.observer == null) return;
         this.observer.report(value,type);
     }
@@ -118,7 +118,7 @@ class Rect extends ObserverObj{
      * @param type 
      * @returns 
      */
-    private beforeReport(value: any, type: "size" | "angle" | "scale" | "position"): void {
+    private beforeReport(value: any, type: keyof OperationType): void {
         if (this.observer == null) return;
         this.observer.beforeReport(value,type);
     }

@@ -10,7 +10,20 @@ enum FuncButtonTrigger{
     dbclick,
 }
 
+//撤销重做种类枚举
+enum OperationTypeEmum{
+    //大小
+    size,
+    //位置
+    position,
+    //角度
+    angle,
+    //镜像
+    mirror
+    //
+}
 
 export {
     FuncButtonTrigger,
+    OperationTypeEmum
 }

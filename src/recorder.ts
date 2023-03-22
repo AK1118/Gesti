@@ -1,68 +1,101 @@
+import { RecordNode } from "./abstract/operation-observer";
+import { OperationTypeEmum } from "./enums";
 import RecorderInterface from "./interfaces/recorder";
-import Rect from "./rect";
-import { Debounce } from "./utils";
 
-//记录操作
-/**
- * 只需要一个栈
- * 在before前
- * 
- */
+//操作记录
 class Recorder implements RecorderInterface {
-    cache: Rect = null;
-    now: Rect = null;
+    //上一步状态
+    cache: RecordNode = null;
+    //现在的状态
+    now: RecordNode = null;
+    //单例模式
     private static _recorder: RecorderInterface = new Recorder();
     public static getInstance(): RecorderInterface {
         return Recorder._recorder;
     }
-    stack: Array<Rect> = [];
-    undoStack: Array<Rect> = [];
-    maxLength: number = 100;
-    currentValue: Rect = null;
+    //左栈
+    stack: Array<RecordNode> = [];
+    //右栈
+    undoStack: Array<RecordNode> = [];
+    //最大历史记录栈长度
+    maxLength: number = 30;
+    //目前状态
+    currentValue: RecordNode = null;
     get len(): number {
         return this.stack.length;
     }
     get undoLen(): number {
         return this.undoStack.length;
     }
-    last(): Rect {
+    last(): RecordNode {
         return this.stack[this.len - 1];
+    }
+    undoLast(): RecordNode {
+        return this.undoLast[this.undoLen - 1];
     }
     get isFull(): boolean {
         return this.len > this.maxLength;
     }
-    setCache(rect: Rect): void {
-        if (this.cache != null) return;
-        this.cache = rect.copy(rect.key);
+    setCache(node: RecordNode): void {
+        //不为空时赋值，或者不是同一个时
+
+        if (this.cache != null) {
+            // if (this.cache.type != node.type) {
+            //     this.commit();
+            //     this.cache = node;
+            //     return;
+            // }
+            return;
+        }
+        this.cache = node;
     }
-    setNow(rect: Rect): void {
-        this.now = rect.copy(rect.key);
+    setNow(node: RecordNode): void {
+        this.now = node;
     }
-    push(rect: Rect) {
-        this.stack.push(rect.copy(rect.key));
+    push(node: RecordNode) {
+        this.stack.push(node);
         this.undoStack = [];
-        this.currentValue = rect.copy(rect.key);
+        this.currentValue = node;
         if (this.isFull) this.stack.shift();
     }
-    public fallback(): Promise<Rect> {
-        if (this.len ==1) return Promise.resolve(null);
+    public fallback(): Promise<RecordNode> {
+        if (this.len == 1) return Promise.resolve(null);
         const rect = this.stack.pop();
         this.undoStack.push(rect);
         this.currentValue = this.last();
-        console.log("撤销", this.stack)
+        //以key为判断，如果相邻的Node不同master key，说明换了master,需要掐头
+        if (rect.key != this.currentValue.key) {
+            const rect = this.stack.pop();
+            this.undoStack.push(rect);
+            this.currentValue = this.last();
+        }
         return Promise.resolve(this.currentValue);
     }
-    public cancelFallback(): Promise<Rect> {
+    public cancelFallback(): Promise<RecordNode> {
         if (this.undoLen == 0) return Promise.resolve(null);
+        if (this.undoLen > 0) {
+            //以key为判断，如果相邻的Node不同master key，说明换了master,需要掐头
+            if (this.undoStack[this.undoLen - 1].key != this.currentValue.key) {
+                const rect = this.undoStack.pop();
+                this.stack.push(rect);
+                this.currentValue = this.last();
+            }
+        }
         const rect = this.undoStack.pop();
         this.stack.push(rect);
         this.currentValue = this.last();
+
+        console.log(this.currentValue)
         return Promise.resolve(this.currentValue);
     }
     commit(): void {
-        if(this.len==0)this.push(this.cache);
+        if (this.cache == null) return;
+        //当栈为0,需要存左端的，或者前与后key不一致,或者前后操作不一致
+        const notOne = this.stack.length != 0 ? (this.cache.key != this.last().key) || (this.cache.type != this.last().type) : false;
+        if (this.stack.length == 0 || notOne) this.push(this.cache)
         this.push(this.now);
         this.cache = null
+        console.log(this.stack);
     }
 }
 

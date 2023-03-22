@@ -46,8 +46,7 @@ const controller:GestiController=gesti.controller;
 // window.addEventListener('wheel',(e)=>{
 //     controller.wheel(e);
 // })
-const debounce=Debounce((arg)=>{console.log("卧槽",arg)},1000);
-const throttle=Throttle((arg)=>{console.log("卧槽",arg)},1000);
+
 
 // document.querySelector("#save").addEventListener("click",(e)=>{
 //     //controller.lock();
