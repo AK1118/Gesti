@@ -1,5 +1,4 @@
 import { RecordNode } from "./abstract/operation-observer";
-import { OperationTypeEmum } from "./enums";
 import RecorderInterface from "./interfaces/recorder";
 
 //操作记录
@@ -40,11 +39,6 @@ class Recorder implements RecorderInterface {
         //不为空时赋值，或者不是同一个时
 
         if (this.cache != null) {
-            // if (this.cache.type != node.type) {
-            //     this.commit();
-            //     this.cache = node;
-            //     return;
-            // }
             return;
         }
         this.cache = node;
@@ -53,6 +47,7 @@ class Recorder implements RecorderInterface {
         this.now = node;
     }
     push(node: RecordNode) {
+        if(node==null)return;
         this.stack.push(node);
         this.undoStack = [];
         this.currentValue = node;
@@ -85,7 +80,6 @@ class Recorder implements RecorderInterface {
         this.stack.push(rect);
         this.currentValue = this.last();
 
-        console.log(this.currentValue)
         return Promise.resolve(this.currentValue);
     }
     commit(): void {
@@ -95,7 +89,7 @@ class Recorder implements RecorderInterface {
         if (this.stack.length == 0 || notOne) this.push(this.cache)
         this.push(this.now);
         this.cache = null
-        console.log(this.stack);
+      //  console.log(this.stack);
     }
 }
 

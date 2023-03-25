@@ -55,10 +55,10 @@ class DragButton extends Button {
         /*不适用于scale函数，需要基于原大小改变*/
         const newWidth = ~~(oldRect.size.width * scale),
             newHeight = ~~(oldRect.size.height * scale);
-        this.master.rect.setSize(newWidth, newHeight);
+        this.master.rect.setSize(newWidth, newHeight,true);
         /*this.oldAngle为弧度，偏移量*/
         const angle = Math.atan2(offsety, offsetx) - this.oldAngle;
-        this.master.rect.setAngle(angle);
+        this.master.rect.setAngle(angle,true);
     }
     public get getOldAngle(): number {
         return this.oldAngle;

@@ -332,13 +332,16 @@ class _Tools {
         const obj=imageBoxList.find((item:ImageBox)=>{
              return item.key==node.key;
         });
-        console.log("找到",obj,node)
         if(obj){
             switch(node.type){
                 case "position":obj.rect.position=node.data;break;
                 case "angle":obj.rect.setAngle(node.data);break;
                 case "scale":obj.rect.setScale(node.data);break;
                 case "size":obj.rect.setSize(node.data.width,node.data.height);break;
+                case "drag":{
+                    obj.rect.setSize(node.data.size.width,node.data.size.height);
+                    obj.rect.setAngle(node.data.angle);
+                }break;
             }
         }
         kit.update();

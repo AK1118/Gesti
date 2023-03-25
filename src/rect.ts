@@ -1,4 +1,4 @@
-import {  ObserverObj, OperationType } from "./abstract/operation-observer";
+import { ObserverObj, OperationType } from "./abstract/operation-observer";
 import RecorderInterface from "./interfaces/recorder";
 import Recorder from "./recorder";
 import Vector from "./vector";
@@ -21,23 +21,28 @@ class Size {
     toVector() {
         return new Vector(this.width, this.height);
     }
+    copy():Size{
+        return new Size(
+            this.width,
+            this.height,
+        );
+    }
 }
 
-
-class Rect extends ObserverObj{
+class Rect extends ObserverObj {
     public onDrag: onDragFunction;
     public beforeDrag: onDragFunction;
     private _angle: number = 0;
     private _vertex: Vertex;
     private _position: Vector;
     private _size: Size;
-    private _scale:number;
+    private _scale: number;
     public key: string = Math.random().toString(16).substring(2);
-    constructor(params?: rectparams,key?:string,options?:{
-        angle:number
+    constructor(params?: rectparams, key?: string, options?: {
+        angle: number
     }) {
         super();
-        const { width, height, x, y} = params || {
+        const { width, height, x, y } = params || {
             x: 0,
             y: 0,
             width: 0,
@@ -45,11 +50,11 @@ class Rect extends ObserverObj{
         };
         this._size = new Size(width, height);
         this._position = new Vector(x || 0, y || 0);
-        if(key){
-            this.key=key;
+        if (key) {
+            this.key = key;
         }
-        if(options){
-            const {angle}=options;
+        if (options) {
+            const { angle } = options;
             this.setAngle(angle);
         }
     }
@@ -81,26 +86,38 @@ class Rect extends ObserverObj{
         return this._angle;
     }
     public set position(position: Vector) {
-        this.beforeReport(position,"position");
+        this.beforeReport(position, "position");
         this._position = position;
-        this.report(position,"position");
+        this.report(position, "position");
     }
     public setScale(scale: number): void {
-        this.beforeReport(scale,"scale");
+        this.beforeReport(scale, "scale");
         this._size.width *= ~~scale;
         this._size.height *= ~~scale;
-        this.report(scale,"scale");
+        this.report(scale, "scale");
     }
-    public setSize(width: number, height: number): void {
-        this.beforeReport(this._size,"size");
-        this._size.width =~~ width;
+    /**
+     * @description 拖拽处需要表明拖拽
+     * @param width 
+     * @param height 
+     */
+    public setSize(width: number, height: number, isDrag?: boolean): void {
+        //之前
+        if (isDrag) this.beforeReport({ size: new Size(width, height), angle: this._angle }, "drag"); else
+            this.beforeReport(new Size(width, height), "size");
+        this._size.width = ~~width;
         this._size.height = ~~height;
-        this.report(this._size,"size");
+        //之后
+        if (isDrag) this.report({ size: new Size(width, height), angle: this._angle }, "drag"); else
+            this.report(new Size(width, height), "size");
     }
-    public setAngle(angle: number): void {
-        this.beforeReport(angle,"angle");
+    public setAngle(angle: number, isDrag?: boolean): void {
+        //之前
+        if (isDrag) this.beforeReport({ size:this._size.copy(), angle: this._angle }, "drag"); else
+        this.beforeReport(angle, "angle");
         this._angle = angle;
-        this.report(angle,"angle");
+        if (isDrag) this.report({ size:this._size.copy(), angle: this._angle }, "drag"); else
+        this.report(angle, "angle");
     }
     /**
      * @description 向观察者汇报自己的变化情况
@@ -110,7 +127,7 @@ class Rect extends ObserverObj{
      */
     private report(value: any, type: keyof OperationType): void {
         if (this.observer == null) return;
-        this.observer.report(value,type);
+        this.observer.report(value, type);
     }
     /**
      * @description 向观察者汇报自己的变化情况之前
@@ -120,23 +137,23 @@ class Rect extends ObserverObj{
      */
     private beforeReport(value: any, type: keyof OperationType): void {
         if (this.observer == null) return;
-        this.observer.beforeReport(value,type);
+        this.observer.beforeReport(value, type);
     }
-    public copy(key?:string) {
+    public copy(key?: string) {
         return new Rect({
             width: this._size.width,
             height: this._size.height,
             x: this._position.x,
             y: this._position.y,
-        },key,{
-            angle:this.getAngle
+        }, key, {
+            angle: this.getAngle
         });
     }
-    public set(newRect:Rect){
+    public set(newRect: Rect) {
         this.position.set(newRect.position);
         this.setAngle(newRect.getAngle);
         this.setScale(newRect.scale);
-        this.setSize(newRect.size.width,newRect.size.height)
+        this.setSize(newRect.size.width, newRect.size.height)
     }
 }
 

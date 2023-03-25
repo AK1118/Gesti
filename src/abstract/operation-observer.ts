@@ -1,15 +1,20 @@
 import RecorderInterface from "../interfaces/recorder";
 import RenderObject from "../interfaces/render-object";
 import Recorder from "../recorder";
-import Rect from "../rect";
 import { Debounce, Throttle } from "../utils";
 
 //操作监听类型
+/**
+ * 值得注意的是，可能会有一些组合的指令
+ * 比如  size+angle=拖拽
+ * 需要另外声明出一个类型出来 drag
+ */
 interface OperationType {
     "size":Size,
     "angle":number,
     "scale":number,
     "position":Vector,
+    "drag":{angle:number,size:Size},
 };
 
 
@@ -27,6 +32,9 @@ interface OperationObserverType {
     didChangePosition(position: Vector): void;
     //改变倍数过后
     didChangeScale(scale: number): void;
+    //拖拽(angle,size)改变后
+    didDrag(value:{size:Size,angle:number}):void;
+
 }
 
 
@@ -96,13 +104,13 @@ class Record{
         this.recorder.setNow(now)
     },0);
     private debounceBefore:Function=Throttle((args:{value:any,type:keyof OperationType,master:RenderObject})=>{
-      
         const {value,type,master}=args;
         const before=this.getNode(value,type,master);
         this.recorder.setCache(before)
     },100);
     //记录现在的窗台
     public recordNow(value:any,type:keyof OperationType,master:RenderObject){
+       
         this.debounceNow({value,type,master});
     }
     //记录现在的窗台
@@ -127,6 +135,7 @@ class Record{
  * 如果需要撤销操作，组件必须继承该抽象类实现
  */
 abstract class OperationObserver implements OperationObserverType {
+    
     private obj: RenderObject;
     private recordClazz:Record=new Record();
     /**
@@ -176,9 +185,10 @@ abstract class OperationObserver implements OperationObserverType {
             case "position":
                 this.didChangePosition(value);
                 break;
-
-            default:
+            case "drag":
+                this.didDrag(value);
                 break;
+            default:{}
         }
     }
     //移除观察者
@@ -190,6 +200,7 @@ abstract class OperationObserver implements OperationObserverType {
     public didChangeSize(size: Size): void {}
     public didChangePosition(position: Vector): void {}
     public didChangeScale(scale: number): void {}
+    public didDrag(value: { size: Size; angle: number; }): void {}
 }
 
 
