@@ -1,10 +1,10 @@
 import { FuncButtonTrigger } from "../enums";
-import ImageBox from "../imageBox";
 import Button from "../abstract/button";
 import Painter from "../painter";
 import Rect from "../rect";
 import Vector from "../vector";
 import Widgets from "../widgets";
+import ViewObject from "../abstract/view-object";
 
 class CloseButton extends Button {
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
@@ -14,8 +14,8 @@ class CloseButton extends Button {
     rect: Rect;
     //相对坐标
     relativeRect: Rect;
-    master: ImageBox;
-    constructor(master: ImageBox) {
+    master: ViewObject;
+    constructor(master: ViewObject) {
         super(master);
         this.init({
             percentage:[.5, -.5]
@@ -25,7 +25,7 @@ class CloseButton extends Button {
         this.updateRelativePosition();
         this.setAbsolutePosition(vector);
     }
-    setMaster(master: ImageBox): void {
+    setMaster(master: ViewObject): void {
         this.master = master;
     }
     effect(): void {

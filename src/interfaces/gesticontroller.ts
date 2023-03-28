@@ -28,9 +28,13 @@ interface LayerController{
      */
     lock():void;
     /**
-     * 取消所有被聚焦的对象|图层
+     * 取消所有被聚焦的对象
      */
     cancelAll():void;
+    /**
+     * 取消当前被聚焦对象
+     */
+    cancel():void,
 }
 
 //画布控制器

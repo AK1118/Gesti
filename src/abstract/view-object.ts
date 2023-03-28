@@ -1,15 +1,21 @@
+import { CloseButton, MirrorButton, RotateButton } from "../buttons";
+import DelockButton from "../buttons/delockButton";
+import DragButton from "../buttons/dragbutton";
+import LockButton from "../buttons/lockbutton";
 import RenderObject from "../interfaces/render-object";
 import Painter from "../painter";
 import Rect from "../rect";
+import Vector from "../vector";
 import { Point } from "../vertex";
 import Button from "./button";
+import OperationObserver from "./operation-observer";
 
 /**
  * 凡是带有操作点的对象都是它，
  * 例如 图片、文字 等
  */
-abstract class ViewObject implements RenderObject{
-    public selected: boolean = false;
+abstract class ViewObject extends OperationObserver implements RenderObject {
+	public selected: boolean = false;
 	private scale: number = 1;
 	public key: string | number = +new Date();
 	private isMirror: boolean = false;
@@ -18,16 +24,34 @@ abstract class ViewObject implements RenderObject{
 	public beforeRect: Rect;
 	private layer: number = 0;
 	private funcButton: Array<Button> = new Array<Button>();
-
-	constructor() {
-		
-	}
-	relativeRect: Rect;
+	public relativeRect: Rect;
 	/**
 	 * @description 是否冻结锁住，
 	 * 锁住过后可被选取，但是不能位移和改变大小
 	 */
 	private _lock: boolean = false;
+	constructor() {
+		super();
+		
+	}
+	public init() {
+		this.funcButton = [
+			new DragButton(this),
+			new MirrorButton(this),
+			new CloseButton(this),
+			new RotateButton(this),
+			new LockButton(this),
+			new DelockButton(this),
+		];
+		this.relativeRect = new Rect({
+			x: 0,
+			y: 0,
+			width: this.rect.size.width,
+			height: this.rect.size.height,
+		});
+		this.addObserver(this);
+	}
+	
 	/**
 	 * @description 锁住
 	 */
@@ -61,7 +85,24 @@ abstract class ViewObject implements RenderObject{
 		this.draw(paint)
 	}
 	public draw(paint: Painter): void {
+		paint.beginPath();
+		paint.save();
+		paint.translate(this.rect.position.x, this.rect.position.y);
+		paint.rotate(this.rect.getAngle);
+		if (this.isMirror) paint.scale(-1, 1)
 		this.drawImage(paint);
+		if (this.isMirror) paint.scale(-1, 1)
+		if (this.selected) {
+			this.drawStroke(paint);
+			this.updateFuncButton(paint);
+		}
+		paint.restore();
+		paint.translate(0, 0);
+		/*更新顶点数据*/
+		this.rect.updateVertex();
+		/*渲染顶点*/
+		paint.closePath();
+
 	}
 	//当被锁定时触发
 	private onLock() {
@@ -77,9 +118,17 @@ abstract class ViewObject implements RenderObject{
 			button.disabled = button.isFree;
 		});
 	}
-	private drawImage(paint: Painter): void {
-		
+	/**
+	 * 该方法需要子类重写
+	 * @param paint 
+	 */
+	public drawImage(paint: Painter): void {
+
 	}
+	/**
+	 * 被选中后外边框
+	 * @param paint 
+	 */
 	private drawStroke(paint: Painter): void {
 		paint.lineWidth = 2;
 		paint.strokeStyle = "#fff";
@@ -92,19 +141,17 @@ abstract class ViewObject implements RenderObject{
 	 * @param paint 
 	 */
 	private updateFuncButton(paint: Painter): void {
+		
 		const rect: Rect = this.rect;
 		const x: number = rect.position.x,
 			y: number = rect.position.y;
-
-		//const len =  Vector.mag(rect.size.toVector());
 		this.funcButton.forEach((button: Button) => {
-			const len:number=button.originDistance;
+			const len: number = button.originDistance;
 			if (button.disabled) return;
 			const angle = this.rect.getAngle + button.oldAngle;
-			const newx = Math.cos(angle) *len + x;
-			const newy = Math.sin(angle) *len + y;
+			const newx = Math.cos(angle) * len + x;
+			const newy = Math.sin(angle) * len + y;
 			const vector = new Vector(~~newx, ~~newy);
-			// if (this.isLock && (!button.isFree)) { }
 			button.updatePosition(vector);
 			button.update(paint);
 		});
@@ -112,7 +159,7 @@ abstract class ViewObject implements RenderObject{
 	/**
 	 * @description
 	 * 
-	 * 检测 @ImageBox 的4个顶点是否被点击到
+	 * 检测 @ViewObject 的4个顶点是否被点击到
 	 * 顶点位置
 	 * 0   1
 	 * 3   2
@@ -141,7 +188,7 @@ abstract class ViewObject implements RenderObject{
 		this.selected = false;
 	}
 	public onUp(paint: Painter) {
-		/*在抬起鼠标时，ImageBox还没有被Calcel，为再次聚焦万向按钮做刷新数据*/
+		/*在抬起鼠标时，ViewObject还没有被Calcel，为再次聚焦万向按钮做刷新数据*/
 		this.onChanged();
 	}
 	public enlarge() {
@@ -154,7 +201,7 @@ abstract class ViewObject implements RenderObject{
 		this.scale -= .1;
 		this.doScale();
 	}
-	doScale() {
+	private doScale() {
 		if (this.isLock) return;
 		this.rect.size.width *= this.scale;
 		this.rect.size.height *= this.scale;
@@ -169,8 +216,10 @@ abstract class ViewObject implements RenderObject{
 	/**
 	 * 世界坐标居中
 	 */
-	public center(){
+	public center() {
 
 	}
-	public didChangePosition(position: globalThis.Vector): void {}
 }
+
+
+export default ViewObject;

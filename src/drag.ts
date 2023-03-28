@@ -4,7 +4,7 @@ import Vector from "./vector";
 class Drag {
     private rect: Rect = null;
     private offset: Vector;
-    public catchImageBox(rect: Rect, position: Vector | any): void {
+    public catchViewObject(rect: Rect, position: Vector | any): void {
         this.rect = rect;
        this.offset=new Vector( this.rect.position.x - position.x,
        this.rect.position.y - position.y,)

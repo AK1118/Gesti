@@ -1,23 +1,24 @@
 import { FuncButtonTrigger } from "../enums";
-import ImageBox from "../imageBox";
+ 
 import Button from "../abstract/button";
 import Painter from "../painter";
 import Rect from "../rect";
 import Vector from "../vector";
 import Widgets from "../widgets";
+import ViewObject from "../abstract/view-object";
 
 class RotateButton extends Button {
     public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
     public rect: Rect;
-    public master: ImageBox
-    private oldImageBoxRect: Rect = null;
+    public master: ViewObject
+    private oldViewObjectRect: Rect = null;
     private oldRadius: number = 0;
     public oldAngle: number = 0;
     public radius: number = 10;
     private disable: boolean = false;
     public relativeRect: Rect;
     key: string | number = +new Date();
-    constructor(master: ImageBox) {
+    constructor(master: ViewObject) {
         super(master);
         this.init({
             percentage: [0, .8]
@@ -33,7 +34,7 @@ class RotateButton extends Button {
         this.updateRelativePosition();
         this.setAbsolutePosition(vector);
     }
-    setMaster(master: ImageBox): void {
+    setMaster(master: ViewObject): void {
         this.master = master;
     }
     /**
@@ -46,9 +47,9 @@ class RotateButton extends Button {
 
         /**
          * @param {ImageRect} newRect 新的万向点Rect三个月还有
-         * @description 万向点的坐标是基于 @ImageBox 内的Rect @ImageRect 的，所以得到的一直是相对坐标
+         * @description 万向点的坐标是基于 @ViewObject 内的Rect @ImageRect 的，所以得到的一直是相对坐标
          */
-        const oldRect = this.oldImageBoxRect;
+        const oldRect = this.oldViewObjectRect;
         const offsetx = newRect.position.x - oldRect.position.x,
             offsety = newRect.position.y - oldRect.position.y;
         let angle = Math.atan2(offsety, offsetx) - this.oldAngle;
@@ -69,7 +70,7 @@ class RotateButton extends Button {
         this.draw(paint);
     }
     onSelected(): void {
-        this.oldImageBoxRect = this.master.rect.copy();
+        this.oldViewObjectRect = this.master.rect.copy();
         this.initScale();
     }
     hide() {

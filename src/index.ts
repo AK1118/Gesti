@@ -25,9 +25,9 @@ gesti.addImage(gesti.createImage(img,{
 //     height:30,
 // }))
 const controller:GestiController=gesti.controller;
-controller.addImage(
-    controller.createImage(img)
-)
+// controller.addImage(
+//     controller.createImage(img)
+// )
 // window.addEventListener('touchstart',(e)=>{
 //     controller.down(e);
 // })

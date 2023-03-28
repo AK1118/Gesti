@@ -1,11 +1,11 @@
 import Button from "./abstract/button";
 import { RecordNode } from "./abstract/operation-observer";
+import ViewObject from "./abstract/view-object";
 import CatchPointUtil from "./catchPointUtil";
 import Drag from "./drag";
 import { FuncButtonTrigger } from "./enums";
 import GestiEventManager, { GestiEvent } from "./event";
 import Gesture from "./gesture";
-import ImageBox from "./imageBox";
 import GestiController from "./interfaces/gesticontroller";
 import RecorderInterface from "./interfaces/recorder";
 import RenderObject from "./interfaces/render-object";
@@ -13,7 +13,9 @@ import Painter from "./painter";
 import Recorder from "./recorder";
 import Rect from "./rect";
 import Vector from "./vector";
+import ImageBox from "./viewObject/image";
 import XImage from "./ximage";
+
 
 enum EventHandlerState {
     down,
@@ -37,7 +39,7 @@ enum LayerOperationType {
 
 class ImageToolkit implements GestiController {
     //所有图层集合
-    private imageBoxList: Array<ImageBox> = new Array<ImageBox>();
+    private ViewObjectList: Array<ViewObject> = new Array<ViewObject>();
     //手势监听器
     private eventHandler: GestiEvent;
     //手势状态
@@ -47,7 +49,7 @@ class ImageToolkit implements GestiController {
     //手势处理识别器
     private gesture: Gesture = new Gesture();
     //当前选中的图层
-    private selectedImageBox: ImageBox = null;
+    private selectedViewObject: ViewObject = null;
     //是否所选图层
     private isMultiple = false;
     //canvas偏移量
@@ -73,35 +75,39 @@ class ImageToolkit implements GestiController {
         this.paint = new Painter(paint);
         this.bindEvent();
     }
+    cancel(): void {
+       this.selectedViewObject?.cancel();
+       this.update();
+    }
     cancelAll(): void {
-        this.imageBoxList.forEach((item:ImageBox)=>item.cancel());
+        this.ViewObjectList.forEach((item:ViewObject)=>item.cancel());
         this.update();
     }
     layerLower(): void {
-        this.tool.arrangeLayer(this.imageBoxList, this.selectedImageBox, LayerOperationType.lower);
+        this.tool.arrangeLayer(this.ViewObjectList, this.selectedViewObject, LayerOperationType.lower);
     }
     layerRise(): void {
-        this.tool.arrangeLayer(this.imageBoxList, this.selectedImageBox, LayerOperationType.rise);
+        this.tool.arrangeLayer(this.ViewObjectList, this.selectedViewObject, LayerOperationType.rise);
     }
     layerTop(): void {
-        this.tool.arrangeLayer(this.imageBoxList, this.selectedImageBox, LayerOperationType.top);
+        this.tool.arrangeLayer(this.ViewObjectList, this.selectedViewObject, LayerOperationType.top);
     }
     layerBottom(): void {
-        this.tool.arrangeLayer(this.imageBoxList, this.selectedImageBox, LayerOperationType.bottom);
+        this.tool.arrangeLayer(this.ViewObjectList, this.selectedViewObject, LayerOperationType.bottom);
     }
     deLock(): void {
-        this.selectedImageBox.deblock();
+        this.selectedViewObject.deblock();
     }
     lock(): void {
-        this.selectedImageBox.lock();
+        this.selectedViewObject.lock();
     }
     async fallback() {
        const node:RecordNode=await  this.recorder.fallback();
-       this.tool.fallbackImageBox(this.imageBoxList,node,this);
+       this.tool.fallbackViewObject(this.ViewObjectList,node,this);
     }
     async cancelFallback(){
         const node:RecordNode=await  this.recorder.cancelFallback();
-        this.tool.fallbackImageBox(this.imageBoxList,node,this);
+        this.tool.fallbackViewObject(this.ViewObjectList,node,this);
     }
    
     
@@ -137,18 +143,18 @@ class ImageToolkit implements GestiController {
      * @description 只有在选中对象时该监听才生效
      */
     public addListening(): void {
-        this.gesture.addListenGesti("click", (imageBox: ImageBox, position: Vector) => {
-            //  console.log("点击",imageBox);
+        this.gesture.addListenGesti("click", (ViewObject: ViewObject, position: Vector) => {
+            //  console.log("点击",ViewObject);
         });
-        this.gesture.addListenGesti("dbclick", (imageBox: ImageBox, position: Vector) => {
+        this.gesture.addListenGesti("dbclick", (ViewObject: ViewObject, position: Vector) => {
             //  console.log("双击",position);
         })
-        this.gesture.addListenGesti("longpress", (imageBox: ImageBox, position: Vector) => {
+        this.gesture.addListenGesti("longpress", (ViewObject: ViewObject, position: Vector) => {
             // console.log("长按",position);
         })
-        this.gesture.addListenGesti("twotouch", (imageBox: ImageBox, position: Vector) => {
+        this.gesture.addListenGesti("twotouch", (ViewObject: ViewObject, position: Vector) => {
             //console.log("二指",position);
-            // this.gesture.onDown(this.selectedImageBox, position);
+            // this.gesture.onDown(this.selectedViewObject, position);
         });
     }
     public cancelEvent(): void {
@@ -161,9 +167,9 @@ class ImageToolkit implements GestiController {
         const event: Vector | Vector[] = this.correctEventPosition(v);
 
         //手势解析处理
-        this.gesture.onDown(this.selectedImageBox, event);
+        this.gesture.onDown(this.selectedViewObject, event);
 
-        if (this.selectedImageBox ?? false) {
+        if (this.selectedViewObject ?? false) {
             if (Array.isArray(event)) {
                 return;
             }
@@ -171,20 +177,20 @@ class ImageToolkit implements GestiController {
         }
 
         /**
-         * 检测是否点击到ImageBox对象
+         * 检测是否点击到ViewObject对象
          */
-        const selectedImageBox: ImageBox = CatchPointUtil.catchImageBox(this.imageBoxList, event);
-        if (selectedImageBox ?? false) {
-            this.debug(["选中了", selectedImageBox]);
-            if (!this.isMultiple && (this.selectedImageBox ?? false)) {
-                this.selectedImageBox.cancel();
+        const selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(this.ViewObjectList, event);
+        if (selectedViewObject ?? false) {
+            this.debug(["选中了", selectedViewObject]);
+            if (!this.isMultiple && (this.selectedViewObject ?? false)) {
+                this.selectedViewObject.cancel();
             }
-            this.selectedImageBox = selectedImageBox;
+            this.selectedViewObject = selectedViewObject;
             //选中后变为选中状态
-            this.selectedImageBox.onSelected();
+            this.selectedViewObject.onSelected();
             //不允许在锁定时被拖拽选中进行操作
-            if (!selectedImageBox.isLock)
-                this.drag.catchImageBox(this.selectedImageBox.rect, event);
+            if (!selectedViewObject.isLock)
+                this.drag.catchViewObject(this.selectedViewObject.rect, event);
         }
         this.update();
     }
@@ -193,7 +199,7 @@ class ImageToolkit implements GestiController {
         if (this.eventHandlerState === EventHandlerState.down) {
             const event: Vector | Vector[] = this.correctEventPosition(v);
             //手势解析处理
-            this.gesture.onMove(this.selectedImageBox, event);
+            this.gesture.onMove(this.selectedViewObject, event);
             //手势
             if (Array.isArray(event)) {
                 this.gesture.update(event);
@@ -210,10 +216,10 @@ class ImageToolkit implements GestiController {
         const event: Vector | Vector[] = this.correctEventPosition(v);
         this.eventHandlerState = EventHandlerState.up;
         //手势解析处理
-        this.gesture.onUp(this.selectedImageBox, event);
+        this.gesture.onUp(this.selectedViewObject, event);
         this.drag.cancel();
-        if (this.selectedImageBox ?? false) {
-            this.selectedImageBox.onUp(this.paint);
+        if (this.selectedViewObject ?? false) {
+            this.selectedViewObject.onUp(this.paint);
             //鼠标|手指抬起时提交一次操作
             this.recorder.commit();
         }
@@ -224,10 +230,10 @@ class ImageToolkit implements GestiController {
         const {
             deltaY
         } = e;
-        if (this.selectedImageBox != null) {
+        if (this.selectedViewObject != null) {
             if (deltaY < 0)
-                this.selectedImageBox.enlarge();
-            else this.selectedImageBox.narrow();
+                this.selectedViewObject.enlarge();
+            else this.selectedViewObject.narrow();
         }
         this.update();
 
@@ -243,15 +249,14 @@ class ImageToolkit implements GestiController {
         return vector.sub(this.offset);
     }
     private checkFuncButton(eventPosition: Vector): boolean {
-        const _button: Button | boolean = this.selectedImageBox.checkFuncButton(eventPosition);
+        const _button: Button | boolean = this.selectedViewObject.checkFuncButton(eventPosition);
         const result: any = _button;
-
         //确保是按钮
         if (result instanceof Button) {
             const button: Button = result;
             if (button.trigger == FuncButtonTrigger.drag) {
                 button.onSelected();
-                this.drag.catchImageBox(button.rect, eventPosition);
+                this.drag.catchViewObject(button.rect, eventPosition);
             } else if (button.trigger == FuncButtonTrigger.click) {
                 button.effect();
             }
@@ -260,29 +265,25 @@ class ImageToolkit implements GestiController {
 
         this.drag.cancel();
         this.gesture.cancel();
-        // this.selectedImageBox.cancel();
-        // this.selectedImageBox = null;
         return false;
     }
     public update() {
         this.debug("Update the Canvas");
         this.paint.clearRect(0, 0, this.canvasRect.size.width, this.canvasRect.size.height);
-        this.imageBoxList.forEach((item: ImageBox) => {
+        this.ViewObjectList.forEach((item: ViewObject) => {
             if (!item.disabled) item.update(this.paint);
         })
     }
     public addImage(ximage: XImage): Promise<boolean> {
         this.debug("Add a Ximage");
         if (ximage.constructor.name != "XImage") throw Error("不是XImage类");
-
-
         const image: XImage = ximage;
         image.width *= image.scale;
         image.height *= image.scale;
         image.x = this.canvasRect.size.width >> 1;
         image.y = this.canvasRect.size.height >> 1;
-        const imageBox: ImageBox = new ImageBox(image);
-        this.imageBoxList.push(imageBox);
+        const imageBox:ImageBox = new ImageBox(image);
+        this.ViewObjectList.push(imageBox);
         setTimeout(() => {
             this.update();
         }, 100);
@@ -299,48 +300,48 @@ class ImageToolkit implements GestiController {
 
 class _Tools {
     /**
-     * @description 传入 @ImageBox 对象，设置该对象的layer层级
-     * @param selectedImageBox 
+     * @description 传入 @ViewObject 对象，设置该对象的layer层级
+     * @param selectedViewObject 
      */
-    public arrangeLayer(imageBoxList: Array<RenderObject>, selectedImageBox: ImageBox, operationType: LayerOperationType): void {
+    public arrangeLayer(ViewObjectList: Array<RenderObject>, selectedViewObject: ViewObject, operationType: LayerOperationType): void {
         /**
          * 层级重构算法，使用换位
-         * 如选中了第3个 @ImageBox ，就将第3个和第一个互换位置
+         * 如选中了第3个 @ViewObject ，就将第3个和第一个互换位置
          */
-        const ndx = imageBoxList.findIndex((item: ImageBox) => item.key === selectedImageBox.key);
-        const len = imageBoxList.length - 1;
+        const ndx = ViewObjectList.findIndex((item: ViewObject) => item.key === selectedViewObject.key);
+        const len = ViewObjectList.length - 1;
         // 0为底部   len为顶部
         switch (operationType) {
             case LayerOperationType.top: {
-                let temp = imageBoxList[len];
-                imageBoxList[len] = selectedImageBox;
-                imageBoxList[ndx] = temp;
+                let temp = ViewObjectList[len];
+                ViewObjectList[len] = selectedViewObject;
+                ViewObjectList[ndx] = temp;
             }; break;
             case LayerOperationType.bottom: {
-                let temp = imageBoxList[0];
-                imageBoxList[0] = selectedImageBox;
-                imageBoxList[ndx] = temp;
+                let temp = ViewObjectList[0];
+                ViewObjectList[0] = selectedViewObject;
+                ViewObjectList[ndx] = temp;
             }; break;
             case LayerOperationType.rise: {
                 if (ndx == len) break;
-                let temp = imageBoxList[ndx + 1];
-                imageBoxList[ndx + 1] = selectedImageBox;
-                imageBoxList[ndx] = temp;
+                let temp = ViewObjectList[ndx + 1];
+                ViewObjectList[ndx + 1] = selectedViewObject;
+                ViewObjectList[ndx] = temp;
             }; break;
             case LayerOperationType.lower: {
                 console.log(ndx)
                 if (ndx == 0) break;
-                const temp = imageBoxList[ndx - 1];
-                imageBoxList[ndx - 1] = selectedImageBox;
-                imageBoxList[ndx] = temp;
+                const temp = ViewObjectList[ndx - 1];
+                ViewObjectList[ndx - 1] = selectedViewObject;
+                ViewObjectList[ndx] = temp;
 
             }; break;
         }
     }
 
-    public fallbackImageBox(imageBoxList: Array<RenderObject>,node:RecordNode,kit:ImageToolkit){
+    public fallbackViewObject(ViewObjectList: Array<RenderObject>,node:RecordNode,kit:ImageToolkit){
         if(node==null)return;
-        const obj=imageBoxList.find((item:ImageBox)=>{
+        const obj=ViewObjectList.find((item:ViewObject)=>{
              return item.key==node.key;
         });
         if(obj){

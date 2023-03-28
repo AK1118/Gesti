@@ -13,8 +13,10 @@ class GestiControllerImpl implements GestiController{
 	private kit:ImageToolkit;
 	constructor(kit:ImageToolkit) {
         //使用控制器时，取消原有控制
-       // kit.cancelEvent();
 		this.kit = kit;
+	}
+	cancel(): void {
+		this.kit.cancel();
 	}
 	cancelAll(): void {
 		this.kit.cancelAll();

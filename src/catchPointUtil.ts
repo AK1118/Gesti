@@ -1,5 +1,5 @@
+import ViewObject from "./abstract/view-object";
 import CheckInside from "./checkInside";
-import ImageBox from "./imageBox";
 import Rect from "./rect";
 import Vector from "./vector";
 import { Point } from "./vertex";
@@ -8,14 +8,14 @@ class CatchPointUtil{
     static _checkInside:CheckInside=new CheckInside;
     /**
      * 
-     * @param imageBox 
+     * @param ViewObject 
      * @param event 
      * @returns 
      */
-    static catchImageBox(imageBoxList:ImageBox[],position:any):ImageBox{
-        const len:number=imageBoxList.length-1;
+    static catchViewObject(ViewObjectList:ViewObject[],position:any):ViewObject{
+        const len:number=ViewObjectList.length-1;
         for(let i=len;i>=0;i--){
-            const item:ImageBox=imageBoxList[i];
+            const item:ViewObject=ViewObjectList[i];
             //隐藏过后不需要检测位置
             if(item.disabled)continue;
             if(CatchPointUtil.inArea(item.rect,position)){

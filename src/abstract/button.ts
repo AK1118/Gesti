@@ -1,15 +1,16 @@
 import CatchPointUtil from "../catchPointUtil";
 import { FuncButtonTrigger } from "../enums";
-import ImageBox from "../imageBox";
+ 
 import RenderObject from "../interfaces/render-object";
 import Painter from "../painter";
 import Rect from "../rect";
 import Vector from "../vector";
+import ViewObject from "./view-object";
 
 
 //按钮抽象类
 export abstract class Button implements RenderObject {
-    constructor(master: ImageBox) {
+    constructor(master: ViewObject) {
         this.master = master;
     }
     //隐藏
@@ -17,7 +18,7 @@ export abstract class Button implements RenderObject {
     rect: Rect = new Rect();
     key: string | number;
     relativeRect: Rect = new Rect();
-    master: ImageBox;
+    master: ViewObject;
     radius: number = 10;
     oldAngle: number;
     //初始化时按钮离主体中心点的距离
