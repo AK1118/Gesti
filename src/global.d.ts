@@ -49,3 +49,13 @@ declare interface GestiEventParams{v:Vector|Vector[],sub(v:Vector):Vector}
 declare interface GestiEventFunction{
     (params:GestiEventParams):void;
 }
+
+
+declare interface createImageOptions {
+    data?: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions,
+    width?: number,
+    height?: number,
+    scale?: number,
+    maxScale?: number,
+    minScale?: number,
+}

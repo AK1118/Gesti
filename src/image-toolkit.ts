@@ -73,6 +73,10 @@ class ImageToolkit implements GestiController {
         this.paint = new Painter(paint);
         this.bindEvent();
     }
+    cancelAll(): void {
+        this.imageBoxList.forEach((item:ImageBox)=>item.cancel());
+        this.update();
+    }
     layerLower(): void {
         this.tool.arrangeLayer(this.imageBoxList, this.selectedImageBox, LayerOperationType.lower);
     }
@@ -115,6 +119,10 @@ class ImageToolkit implements GestiController {
     }
     //无须实现
     wheel(e: Event): void {
+        throw new Error("Method not implemented.");
+    }
+    //无需实现
+    createImage(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions): Promise<XImage> {
         throw new Error("Method not implemented.");
     }
     private bindEvent(): void {
@@ -263,9 +271,11 @@ class ImageToolkit implements GestiController {
             if (!item.disabled) item.update(this.paint);
         })
     }
-    public addImage(ximage: XImage): void {
+    public addImage(ximage: XImage): Promise<boolean> {
         this.debug("Add a Ximage");
         if (ximage.constructor.name != "XImage") throw Error("不是XImage类");
+
+
         const image: XImage = ximage;
         image.width *= image.scale;
         image.height *= image.scale;
@@ -275,7 +285,8 @@ class ImageToolkit implements GestiController {
         this.imageBoxList.push(imageBox);
         setTimeout(() => {
             this.update();
-        }, 100)
+        }, 100);
+        return Promise.resolve(true);
     }
     private debug(message: any): void {
         if (!this.isDebug) return;

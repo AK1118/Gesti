@@ -1,6 +1,7 @@
 import ImageToolkit from "./image-toolkit";
 import GestiController from "./interfaces/gesticontroller";
 import Vector from "./vector";
+import XImage from "./ximage";
 
 
 
@@ -15,6 +16,10 @@ class GestiControllerImpl implements GestiController{
        // kit.cancelEvent();
 		this.kit = kit;
 	}
+	cancelAll(): void {
+		this.kit.cancelAll();
+	}
+	
 	layerLower(): void {
 		this.kit.layerLower();
 	}
@@ -85,7 +90,7 @@ class GestiControllerImpl implements GestiController{
 	 * @description 判断是移动端还是Pc端
 	 * @private
 	 */
-	private eventTransForm(e:MouseEvent|Event|EventHandle,callback,key?:string){
+	private eventTransForm(e:MouseEvent|Event|EventHandle,callback:Function,key?:string){
 		if('touches' in e){
 			//移动端
 			/**
@@ -133,6 +138,42 @@ class GestiControllerImpl implements GestiController{
 			callback.bind(this.kit)(vector);
 		}
 	}
+	async addImage(ximage: XImage|Promise<XImage>): Promise<boolean> {
+		if (ximage.constructor.name == 'Promise') {
+            const _ximage = await ximage;
+            this.kit.addImage(_ximage);
+            return true;
+        }
+        //使用any类型强制转换
+        const _ximage: XImage = ximage as any;
+        this.kit.addImage(_ximage);
+        return true;
+	}
+	/**
+     * @description 根据传入的image生成一个 @ImageBitmap 实例，拿到图片的宽高数据，创建XImage对象
+     * @param image 
+     * @param options 
+     * @returns Promise< @XImage >
+     */
+    public createImage(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions): Promise<XImage> {
+        return new Promise(async (r, e) => {
+            try {
+                const bimp = await createImageBitmap(image);
+                const { width, height } = bimp;
+                const ximage = new XImage({
+                    data: bimp,
+                    width: options?.width || width,
+                    height: options?.height || height,
+                    scale: options?.scale || 1,
+                    maxScale: options?.maxScale || 10,
+                    minScale: options?.minScale || .1,
+                });
+                r(ximage)
+            } catch (error) {
+                r(error)
+            }
+        });
+    }
 }
 
 export default GestiControllerImpl;

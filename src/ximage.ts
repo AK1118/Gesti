@@ -1,4 +1,3 @@
-import { createImageOptions } from "./gesti";
 
 class XImage{
     data:any;
@@ -7,6 +6,17 @@ class XImage{
     x:number=0;
     y:number=0;
     scale:number=1;
+/**
+ *   interface createImageOptions {
+        data?: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions,
+        width?: number,
+        height?: number,
+        scale?: number,
+        maxScale?: number,
+        minScale?: number,
+    }
+ * 
+ */
     constructor(params:createImageOptions){
         const {data,width,height,scale}=params;
         if(!data||!width||!height)throw Error("宽或高不能为0");

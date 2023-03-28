@@ -5,18 +5,8 @@ import XImage from "./ximage";
 
 
 
-interface createImageOptions {
-    data?: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions,
-    width?: number,
-    height?: number,
-    scale?: number,
-    maxScale?: number,
-    minScale?: number,
-}
 
-export {
-    createImageOptions,
-}
+
 
 /**
  * 初始化该 @Gesti 实例时，由于平台不确定，用户必须传入 @CanvasRenderingContext2D 画笔作为

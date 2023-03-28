@@ -1,3 +1,4 @@
+import XImage from "../ximage";
 
 
 //图层控制器
@@ -26,6 +27,10 @@ interface LayerController{
      * 锁定图层
      */
     lock():void;
+    /**
+     * 取消所有被聚焦的对象|图层
+     */
+    cancelAll():void;
 }
 
 //画布控制器
@@ -42,6 +47,26 @@ interface ImageToolKitController{
      * 刷新画布
      */
     update():void;
+    /**
+     * 新增图片
+     * @param @XImage 
+     */
+    addImage(ximage: XImage|Promise<XImage>):Promise<boolean>;
+    /**
+     * @description 传入对应的值返回一个Promise<XImage>对象,option可传入 图片width、height、scale,maxScale,minScale,
+     * @param image 
+     * @param options 
+     * 
+    *   {
+                data?: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions,
+                width?: number,
+                height?: number,
+                scale?: number,
+                maxScale?: number,
+                minScale?: number,
+            }
+     */
+    createImage(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions): Promise<XImage>
 }
 /**
  * 控制器类，提供接口供给用户使用

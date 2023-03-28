@@ -1,27 +1,16 @@
-import Button from "./abstract/button";
-import OperationObserver from "./abstract/operation-observer";
-import { CloseButton, MirrorButton, RotateButton } from "./buttons";
-import DelockButton from "./buttons/delockButton";
-import DragButton from "./buttons/dragbutton";
-import LockButton from "./buttons/lockbutton";
-import CatchPointUtil from "./catchPointUtil";
-import RenderObject from "./interfaces/render-object";
-import Painter from "./painter";
-import Rect from "./rect";
-import Vector from "./vector";
-import { Point } from "./vertex";
-import XImage from "./ximage";
-class ImageBox extends OperationObserver implements RenderObject {
-	public selected: boolean = false;
+import RenderObject from "../interfaces/render-object";
+import Painter from "../painter";
+import Rect from "../rect";
+import { Point } from "../vertex";
+import Button from "./button";
+
+/**
+ * 凡是带有操作点的对象都是它，
+ * 例如 图片、文字 等
+ */
+abstract class ViewObject implements RenderObject{
+    public selected: boolean = false;
 	private scale: number = 1;
-	/**
-	 * 提供 @CanvasRenderingContext2D 渲染的数据
-	 */
-	private image: HTMLOrSVGImageElement | HTMLVideoElement | HTMLCanvasElement | ImageBitmap | OffscreenCanvas;
-	/**
-	 * 外层传入的 @XImage 原始数据
-	 */
-	private ximage: XImage;
 	public key: string | number = +new Date();
 	private isMirror: boolean = false;
 	public disabled: boolean = false;
@@ -30,27 +19,8 @@ class ImageBox extends OperationObserver implements RenderObject {
 	private layer: number = 0;
 	private funcButton: Array<Button> = new Array<Button>();
 
-	constructor(image: XImage) {
-		super();
-		this.image = image.data;
-		this.ximage = image;
-		this.rect = new Rect(image.toJson());
-		//this.beforeRect = this.rect.copy();
-		this.funcButton = [
-			new DragButton(this),
-			new MirrorButton(this),
-			new CloseButton(this),
-			new RotateButton(this),
-			new LockButton(this),
-			new DelockButton(this),
-		];
-		this.relativeRect = new Rect({
-			x: 0,
-			y: 0,
-			width: this.rect.size.width,
-			height: this.rect.size.height,
-		});
-		this.addObserver(this);
+	constructor() {
+		
 	}
 	relativeRect: Rect;
 	/**
@@ -108,27 +78,7 @@ class ImageBox extends OperationObserver implements RenderObject {
 		});
 	}
 	private drawImage(paint: Painter): void {
-		paint.beginPath();
-		paint.save();
-		paint.translate(this.rect.position.x, this.rect.position.y);
-		paint.rotate(this.rect.getAngle);
-		if (this.isMirror) paint.scale(-1, 1)
-		paint.drawImage(this.image, this.rect.position.x, this.rect.position.y, this.rect.size.width,
-			this.rect.size.height);
-		// paint.fillRect(-this.rect.size.width / 2, -this.rect.size.height / 2, this.rect.size.width,
-		// 	this.rect.size.height);
-		if (this.isMirror) paint.scale(-1, 1)
-		if (this.selected) {
-			this.drawStroke(paint);
-			this.updateFuncButton(paint);
-		}
-		paint.restore();
-		paint.translate(0, 0);
-		/*更新顶点数据*/
-		this.rect.updateVertex();
-		/*渲染顶点*/
-		//this.rect.vertex.drawPoints(paint);
-		paint.closePath();
+		
 	}
 	private drawStroke(paint: Painter): void {
 		paint.lineWidth = 2;
@@ -224,6 +174,3 @@ class ImageBox extends OperationObserver implements RenderObject {
 	}
 	public didChangePosition(position: globalThis.Vector): void {}
 }
-
-
-export default ImageBox;
