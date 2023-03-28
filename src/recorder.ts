@@ -54,7 +54,7 @@ class Recorder implements RecorderInterface {
         if (this.isFull) this.stack.shift();
     }
     public fallback(): Promise<RecordNode> {
-        if (this.len == 1) return Promise.resolve(null);
+        if (this.len <=1) return Promise.resolve(null);
         const rect = this.stack.pop();
         this.undoStack.push(rect);
         this.currentValue = this.last();

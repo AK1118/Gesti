@@ -62,6 +62,10 @@ class ImageToolkit implements GestiController {
     public isDebug: boolean = false;
     //记录操作
     private recorder: RecorderInterface = Recorder.getInstance();
+    /**
+     * 本次点击是否有选中到对象，谈起时需要置于false
+     */
+    private _inObjectArea:boolean=false;
     private tool: _Tools = new _Tools();
     constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
         const {
@@ -96,10 +100,10 @@ class ImageToolkit implements GestiController {
         this.tool.arrangeLayer(this.ViewObjectList, this.selectedViewObject, LayerOperationType.bottom);
     }
     deLock(): void {
-        this.selectedViewObject.deblock();
+        this.selectedViewObject?.deblock();
     }
     lock(): void {
-        this.selectedViewObject.lock();
+        this.selectedViewObject?.lock();
     }
     async fallback() {
        const node:RecordNode=await  this.recorder.fallback();
@@ -182,6 +186,7 @@ class ImageToolkit implements GestiController {
         const selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(this.ViewObjectList, event);
         if (selectedViewObject ?? false) {
             this.debug(["选中了", selectedViewObject]);
+            this._inObjectArea=true;
             if (!this.isMultiple && (this.selectedViewObject ?? false)) {
                 this.selectedViewObject.cancel();
             }
@@ -218,12 +223,13 @@ class ImageToolkit implements GestiController {
         //手势解析处理
         this.gesture.onUp(this.selectedViewObject, event);
         this.drag.cancel();
-        if (this.selectedViewObject ?? false) {
+        if ((this.selectedViewObject ?? false)&& this._inObjectArea) {
             this.selectedViewObject.onUp(this.paint);
             //鼠标|手指抬起时提交一次操作
             this.recorder.commit();
         }
         setTimeout(() => this.update(), 100)
+        this._inObjectArea=false;
     }
 
     public onWheel(e: WheelEvent): void {
@@ -253,6 +259,7 @@ class ImageToolkit implements GestiController {
         const result: any = _button;
         //确保是按钮
         if (result instanceof Button) {
+            this._inObjectArea=true;
             const button: Button = result;
             if (button.trigger == FuncButtonTrigger.drag) {
                 button.onSelected();
