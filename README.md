@@ -1,8 +1,9 @@
 ### 主要特性
 
-- Typescript开发，打包jsdk,灵活安装使用，不再为臃肿的操作烦恼。
-- 基于原生Canvas，兼容主流浏览器，PC端以及移动端,兼容微信小程序。
-- 拖拽缩放，移动端二指缩放，PC端鼠标缩放，点击即选中，可镜像操作等。
+- Typescript开发，JavaScript,TypeScript都支持
+- 支持 ESM & AMD
+- 基于原生Canvas，兼容主流浏览器，PC端以及移动端,兼容微信小程序，Uniapp App 端。
+- 极简操作，更多功能，持续更新。
 
 # 效果图
 
@@ -31,12 +32,23 @@
 			- [Gesti.XImage](#gestiximage)
 			- [Gesti.controller](#gesticontroller)
 	- [GestiController](#gesticontroller-1)
+			- [layerLower](#layerlower)
+			- [layerRise](#layerrise)
+			- [layerTop](#layertop)
+			- [layerBottom](#layerbottom)
+			- [lock](#lock)
+			- [deLock](#delock)
+			- [cancel](#cancel)
+			- [cancelAll](#cancelall)
+			- [fallback](#fallback)
+			- [cancelFallback](#cancelfallback)
 			- [down](#down)
 			- [up](#up)
 			- [move](#move)
 			- [wheel](#wheel)
 - [保存](#保存)
 - [在 微信小程序 | uniapp 端使用](#在-微信小程序--uniapp-端使用)
+- [可能会遇到的问题](#可能会遇到的问题)
 - [示例](#示例)
 			- [HTML](#html)
 			- [JavaScript 或 Typescript](#javascript-或-typescript)
@@ -136,6 +148,67 @@
 
 ## GestiController
 
+
+#### layerLower
+
+	layerLower():void;
+
+- 图层向下移动一层
+
+#### layerRise
+
+	layerRise():void;
+
+- 图层向上移动一层
+
+#### layerTop
+
+	layerTop():void;
+
+- 图层置于最顶层
+
+#### layerBottom
+
+	layerBottom():void;
+
+- 图层置于最底层
+
+#### lock
+
+	lock():void;
+
+- 锁定当前选中图层
+
+#### deLock
+
+	deLock():void;
+
+- 解锁当前选中图层
+
+#### cancel
+
+	cancel():void;
+
+- 取消当前被聚焦对象
+
+#### cancelAll
+
+	cancelAll():void;
+
+- 取消所有被聚焦对象
+
+#### fallback
+
+	fallback():void;
+
+- 撤销
+
+#### cancelFallback
+
+	fallback():void;
+
+- 取消上次撤销
+
 #### down
 
 	down(e: MouseEvent | Event | EventHandle): void;
@@ -169,7 +242,10 @@
 # 在 微信小程序 | uniapp 端使用
 - 微信小程序端我无法监听屏幕事件，但是您可以使用我提供的  [GestiController](#gesticontroller-1)  实现自定义事件。为canvas提供事件并在方法里面调用 [GestiController](#gesticontroller-1) 的各个方法。
 - 如果您的uniapp运行在H5端，那您无需担心任何问题，如果您在其他端，请参考以上微信小程序方案
-
+- 详细操作请参考Demo:  https://ext.dcloud.net.cn/plugin?id=10867
+# 可能会遇到的问题
+- 在执行操作方法后可能会出现画布为刷新问题，为您提供了controller.update方法手动刷新。
+- Demo下载地址:  https://ext.dcloud.net.cn/plugin?id=10867 
 
 # 示例
 
