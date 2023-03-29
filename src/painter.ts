@@ -78,6 +78,18 @@
 	getImageData(x:number, y:number, w:number, h:number) {
 		return this.paint.getImageData(x, y, w, h);
 	}
+	fillText(text: string, x: number, y: number, maxWidth?: number){
+		this.paint.fillText(text,x,y,maxWidth);
+	}
+	strokeText(text: string, x: number, y: number, maxWidth?: number){
+		this.paint.strokeText(text,x,y,maxWidth);
+	}
+	set font(font:string){
+		this.paint.font=font;
+	}
+	measureText(text:string):TextMetrics{
+		return this.paint?.measureText(text);
+	}
 	/*清空画布|刷新画布*/
 	update() {
 

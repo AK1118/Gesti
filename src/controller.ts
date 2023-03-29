@@ -15,6 +15,13 @@ class GestiControllerImpl implements GestiController{
         //使用控制器时，取消原有控制
 		this.kit = kit;
 	}
+	addText(text: string, options?: {
+        fontFamily?: string,
+        fontSize?: number,
+    }): Promise<boolean> {
+		
+		return this.kit.addText(text,options);
+	}
 	cancel(): void {
 		this.kit.cancel();
 	}

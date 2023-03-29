@@ -71,6 +71,15 @@ interface ImageToolKitController{
             }
      */
     createImage(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions): Promise<XImage>
+    /**
+     * @description 添加文字
+     * @param text 
+     * @param options 
+     */
+    addText(text: string, options?: {
+        fontFamily?: string,
+        fontSize?: number,
+    }):Promise<boolean>;
 }
 /**
  * 控制器类，提供接口供给用户使用

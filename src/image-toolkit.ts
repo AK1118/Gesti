@@ -14,6 +14,7 @@ import Recorder from "./recorder";
 import Rect from "./rect";
 import Vector from "./vector";
 import ImageBox from "./viewObject/image";
+import TextBox from "./viewObject/text";
 import XImage from "./ximage";
 
 
@@ -65,7 +66,7 @@ class ImageToolkit implements GestiController {
     /**
      * 本次点击是否有选中到对象，谈起时需要置于false
      */
-    private _inObjectArea:boolean=false;
+    private _inObjectArea: boolean = false;
     private tool: _Tools = new _Tools();
     constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
         const {
@@ -79,12 +80,13 @@ class ImageToolkit implements GestiController {
         this.paint = new Painter(paint);
         this.bindEvent();
     }
+
     cancel(): void {
-       this.selectedViewObject?.cancel();
-       this.update();
+        this.selectedViewObject?.cancel();
+        this.update();
     }
     cancelAll(): void {
-        this.ViewObjectList.forEach((item:ViewObject)=>item.cancel());
+        this.ViewObjectList.forEach((item: ViewObject) => item.cancel());
         this.update();
     }
     layerLower(): void {
@@ -106,15 +108,15 @@ class ImageToolkit implements GestiController {
         this.selectedViewObject?.lock();
     }
     async fallback() {
-       const node:RecordNode=await  this.recorder.fallback();
-       this.tool.fallbackViewObject(this.ViewObjectList,node,this);
+        const node: RecordNode = await this.recorder.fallback();
+        this.tool.fallbackViewObject(this.ViewObjectList, node, this);
     }
-    async cancelFallback(){
-        const node:RecordNode=await  this.recorder.cancelFallback();
-        this.tool.fallbackViewObject(this.ViewObjectList,node,this);
+    async cancelFallback() {
+        const node: RecordNode = await this.recorder.cancelFallback();
+        this.tool.fallbackViewObject(this.ViewObjectList, node, this);
     }
-   
-    
+
+
     //无须实现
     down(e: Event): void {
         throw new Error("Method not implemented.");
@@ -186,7 +188,7 @@ class ImageToolkit implements GestiController {
         const selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(this.ViewObjectList, event);
         if (selectedViewObject ?? false) {
             this.debug(["选中了", selectedViewObject]);
-            this._inObjectArea=true;
+            this._inObjectArea = true;
             if (!this.isMultiple && (this.selectedViewObject ?? false)) {
                 this.selectedViewObject.cancel();
             }
@@ -223,13 +225,13 @@ class ImageToolkit implements GestiController {
         //手势解析处理
         this.gesture.onUp(this.selectedViewObject, event);
         this.drag.cancel();
-        if ((this.selectedViewObject ?? false)&& this._inObjectArea) {
+        if ((this.selectedViewObject ?? false) && this._inObjectArea) {
             this.selectedViewObject.onUp(this.paint);
             //鼠标|手指抬起时提交一次操作
             this.recorder.commit();
         }
         setTimeout(() => this.update(), 100)
-        this._inObjectArea=false;
+        this._inObjectArea = false;
     }
 
     public onWheel(e: WheelEvent): void {
@@ -259,7 +261,7 @@ class ImageToolkit implements GestiController {
         const result: any = _button;
         //确保是按钮
         if (result instanceof Button) {
-            this._inObjectArea=true;
+            this._inObjectArea = true;
             const button: Button = result;
             if (button.trigger == FuncButtonTrigger.drag) {
                 button.onSelected();
@@ -289,8 +291,19 @@ class ImageToolkit implements GestiController {
         image.height *= image.scale;
         image.x = this.canvasRect.size.width >> 1;
         image.y = this.canvasRect.size.height >> 1;
-        const imageBox:ImageBox = new ImageBox(image);
+        const imageBox: ImageBox = new ImageBox(image);
         this.ViewObjectList.push(imageBox);
+        setTimeout(() => {
+            this.update();
+        }, 100);
+        return Promise.resolve(true);
+    }
+    public addText(text: string, options?: {
+        fontFamily?: string,
+        fontSize?: number,
+    }): Promise<boolean> {
+        const textBox: TextBox = new TextBox(text, this.paint, options);
+        this.ViewObjectList.push(textBox);
         setTimeout(() => {
             this.update();
         }, 100);
@@ -346,21 +359,21 @@ class _Tools {
         }
     }
 
-    public fallbackViewObject(ViewObjectList: Array<RenderObject>,node:RecordNode,kit:ImageToolkit){
-        if(node==null)return;
-        const obj=ViewObjectList.find((item:ViewObject)=>{
-             return item.key==node.key;
+    public fallbackViewObject(ViewObjectList: Array<RenderObject>, node: RecordNode, kit: ImageToolkit) {
+        if (node == null) return;
+        const obj = ViewObjectList.find((item: ViewObject) => {
+            return item.key == node.key;
         });
-        if(obj){
-            switch(node.type){
-                case "position":obj.rect.position=node.data;break;
-                case "angle":obj.rect.setAngle(node.data);break;
-                case "scale":obj.rect.setScale(node.data);break;
-                case "size":obj.rect.setSize(node.data.width,node.data.height);break;
-                case "drag":{
-                    obj.rect.setSize(node.data.size.width,node.data.size.height);
+        if (obj) {
+            switch (node.type) {
+                case "position": obj.rect.position = node.data; break;
+                case "angle": obj.rect.setAngle(node.data); break;
+                case "scale": obj.rect.setScale(node.data); break;
+                case "size": obj.rect.setSize(node.data.width, node.data.height); break;
+                case "drag": {
+                    obj.rect.setSize(node.data.size.width, node.data.size.height);
                     obj.rect.setAngle(node.data.angle);
-                }break;
+                } break;
             }
         }
         kit.update();
