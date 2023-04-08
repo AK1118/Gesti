@@ -251,9 +251,9 @@
 
 #### addListener
 
-	addListener(listenType:"onSelect"|"onHide",callback:ListenerCallback):void;
+	addListener(listenType:"onSelect"|"onHide"|"onCancel",callback:ListenerCallback):void;
 
-- 监听图层操作，目前支持监听选中和删除
+- 监听图层操作，目前支持监听选中、取消选中和隐藏
 
 # 保存
 
