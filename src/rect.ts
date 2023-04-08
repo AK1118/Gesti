@@ -92,8 +92,8 @@ class Rect extends ObserverObj {
     }
     public setScale(scale: number): void {
         this.beforeReport(scale, "scale");
-        this._size.width *= ~~scale;
-        this._size.height *= ~~scale;
+        this._size.width *= scale;
+        this._size.height *= scale;
         this.report(scale, "scale");
     }
     /**

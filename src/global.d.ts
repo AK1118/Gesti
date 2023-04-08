@@ -59,3 +59,10 @@ declare interface createImageOptions {
     maxScale?: number,
     minScale?: number,
 }
+
+declare interface textOptions{
+    fontFamily?: string,
+    fontSize?: number,
+    spacing?:number,
+    color?:string,
+}

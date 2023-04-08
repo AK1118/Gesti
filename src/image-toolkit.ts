@@ -12,6 +12,7 @@ import RenderObject from "./interfaces/render-object";
 import Painter from "./painter";
 import Recorder from "./recorder";
 import Rect from "./rect";
+import { classTypeIs } from "./utils";
 import Vector from "./vector";
 import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
@@ -80,7 +81,16 @@ class ImageToolkit implements GestiController {
         this.paint = new Painter(paint);
         this.bindEvent();
     }
-
+    updateText(text: string,options?:textOptions): void {
+        const isTextBox=classTypeIs(this.selectedViewObject,TextBox);
+        if(isTextBox){
+            (this.selectedViewObject as TextBox).updateText(text,options);
+            this.update();
+        }
+    }
+    center(): void {
+        this.selectedViewObject?.center(this.canvasRect.size);
+    }
     cancel(): void {
         this.selectedViewObject?.cancel();
         this.update();
@@ -216,7 +226,8 @@ class ImageToolkit implements GestiController {
             //拖拽
             this.drag.update(event);
         }
-        this.update();
+        //有被选中对象才刷新
+        if(this.selectedViewObject!=null)this.update();
     }
     public onUp(v: GestiEventParams): void {
         this.debug(["Event Up,", v]);
@@ -283,26 +294,34 @@ class ImageToolkit implements GestiController {
             if (!item.disabled) item.update(this.paint);
         })
     }
+    /**
+     * @description 新增图片
+     * @param ximage 
+     * @returns 
+     */
     public addImage(ximage: XImage): Promise<boolean> {
         this.debug("Add a Ximage");
         if (ximage.constructor.name != "XImage") throw Error("不是XImage类");
         const image: XImage = ximage;
         image.width *= image.scale;
         image.height *= image.scale;
-        image.x = this.canvasRect.size.width >> 1;
-        image.y = this.canvasRect.size.height >> 1;
         const imageBox: ImageBox = new ImageBox(image);
+        imageBox.center(this.canvasRect.size);
         this.ViewObjectList.push(imageBox);
         setTimeout(() => {
             this.update();
         }, 100);
         return Promise.resolve(true);
     }
-    public addText(text: string, options?: {
-        fontFamily?: string,
-        fontSize?: number,
-    }): Promise<boolean> {
+    /**
+     * @description 新增文字
+     * @param text 
+     * @param options 
+     * @returns 
+     */
+    public addText(text: string, options?: textOptions): Promise<boolean> {
         const textBox: TextBox = new TextBox(text, this.paint, options);
+        textBox.center(this.canvasRect.size);
         this.ViewObjectList.push(textBox);
         setTimeout(() => {
             this.update();
@@ -359,9 +378,9 @@ class _Tools {
         }
     }
 
-    public fallbackViewObject(ViewObjectList: Array<RenderObject>, node: RecordNode, kit: ImageToolkit) {
+    public fallbackViewObject(ViewObjectList: Array<ViewObject>, node: RecordNode, kit: ImageToolkit) {
         if (node == null) return;
-        const obj = ViewObjectList.find((item: ViewObject) => {
+        const obj:ViewObject = ViewObjectList.find((item: ViewObject) => {
             return item.key == node.key;
         });
         if (obj) {
@@ -375,6 +394,7 @@ class _Tools {
                     obj.rect.setAngle(node.data.angle);
                 } break;
             }
+            obj.didFallback();
         }
         kit.update();
     }

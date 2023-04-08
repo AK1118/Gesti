@@ -32,6 +32,8 @@
 			- [Gesti.XImage](#gestiximage)
 			- [Gesti.controller](#gesticontroller)
 	- [GestiController](#gesticontroller-1)
+			- [addText](#addtext)
+			- [updateText](#updatetext)
 			- [layerLower](#layerlower)
 			- [layerRise](#layerrise)
 			- [layerTop](#layertop)
@@ -148,6 +150,19 @@
 
 ## GestiController
 
+
+
+#### addText
+
+	addText(text: string, options?:textOptions):Promise<boolean>;
+
+- 新增文字图层到Gesti内
+
+#### updateText
+
+	updateText(text: string, options?:textOptions):void;
+
+- 更新被选中的文字图层的文字内容，或者文字属性
 
 #### layerLower
 

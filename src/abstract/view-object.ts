@@ -119,12 +119,10 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 		});
 	}
 	/**
-	 * 该方法需要子类重写
+	 * 该方法需要子类实现
 	 * @param paint 
 	 */
-	public drawImage(paint: Painter): void {
-
-	}
+	abstract drawImage(paint: Painter): void;
 	/**
 	 * 被选中后外边框
 	 * @param paint 
@@ -194,17 +192,17 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 	public enlarge() {
 		this.scale = 1;
 		this.scale += .1;
+		this.rect.setScale(this.scale);
 		this.doScale();
 	}
 	public narrow() {
 		this.scale = 1;
 		this.scale -= .1;
+		this.rect.setScale(this.scale);
 		this.doScale();
 	}
 	private doScale() {
 		if (this.isLock) return;
-		this.rect.size.width *= this.scale;
-		this.rect.size.height *= this.scale;
 		this.onChanged();
 	}
 	/*每次改变大小后都需要刷新按钮的数据*/
@@ -216,7 +214,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 	/**
 	 * 世界坐标居中
 	 */
-	public center() {
+	public center(canvasSize:Size) {
+		const x=canvasSize.width>>1,y=canvasSize.height>>1;
+		this.rect.position=new Vector(x,y);
+	}
+	/**
+	 * 撤销 | 取消撤销回调
+	 */
+	public didFallback(){
 
 	}
 }

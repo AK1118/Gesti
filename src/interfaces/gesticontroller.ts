@@ -35,6 +35,24 @@ interface LayerController{
      * 取消当前被聚焦对象
      */
     cancel():void,
+    /**
+     * 被选中对象居中画布
+     */
+    center():void;
+    /**
+     * 更新文字图层内容
+     * @param text:String
+     * 
+     *  options {
+            fontFamily?: string,
+            fontSize?: number,
+            spacing?:number,
+            color?:string,
+        }
+
+     * 
+     */
+    updateText(text:string,options?:textOptions):void;
 }
 
 //画布控制器
@@ -76,10 +94,7 @@ interface ImageToolKitController{
      * @param text 
      * @param options 
      */
-    addText(text: string, options?: {
-        fontFamily?: string,
-        fontSize?: number,
-    }):Promise<boolean>;
+    addText(text: string, options?:textOptions):Promise<boolean>;
 }
 /**
  * 控制器类，提供接口供给用户使用
