@@ -175,6 +175,8 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 	}
 	public hide() {
 		this.disabled = true;
+		this.onHide();
+		this.cancel();
 	}
 	public getVertex(): Point[] {
 		return this.rect.vertex.getPoints();

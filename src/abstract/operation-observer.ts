@@ -34,7 +34,7 @@ interface OperationObserverType {
     didChangeScale(scale: number): void;
     //拖拽(angle,size)改变后
     didDrag(value:{size:Size,angle:number}):void;
-
+    onHide():void;
 }
 
 
@@ -135,7 +135,9 @@ class Record{
  * 如果需要撤销操作，组件必须继承该抽象类实现
  */
 abstract class OperationObserver implements OperationObserverType {
-    
+    onHide(): void {
+       
+    }
     private obj: RenderObject;
     private recordClazz:Record=new Record();
     /**
@@ -200,7 +202,7 @@ abstract class OperationObserver implements OperationObserverType {
     public didChangeAngle(angle: number) {}
     public didChangeSize(size: Size): void {}
     public didChangePosition(position: Vector): void {}
-    public didChangeScale(scale: number): void {  console.log("改变倍数",scale)}
+    public didChangeScale(scale: number): void { }
     public didDrag(value: { size: Size; angle: number; }): void {}
 }
 

@@ -39,6 +39,21 @@ enum LayerOperationType {
     bottom,
 }
 
+interface ListenerTypes {
+    onSelect(viewObject: ViewObject): void;
+    onHide(viewObject: ViewObject): void;
+    onCancel(viewObject: ViewObject):void;
+}
+
+/**
+ * 监听类
+ */
+class Listeners implements ListenerTypes {
+    onHide(viewObject: ViewObject): void { }
+    onSelect(viewObject: ViewObject): void { }
+    onCancel(viewObject: ViewObject):void{} 
+}
+
 class ImageToolkit implements GestiController {
     //所有图层集合
     private ViewObjectList: Array<ViewObject> = new Array<ViewObject>();
@@ -68,7 +83,15 @@ class ImageToolkit implements GestiController {
      * 本次点击是否有选中到对象，谈起时需要置于false
      */
     private _inObjectArea: boolean = false;
+    /**
+     * 工具
+     */
     private tool: _Tools = new _Tools();
+    private listen: Listeners = new Listeners();
+    /**
+     * 目前图层的显示状态，0表示隐藏，1表示显示
+     */
+    private currentViewObjectState:Array<0|1>=[];
     constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
         const {
             x: offsetx,
@@ -81,10 +104,23 @@ class ImageToolkit implements GestiController {
         this.paint = new Painter(paint);
         this.bindEvent();
     }
-    updateText(text: string,options?:textOptions): void {
-        const isTextBox=classTypeIs(this.selectedViewObject,TextBox);
-        if(isTextBox){
-            (this.selectedViewObject as TextBox).updateText(text,options);
+    addListener(listenType: keyof ListenerTypes, callback: (obj: any) => void): void {
+        switch (listenType) {
+            case "onSelect": {
+                this.listen.onSelect = callback;
+            } break;
+            case "onHide": {
+                this.listen.onHide = callback;
+            } break;
+            case "onCancel":{
+                this.listen.onCancel=callback;
+            }
+        }
+    }
+    updateText(text: string, options?: textOptions): void {
+        const isTextBox = classTypeIs(this.selectedViewObject, TextBox);
+        if (isTextBox) {
+            (this.selectedViewObject as TextBox).updateText(text, options);
             this.update();
         }
     }
@@ -93,6 +129,9 @@ class ImageToolkit implements GestiController {
     }
     cancel(): void {
         this.selectedViewObject?.cancel();
+        if(this.selectedViewObject){
+            this.listen.onCancel(this.selectedViewObject);
+        }
         this.update();
     }
     cancelAll(): void {
@@ -198,9 +237,11 @@ class ImageToolkit implements GestiController {
         const selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(this.ViewObjectList, event);
         if (selectedViewObject ?? false) {
             this.debug(["选中了", selectedViewObject]);
+            this.listen.onSelect(selectedViewObject);
             this._inObjectArea = true;
             if (!this.isMultiple && (this.selectedViewObject ?? false)) {
                 this.selectedViewObject.cancel();
+                this.listen.onCancel(this.selectedViewObject);
             }
             this.selectedViewObject = selectedViewObject;
             //选中后变为选中状态
@@ -227,7 +268,7 @@ class ImageToolkit implements GestiController {
             this.drag.update(event);
         }
         //有被选中对象才刷新
-        if(this.selectedViewObject!=null)this.update();
+        if (this.selectedViewObject != null) this.update();
     }
     public onUp(v: GestiEventParams): void {
         this.debug(["Event Up,", v]);
@@ -290,8 +331,19 @@ class ImageToolkit implements GestiController {
     public update() {
         this.debug("Update the Canvas");
         this.paint.clearRect(0, 0, this.canvasRect.size.width, this.canvasRect.size.height);
-        this.ViewObjectList.forEach((item: ViewObject) => {
-            if (!item.disabled) item.update(this.paint);
+        //当前显示标记数组初始化数据，且需要实时更新
+        if(this.currentViewObjectState.length!=this.ViewObjectList.length){
+            this.currentViewObjectState.push(1);
+        }
+        this.ViewObjectList.forEach((item: ViewObject,ndx:number) => {
+            if (!item.disabled) {
+                item.update(this.paint);
+            }else if(this.currentViewObjectState[ndx]==1){
+                //标记过后不会再次标记
+                this.currentViewObjectState[ndx]=0;
+                item.cancel();
+                this.listen.onHide(item);
+            }
         })
     }
     /**
@@ -380,7 +432,7 @@ class _Tools {
 
     public fallbackViewObject(ViewObjectList: Array<ViewObject>, node: RecordNode, kit: ImageToolkit) {
         if (node == null) return;
-        const obj:ViewObject = ViewObjectList.find((item: ViewObject) => {
+        const obj: ViewObject = ViewObjectList.find((item: ViewObject) => {
             return item.key == node.key;
         });
         if (obj) {

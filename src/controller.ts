@@ -1,3 +1,4 @@
+import ViewObject from "./abstract/view-object";
 import ImageToolkit from "./image-toolkit";
 import GestiController from "./interfaces/gesticontroller";
 import Vector from "./vector";
@@ -15,6 +16,10 @@ class GestiControllerImpl implements GestiController{
         //使用控制器时，取消原有控制
 		this.kit = kit;
 	}
+	addListener(listenType: "onSelect"|"onHide"|"onCancel", callback: (obj: any) =>void): void {
+		this.kit.addListener(listenType,callback);
+	}
+	
 	updateText(text: string): void {
 		this.kit.updateText(text);
 	}

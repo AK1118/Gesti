@@ -1,3 +1,4 @@
+import ViewObject from "../abstract/view-object";
 import XImage from "../ximage";
 
 
@@ -55,6 +56,8 @@ interface LayerController{
     updateText(text:string,options?:textOptions):void;
 }
 
+type ListenerCallback=(object:any)=>void;
+
 //画布控制器
 interface ImageToolKitController{
     /**
@@ -95,6 +98,7 @@ interface ImageToolKitController{
      * @param options 
      */
     addText(text: string, options?:textOptions):Promise<boolean>;
+    addListener(listenType:"onSelect"|"onHide"|"onCancel",callback:ListenerCallback):void;
 }
 /**
  * 控制器类，提供接口供给用户使用

@@ -1,7 +1,7 @@
 ### 主要特性
 
 - Typescript开发，JavaScript,TypeScript都支持
-- 支持 ESM & AMD
+- 支持 ESM & AMD ,支持 TS
 - 基于原生Canvas，兼容主流浏览器，PC端以及移动端,兼容微信小程序，Uniapp App 端。
 - 极简操作，更多功能，持续更新。
 
@@ -48,6 +48,7 @@
 			- [up](#up)
 			- [move](#move)
 			- [wheel](#wheel)
+			- [addListener](#addlistener)
 - [保存](#保存)
 - [在 微信小程序 | uniapp 端使用](#在-微信小程序--uniapp-端使用)
 - [可能会遇到的问题](#可能会遇到的问题)
@@ -248,7 +249,11 @@
 
 - 鼠标滚轮事件时调用
 
+#### addListener
 
+	addListener(listenType:"onSelect"|"onHide",callback:ListenerCallback):void;
+
+- 监听图层操作，目前支持监听选中和删除
 
 # 保存
 
