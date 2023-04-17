@@ -60,6 +60,9 @@ class Vector{
 			y:this.y,
 		}
 	}
+	equals(v:Vector):boolean{
+		return v.x==this.x&&v.y==this.y;
+	}
 	toArray():number[]{
 		return [this.x,this.y];
 	}
@@ -76,6 +79,7 @@ class Vector{
 	static add(v1:Vector, v2:Vector) {
 		return new Vector(v1.x + v2.x, v1.y + v2.y);
 	}
+	
 }
 
 export default Vector;

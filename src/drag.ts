@@ -9,12 +9,6 @@ class Drag {
        this.offset=new Vector( this.rect.position.x - position.x,
        this.rect.position.y - position.y,)
     }
-    /**
-     * @description 手指抬起调用
-     */
-    up() {
-
-    }
     public cancel(): void {
         this.rect = null;
     }
@@ -23,10 +17,6 @@ class Drag {
         if (this.rect.beforeDrag != null) this.rect.beforeDrag(this.rect);
         position.add(this.offset);
         this.rect.position=position;
-        // this.rect.position.setXY(
-        //     ~~(position.x + this.offset.offsetx),
-        //     ~~(position.y + this.offset.offsety)
-        // );
         if (this.rect.onDrag != null) this.rect.onDrag(this.rect);
     }
 }

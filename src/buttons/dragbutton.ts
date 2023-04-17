@@ -53,6 +53,7 @@ class DragButton extends Button {
             offsety = newRect.position.y - oldRect.position.y;
         /*等比例缩放*/
         const scale = Vector.mag(new Vector(offsetx, offsety)) / this.oldRadius;
+        
         /*不适用于scale函数，需要基于原大小改变*/
         const newWidth = ~~(oldRect.size.width * scale),
             newHeight = ~~(oldRect.size.height * scale);
@@ -60,6 +61,7 @@ class DragButton extends Button {
         /*this.oldAngle为弧度，偏移量*/
         const angle = Math.atan2(offsety, offsetx) - this.oldAngle;
         this.master.rect.setAngle(angle,true);
+        this.master.rect.setScale(scale,false);
     }
     public get getOldAngle(): number {
         return this.oldAngle;

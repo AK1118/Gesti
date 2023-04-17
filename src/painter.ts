@@ -90,6 +90,15 @@
 	measureText(text:string):TextMetrics{
 		return this.paint?.measureText(text);
 	}
+	set lineCap(lineCap:any){
+		this.paint.lineCap=lineCap;
+	}
+	set lineJoin(lineJoin:any){
+		this.paint.lineJoin=lineJoin;
+	}
+	quadraticCurveTo(cpx: number, cpy: number, x: number, y: number):void{
+		this.paint.quadraticCurveTo(cpx,cpy,x,y);
+	}
 	/*清空画布|刷新画布*/
 	update() {
 

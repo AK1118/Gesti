@@ -57,6 +57,8 @@ class TwoFingerOperate implements Operate{
  * 添加点击事件时触发
  */
 type listenCallback=(ViewObject:ViewObject,position:Vector|Vector[])=>void;
+
+type GlobalListenCallback=(position:Vector|Vector[])=>void;
 /**
  * 该类为手势判断类
  * 点击
@@ -73,8 +75,11 @@ class Gesture{
     private longPressTimeout:number=1000;
 	//双击间隔时长
 	private dbClickTimeout:number=200;
+	private clickTimeout:number=200;
 	//按下屏幕的时间
 	private pressTime:number=0;
+	//down的时间，不包括move
+	private downTime:number=0;
 	//抬起屏幕的时间
 	private upTime:number=0;
 	//抬起屏幕的时间
@@ -87,14 +92,26 @@ class Gesture{
 	private dbclickEventList:Array<listenCallback>=new Array<listenCallback>();
 	private longpressEventList:Array<listenCallback>=new Array<listenCallback>();
 	private twoTouchEventList:Array<listenCallback>=new Array<listenCallback>();
+	private globalClickEventList:Array<GlobalListenCallback>=[];
+	private globalDownEventList:Array<GlobalListenCallback>=[];
 	private operate:Operate=null;
+	private startPosition:Vector;
+	private endPosition:Vector;
     private isTwoFingers(touches:Vector|Vector[]):boolean{
         if(Array.isArray(touches)&&touches.length==2) return true;
         return false; 
     }
 	public onUp(ViewObject:ViewObject,position:Vector|Vector[]):void{
+		if(!Array.isArray(position)){
+			this.endPosition=position;
+		}
 		this.preUpTime=this.upTime;
 		this.upTime=+new Date();
+
+		if(this.isClick){
+			this.onGlobalClick(position);
+		}
+
 		if(ViewObject==null)return;
 		const _position:any=position;
 		this.upVector=_position;
@@ -103,7 +120,7 @@ class Gesture{
 			this.onLonePress(ViewObject,position);
 		}else if(this.isDbClick){
 			this.onDbClick(ViewObject,position);
-		}else{
+		}else if(this.endPosition.equals(this.startPosition)){
 			this.onClick(ViewObject,position);
 		}
 		
@@ -115,6 +132,10 @@ class Gesture{
 		this.update(vector);
 	}
 	public onDown(ViewObject:ViewObject,position:Vector|Vector[]):void{
+		if(!Array.isArray(position)){
+			this.startPosition=position;
+		}
+		this.downTime=+new Date()
 		this.pressTime=+new Date();
 		if(ViewObject==null)return;
 
@@ -130,6 +151,9 @@ class Gesture{
 	}
 	get isDbClick():boolean{
 		return this.upTime-this.preUpTime<this.dbClickTimeout;
+	}
+	get isClick():boolean{
+		return this.upTime-this.downTime<=this.clickTimeout;
 	}
 	/**
 	 * 二指操作
@@ -163,16 +187,22 @@ class Gesture{
 			listenCallback(ViewObject,position);
 		})
 	}
+	private onGlobalClick(position:Vector|Vector[]){
+		this.globalClickEventList.forEach(eventCallback=>{
+			eventCallback(position);
+		});
+	}
 	/**
 	 * @description 添加监听事件
 	 * @param gestiType 
 	 * @param listenCallback 
 	 */
-	public addListenGesti(gestiType:"click"|"longpress"|"dbclick"|'twotouch',listenCallback:listenCallback){
-		if(gestiType==='click')this.clickEventList.push(listenCallback);
-		if(gestiType==='longpress')this.longpressEventList.push(listenCallback);
-		if(gestiType==='dbclick')this.dbclickEventList.push(listenCallback);
-		if(gestiType==="twotouch")this.twoTouchEventList.push(listenCallback);
+	public addListenGesti(gestiType:"click"|"longpress"|"dbclick"|'twotouch'|'globalClick',listenCallback:listenCallback|GlobalListenCallback){
+		if(gestiType==='click')this.clickEventList.push(listenCallback as listenCallback);
+		if(gestiType==='longpress')this.longpressEventList.push(listenCallback as listenCallback);
+		if(gestiType==='dbclick')this.dbclickEventList.push(listenCallback as listenCallback);
+		if(gestiType==="twotouch")this.twoTouchEventList.push(listenCallback as listenCallback);
+		if(gestiType==='globalClick')this.globalClickEventList.push(listenCallback as GlobalListenCallback);
 	}
     public cancel(): void{
 		if(this.operate==null)return;

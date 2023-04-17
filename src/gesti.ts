@@ -31,6 +31,8 @@ class Gesti {
             const canvasRect: DOMRect = canvas.getBoundingClientRect();
             if (canvasRect) {
                 const g = canvas.getContext("2d");
+                g.imageSmoothingEnabled=true;
+                g.imageSmoothingQuality="high";
                 this.kit = new ImageToolkit(g, canvasRect);
                 return;
             }

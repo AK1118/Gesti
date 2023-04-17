@@ -38,6 +38,7 @@ declare class Vector {
     setXY(x: number, y: number): void;
     toJson():{x:number,y:number};
     toArray():number[];
+    equals(v:Vector):boolean;
     static dist(v1: Vector, v2: Vector): number;
     static mag(v: Vector): number;
     static sub(v1: Vector, v2: Vector): Vector;

@@ -16,6 +16,7 @@ import OperationObserver from "./operation-observer";
  */
 abstract class ViewObject extends OperationObserver implements RenderObject {
 	public selected: boolean = false;
+	//矩形缩放时用到
 	private scale: number = 1;
 	public key: string | number = +new Date();
 	private isMirror: boolean = false;
@@ -93,7 +94,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 		this.drawImage(paint);
 		if (this.isMirror) paint.scale(-1, 1)
 		if (this.selected) {
-			this.drawStroke(paint);
+			this.drawBorder(paint);
 			this.updateFuncButton(paint);
 		}
 		paint.restore();
@@ -127,12 +128,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 	 * 被选中后外边框
 	 * @param paint 
 	 */
-	private drawStroke(paint: Painter): void {
+	private drawBorder(paint: Painter): void {
+		paint.beginPath();
 		paint.lineWidth = 2;
 		paint.strokeStyle = "#fff";
 		paint.strokeRect(-this.rect.size.width >> 1, -this.rect.size.height >> 1, this.rect.size.width + 1, this.rect.size.height +
 			1);
 		paint.stroke();
+		paint.closePath()
 	}
 	/**
 	 * @description 刷新功能点

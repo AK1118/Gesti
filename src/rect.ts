@@ -21,7 +21,7 @@ class Size {
     toVector() {
         return new Vector(this.width, this.height);
     }
-    copy():Size{
+    copy(): Size {
         return new Size(
             this.width,
             this.height,
@@ -90,10 +90,13 @@ class Rect extends ObserverObj {
         this._position = position;
         this.report(position, "position");
     }
-    public setScale(scale: number): void {
+    public setScale(scale: number, change?: boolean): void {
         this.beforeReport(scale, "scale");
-        this._size.width *= scale;
-        this._size.height *= scale;
+        //是否真正改变大小，还是之通知倍数改变了，后续可以考虑移除监听scale
+        if (change??true) {
+            this._size.width *= scale;
+            this._size.height *= scale;
+        }
         this.report(scale, "scale");
     }
     /**
@@ -113,11 +116,11 @@ class Rect extends ObserverObj {
     }
     public setAngle(angle: number, isDrag?: boolean): void {
         //之前
-        if (isDrag) this.beforeReport({ size:this._size.copy(), angle: this._angle }, "drag"); else
-        this.beforeReport(angle, "angle");
+        if (isDrag) this.beforeReport({ size: this._size.copy(), angle: this._angle }, "drag"); else
+            this.beforeReport(angle, "angle");
         this._angle = angle;
-        if (isDrag) this.report({ size:this._size.copy(), angle: this._angle }, "drag"); else
-        this.report(angle, "angle");
+        if (isDrag) this.report({ size: this._size.copy(), angle: this._angle }, "drag"); else
+            this.report(angle, "angle");
     }
     /**
      * @description 向观察者汇报自己的变化情况

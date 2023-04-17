@@ -1,6 +1,7 @@
 import Button from "./abstract/button";
 import { RecordNode } from "./abstract/operation-observer";
 import ViewObject from "./abstract/view-object";
+import WriteBase from "./abstract/write-category";
 import CatchPointUtil from "./catchPointUtil";
 import Drag from "./drag";
 import { FuncButtonTrigger } from "./enums";
@@ -16,6 +17,8 @@ import { classTypeIs } from "./utils";
 import Vector from "./vector";
 import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
+import Write from "./viewObject/write";
+import WriteFactory, { WriteType } from "./write/write-factory";
 import XImage from "./ximage";
 
 
@@ -42,7 +45,7 @@ enum LayerOperationType {
 interface ListenerTypes {
     onSelect(viewObject: ViewObject): void;
     onHide(viewObject: ViewObject): void;
-    onCancel(viewObject: ViewObject):void;
+    onCancel(viewObject: ViewObject): void;
 }
 
 /**
@@ -51,7 +54,7 @@ interface ListenerTypes {
 class Listeners implements ListenerTypes {
     onHide(viewObject: ViewObject): void { }
     onSelect(viewObject: ViewObject): void { }
-    onCancel(viewObject: ViewObject):void{} 
+    onCancel(viewObject: ViewObject): void { }
 }
 
 class ImageToolkit implements GestiController {
@@ -67,8 +70,6 @@ class ImageToolkit implements GestiController {
     private gesture: Gesture = new Gesture();
     //当前选中的图层
     private selectedViewObject: ViewObject = null;
-    //是否所选图层
-    private isMultiple = false;
     //canvas偏移量
     private offset: Vector;
     //画布矩形大小
@@ -91,7 +92,12 @@ class ImageToolkit implements GestiController {
     /**
      * 目前图层的显示状态，0表示隐藏，1表示显示
      */
-    private currentViewObjectState:Array<0|1>=[];
+    private currentViewObjectState: Array<0 | 1> = [];
+    //是否在绘制中
+    private isWriting: boolean = false;
+    //绘制对象工厂  //绘制对象，比如签字、矩形、圆形等
+    private writeFactory: WriteFactory;
+
     constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
         const {
             x: offsetx,
@@ -102,7 +108,11 @@ class ImageToolkit implements GestiController {
         this.offset = new Vector(offsetx || 0, offsety || 0);
         this.canvasRect = new Rect(rect);
         this.paint = new Painter(paint);
+        this.writeFactory = new WriteFactory(this.paint);
         this.bindEvent();
+        setTimeout(() => {
+            this.writeFactory.setWriteType(WriteType.Write);
+        }, 10)
     }
     addListener(listenType: keyof ListenerTypes, callback: (obj: any) => void): void {
         switch (listenType) {
@@ -112,8 +122,8 @@ class ImageToolkit implements GestiController {
             case "onHide": {
                 this.listen.onHide = callback;
             } break;
-            case "onCancel":{
-                this.listen.onCancel=callback;
+            case "onCancel": {
+                this.listen.onCancel = callback;
             }
         }
     }
@@ -129,8 +139,9 @@ class ImageToolkit implements GestiController {
     }
     cancel(): void {
         this.selectedViewObject?.cancel();
-        if(this.selectedViewObject){
+        if (this.selectedViewObject) {
             this.listen.onCancel(this.selectedViewObject);
+            this.selectedViewObject = null;
         }
         this.update();
     }
@@ -199,7 +210,6 @@ class ImageToolkit implements GestiController {
      */
     public addListening(): void {
         this.gesture.addListenGesti("click", (ViewObject: ViewObject, position: Vector) => {
-            //  console.log("点击",ViewObject);
         });
         this.gesture.addListenGesti("dbclick", (ViewObject: ViewObject, position: Vector) => {
             //  console.log("双击",position);
@@ -210,6 +220,13 @@ class ImageToolkit implements GestiController {
         this.gesture.addListenGesti("twotouch", (ViewObject: ViewObject, position: Vector) => {
             //console.log("二指",position);
             // this.gesture.onDown(this.selectedViewObject, position);
+        });
+        this.gesture.addListenGesti('globalClick', (position: Vector) => {
+            const selected = this.clickViewObject(position);
+            if (selected == null && this.selectedViewObject) {
+                this.drag.cancel();
+                this.cancel();
+            }
         });
     }
     public cancelEvent(): void {
@@ -225,44 +242,45 @@ class ImageToolkit implements GestiController {
         this.gesture.onDown(this.selectedViewObject, event);
 
         if (this.selectedViewObject ?? false) {
-            if (Array.isArray(event)) {
+            if (Array.isArray(event) || this.checkFuncButton(event)) {
                 return;
             }
-            if (this.checkFuncButton(event)) return;
         }
 
         /**
-         * 检测是否点击到ViewObject对象
+         * 处理拖拽的代码块，被选中图册是检测选中的最高优先级
+         * 当有被选中图层时，拖拽的必然是他，不论层级
+         * 
          */
-        const selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(this.ViewObjectList, event);
-        if (selectedViewObject ?? false) {
-            this.debug(["选中了", selectedViewObject]);
-            this.listen.onSelect(selectedViewObject);
-            this._inObjectArea = true;
-            if (!this.isMultiple && (this.selectedViewObject ?? false)) {
-                this.selectedViewObject.cancel();
-                this.listen.onCancel(this.selectedViewObject);
-            }
-            this.selectedViewObject = selectedViewObject;
-            //选中后变为选中状态
-            this.selectedViewObject.onSelected();
-            //不允许在锁定时被拖拽选中进行操作
-            if (!selectedViewObject.isLock)
-                this.drag.catchViewObject(this.selectedViewObject.rect, event);
-        }
+        let selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(this.ViewObjectList, event);
+        if (selectedViewObject && this.selectedViewObject === selectedViewObject && !this.selectedViewObject.isLock)
+            this.drag.catchViewObject(selectedViewObject.rect, event);
+
+        /**
+         * 画笔代码块 可以有被选中的图层，前提是当前下落的位置必定不能在上一个被选中的图册内
+         * 
+         * */
+        if (this.selectedViewObject != selectedViewObject || selectedViewObject == null)
+            this.writeFactory.onDraw();
+
         this.update();
     }
     public onMove(v: GestiEventParams): void {
         this.debug(["Event Move,", v]);
         if (this.eventHandlerState === EventHandlerState.down) {
             const event: Vector | Vector[] = this.correctEventPosition(v);
+
+            //绘制处理,当down在已被选中的图册上时不能绘制
+            if (this.writeFactory.current) {
+                return this.writeFactory.current?.onMove(event);
+            }
+
             //手势解析处理
             this.gesture.onMove(this.selectedViewObject, event);
             //手势
             if (Array.isArray(event)) {
                 this.gesture.update(event);
-                this.update();
-                return;
+                return this.update();
             }
             //拖拽
             this.drag.update(event);
@@ -277,6 +295,14 @@ class ImageToolkit implements GestiController {
         //手势解析处理
         this.gesture.onUp(this.selectedViewObject, event);
         this.drag.cancel();
+        //绘制完了新建一个viewObj图册对象
+        const writeObj = this.writeFactory.done();
+        writeObj.then(value => {
+            if (value) {
+                this.ViewObjectList.push(value)
+            }
+        });
+
         if ((this.selectedViewObject ?? false) && this._inObjectArea) {
             this.selectedViewObject.onUp(this.paint);
             //鼠标|手指抬起时提交一次操作
@@ -298,6 +324,33 @@ class ImageToolkit implements GestiController {
         this.update();
 
     }
+
+    /**
+     * 传入一个Vector坐标判断是否选中了图册
+     * @param event 
+     */
+    private clickViewObject(event: Vector | Vector[]): ViewObject {
+        const selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(this.ViewObjectList, event);
+        if (selectedViewObject ?? false) {
+            this.debug(["选中了", selectedViewObject]);
+            this.listen.onSelect(selectedViewObject);
+            this._inObjectArea = true;
+            //之前是否有被选中图层 如果有就取消之前的选中
+            if (this.selectedViewObject ?? false) {
+                this.selectedViewObject.cancel();
+                this.listen.onCancel(this.selectedViewObject);
+            }
+            this.selectedViewObject = selectedViewObject;
+            //选中后变为选中状态
+            this.selectedViewObject.onSelected();
+            //不允许在锁定时被拖拽选中进行操作
+            if (!selectedViewObject.isLock)
+                this.drag.catchViewObject(this.selectedViewObject.rect, event);
+            return selectedViewObject;
+        }
+        return null;
+    }
+
     private correctEventPosition(vector: GestiEventParams): Vector | Vector[] {
         let _vector: Vector[] = new Array<Vector>;
         if (Array.isArray(vector)) {
@@ -329,18 +382,22 @@ class ImageToolkit implements GestiController {
         return false;
     }
     public update() {
+        /**
+         * 在使用绘制对象时，根据值来判断是否禁止重绘
+         */
+        // if (this.writeFactory.current?.disableCanvasUpdate) return;
         this.debug("Update the Canvas");
         this.paint.clearRect(0, 0, this.canvasRect.size.width, this.canvasRect.size.height);
         //当前显示标记数组初始化数据，且需要实时更新
-        if(this.currentViewObjectState.length!=this.ViewObjectList.length){
+        if (this.currentViewObjectState.length != this.ViewObjectList.length) {
             this.currentViewObjectState.push(1);
         }
-        this.ViewObjectList.forEach((item: ViewObject,ndx:number) => {
+        this.ViewObjectList.forEach((item: ViewObject, ndx: number) => {
             if (!item.disabled) {
                 item.update(this.paint);
-            }else if(this.currentViewObjectState[ndx]==1){
+            } else if (this.currentViewObjectState[ndx] == 1) {
                 //标记过后不会再次标记
-                this.currentViewObjectState[ndx]=0;
+                this.currentViewObjectState[ndx] = 0;
                 item.cancel();
                 this.listen.onHide(item);
             }

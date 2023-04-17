@@ -54,8 +54,6 @@ const controller:GestiController=gesti.controller;
 
 
 document.querySelector("#save").addEventListener("click",(e)=>{
-    //controller.lock();
-   // throttle(new Date());
    controller.center();
 });
 const input:HTMLInputElement=document.querySelector("#input");
@@ -68,17 +66,7 @@ controller.addText("原价￥99.0",{
     fontFamily:'隶书',
     color:"rgba(0,0,0,.1)",
 });
-controller.addListener("onSelect",(obj:any)=>{
-    console.log("选中啦",obj.constructor.name)
-})
-controller.addListener("onHide",(obj:any)=>{
-    console.log("隐藏",obj.constructor.name);
-});
-controller.addListener("onCancel",(obj:any)=>{
-    console.log("取消",obj.constructor.name);
-});
 window.onkeydown=(e)=>{
-    // console.log(e.keyCode);
   if(e.keyCode==90)controller.fallback();
   if(e.keyCode==88)controller.cancelFallback();
 }
