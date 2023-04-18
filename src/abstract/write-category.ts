@@ -16,11 +16,17 @@ abstract class WriteBase {
     /**
      * 收集在绘制过程中的最大点和最小点，以便于得到最终的矩形高宽
      */
-    private maxX: number = 0;
-    private maxY: number = 0;
-    private minX: number = 9999;
-    private minY: number = 9999;
-
+    public maxX: number = 0;
+    public maxY: number = 0;
+    public minX: number = 9999;
+    public minY: number = 9999;
+    //存储down
+    public startPoint:Vector;
+    public config: {
+        color?: string,
+        lineWidth?: number,
+        type: "circle" | "write" | "line" | "rect"|"none",
+    };
     constructor(paint: Painter) {
         this.paint = paint;
     }
@@ -35,20 +41,20 @@ abstract class WriteBase {
 
             this.draw(position);
         }
-        this.paint.save();
     }
     onUp(position: Vector | Vector[]) {
         if (!Array.isArray(position)) this.draw(position);
     }
     onMove(position: Vector | Vector[]) {
         if (!Array.isArray(position)) {
+            if(!this.startPoint)this.startPoint=position;
+           //this.paint.clearRect(0,0,9999,9999);
             this.draw(position);
             const [x, y] = position.toArray();
             this.maxX = Math.max(x, this.maxX);
             this.maxY = Math.max(y, this.maxY);
             this.minY = Math.min(y, this.minY);
             this.minX = Math.min(x, this.minX);
-        
         }
     }
     getRect():Rect{
@@ -58,6 +64,13 @@ abstract class WriteBase {
             { width, height, x: this.minX + width / 2, y: this.minY + height / 2 },
         );
         return rect;
+    }
+    public setConfig(config: {
+        color?: string,
+        lineWidth?: number,
+        type: "circle" | "write" | "line" | "rect"|"none",
+    }) {
+        this.config = config;
     }
     abstract draw(position: Vector);
     /**

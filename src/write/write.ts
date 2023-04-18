@@ -18,7 +18,7 @@ class Write extends WriteBase {
             item.y-=y;
         })
         if(this.points.length<2)return null;
-        const viewobj =new WriteViewObj(this.points,this.color);
+        const viewobj =new WriteViewObj(this.points,this.color, this.config);
         viewobj.rect = rect;
         viewobj.init();
         this.reset();
@@ -49,7 +49,7 @@ class Write extends WriteBase {
             this.paint.lineWidth =3;//this.lineWidth(this.lastPosition, position);
         }
         this.paint.lineWidth =3;
-       this. paint.stroke();
+        this. paint.stroke();
         this.paint.closePath();
     }
     //速度越快，线越细

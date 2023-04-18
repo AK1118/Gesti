@@ -17,6 +17,7 @@ class DragButton extends Button {
     public radius: number = 10;
     private disable: boolean = false;
     public relativeRect: Rect;
+    private changeType:"ratio"|"width"|"height"|"free"="ratio";
     key: string | number = +new Date();
     constructor(master: ViewObject) {
         super(master);
@@ -49,18 +50,32 @@ class DragButton extends Button {
          * @description 万向点的坐标是基于 @ViewObject 内的Rect @ImageRect 的，所以得到的一直是相对坐标
          */
         const oldRect = this.oldViewObjectRect;
+        console.log(oldRect.position);
         const offsetx = newRect.position.x - oldRect.position.x,
             offsety = newRect.position.y - oldRect.position.y;
         /*等比例缩放*/
         const scale = Vector.mag(new Vector(offsetx, offsety)) / this.oldRadius;
         
         /*不适用于scale函数，需要基于原大小改变*/
-        const newWidth = ~~(oldRect.size.width * scale),
+        let newWidth = ~~(oldRect.size.width * scale),
             newHeight = ~~(oldRect.size.height * scale);
+        
+        if(this.changeType=="width"){
+            newHeight = ~~(oldRect.size.height * 1);
+        }
+        else if(this.changeType=="height"){
+            newWidth = ~~(oldRect.size.width * 1);
+        }
+        else if(this.changeType=="ratio"){
+
+        }else if(this.changeType=="free"){
+           newWidth=oldRect.size.width*(offsetx*1.5/this.oldRadius);
+           newHeight=oldRect.size.height*(offsety*1.5/this.oldRadius);
+        }
         this.master.rect.setSize(newWidth, newHeight,true);
         /*this.oldAngle为弧度，偏移量*/
         const angle = Math.atan2(offsety, offsetx) - this.oldAngle;
-        this.master.rect.setAngle(angle,true);
+       if(this.changeType=="ratio") this.master.rect.setAngle(angle,true);
         this.master.rect.setScale(scale,false);
     }
     public get getOldAngle(): number {

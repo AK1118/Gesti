@@ -10,32 +10,69 @@ import Painter from "../painter";
 class WriteViewObj extends ViewObject {
     private points: Array<Vector> = [];
     private _scale: number = 1;
-    private color:string="";
-    constructor(points: Array<Vector>,color:string) {
+    private color: string = "";
+    private type: "circle" | "write" | "line" | "rect" | "none" = "write";
+    private config: {
+        color?: string,
+        lineWidth?: number,
+        type: "circle" | "write" | "line" | "rect" | "none",
+    };
+    private lineWidth: number = 3;
+    constructor(points: Array<Vector>, color: string, config: {
+        color?: string,
+        lineWidth?: number,
+        type: "circle" | "write" | "line" | "rect" | "none",
+    }) {
         super();
         this.points = points;
-        this.color=color;
+        this.color = color;
+        this.type = config.type;
+        this.color = config.color ?? "black";
+        this.lineWidth = config.lineWidth ?? 3;
     }
     drawImage(paint: Painter): void {
-        paint.strokeStyle=this.color;
+        paint.strokeStyle = this.color;
         const len = this.points.length;
         paint.beginPath();
-        
-        for (let i = 1; i < len; i++) {
-            const currentPoint = this.points[i];
-            const beforePoint = this.points[i - 1];
-            paint.lineCap = "round";
-            let prex = beforePoint.x, prey = beforePoint.y;
-            let curx = currentPoint.x, cury = currentPoint.y;
-            let cx = (prex + curx) * .5;
-            let cy = (prey + cury) * .5;
-            //  paint.moveTo(prex * this._scale, prey * this._scale);
-            //  paint.lineTo(curx * this._scale, cury * this._scale);
-             paint.quadraticCurveTo(prex* this._scale,prey* this._scale,cx* this._scale,cy* this._scale);
+        //普通涂鸦
+        if (this.type == 'write')
+            for (let i = 1; i < len; i++) {
+                const currentPoint = this.points[i];
+                const beforePoint = this.points[i - 1];
+                paint.lineCap = "round";
+                let prex = beforePoint.x, prey = beforePoint.y;
+                let curx = currentPoint.x, cury = currentPoint.y;
+                let cx = (prex + curx) * .5;
+                let cy = (prey + cury) * .5;
+                paint.quadraticCurveTo(prex * this._scale, prey * this._scale, cx * this._scale, cy * this._scale);
+            }
+        if (this.type == "rect" || this.type == "line")
+            for (let i = 0; i < len; i++) {
+                const point = this.points[i];
+                if (i == 0) paint.moveTo(point.x * this._scale, point.y * this._scale);
+                paint.lineTo(point.x * this._scale, point.y * this._scale);
+            }
+
+        if (this.type == "circle") {
+
+            const { sx, sy, x, y, minx, miny, width, height } = this.getCircleParams(this.points[0], this.points[1]);
+            paint.ellipse(minx + width * .5, miny + height * .5, width * .5, height * .5);
         }
-        paint.lineWidth = 3;
+        paint.lineWidth = this.lineWidth;
+        paint.strokeStyle = this.color;
+        if (this.type != "write") paint.closePath();
         paint.stroke();
-        paint.closePath();
+        if (this.type == "write") paint.closePath();
+
+    }
+    private getCircleParams(p1: Vector, p2: Vector) {
+        const sx = p1.x * this._scale, sy = p1.y * this._scale;
+        const x = p2.x * this._scale, y = p2.y * this._scale;
+        const width = Math.abs(sx - x), height = Math.abs(sy - y);
+        const minx = Math.min(x, sx), miny = Math.min(y, sy);
+        return {
+            sx, sy, x, y, minx, miny, width, height
+        }
     }
     public didChangeScale(scale: number): void {
         this._scale = this.rect.size.width / this.relativeRect.size.width;

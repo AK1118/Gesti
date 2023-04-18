@@ -111,7 +111,12 @@ class ImageToolkit implements GestiController {
         this.writeFactory = new WriteFactory(this.paint);
         this.bindEvent();
         setTimeout(() => {
-            this.writeFactory.setWriteType(WriteType.Write);
+            this.writeFactory.setConfig(
+                {
+                    type:"none",
+                    lineWidth:3,
+                }
+            );
         }, 10)
     }
     addListener(listenType: keyof ListenerTypes, callback: (obj: any) => void): void {
@@ -223,10 +228,10 @@ class ImageToolkit implements GestiController {
         });
         this.gesture.addListenGesti('globalClick', (position: Vector) => {
             const selected = this.clickViewObject(position);
-            if (selected == null && this.selectedViewObject) {
-                this.drag.cancel();
-                this.cancel();
-            }
+            // if (selected == null && this.selectedViewObject) {
+            //     this.drag.cancel();
+            //     this.cancel();
+            // }
         });
     }
     public cancelEvent(): void {
@@ -272,7 +277,9 @@ class ImageToolkit implements GestiController {
 
             //绘制处理,当down在已被选中的图册上时不能绘制
             if (this.writeFactory.current) {
+                this.update()
                 return this.writeFactory.current?.onMove(event);
+                  
             }
 
             //手势解析处理
@@ -385,7 +392,7 @@ class ImageToolkit implements GestiController {
         /**
          * 在使用绘制对象时，根据值来判断是否禁止重绘
          */
-        // if (this.writeFactory.current?.disableCanvasUpdate) return;
+      //  if (this.writeFactory.current?.disableCanvasUpdate) return;
         this.debug("Update the Canvas");
         this.paint.clearRect(0, 0, this.canvasRect.size.width, this.canvasRect.size.height);
         //当前显示标记数组初始化数据，且需要实时更新

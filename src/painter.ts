@@ -63,6 +63,27 @@
 	arc(x:number, y:number, radius:number, start:number, end:number) {
 		this.paint.arc(x, y, radius, start, end);
 	}
+	arcTo(x1:number, y1:number, x2:number, y2:number, radius:number){
+		this.paint.arcTo(x1, y1, x2, y2, radius);
+	}
+	/**
+	 * 
+	 * @param x 圆心点x
+	 * @param y 圆心点y
+	 * @param a width
+	 * @param b height
+	 */
+	ellipse(x: number, y: number, a: number, b: number): void {
+        this.paint.save();
+        this.paint.translate(x,y);
+        const r = (a > b) ? a : b;
+        const rx = a / r, ry = b / r;
+        this.paint.scale(rx, ry);
+        this.paint.beginPath();
+        this.paint.arc(0,0, r, 0, 2 * Math.PI);
+        this.paint.closePath();
+        this.paint.restore();
+    }
 	drawImage(image: HTMLOrSVGImageElement | HTMLVideoElement | HTMLCanvasElement | ImageBitmap | OffscreenCanvas, x:number, y:number, width:number, height:number) {
 		this.paint.drawImage(image, -width / 2, -height / 2, width, height);
 	}
