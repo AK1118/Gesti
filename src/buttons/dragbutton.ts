@@ -17,9 +17,12 @@ class DragButton extends Button {
     public radius: number = 10;
     private disable: boolean = false;
     public relativeRect: Rect;
-    private changeType:"ratio"|"width"|"height"|"free"="ratio";
+    //拉伸变化方式  比例   水平  垂直   自由
+    private axis:"ratio"|"horizontal"|"vertical"|"free"="ratio";
     key: string | number = +new Date();
-    constructor(master: ViewObject) {
+    constructor(master: ViewObject,options?:{
+        axis?:"ratio"|"horizontal"|"vertical"|"free"
+    }) {
         super(master);
         this.init({percentage:[.5, .5]});
         this.initScale();
@@ -28,10 +31,14 @@ class DragButton extends Button {
             this.rect = newRect;
             this.effect(newRect);
         }
+        if(options)this.axis=options.axis??"ratio";
     }
     updatePosition(vector: Vector): void {
         this.updateRelativePosition();
         this.setAbsolutePosition(vector);
+    }
+    public setAxis(axis:"ratio"|"horizontal"|"vertical"|"free"){
+        this.axis=axis;
     }
     setMaster(master: ViewObject): void {
         this.master = master;
@@ -50,7 +57,6 @@ class DragButton extends Button {
          * @description 万向点的坐标是基于 @ViewObject 内的Rect @ImageRect 的，所以得到的一直是相对坐标
          */
         const oldRect = this.oldViewObjectRect;
-        console.log(oldRect.position);
         const offsetx = newRect.position.x - oldRect.position.x,
             offsety = newRect.position.y - oldRect.position.y;
         /*等比例缩放*/
@@ -60,22 +66,22 @@ class DragButton extends Button {
         let newWidth = ~~(oldRect.size.width * scale),
             newHeight = ~~(oldRect.size.height * scale);
         
-        if(this.changeType=="width"){
+        if(this.axis=="horizontal"){
             newHeight = ~~(oldRect.size.height * 1);
         }
-        else if(this.changeType=="height"){
+        else if(this.axis=="vertical"){
             newWidth = ~~(oldRect.size.width * 1);
         }
-        else if(this.changeType=="ratio"){
+        else if(this.axis=="ratio"){
 
-        }else if(this.changeType=="free"){
+        }else if(this.axis=="free"){
            newWidth=oldRect.size.width*(offsetx*1.5/this.oldRadius);
            newHeight=oldRect.size.height*(offsety*1.5/this.oldRadius);
         }
         this.master.rect.setSize(newWidth, newHeight,true);
         /*this.oldAngle为弧度，偏移量*/
         const angle = Math.atan2(offsety, offsetx) - this.oldAngle;
-       if(this.changeType=="ratio") this.master.rect.setAngle(angle,true);
+       if(this.axis=="ratio") this.master.rect.setAngle(angle,true);
         this.master.rect.setScale(scale,false);
     }
     public get getOldAngle(): number {
@@ -96,23 +102,17 @@ class DragButton extends Button {
     }
     draw(paint: Painter) {
         if (this.disable) return;
-        const {
-            width,
-            height
-        } = this.master.rect.size;
         const halfRadius = this.radius * .75;
-
-        const halfWidth = width >> 1,
-            halfHeight = height >> 1;
+        const x=this.relativeRect.position.x,y=this.relativeRect.position.y;
 
         paint.beginPath();
         paint.fillStyle = "#fff";
-        paint.arc(halfWidth, halfHeight, this.radius, 0, Math.PI * 2);
+        paint.arc(x, y, this.radius, 0, Math.PI * 2);
         paint.closePath();
         paint.fill();
         Widgets.drawGrag(paint, {
-            offsetx: halfWidth - halfRadius + 2,
-            offsety: halfHeight - halfRadius + 2
+            offsetx: x - halfRadius + 2,
+            offsety: y - halfRadius + 2
         });
     }
 }

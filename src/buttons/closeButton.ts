@@ -38,15 +38,14 @@ class CloseButton extends Button {
         } = this.master.rect.size;
         const halfRadius = this.radius * .75;
 
-        const halfWidth = width >> 1,
-            halfHeight = height >> 1;
+        const x = this.relativeRect.position.x, y = this.relativeRect.position.y;
         paint.beginPath();
         paint.fillStyle = "#fff";
-        paint.arc(halfWidth, -halfHeight, this.radius, 0, Math.PI * 2);
+        paint.arc(x, y, this.radius, 0, Math.PI * 2);
         paint.closePath();
         paint.fill();
         Widgets.drawClose(paint, {
-            offsetx: halfWidth - halfRadius + 4,
+            offsetx: x - halfRadius + 4,
             offsety: -height / 2 - 3
         });
     }

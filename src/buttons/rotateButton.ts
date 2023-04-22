@@ -1,5 +1,5 @@
 import { FuncButtonTrigger } from "../enums";
- 
+
 import Button from "../abstract/button";
 import Painter from "../painter";
 import Rect from "../rect";
@@ -21,7 +21,7 @@ class RotateButton extends Button {
     constructor(master: ViewObject) {
         super(master);
         this.init({
-            percentage: [0, .8]
+            position:new Vector(0,this.rect.size.height+40),
         });
         this.initScale();
         this.rect.onDrag = (newRect: Rect) => {
@@ -82,25 +82,16 @@ class RotateButton extends Button {
     draw(paint: Painter) {
 
         if (this.disable) return;
-        const {
-            width,
-            height
-        } = this.master.rect.size;
-        const halfRadius = this.radius * .75;
-
-        const halfWidth = width >> 1,
-            halfHeight = height >> 1;
-
+        const x = this.relativeRect.position.x, y = this.relativeRect.position.y;
         paint.beginPath();
         paint.fillStyle = "#fff";
-        paint.arc(this.relativeRect.position.x, this.relativeRect.position.y, 10, 0, Math.PI * 2);
+        paint.arc(x, y, this.radius, 0, Math.PI * 2);
         paint.closePath();
         paint.fill();
         Widgets.drawRotate(paint, {
-            offsetx: this.relativeRect.position.x,
-            offsety: this.relativeRect.position.y,
+            offsetx: x,
+            offsety: y,
         });
-        // paint.fillRect(this.rect.position.x-this.master.rect.position.x,this.rect.position.y-this.master.rect.position.y,10,10);
     }
 }
 

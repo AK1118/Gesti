@@ -19,7 +19,10 @@ export abstract class Button implements RenderObject {
     key: string | number;
     relativeRect: Rect = new Rect();
     master: ViewObject;
-    radius: number = 10;
+    //渲染UI按钮半径
+    radius: number = 20;
+    //点击感应范围
+    senseRadius:number=20;
     oldAngle: number;
     //初始化时按钮离主体中心点的距离
     originDistance: number;
@@ -84,10 +87,10 @@ export abstract class Button implements RenderObject {
     public setAbsolutePosition(vector?: Vector) {
         this.rect.position = vector || this.getAbsolutePosition;
     }
-    public isInArea(event: Vector): boolean {
+    public isInArea(event: Vector,target:Vector): boolean {
         if (this.master.isLock && this.canBeeLocking) return false;
-        return CatchPointUtil.checkInsideArc(this.rect.position, event, this
-            .radius);
+        return CatchPointUtil.checkInsideArc(target, event, this
+            .senseRadius);
     }
     /**
      * @description 根据父Box的大小宽度比作为基础定位

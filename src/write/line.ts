@@ -33,7 +33,7 @@ class WriteLine extends WriteBase {
         //已知直径，中心点，
         const rect=new Rect({
             width:dt,
-            height:10,
+            height:30,
             x:minx+Math.abs(sx-x)*.5,
             y:miny+Math.abs(sy-y)*.5,
         });
@@ -50,6 +50,7 @@ class WriteLine extends WriteBase {
         const viewobj =new WriteViewObj(this.points,this.color, this.config);
         viewobj.rect = rect;
         viewobj.init();
+        viewobj.dragButton.setAxis("horizontal");
         this.reset();
         this.points=[];
         return viewobj;

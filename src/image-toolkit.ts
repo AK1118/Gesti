@@ -113,7 +113,7 @@ class ImageToolkit implements GestiController {
         setTimeout(() => {
             this.writeFactory.setConfig(
                 {
-                    type:"none",
+                    type:"circle",
                     lineWidth:3,
                 }
             );

@@ -9,7 +9,8 @@ import Painter from "../painter";
  */
 class WriteViewObj extends ViewObject {
     private points: Array<Vector> = [];
-    private _scale: number = 1;
+    private _scalex: number = 1;
+    private _scaley: number = 1;
     private color: string = "";
     private type: "circle" | "write" | "line" | "rect" | "none" = "write";
     private config: {
@@ -44,13 +45,13 @@ class WriteViewObj extends ViewObject {
                 let curx = currentPoint.x, cury = currentPoint.y;
                 let cx = (prex + curx) * .5;
                 let cy = (prey + cury) * .5;
-                paint.quadraticCurveTo(prex * this._scale, prey * this._scale, cx * this._scale, cy * this._scale);
+                paint.quadraticCurveTo(prex * this._scalex, prey * this._scaley, cx * this._scalex, cy * this._scaley);
             }
         if (this.type == "rect" || this.type == "line")
             for (let i = 0; i < len; i++) {
                 const point = this.points[i];
-                if (i == 0) paint.moveTo(point.x * this._scale, point.y * this._scale);
-                paint.lineTo(point.x * this._scale, point.y * this._scale);
+                if (i == 0) paint.moveTo(point.x * this._scalex, point.y * this._scaley);
+                paint.lineTo(point.x * this._scalex, point.y * this._scaley);
             }
 
         if (this.type == "circle") {
@@ -66,8 +67,8 @@ class WriteViewObj extends ViewObject {
 
     }
     private getCircleParams(p1: Vector, p2: Vector) {
-        const sx = p1.x * this._scale, sy = p1.y * this._scale;
-        const x = p2.x * this._scale, y = p2.y * this._scale;
+        const sx = p1.x * this._scalex, sy = p1.y * this._scaley;
+        const x = p2.x * this._scalex, y = p2.y * this._scaley;
         const width = Math.abs(sx - x), height = Math.abs(sy - y);
         const minx = Math.min(x, sx), miny = Math.min(y, sy);
         return {
@@ -75,7 +76,11 @@ class WriteViewObj extends ViewObject {
         }
     }
     public didChangeScale(scale: number): void {
-        this._scale = this.rect.size.width / this.relativeRect.size.width;
+        this._scalex = this.rect.size.width / this.relativeRect.size.width;
+        this._scaley = this.rect.size.height / this.relativeRect.size.height;
+        if(this.type=="rect"){
+
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 import { FuncButtonTrigger } from "../enums";
- 
+
 import Button from "../abstract/button";
 import Painter from "../painter";
 import Rect from "../rect";
@@ -21,7 +21,7 @@ class MirrorButton extends Button {
     constructor(master: ViewObject) {
         super(master);
         this.init({
-            percentage:[-.5, .5]
+            percentage: [-.5, .5]
         });
     }
     /**
@@ -53,15 +53,14 @@ class MirrorButton extends Button {
         } = this.master.rect.size;
         const halfRadius = this.radius * .75;
 
-        const halfWidth = width >> 1,
-            halfHeight = height >> 1;
+        const x = this.relativeRect.position.x, y = this.relativeRect.position.y;
         paint.beginPath();
         paint.fillStyle = "#fff";
-        paint.arc(-halfWidth, halfHeight, this.radius, 0, Math.PI * 2);
+        paint.arc(x, y, this.radius, 0, Math.PI * 2);
         paint.closePath();
         paint.fill();
         Widgets.drawMirror(paint, {
-            offsetx: -halfWidth - halfRadius + 1,
+            offsetx: x - halfRadius + 1,
             offsety: height / 2 - halfRadius + 3
         });
     }

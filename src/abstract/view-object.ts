@@ -31,13 +31,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 	 * 锁住过后可被选取，但是不能位移和改变大小
 	 */
 	private _lock: boolean = false;
+	public dragButton: DragButton;
 	constructor() {
 		super();
-		
 	}
 	public init() {
+		this.dragButton = new DragButton(this);
 		this.funcButton = [
-			new DragButton(this),
+			this.dragButton,
 			new MirrorButton(this),
 			new CloseButton(this),
 			new RotateButton(this),
@@ -52,7 +53,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 		});
 		this.addObserver(this);
 	}
-	
+
 	/**
 	 * @description 锁住
 	 */
@@ -142,7 +143,6 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 	 * @param paint 
 	 */
 	private updateFuncButton(paint: Painter): void {
-		
 		const rect: Rect = this.rect;
 		const x: number = rect.position.x,
 			y: number = rect.position.y;
@@ -158,22 +158,26 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 		});
 	}
 	/**
-	 * @description
-	 * 
-	 * 检测 @ViewObject 的4个顶点是否被点击到
-	 * 顶点位置
-	 * 0   1
-	 * 3   2
+	 * @description 功能点是否被点击
 	 * @param eventPosition 
 	 * @returns 
 	 */
 	public checkFuncButton(eventPosition: Vector): Button | boolean {
 		/**
 		 * 遍历功能键
+		 * 传入的时global位置，转换为相对位置判断是否点击到按钮
 		 */
+		const event: Vector = Vector.sub(eventPosition, this.rect.position);
 		const button: Button = this.funcButton.find((button: Button) => {
-			return button.isInArea(eventPosition);
+			const angle = button.oldAngle + this.rect.getAngle;
+			const x = Math.cos(angle) * button.originDistance;
+			const y = Math.sin(angle) * button.originDistance;
+			const buttonPosi: Vector = new Vector(x, y);
+			//console.log(button.constructor.name);
+		//	console.log(event, buttonPosi);
+			return button.isInArea(event, buttonPosi);
 		});
+		//console.log("选中", button)
 		return button;
 	}
 	public hide() {
@@ -219,14 +223,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 	/**
 	 * 世界坐标居中
 	 */
-	public center(canvasSize:Size) {
-		const x=canvasSize.width>>1,y=canvasSize.height>>1;
-		this.rect.position=new Vector(x,y);
+	public center(canvasSize: Size) {
+		const x = canvasSize.width >> 1, y = canvasSize.height >> 1;
+		this.rect.position = new Vector(x, y);
 	}
 	/**
 	 * 撤销 | 取消撤销回调
 	 */
-	public didFallback(){
+	public didFallback() {
 
 	}
 }
