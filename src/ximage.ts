@@ -1,5 +1,6 @@
 
 class XImage{
+    originData:any;
     data:any;
     width:number=0;
     height:number=0;
@@ -18,8 +19,9 @@ class XImage{
  * 
  */
     constructor(params:createImageOptions){
-        const {data,width,height,scale}=params;
+        const {data,width,height,scale,originData}=params;
         if(!data||!width||!height)throw Error("宽或高不能为0");
+        this.originData=originData;
         this.data=data;
         this.width=width;
         this.height=height;

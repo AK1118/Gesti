@@ -71,6 +71,9 @@ abstract class WriteBase {
         type: "circle" | "write" | "line" | "rect"|"none",
     }) {
         this.config = config;
+        //设置默认数值
+        if(!this.config.lineWidth)this.config.lineWidth=3;
+        if(!this.config.color)this.config.color="red";
     }
     abstract draw(position: Vector);
     /**

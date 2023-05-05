@@ -9,6 +9,8 @@ class WriteCircle extends WriteBase {
     draw(position: Vector) {
         this.currentPosition = position;
         const { sx, sy, x, y, minx, miny, width, height } = this.getParams();
+        this.paint.lineWidth=this.config.lineWidth;
+        this.paint.strokeStyle=this.config.color;
         this.paint.ellipse(minx + width * .5, miny + height * .5, width * .5, height * .5);
         this.paint.stroke();
         this.paint.fillRect(sx, sy, 3, 3);

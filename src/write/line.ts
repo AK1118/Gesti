@@ -15,6 +15,8 @@ class WriteLine extends WriteBase {
         this.paint.lineTo(x, y);
         this.paint.lineJoin = "round";
         this.paint.lineCap = "round";
+        this.paint.lineWidth=this.config.lineWidth;
+        this.paint.strokeStyle=this.config.color;
         this.paint.stroke();
         this.paint.closePath()
         this.currentPosition = position;

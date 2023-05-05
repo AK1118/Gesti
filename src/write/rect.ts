@@ -20,7 +20,9 @@ class WriteRect extends WriteBase{
         this.paint.lineTo(x,sy);
         this.paint.lineTo(x,y);
         this.paint.lineTo(sx,y);
-        this.paint.closePath()
+        this.paint.closePath();
+        this.paint.strokeStyle=this.config.color;
+        this.paint.lineWidth=this.config.lineWidth;
         this.paint.stroke();
         this.currentPosition=position;
     }

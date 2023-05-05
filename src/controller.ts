@@ -16,6 +16,27 @@ class GestiControllerImpl implements GestiController{
         //使用控制器时，取消原有控制
 		this.kit = kit;
 	}
+	upward(viewObject?: ViewObject): number {
+		return this.kit.upward(viewObject);
+	}
+	downward(viewObject?: ViewObject): number {
+		return this.kit.downward(viewObject);
+	}
+	leftward(viewObject?: ViewObject): number {
+		return this.kit.leftward(viewObject);
+	}
+	rightward(viewObject?: ViewObject): number {
+		return this.kit.rightward(viewObject);
+	}
+	importAll(json: string): Promise<void> {
+		return this.kit.importAll(json);
+	}
+	exportAll(): Promise<string> {
+		return this.kit.exportAll();
+	}
+	addWrite(options: { type: "circle" | "write" | "line" | "rect" | "none"; lineWidth?: number; color?: string; }) {
+		this.kit.addWrite(options);
+	}
 	addListener(listenType: "onSelect"|"onHide"|"onCancel", callback: (obj: any) =>void): void {
 		this.kit.addListener(listenType,callback);
 	}
@@ -23,8 +44,8 @@ class GestiControllerImpl implements GestiController{
 	updateText(text: string): void {
 		this.kit.updateText(text);
 	}
-	center(): void {
-		this.kit.center()
+	center(axis?:CenterAxis): void {
+		this.kit.center(axis)
 	}
 	addText(text: string, options?: {
         fontFamily?: string,
@@ -181,6 +202,7 @@ class GestiControllerImpl implements GestiController{
                 const { width, height } = bimp;
                 const ximage = new XImage({
                     data: bimp,
+					originData:image,
                     width: options?.width || width,
                     height: options?.height || height,
                     scale: options?.scale || 1,

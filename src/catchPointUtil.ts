@@ -25,7 +25,8 @@ class CatchPointUtil{
         return null;
     }
     static inArea(rect:Rect,position:Vector):boolean{
-        const points:Point[]=rect.vertex.getPoints();
+        if(!rect.vertex)return false;
+        const points:Point[]=rect.vertex?.getPoints();
         const point:Point=new Point(
             position.x,
             position.y

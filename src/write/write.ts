@@ -49,6 +49,8 @@ class Write extends WriteBase {
             this.paint.lineWidth =3;//this.lineWidth(this.lastPosition, position);
         }
         this.paint.lineWidth =3;
+        this.paint.strokeStyle=this.config.color;
+        this.paint.lineWidth=this.config.lineWidth;
         this. paint.stroke();
         this.paint.closePath();
     }

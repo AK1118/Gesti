@@ -40,53 +40,53 @@ class Gesti {
         if (rect)
             this.kit = new ImageToolkit(paint, rect);
     }
-    /**
-     * @description 添加 @XImage 到canvas里面
-     * @param @XImage 
-     * @returns 
-     */
-    public async addImage(ximage: XImage | Promise<XImage>): Promise<boolean> {
-        if (ximage.constructor.name == 'Promise') {
-            const _ximage = await ximage;
-            this.kit.addImage(_ximage);
-            return true;
-        }
-        //使用any类型强制转换
-        const _ximage: any = ximage;
-        this.kit.addImage(_ximage);
-        return true;
-    }
-    /**
-     * @description 根据传入的image生成一个 @ImageBitmap 实例，拿到图片的宽高数据，创建XImage对象
-     * @param image 
-     * @param options 
-     * @returns Promise< @XImage >
-     */
-    public createImage(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions): Promise<XImage> {
-        return new Promise(async (r, e) => {
-            try {
-                const bimp = await createImageBitmap(image);
-                const { width, height } = bimp;
-                const ximage = new XImage({
-                    data: bimp,
-                    width: options?.width || width,
-                    height: options?.height || height,
-                    scale: options?.scale || 1,
-                    maxScale: options?.maxScale || 10,
-                    minScale: options?.minScale || .1,
-                });
-                r(ximage)
-            } catch (error) {
-                r(error)
-            }
-        });
-    }
-    /**
-     * 手动刷新画布
-     */
-    public update() {
-        this.kit.update();
-    }
+    // /**
+    //  * @description 添加 @XImage 到canvas里面
+    //  * @param @XImage 
+    //  * @returns 
+    //  */
+    // public async addImage(ximage: XImage | Promise<XImage>): Promise<boolean> {
+    //     if (ximage.constructor.name == 'Promise') {
+    //         const _ximage = await ximage;
+    //         this.kit.addImage(_ximage);
+    //         return true;
+    //     }
+    //     //使用any类型强制转换
+    //     const _ximage: any = ximage;
+    //     this.kit.addImage(_ximage);
+    //     return true;
+    // }
+    // /**
+    //  * @description 根据传入的image生成一个 @ImageBitmap 实例，拿到图片的宽高数据，创建XImage对象
+    //  * @param image 
+    //  * @param options 
+    //  * @returns Promise< @XImage >
+    //  */
+    // public createImage(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions): Promise<XImage> {
+    //     return new Promise(async (r, e) => {
+    //         try {
+    //             const bimp = await createImageBitmap(image);
+    //             const { width, height } = bimp;
+    //             const ximage = new XImage({
+    //                 data: bimp,
+    //                 width: options?.width || width,
+    //                 height: options?.height || height,
+    //                 scale: options?.scale || 1,
+    //                 maxScale: options?.maxScale || 10,
+    //                 minScale: options?.minScale || .1,
+    //             });
+    //             r(ximage)
+    //         } catch (error) {
+    //             r(error)
+    //         }
+    //     });
+    // }
+    // /**
+    //  * 手动刷新画布
+    //  */
+    // public update() {
+    //     this.kit.update();
+    // }
 }
 
 export default Gesti;
