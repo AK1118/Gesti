@@ -20,6 +20,7 @@ class RotateButton extends Button {
     key: string | number = +new Date();
     constructor(master: ViewObject) {
         super(master);
+        this.name="rotate";
         this.init({
             position:new Vector(0,(master.rect.size.height>>1)+5),
         });

@@ -120,6 +120,9 @@
 	quadraticCurveTo(cpx: number, cpy: number, x: number, y: number):void{
 		this.paint.quadraticCurveTo(cpx,cpy,x,y);
 	}
+	setlineDash(dash:any){
+		this.paint?.setLineDash(dash);
+	}
 	/*清空画布|刷新画布*/
 	update() {
 

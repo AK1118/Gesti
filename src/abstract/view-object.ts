@@ -2,6 +2,7 @@ import { CloseButton, MirrorButton, RotateButton } from "../buttons";
 import DelockButton from "../buttons/delockButton";
 import DragButton from "../buttons/dragbutton";
 import LockButton from "../buttons/lockbutton";
+import canvasConfig from "../config/canvasConfig";
 import RenderObject from "../interfaces/render-object";
 import Painter from "../painter";
 import Rect from "../rect";
@@ -9,6 +10,7 @@ import Vector from "../vector";
 import { Point } from "../vertex";
 import Button from "./button";
 import OperationObserver from "./operation-observer";
+import AuxiliaryLine from "./tools/auxiliary-lines";
 
 //转换为json的类型
 export type toJsonType = "image" | "text" | "write";
@@ -22,7 +24,7 @@ export interface toJSONInterface {
  * 凡是带有操作点的对象都是它，
  * 例如 图片、文字 等
  */
-abstract class ViewObject extends OperationObserver implements RenderObject {
+abstract class ViewObject extends OperationObserver implements RenderObject{
   public selected: boolean = false;
   //矩形缩放时用到
   private scale: number = 1;
@@ -34,6 +36,8 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   private layer: number = 0;
   private funcButton: Array<Button> = new Array<Button>();
   public relativeRect: Rect;
+  //辅助线
+  private auxiliary:AuxiliaryLine=new AuxiliaryLine();
   /**
    * @description 是否冻结锁住，
    * 锁住过后可被选取，但是不能位移和改变大小
@@ -61,7 +65,15 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     });
     this.addObserver(this);
   }
-
+  /**
+   * 重置按钮
+   */
+  public resetButtons(excludeNames?: Array<string>) {
+    const arr = excludeNames ?? [];
+    this.funcButton.forEach((button: Button) => {
+      if (!arr.includes(button.name)) button.reset();
+    });
+  }
   /**
    * @description 锁住
    */
@@ -103,15 +115,20 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.drawImage(paint);
     if (this.isMirror) paint.scale(-1, 1);
     if (this.selected) {
+      //边框
       this.drawBorder(paint);
+      //按钮
       this.updateFuncButton(paint);
     }
     paint.restore();
     paint.translate(0, 0);
     /*更新顶点数据*/
     this.rect.updateVertex();
-    /*渲染顶点*/
     paint.closePath();
+    if (this.selected) {
+      //辅助线
+      this.auxiliary.draw(paint,this);
+    }
   }
   //当被锁定时触发
   private onLock() {
@@ -169,7 +186,6 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       const vector = new Vector(~~newx, ~~newy);
       button.updatePosition(vector);
       button.update(paint);
-      
     });
   }
   /**
@@ -188,11 +204,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       const x = Math.cos(angle) * button.originDistance;
       const y = Math.sin(angle) * button.originDistance;
       const buttonPosi: Vector = new Vector(x, y);
-      //console.log(button.constructor.name);
-      //	console.log(event, buttonPosi);
       return button.isInArea(event, buttonPosi);
     });
-    //console.log("选中", button)
+
     return button;
   }
   public hide() {
@@ -201,9 +215,11 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.cancel();
   }
   public getVertex(): Point[] {
-    return this.rect.vertex.getPoints();
+    return this.rect.vertex?.getPoints();
   }
   public onSelected() {
+    //被选中过后对所有图层点进行备份，不需要每次渲染都获取一次
+    this.auxiliary.createReferencePoint(this.key.toString());
     this.selected = true;
   }
   public cancel() {
@@ -238,10 +254,18 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   /**
    * 世界坐标居中
    */
-  public center(canvasSize: Size,axis?:CenterAxis) {
-    if(axis){
-      if(axis=="vertical")return this.rect.position = new Vector(this.rect.position.x,canvasSize.height >> 1);
-      if(axis=="horizon")return this.rect.position = new Vector(canvasSize.width >> 1,this.rect.position.y);
+  public center(canvasSize: Size, axis?: CenterAxis) {
+    if (axis) {
+      if (axis == "vertical")
+        return (this.rect.position = new Vector(
+          this.rect.position.x,
+          canvasSize.height >> 1
+        ));
+      if (axis == "horizon")
+        return (this.rect.position = new Vector(
+          canvasSize.width >> 1,
+          this.rect.position.y
+        ));
     }
     const x = canvasSize.width >> 1,
       y = canvasSize.height >> 1;
@@ -255,7 +279,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   abstract export(): Promise<Object>;
   /**
    * @description 提供公用基础信息导出
-   * @returns 
+   * @returns
    */
   public getBaseInfo(): Object {
     return {
@@ -274,7 +298,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
         angle: this.rect.getAngle,
       },
       mirror: this.isMirror,
-      locked:this.isLock
+      locked: this.isLock,
     };
   }
 }

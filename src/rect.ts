@@ -37,7 +37,7 @@ class Rect extends ObserverObj {
     private _position: Vector;
     private _size: Size;
     private _scale: number;
-    public key: string = Math.random().toString(16).substring(2);
+    public readonly key: string = Math.random().toString(16).substring(2);
     constructor(params?: rectparams, key?: string, options?: {
         angle: number
     }) {
@@ -70,7 +70,6 @@ class Rect extends ObserverObj {
         this._vertex.rotate(this.getAngle, this);
     }
     public get position(): Vector {
-
         return this._position;
     }
     public get size(): Size {
@@ -88,6 +87,8 @@ class Rect extends ObserverObj {
     public set position(position: Vector) {
         this.beforeReport(position, "position");
         this._position = position;
+        this._position.x=~~this._position.x;
+        this._position.y=~~this._position.y;
         this.report(position, "position");
     }
     public setScale(scale: number, change?: boolean): void {

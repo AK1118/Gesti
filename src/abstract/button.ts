@@ -13,6 +13,7 @@ export abstract class Button implements RenderObject {
     constructor(master: ViewObject) {
         this.master = master;
     }
+    name:string="";
     //隐藏
     disabled: boolean = false;
     rect: Rect = new Rect();
@@ -37,6 +38,16 @@ export abstract class Button implements RenderObject {
     set free(canBeeLocking: boolean) {
         this.canBeeLocking = !canBeeLocking;
     }
+    private options:{
+        percentage?: [x: number, y: number],
+        position?: Vector,
+    };
+    /**
+     * 充值按钮坐标
+     */
+    public reset(){
+        this.init(this.options);
+    }
     /**
      * @description 设置相对定位
      * @param options 
@@ -45,6 +56,7 @@ export abstract class Button implements RenderObject {
         percentage?: [x: number, y: number],
         position?: Vector,
     }) {
+        this.options=options;
         const { percentage, position } = options;
 
         if (percentage)

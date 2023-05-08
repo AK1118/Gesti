@@ -41,8 +41,8 @@ class GestiControllerImpl implements GestiController{
 		this.kit.addListener(listenType,callback);
 	}
 	
-	updateText(text: string): void {
-		this.kit.updateText(text);
+	updateText(text: string,options?:textOptions): void {
+		this.kit.updateText(text,options);
 	}
 	center(axis?:CenterAxis): void {
 		this.kit.center(axis)

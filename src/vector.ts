@@ -60,6 +60,11 @@ class Vector{
 			y:this.y,
 		}
 	}
+	troweling():Vector{
+		this.x=this.x>>0;
+		this.y=this.y>>0;
+		return this;
+	}
 	equals(v:Vector):boolean{
 		return v.x==this.x&&v.y==this.y;
 	}
@@ -78,6 +83,11 @@ class Vector{
 	}
 	static add(v1:Vector, v2:Vector) {
 		return new Vector(v1.x + v2.x, v1.y + v2.y);
+	}
+	static troweling(v:Vector){
+		v.x=v.x>>0;
+		v.y=v.y>>0;
+		return v;
 	}
 	
 }

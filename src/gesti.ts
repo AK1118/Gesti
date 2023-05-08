@@ -1,3 +1,4 @@
+import canvasConfig from "./config/canvasConfig";
 import GestiControllerImpl from "./controller";
 import ImageToolkit from "./image-toolkit";
 import GestiController from "./interfaces/gesticontroller";
@@ -34,6 +35,7 @@ class Gesti {
                 g.imageSmoothingEnabled=true;
                 g.imageSmoothingQuality="high";
                 this.kit = new ImageToolkit(g, canvasRect);
+                canvasConfig.init(this.kit);
                 return;
             }
         }

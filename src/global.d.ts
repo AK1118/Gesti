@@ -39,10 +39,12 @@ declare class Vector {
   toJson(): { x: number; y: number };
   toArray(): number[];
   equals(v: Vector): boolean;
+  troweling():Vector;
   static dist(v1: Vector, v2: Vector): number;
   static mag(v: Vector): number;
   static sub(v1: Vector, v2: Vector): Vector;
   static add(v1: Vector, v2: Vector): Vector;
+  static troweling(v:Vector):Vector;
 }
 
 declare interface GestiEventParams {

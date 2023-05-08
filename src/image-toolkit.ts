@@ -18,7 +18,6 @@ import { classTypeIs } from "./utils";
 import Vector from "./vector";
 import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
-import Write from "./viewObject/write";
 import WriteFactory, { WriteType } from "./write/write-factory";
 import XImage from "./ximage";
 
@@ -97,10 +96,17 @@ class ImageToolkit implements GestiController {
   private isWriting: boolean = false;
   //绘制对象工厂  //绘制对象，比如签字、矩形、圆形等
   private writeFactory: WriteFactory;
-
+  public get getCanvasRect():Rect{
+    return this.canvasRect;
+  }
+  public get getViewObjects(){
+    return this.ViewObjectList;
+  }
   constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
     const { x: offsetx, y: offsety, width, height } = rect;
     this.offset = new Vector(offsetx || 0, offsety || 0);
+    rect.x=this.offset.x;
+    rect.y=this.offset.y;
     this.canvasRect = new Rect(rect);
     this.paint = new Painter(paint);
     this.writeFactory = new WriteFactory(this.paint);
@@ -207,8 +213,9 @@ class ImageToolkit implements GestiController {
   updateText(text: string, options?: textOptions): void {
     const isTextBox = classTypeIs(this.selectedViewObject, TextBox);
     if (isTextBox) {
-      (this.selectedViewObject as TextBox).updateText(text, options);
-      this.update();
+      (this.selectedViewObject as TextBox).updateText(text, options).then(()=>{
+        this.update()
+      });
     }
   }
   center(axis?: CenterAxis): void {
@@ -566,6 +573,9 @@ class ImageToolkit implements GestiController {
     const textBox: TextBox = new TextBox(text, this.paint, options);
     textBox.center(this.canvasRect.size);
     this.ViewObjectList.push(textBox);
+    //测试
+    // this.selectedViewObject=textBox;
+    // this.selectedViewObject.onSelected()
     setTimeout(() => {
       this.update();
     }, 100);
@@ -674,4 +684,4 @@ class _Tools {
     kit.update();
   }
 }
-export default ImageToolkit;
+export default ImageToolkit; 
