@@ -2,7 +2,6 @@ import { CloseButton, MirrorButton, RotateButton } from "../buttons";
 import DelockButton from "../buttons/delockButton";
 import DragButton from "../buttons/dragbutton";
 import LockButton from "../buttons/lockbutton";
-import canvasConfig from "../config/canvasConfig";
 import RenderObject from "../interfaces/render-object";
 import Painter from "../painter";
 import Rect from "../rect";
@@ -11,7 +10,7 @@ import { Point } from "../vertex";
 import Button from "./button";
 import OperationObserver from "./operation-observer";
 import AuxiliaryLine from "./tools/auxiliary-lines";
-
+import GestiConfig from "../config/gestiConfig";
 //转换为json的类型
 export type toJsonType = "image" | "text" | "write";
 
@@ -37,7 +36,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
   private funcButton: Array<Button> = new Array<Button>();
   public relativeRect: Rect;
   //辅助线
-  private auxiliary:AuxiliaryLine=new AuxiliaryLine();
+  private auxiliary:AuxiliaryLine;
   /**
    * @description 是否冻结锁住，
    * 锁住过后可被选取，但是不能位移和改变大小
@@ -46,6 +45,8 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
   public dragButton: DragButton;
   constructor() {
     super();
+    //根据配置判断是否设置参考线
+    GestiConfig.auxiliary&&(this.auxiliary=new AuxiliaryLine());
   }
   public init() {
     this.dragButton = new DragButton(this);
@@ -127,7 +128,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
     paint.closePath();
     if (this.selected) {
       //辅助线
-      this.auxiliary.draw(paint,this);
+      this.auxiliary?.draw(paint,this);
     }
   }
   //当被锁定时触发
@@ -219,7 +220,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
   }
   public onSelected() {
     //被选中过后对所有图层点进行备份，不需要每次渲染都获取一次
-    this.auxiliary.createReferencePoint(this.key.toString());
+    this.auxiliary?.createReferencePoint(this.key.toString());
     this.selected = true;
   }
   public cancel() {

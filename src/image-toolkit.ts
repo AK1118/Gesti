@@ -112,6 +112,13 @@ class ImageToolkit implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  get currentViewObject(): Promise<ViewObject> {
+    return Promise.resolve(this.selectedViewObject);
+  }
+  async rotate(angle:number): Promise<void> {
+     if(!this.selectedViewObject)return null;
+     this.selectedViewObject.rect.setAngle(angle);
+  }
   upward(viewObject?: ViewObject): number {
     if (viewObject) {
       viewObject.rect.position.y -= 1;
@@ -585,6 +592,7 @@ class ImageToolkit implements GestiController {
     type: "circle" | "write" | "line" | "rect" | "none";
     lineWidth?: number;
     color?: string;
+    isFill?: boolean;
   }) {
     this.writeFactory.setConfig(options);
   }

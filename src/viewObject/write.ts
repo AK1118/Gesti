@@ -28,11 +28,13 @@ class WriteViewObj extends ViewObject {
   private _scalex: number = 1;
   private _scaley: number = 1;
   private color: string = "";
+  private isFill: boolean = false;
   private type: "circle" | "write" | "line" | "rect" | "none" = "write";
   private config: {
     color?: string;
     lineWidth?: number;
     type: "circle" | "write" | "line" | "rect" | "none";
+    isFill?: boolean;
   };
   private lineWidth: number = 3;
   constructor(
@@ -44,6 +46,7 @@ class WriteViewObj extends ViewObject {
       type: "circle" | "write" | "line" | "rect" | "none";
       scaleX?: number;
       scaleY?: number;
+      isFill?: boolean;
     }
   ) {
     super();
@@ -51,6 +54,7 @@ class WriteViewObj extends ViewObject {
     this.color = color;
     this.type = config.type;
     this.color = config.color ?? "black";
+    this.isFill = config.isFill ?? false;
     this.lineWidth = config.lineWidth ?? 3;
     this._scalex = config.scaleX ?? 1;
     this._scaley = config.scaleY ?? 1;
@@ -102,7 +106,11 @@ class WriteViewObj extends ViewObject {
     paint.lineWidth = this.lineWidth;
     paint.strokeStyle = this.color;
     if (this.type != "write") paint.closePath();
-    paint.stroke();
+    if (this.isFill) {
+      paint.fillStyle=this.color;
+      paint.fill();
+    }
+    else paint.stroke();
     if (this.type == "write") paint.closePath();
   }
   private getCircleParams(p1: Vector, p2: Vector) {

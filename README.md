@@ -74,12 +74,21 @@
 ### 加入图片
 
 	//image 类型详情请参考API,传入一个 <img>也适用
-	gesti.addImage(gesti.createImage(image));
+	 gesti.addImage(gesti.createImage(image));
 
 # API
 
-## Gesti[方法]
+## Gesti
 
+| 方法名      | 返回值类型  |  所属    |    参数    |   说明   |
+| :----:      |   :----: | :----:   |  :----:   | :----:      | 
+| init      |    void      |     Gesti   |    (canvas?: HTMLCanvasElement, paint?: CanvasRenderingContext2D, rect?:rectParam)   |     初始化 Gesti 时调用，共3个可选参数。canvas 和 paint 必须二选一，且没有传入canvas时，必须传入paint 和 rect.       |
+
+| 属性名      | 返回值类型  |  所属    |    参数    |   说明   |
+| :----:      |   :----: | :----:   |  :----:   | :----: | 
+|  constructor | Gesti    |  Gesti |    config?: gesticonfig    |     构造函数,传入配置参数，当前只有一个可选参数  auxiliary?:boolean 控制辅助线开关     |
+|  static XImage | XImage  |  Gesti |    -    |     暴露给外部声明Ximage对象类型     |
+|  controller | GestiController  |  Gesti |    -    |     控制器，获取控制器，详情请查看下方  GestiController   |
 #### init
 
 	init(canvas?: HTMLCanvasElement, paint?: CanvasRenderingContext2D, rect?: {
@@ -93,6 +102,8 @@
 - canvas 和 paint 必须二选一，且没有传入canvas时，必须传入paint 和 rect.
 
 ***在H5端，推荐您直接传入一个canvas即可***
+
+
 
 #### addImage
 
@@ -151,109 +162,44 @@
 
 ## GestiController
 
+| 方法名      | 返回值类型              |  所属    |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |    :----:   |   :----: |
+| addText    | Promise\<boolean\>|      GestiController     |    text: string, options?: textOptions ) |    新增文字图层到画布内    |
+| updateText  | void              |    GestiController  |       (text: string, options?:textOptions )     |      更新被选中的文字图层的文字内容，或者文字属性   |
+| layerLower  | void             |      GestiController     |    -      |    图层向下移动一层    |
+| layerRise  | void             |      GestiController     |     -     |    图层向上移动一层    |
+| layerTop  | void             |      GestiController     |     -     |    图层置于最顶层    |
+| layerBottom  | void             |      GestiController     |    -      |    图层置于最底层    |
+| lock    | void             |      GestiController     |     -     |    锁定当前选中图层    |
+| deLock    | void             |      GestiController     |     -     |    解锁当前选中图层    |
+| cancel    | void             |      GestiController     |      -    |    取消当前被聚焦对象    |
+| cancelAll    | void             |      GestiController     |     -     |    取消所有被聚焦对象    |
+| fallback(暂未全局兼容)    | void             |      GestiController     |     -     |    撤销    |
+| cancelFallback(暂未全局兼容)    | void             |      GestiController     |    -      |    取消上次撤销    |
+| down    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标\|手指点击事件时调用    |
+| up    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标\|手指抬起事件时调用    |
+| move    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标\|手指移动事件时调用    |
+| wheel    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标滚轮事件时调用    |
+| addListener    | void  |   GestiController |    (listenType:"onSelect"\|"onHide"\|"onCancel",callback:ListenerCallback)     |   监听图层操作，目前支持监听选中、取消选中和隐藏    |
+| rotate    | Promise\<void\>  |   GestiController |    angle: number     |   旋转被选中对象,传入弧度。可传入  角度*Math.PI/180     |
+| upward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向上移动距离 1     |
+| downward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向下移动距离 1     |
+| leftward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向左移动距离 1     |
+| rightward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向右移动距离 1     |
+| update    | void  |   GestiController |    -    |   调用后会重绘canvas,一般在改变数据后画布未刷新时使用     |
+| importAll(试行)    | Promise\<void\>  |   GestiController |    (json: string)   |   以json形式导入对象集合 |
+| exportAll(试行)   | Promise\<void\>  |   GestiController |    -   |   以json形式导出对象集合, 小图片支持base64导出，大型图片会溢base64    |
+| center   | void  |   GestiController |   (axis?: "vertical" \| "horizon")   |  垂直居中或者水平居中，不填写参数水平垂直居中    |
+| addImage   | 	Promise\<boolean\>  |   GestiController |   (ximage: XImage \| Promise<XImage>)   |  添加一张图片到画布内    |
+| createImage   | 	Promise\<XImage\>  |   GestiController |   (image: HTMLImageElement \| SVGImageElement \| HTMLVideoElement \| HTMLCanvasElement \| Blob \| ImageData \| ImageBitmap \| OffscreenCanvas, options?: createImageOptions)   |  传入图片数据，返回一个Ximage对象,详细使用方法参考Demo    |
+| cancelEvent   | void  |   GestiController |   -   |  取消Gesti自带的鼠标手指时间监听。使用该函数后需要自行调用鼠标各个事件，请参考上方  down,up,move  ,使用详情参考Demo    |
+| addWrite   | 	void  |   GestiController |   (options: {type: "circle" \| "write" \| "line" \| "rect" \| "none";lineWidth?: number;color?: string;isFill?: boolean;})   |  添加涂鸦功能，调用该函数且传入options.type不为"none"时，下一次在canvas内滑动会触发生成对应的涂鸦对象,直到再次调用该函数且options.type为"none"时停止    |
 
 
-#### addText
+| 属性名      | 返回值类型         |  所属    |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |    :----:   |   :----: |
+| currentViewObject| Promise\<ViewObject\> | GestiController | - | 获取当前选中对象|
 
-	addText(text: string, options?:textOptions):Promise<boolean>;
-
-- 新增文字图层到Gesti内
-
-#### updateText
-
-	updateText(text: string, options?:textOptions):void;
-
-- 更新被选中的文字图层的文字内容，或者文字属性
-
-#### layerLower
-
-	layerLower():void;
-
-- 图层向下移动一层
-
-#### layerRise
-
-	layerRise():void;
-
-- 图层向上移动一层
-
-#### layerTop
-
-	layerTop():void;
-
-- 图层置于最顶层
-
-#### layerBottom
-
-	layerBottom():void;
-
-- 图层置于最底层
-
-#### lock
-
-	lock():void;
-
-- 锁定当前选中图层
-
-#### deLock
-
-	deLock():void;
-
-- 解锁当前选中图层
-
-#### cancel
-
-	cancel():void;
-
-- 取消当前被聚焦对象
-
-#### cancelAll
-
-	cancelAll():void;
-
-- 取消所有被聚焦对象
-
-#### fallback
-
-	fallback():void;
-
-- 撤销
-
-#### cancelFallback
-
-	fallback():void;
-
-- 取消上次撤销
-
-#### down
-
-	down(e: MouseEvent | Event | EventHandle): void;
-
-- 鼠标|手指点击事件时调用
-
-#### up
-
-	up(e: MouseEvent | Event | EventHandle): void;
-
-- 鼠标|手指抬起事件时调用
-
-#### move
-
-	move(e: MouseEvent | Event | EventHandle): void;
-
-- 鼠标|手指移动事件时调用
-
-#### wheel
-
-	wheel(e: MouseEvent | Event | EventHandle): void;
-
-- 鼠标滚轮事件时调用
-
-#### addListener
-
-	addListener(listenType:"onSelect"|"onHide"|"onCancel",callback:ListenerCallback):void;
-
-- 监听图层操作，目前支持监听选中、取消选中和隐藏
 
 # 保存
 
@@ -282,7 +228,7 @@
 	const gesti = new Gesti();
 	const img: HTMLImageElement = document.querySelector("#img");
 	gesti.init(canvas);
-	gesti.addImage(gesti.createImage(img))
+	gesti.controller.addImage(gesti.createImage(img))
 
 
 ***不是吗？***

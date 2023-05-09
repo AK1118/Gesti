@@ -91,6 +91,13 @@ class Rect extends ObserverObj {
         this._position.y=~~this._position.y;
         this.report(position, "position");
     }
+    public setPosition(position: Vector):void {
+        this.beforeReport(position, "position");
+        this._position = position;
+        this._position.x=~~this._position.x;
+        this._position.y=~~this._position.y;
+        this.report(position, "position");
+    }
     public setScale(scale: number, change?: boolean): void {
         this.beforeReport(scale, "scale");
         //是否真正改变大小，还是之通知倍数改变了，后续可以考虑移除监听scale

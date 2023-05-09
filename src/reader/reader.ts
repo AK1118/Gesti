@@ -1,5 +1,5 @@
 import ViewObject from "../abstract/view-object";
-import GestiControllerImpl from "../controller";
+import GesteControllerImpl from "../controller";
 import Painter from "../painter";
 import Rect from "../rect";
 import { dataURLtoBlob } from "../utils/index";
@@ -35,7 +35,7 @@ class GestiReader {
           const blob: Blob = dataURLtoBlob(options.options.data, "name");
           const image = new Image();
           image.src = options.options.data;
-          const ximage: XImage = await new GestiControllerImpl(
+          const ximage: XImage = await new GesteControllerImpl(
             null
           ).createImage(blob);
           viewObject = new ImageBox(ximage);

@@ -23,7 +23,10 @@ class WriteRect extends WriteBase{
         this.paint.closePath();
         this.paint.strokeStyle=this.config.color;
         this.paint.lineWidth=this.config.lineWidth;
-        this.paint.stroke();
+        if (this.config.isFill ?? false) {
+            this.paint.fillStyle=this.config.color;
+            this.paint.fill();
+        }else this.paint.stroke();
         this.currentPosition=position;
     }
     async getWriteViewObject(): Promise<ViewObject> {

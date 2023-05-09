@@ -51,7 +51,7 @@ class Write extends WriteBase {
         this.paint.lineWidth =3;
         this.paint.strokeStyle=this.config.color;
         this.paint.lineWidth=this.config.lineWidth;
-        this. paint.stroke();
+         this.paint.stroke();
         this.paint.closePath();
     }
     //速度越快，线越细

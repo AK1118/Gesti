@@ -26,6 +26,7 @@ abstract class WriteBase {
         color?: string,
         lineWidth?: number,
         type: "circle" | "write" | "line" | "rect"|"none",
+        isFill?:boolean,
     };
     constructor(paint: Painter) {
         this.paint = paint;
@@ -74,6 +75,7 @@ abstract class WriteBase {
         //设置默认数值
         if(!this.config.lineWidth)this.config.lineWidth=3;
         if(!this.config.color)this.config.color="red";
+        if(!this.config.isFill)this.config.isFill=false;
     }
     abstract draw(position: Vector);
     /**

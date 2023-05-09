@@ -6,7 +6,7 @@
         "strict": false,
         "declaration": true,
         "outDir": "./dist",
-        "declarationMap": true,
+       // "declarationMap": true,
         "declarationDir": "types"
     },
     "include": [

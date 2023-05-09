@@ -86,4 +86,4 @@ declare interface textOptions {
   lineOffsetY?: number;
 }
 
-type CenterAxis="vertical"|"horizon";
+declare type CenterAxis="vertical"|"horizon";

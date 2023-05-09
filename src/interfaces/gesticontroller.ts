@@ -54,13 +54,34 @@ interface LayerController {
      */
   updateText(text: string, options?: textOptions): void;
   /**
-   * @description 选中图册位移变化
+   * @description 选中图册位移变化 向上移动一距离
    * @param viewObject 
    */
   upward(viewObject?:ViewObject):number;
+ /**
+   * @description 选中图册位移变化 向下移动一距离
+   * @param viewObject 
+   */
   downward(viewObject?:ViewObject):number;
+  /**
+   * @description 选中图册位移变化 向左移动一距离
+   * @param viewObject 
+   */
   leftward(viewObject?:ViewObject):number;
+  /**
+   * @description 选中图册位移变化 向右移动一距离
+   * @param viewObject 
+   */
   rightward(viewObject?:ViewObject):number;
+  /**
+   * @description 旋转已被选中对象  传入弧度  可使用公式【 angle++ * Math.PI / 180  】转换角度为弧度
+   * @param angle 
+   */
+  rotate(angle:number):Promise<void>;
+  /**
+   * 获取当前选中对象
+   */
+  get currentViewObject():Promise<ViewObject>;
 }
 
 type ListenerCallback = (object: any) => void;
@@ -121,9 +142,10 @@ interface ImageToolKitController {
     callback: ListenerCallback
   ): void;
   addWrite(options: {
-    type: "circle" | "write" | "line" | "rect" | "none";
-    lineWidth?: number;
-    color?: string;
+    type: "circle" | "write" | "line" | "rect" | "none",
+    lineWidth?: number,
+    color?: string,
+    isFill?:boolean,
   });
   /**
    * @description 导出所有对象成JSON字符串
