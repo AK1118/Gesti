@@ -4,10 +4,10 @@
         "target": "ES6",
         "module": "ES6",
         "strict": false,
-        "declaration": true,
+    //   "declaration": true,
         "outDir": "./dist",
        // "declarationMap": true,
-        "declarationDir": "types"
+       // "declarationDir": "types"
     },
     "include": [
         "src/**/*"

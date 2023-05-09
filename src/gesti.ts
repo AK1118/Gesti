@@ -27,14 +27,14 @@ class Gesti {
    * @param rect
    */
   public init(
-    canvas?: HTMLCanvasElement,
-    paint?: CanvasRenderingContext2D,
-    rect: {
+    canvas: HTMLCanvasElement|null,
+    paint?: CanvasRenderingContext2D|null,
+    rect?:{
       x?: number;
       y?: number;
       width: number;
       height: number;
-    } = null
+    }
   ) {
     if (!canvas && !rect) throw Error("未指定Canvas大小或Canvas节点");
     if (typeof document != "undefined" && canvas) {

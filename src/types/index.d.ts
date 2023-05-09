@@ -12,7 +12,7 @@ declare interface textOptions {
   lineOffsetY?: number;
 }
 declare interface createImageOptions {
-  data?:
+  data:
     | HTMLImageElement
     | SVGImageElement
     | HTMLVideoElement
@@ -22,14 +22,14 @@ declare interface createImageOptions {
     | ImageBitmap
     | OffscreenCanvas;
   originData?: any;
-  options?: createImageOptions;
-  width?: number;
-  height?: number;
+  options: createImageOptions;
+  width: number;
+  height: number;
   scale?: number;
   maxScale?: number;
   minScale?: number;
 }
-declare interface Rect{
+export declare interface Rect{
   readonly key: string;
   get position(): Vector;
   get getAngle(): number ;
@@ -43,11 +43,13 @@ declare interface Rect{
   copy(key?: string):Rect;
 }
 declare class ImageToolkit {}
-declare class ViewObject {
+export declare class ViewObject {
   getBaseInfo():Object;
   rect:Rect;
 }
-declare class XImage {
+export declare interface XImage {
+  new(params: createImageOptions):XImage;
+  constructor(params: createImageOptions):XImage;
   originData: any;
   data: any;
   width: number;
@@ -55,23 +57,26 @@ declare class XImage {
   x: number;
   y: number;
   scale: number;
-  constructor(params: createImageOptions);
   toJson(): rectparams;
 }
-declare type CenterAxis = "vertical" | "horizon";
+
+export declare type CenterAxis = "vertical" | "horizon";
 
 declare class Gesti{
+  new(config?:gesticonfig):Gesti;
   constructor(config?:gesticonfig);
   get controller():GestiController;
-  init(canvas: HTMLCanvasElement, paint: CanvasRenderingContext2D , rect: {
-    x?: number,
-    y?: number,
-    width: number,
-    height: number,
-}):Gesti;
+  static XImage:XImage;
+  init( canvas: HTMLCanvasElement|null,
+    paint?: CanvasRenderingContext2D|null,
+    rect?:{
+      x?: number;
+      y?: number;
+      width: number;
+      height: number;
+    }):void;
 }
-
-declare class GestiController {
+export declare class GestiController {
   /**
    * @ImageToolkit
    * @private
@@ -180,3 +185,5 @@ declare class GestiController {
     options?: createImageOptions
   ): Promise<XImage>;
 }
+
+export default Gesti;

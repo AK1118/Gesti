@@ -89,6 +89,7 @@
 |  constructor | Gesti    |  Gesti |    config?: gesticonfig    |     构造函数,传入配置参数，当前只有一个可选参数  auxiliary?:boolean 控制辅助线开关     |
 |  static XImage | XImage  |  Gesti |    -    |     暴露给外部声明Ximage对象类型     |
 |  controller | GestiController  |  Gesti |    -    |     控制器，获取控制器，详情请查看下方  GestiController   |
+
 #### init
 
 	init(canvas?: HTMLCanvasElement, paint?: CanvasRenderingContext2D, rect?: {
@@ -102,63 +103,6 @@
 - canvas 和 paint 必须二选一，且没有传入canvas时，必须传入paint 和 rect.
 
 ***在H5端，推荐您直接传入一个canvas即可***
-
-
-
-#### addImage
-
-	addImage(ximage: XImage | Promise<XImage>): 	Promise<boolean>;
-
-- 添加一张图片到canvas里面
-
-#### createImage
-
-
-	createImage(image: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions): Promise<XImage>;
-
-- 传入图片，创建一个XImage,并返回一个Promise <XImage>
-
-
-#### update
-
-	update():void;
-
-- 手动刷新画布
-
-## Gesti[属性]
-
-#### debug
-
-	debug:boolean
-
-- 值为true时开启
-	
-#### Gesti.XImage
-
-	declare class XImage {
-		data: any;
-		width: number;
-		height: number;
-		x: number;
-		y: number;
-		scale: number;
-		constructor(params: createImageOptions);
-		toJson(): {
-			x:number,
-			y:number,
-			width:number,
-			height:number,
-		};
-	}
-
-- 传入到Gesti里面的类型
-
-#### Gesti.controller
-
-	get controller:GestiController;
-
-- 自定义鼠标|手指事件时使用
-- 详情请查看 - [controller](#GestiController)
 
 ## GestiController
 
