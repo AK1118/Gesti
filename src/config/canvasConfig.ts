@@ -6,7 +6,7 @@ class CanvasConfig {
     this.kit = kit;
   }
   public get rect(){return this.kit.getCanvasRect};
-  //所有图册对象
+  //所有图层对象
   public get views(){return this.kit.getViewObjects};
 }
 

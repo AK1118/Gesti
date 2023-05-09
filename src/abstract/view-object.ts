@@ -2,6 +2,7 @@ import { CloseButton, MirrorButton, RotateButton } from "../buttons";
 import DelockButton from "../buttons/delockButton";
 import DragButton from "../buttons/dragbutton";
 import LockButton from "../buttons/lockbutton";
+
 import RenderObject from "../interfaces/render-object";
 import Painter from "../painter";
 import Rect from "../rect";

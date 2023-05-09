@@ -13,7 +13,7 @@ class Gesti {
   public static XImage = XImage;
   public static config: GestiConfig;
   constructor(config?: gesticonfig) {
-    Gesti.config=new GestiConfig(config);
+    Gesti.config = new GestiConfig(config);
   }
   get controller(): GestiController {
     return new GesteControllerImpl(this.kit);
@@ -27,9 +27,9 @@ class Gesti {
    * @param rect
    */
   public init(
-    canvas: HTMLCanvasElement|null,
-    paint?: CanvasRenderingContext2D|null,
-    rect?:{
+    canvas: HTMLCanvasElement | null,
+    paint?: CanvasRenderingContext2D | null,
+    rect?: {
       x?: number;
       y?: number;
       width: number;
@@ -38,7 +38,9 @@ class Gesti {
   ) {
     if (!canvas && !rect) throw Error("未指定Canvas大小或Canvas节点");
     if (typeof document != "undefined" && canvas) {
-      const canvasRect: DOMRect = canvas.getBoundingClientRect();
+      let canvasRect: DOMRect = canvas.getBoundingClientRect();
+      //优先使用自定义的rect
+      if (rect) canvasRect = rect as DOMRect;
       if (canvasRect) {
         const g = canvas.getContext("2d");
         g.imageSmoothingEnabled = true;

@@ -22,7 +22,7 @@ class RotateButton extends Button {
         super(master);
         this.name="rotate";
         this.init({
-            position:new Vector(0,(master.rect.size.height>>1)+5),
+            position:new Vector(0,(master.rect.size.height>>1)+10),
         });
         this.initScale();
         this.rect.onDrag = (newRect: Rect) => {

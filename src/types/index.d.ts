@@ -67,6 +67,13 @@ declare class Gesti{
   constructor(config?:gesticonfig);
   get controller():GestiController;
   static XImage:XImage;
+  /**
+   * canvas必传，在h5端时paint可不传
+   * 关于rect  width 和 height 对应的是canvas的高宽   而 x,y其实对应的是canvas在屏幕的位置，或者可以理解为偏移量
+   * @param canvas 
+   * @param paint 
+   * @param rect 
+   */
   init( canvas: HTMLCanvasElement|null,
     paint?: CanvasRenderingContext2D|null,
     rect?:{
