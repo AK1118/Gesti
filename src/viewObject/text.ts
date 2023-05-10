@@ -165,8 +165,8 @@ class TextBox extends ViewObject {
         oldColumn = this.column;
       }
       if (!isAutoColumn) {
-       // paint.fillText(text, drawX, drawY);
-        paint.fillText(""+this.lineOneHotMark[ndx], drawX, drawY);
+        paint.fillText(text, drawX, drawY);
+       // paint.fillText(""+this.lineOneHotMark[ndx], drawX, drawY);
         currentWidth += x;
       }
       this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
