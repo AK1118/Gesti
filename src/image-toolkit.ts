@@ -354,7 +354,7 @@ class ImageToolkit implements GestiController {
       }
     );
     this.gesture.addListenGesti("globalClick", (position: Vector) => {
-      const selected = this.clickViewObject(position);
+     // const selected = this.clickViewObject(position);
       // if (selected == null && this.selectedViewObject) {
       //     this.drag.cancel();
       //     this.cancel();
@@ -434,6 +434,8 @@ class ImageToolkit implements GestiController {
   public onUp(v: GestiEventParams): void {
     this.debug(["Event Up,", v]);
     const event: Vector | Vector[] = this.correctEventPosition(v);
+    //判断是否选中对象
+     this.clickViewObject(event);
     this.eventHandlerState = EventHandlerState.up;
     //手势解析处理
     this.gesture.onUp(this.selectedViewObject, event);

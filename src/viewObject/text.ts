@@ -44,7 +44,7 @@ class TextBox extends ViewObject {
   //行？
   private column: number = 1;
   //划线状态，1是从起点开始中 2是已经画完上一个线段了，等待下一次
-  private currentLineState: 1 | 2 | 3 | 4 = 1;
+  private currentLineState: 1 | 2 | 3 | 4 | 0 | 5 = 0;
   constructor(text: string, painter: Painter, options?: textOptions) {
     super();
     this._painter = painter;
@@ -131,7 +131,7 @@ class TextBox extends ViewObject {
     paint.font = this.fontsize + "px " + this._fontFamily;
     const text_len = textList.length;
     for (let ndx = 0; ndx < text_len; ndx++) {
-      const text=textList[ndx];
+      const text = textList[ndx];
       const text_width = ~~this._painter.measureText(text).width;
       const beforeText = this._text[ndx - 1];
       const nextText = this._text[ndx + 1];
@@ -142,14 +142,14 @@ class TextBox extends ViewObject {
       /**
        * 宽度不足一个字体，接下来要换行才行，还未换行
        */
-      if (width - currentWidth - text_width < text_width || isAutoColumn) {
+      if (width - currentWidth - text_width < text_width || isAutoColumn&&this.column==oldColumn) {
         //上一个为1,且马上要被替换的必须为0
-        if (this.currentLineState == 1 && this.lineOneHotMark[ndx] == 0)
+        if (this.currentLineState == 1 && this.lineOneHotMark[ndx] == 0&&this.lineOneHotMark[ndx-1]!=4)
           this.lineOneHotMark[ndx] = 4;
       }
 
       //字数达到宽度后需要换行   或者出发换行字符
-      if (currentWidth + text_width > width||isAutoColumn) {
+      if (currentWidth + text_width > width || isAutoColumn) {
         this.column += 1;
         currentWidth = 0;
       }
@@ -159,66 +159,23 @@ class TextBox extends ViewObject {
         (this.rect.size.height >> 1);
 
       //换行后需要连接起始点不在同意行的线段
-      if (this.currentLineState == 1 && this.column > oldColumn) {
+      if (this.currentLineState == 1 && this.column > oldColumn&&this.lineOneHotMark[ndx-1]==4&& this.lineOneHotMark[ndx]==0) {
         this.lineOneHotMark[ndx] = 3;
-        this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
+         this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
         oldColumn = this.column;
       }
       if (!isAutoColumn) {
-        paint.fillText(text, drawX, drawY);
+       // paint.fillText(text, drawX, drawY);
+        paint.fillText(""+this.lineOneHotMark[ndx], drawX, drawY);
         currentWidth += x;
       }
-
       this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
-      if(isAutoColumn){
-        ndx+=1;
-        paint.stroke()
+      if (isAutoColumn) {
+        ndx += 1;
+        paint.stroke();
         continue;
       }
     }
-    // textList.forEach((text: string, ndx: number) => {
-    //   const text_width = ~~this._painter.measureText(text).width;
-    //   const beforeText=this._text[ndx-1];
-    //   const nextText=this._text[ndx+1];
-    //   const spacing = this.fontsize / this._spacing_scale;
-    //   const x = text_width + spacing;
-    //   const rep=/ &n/g;
-    //   const isAutoColumn=rep.test(beforeText+text+nextText);
-    //   /**
-    //    * 宽度不足一个字体，接下来要换行才行，还未换行
-    //    */
-    //   if (width - currentWidth - text_width < text_width||isAutoColumn) {
-    //     //上一个为1,且马上要被替换的必须为0
-    //     if (this.currentLineState == 1 && this.lineOneHotMark[ndx] == 0)
-    //       this.lineOneHotMark[ndx] = 4;
-    //   }
-
-    //   //字数达到宽度后需要换行
-    //   if (currentWidth + text_width > width) {
-    //     this.column += 1;
-    //     currentWidth = 0;
-    //   }else if(isAutoColumn){
-    //     this.column += 1;
-    //     currentWidth = 0//- ~~this._painter.measureText(' ').width;
-    //   }
-    //   const drawX = width * -0.5 + currentWidth;
-    //   const drawY =
-    //     (this.column == 1 ? height * 2 : height * (this.column * 2)) -
-    //     (this.rect.size.height >> 1);
-
-    //   //换行后需要连接起始点不在同意行的线段
-    //   if (this.currentLineState == 1 && this.column > oldColumn) {
-    //     this.lineOneHotMark[ndx] = 3;
-    //     this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
-    //     oldColumn = this.column;
-    //   }
-    //   if(!isAutoColumn){
-    //     paint.fillText(text, drawX, drawY);
-    //     currentWidth += x;
-    //   }
-
-    //   this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
-    // });
     paint.stroke();
     paint.closePath();
     this.setData();
@@ -245,19 +202,21 @@ class TextBox extends ViewObject {
     const lineY: number = drawY + this.fontsize * 0.2 + this.lineOffsetY;
     //使用标记，1是起始点，2是终点
     const code = this.lineOneHotMark[ndx];
+    const beforeCode=this.lineOneHotMark[ndx-1];
     paint.strokeStyle = this.lineColor;
     paint.lineWidth = this.lineWidth;
     if (code == 1 || code == 2) this.currentLineState = code as 1 | 2;
-    if (code == 3) return paint.moveTo(drawX, lineY);
+
     if (code == 1) return paint.moveTo(drawX - textWidth, lineY);
-    if (code == 2) return paint.lineTo(drawX, lineY);
-    if (code == 4) return paint.lineTo(drawX + textWidth, lineY);
+    if (code == 2&&beforeCode!=4) return paint.lineTo(drawX, lineY);
+    if (code == 3) return paint.moveTo(drawX, lineY);
+    if (code == 4&&beforeCode!=4&&beforeCode!=1) return paint.lineTo(drawX + textWidth, lineY);
   }
 
   //@Override
   public didChangeScale(scale: number): void {
-    this.setData();
     this.initLine();
+    this.setData();
     this.drawImage(this._painter);
   }
 
@@ -266,8 +225,8 @@ class TextBox extends ViewObject {
     return new Promise((r, j) => {
       //  console.log(text,options)
       this._text = text;
-      this.initPrototypes(text, options);
       this.initLine();
+      this.initPrototypes(text, options);
       this.drawImage(this._painter);
       r();
     });
@@ -284,8 +243,9 @@ class TextBox extends ViewObject {
     const newHeight = this.fontsize * this.column;
     this.rect.setSize(this.rect.size.width, newHeight);
     this.resetButtons(["rotate"]);
-    this.dragButton.setAxis("horizontal");
-    if(size.width<=this.fontsize)this.rect.setSize(this.fontsize, newHeight);
+     this.dragButton.setAxis("horizontal");
+    if (size.width <= this.fontsize)
+      this.rect.setSize(this.fontsize, newHeight);
     //this.relativeRect.setSize(this.rect.size.width,newHeight);
   }
 }

@@ -21,7 +21,7 @@
 		this.paint.strokeStyle = style;
 	}
 	draw() {
-		this.paint?.draw();
+		this.paint?.draw?.call(this.paint);
 	}
 	strokeRect(x:number, y:number, w:number, h:number) {
 		this.paint.strokeRect(x, y, w, h);
@@ -33,7 +33,7 @@
 		this.paint.stroke();
 	}
 	clearRect(x:number, y:number, w:number, h:number) {
-		if (typeof(uni) != 'undefined')
+		if (typeof(uni) != 'undefined'&&this.paint.draw)
 			this.draw();
 		else
 			this.paint.clearRect(x, y, w, h);
