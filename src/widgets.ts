@@ -1,3 +1,4 @@
+import GestiConfig from "./config/gestiConfig";
 import Painter from "./painter";
 
 /*使用Canvas渲染一些小部件*/
@@ -15,7 +16,7 @@ class Widgets {
         } = offset;
         // 填充三角形
         paint.beginPath();
-        paint.fillStyle = "#c1c1c1";
+        paint.fillStyle = GestiConfig.theme.buttonIconColor;
         paint.moveTo(25 * scale + offsetx, 25 * scale + offsety);
         paint.lineTo(105 * scale + offsetx, 25 * scale + offsety);
         paint.lineTo(25 * scale + offsetx, 105 * scale + offsety);
@@ -40,12 +41,12 @@ class Widgets {
         } = offset;
         // 填充三角形
         paint.beginPath();
-        paint.fillStyle = "#c1c1c1";
+        paint.fillStyle = GestiConfig.theme.buttonIconColor;
         paint.arc(offsetx,offsety,4,0,Math.PI*.6);
         paint.stroke();
         paint.closePath();
         paint.beginPath();
-        paint.fillStyle = "#c1c1c1";
+        paint.fillStyle = GestiConfig.theme.buttonIconColor;
         paint.arc(offsetx,offsety,4,Math.PI,Math.PI*1.6);
         paint.stroke();
         paint.closePath();
@@ -63,7 +64,7 @@ class Widgets {
         } = offset;
 
         paint.beginPath();
-        paint.fillStyle = "#c1c1c1";
+        paint.fillStyle = GestiConfig.theme.buttonIconColor;
         paint.moveTo(10 * scale + offsetx, 5 * scale + offsety);
         paint.lineTo(0 * scale + offsetx, 15 * scale + offsety);
         paint.lineTo(10 * scale + offsetx, 25 * scale + offsety);
@@ -95,7 +96,7 @@ class Widgets {
         } = offset;
 
         paint.beginPath();
-        paint.strokeStyle = "#c1c1c1";
+        paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.lineWidth = 1;
         paint.moveTo(0 * scale + offsetx, 0 * scale + offsety);
         paint.lineTo(10 * scale + offsetx, 10 * scale + offsety);
@@ -120,7 +121,7 @@ class Widgets {
         } = offset;
 
         paint.beginPath();
-        paint.strokeStyle = "#c1c1c1";
+        paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.lineWidth = 1;
         paint.arc(5 + offsetx, offsety + 3, 3, Math.PI, 0);
         paint.strokeRect(offsetx, offsety + 4, 10, 6);
@@ -142,12 +143,29 @@ class Widgets {
             offsety
         } = offset;
         paint.beginPath();
-        paint.strokeStyle = "#c1c1c1";
+        paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.lineWidth = 1;
         paint.arc(5 + offsetx, offsety + 2, 3, Math.PI, 0);
         paint.strokeRect(offsetx, offsety + 6, 10, 6);
         paint.strokeRect(offsetx + 4, offsety + 7, 2, 2);
         paint.stroke();
+        paint.closePath();
+    }
+
+    /**
+     * @description 改变宽度或者高度，不是等比例缩放
+     * @param paint 
+     * @param offset 
+     */
+    public static drawChangeSizeAlone(paint: Painter, offset: Offset){
+        const {
+            offsetx:x,
+            offsety:y
+        } = offset;
+        paint.beginPath();
+        paint.fillStyle=GestiConfig.theme.buttonIconColor;
+        paint.arc(x,y,3,0,Math.PI*2);
+        paint.fill();
         paint.closePath();
     }
 }

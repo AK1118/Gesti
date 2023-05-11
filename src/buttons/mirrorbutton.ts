@@ -6,6 +6,7 @@ import Rect from "../rect";
 import Vector from "../vector";
 import Widgets from "../widgets";
 import ViewObject from "../abstract/view-object";
+import GestiConfig from "../config/gestiConfig";
 
 
 
@@ -55,7 +56,7 @@ class MirrorButton extends Button {
 
         const x = this.relativeRect.position.x, y = this.relativeRect.position.y;
         paint.beginPath();
-        paint.fillStyle = "#fff";
+        paint.fillStyle = GestiConfig.theme.buttonsBgColor;
         paint.arc(x, y, this.radius, 0, Math.PI * 2);
         paint.closePath();
         paint.fill();

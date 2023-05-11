@@ -1,4 +1,5 @@
 import canvasConfig from "../../config/canvasConfig";
+import GestiConfig from "../../config/gestiConfig";
 import Painter from "../../painter";
 import Rect from "../../rect";
 import Vector from "../../vector";
@@ -22,7 +23,7 @@ class AuxiliaryLine {
   private readonly d: number = 3;
   //虚线
   private readonly dash=[3,3];
-  private readonly color="#999";
+  private readonly color=GestiConfig.theme.dashedLineColor
   //参考点
   private referencePoint: Array<Point> = [];
   public createReferencePoint(key: string) {
@@ -32,7 +33,7 @@ class AuxiliaryLine {
     //如果只有一个必定是自己
     if (views.length <= 1) return;
     views
-      .filter((v) => v.key.toString() != key)
+      .filter((v) => v.key.toString() != key&&!v.disabled)
       .forEach((view: ViewObject) => {
         const rect = view.rect;
         const position = view.rect.position;

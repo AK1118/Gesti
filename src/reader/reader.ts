@@ -62,6 +62,7 @@ class GestiReader {
     viewObject.init();
     //init包括生成按钮
     options.locked&&viewObject.lock();
+    viewObject.custom()
     return viewObject;
   }
   private getRectByRectJson(rectJson: any): Rect {

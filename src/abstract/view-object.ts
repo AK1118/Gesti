@@ -12,6 +12,9 @@ import Button from "./button";
 import OperationObserver from "./operation-observer";
 import AuxiliaryLine from "./tools/auxiliary-lines";
 import GestiConfig from "../config/gestiConfig";
+import canvasConfig from "../config/canvasConfig";
+import VerticalButton from "../buttons/verticalButton";
+import HorizonButton from "../buttons/horizonButton";
 //转换为json的类型
 export type toJsonType = "image" | "text" | "write";
 
@@ -24,7 +27,7 @@ export interface toJSONInterface {
  * 凡是带有操作点的对象都是它，
  * 例如 图片、文字 等
  */
-abstract class ViewObject extends OperationObserver implements RenderObject{
+abstract class ViewObject extends OperationObserver implements RenderObject {
   public selected: boolean = false;
   //矩形缩放时用到
   private scale: number = 1;
@@ -37,28 +40,54 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
   private funcButton: Array<Button> = new Array<Button>();
   public relativeRect: Rect;
   //辅助线
-  private auxiliary:AuxiliaryLine;
+  private auxiliary: AuxiliaryLine;
   /**
    * @description 是否冻结锁住，
    * 锁住过后可被选取，但是不能位移和改变大小
    */
   private _lock: boolean = false;
+  public inited: boolean = false;
   public dragButton: DragButton;
+  public verticalButton: VerticalButton;
+  public horizonButton: HorizonButton;
+  public mirrorButton: MirrorButton;
+  public closeButton: CloseButton;
+  public lockButton: LockButton;
+  public delockButton: DelockButton;
+  public rotateButton: RotateButton;
   constructor() {
     super();
     //根据配置判断是否设置参考线
-    GestiConfig.auxiliary&&(this.auxiliary=new AuxiliaryLine());
+    GestiConfig.auxiliary && (this.auxiliary = new AuxiliaryLine());
   }
+  //获取对象值
+  abstract get value(): any;
   public init() {
+    //注册功能按钮
+    /**
+     * 如果需要某个图层对象自定义某个按钮是否显示或者其他自定义操作
+     * 提供 @custom 方法使用
+     */
     this.dragButton = new DragButton(this);
+    this.verticalButton = new VerticalButton(this);
+    this.horizonButton = new HorizonButton(this);
+    this.mirrorButton = new MirrorButton(this);
+    this.closeButton = new CloseButton(this);
+    this.rotateButton = new RotateButton(this);
+    this.lockButton = new LockButton(this);
+    this.delockButton = new DelockButton(this);
+
     this.funcButton = [
       this.dragButton,
-      new MirrorButton(this),
-      new CloseButton(this),
-      new RotateButton(this),
-      new LockButton(this),
-      new DelockButton(this),
+      this.verticalButton,
+      this.horizonButton,
+      this.mirrorButton,
+      this.closeButton,
+      this.rotateButton,
+      this.lockButton,
+      this.delockButton,
     ];
+
     this.relativeRect = new Rect({
       x: 0,
       y: 0,
@@ -66,6 +95,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
       height: this.rect.size.height,
     });
     this.addObserver(this);
+    this.inited = true;
   }
   /**
    * 重置按钮
@@ -106,6 +136,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
     this.isMirror = !this.isMirror;
   }
   public update(paint: Painter) {
+    if (!this.inited) return;
     this.draw(paint);
   }
   public draw(paint: Painter): void {
@@ -118,10 +149,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
     if (this.isMirror) paint.scale(-1, 1);
     if (this.selected) {
       //边框
-      this.drawBorder(paint);
+      this.drawSelected(paint);
       //按钮
       this.updateFuncButton(paint);
+    } else {
+      //根据配置开关虚线框
+      if (GestiConfig.dashedLine) this.strokeDashBorder(paint);
     }
+
     paint.restore();
     paint.translate(0, 0);
     /*更新顶点数据*/
@@ -129,7 +164,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
     paint.closePath();
     if (this.selected) {
       //辅助线
-      this.auxiliary?.draw(paint,this);
+      this.auxiliary?.draw(paint, this);
     }
   }
   //当被锁定时触发
@@ -155,7 +190,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
    * 被选中后外边框
    * @param paint
    */
-  private drawBorder(paint: Painter): void {
+  public drawSelected(paint: Painter): void {
     paint.beginPath();
     paint.lineWidth = 2;
     paint.strokeStyle = "#fff";
@@ -165,9 +200,31 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
       this.rect.size.width + 1,
       this.rect.size.height + 1
     );
-    paint.stroke();
     paint.closePath();
+    paint.stroke();
   }
+  /**
+   * 对象渲染虚线框
+   */
+  public strokeDashBorder(paint: Painter): void {
+    paint.closePath();
+    paint.beginPath();
+    paint.lineWidth = 1;
+    paint.setlineDash([3, 3]);
+    paint.strokeStyle = "#999";
+    paint.strokeRect(
+      -this.rect.size.width >> 1,
+      -this.rect.size.height >> 1,
+      this.rect.size.width + 1,
+      this.rect.size.height + 1
+    );
+    paint.closePath();
+    paint.stroke();
+    paint.setlineDash([]);
+  }
+  /**
+   * 镜像翻转
+   */
   public setMirror(isMirror: boolean) {
     this.isMirror = isMirror;
   }
@@ -303,6 +360,10 @@ abstract class ViewObject extends OperationObserver implements RenderObject{
       locked: this.isLock,
     };
   }
+  /**
+   * 自定义一些操作
+   */
+  public custom() {}
 }
 
 export default ViewObject;

@@ -1,6 +1,10 @@
+import Button from "../abstract/button";
 import ViewObject, { toJSONInterface } from "../abstract/view-object";
+import canvasConfig from "../config/canvasConfig";
+import GestiConfig from "../config/gestiConfig";
 import Painter from "../painter";
 import Rect from "../rect";
+import Widgets from "../widgets";
 /**
  * 文字
  */
@@ -19,6 +23,9 @@ class TextBox extends ViewObject {
           lineWidth: this.lineWidth,
           lineColor: this.lineColor,
           lineOffsetY: this.lineOffsetY,
+          lineHeight: this.lineHeight,
+          width: this.width,
+          height: this.height,
         },
         ...this.getBaseInfo(),
       },
@@ -36,13 +43,18 @@ class TextBox extends ViewObject {
   private linesMarks: Array<number> = [];
   //下划线宽度
   private lineWidth: number = 1;
+  //文字间距高度
+  private lineHeight: number = 0;
   //下划线在Y轴上的偏移量
   private lineOffsetY: number = 0;
   private lineColor: string = "black";
   private _options: textOptions;
   private lineOneHotMark: Array<number> = [];
   //行？
-  private column: number = 1;
+  private column: number = 0;
+  //初始化默认传入高度
+  private height: number = 0;
+  private width: number = 0;
   //划线状态，1是从起点开始中 2是已经画完上一个线段了，等待下一次
   private currentLineState: 1 | 2 | 3 | 4 | 0 | 5 = 0;
   constructor(text: string, painter: Painter, options?: textOptions) {
@@ -50,9 +62,26 @@ class TextBox extends ViewObject {
     this._painter = painter;
     this._options = options;
     this.initPrototypes(text, options);
+    this.initColumns();
+
+    //自定义操作
+    this.custom();
   }
 
-  private initPrototypes(text: string, options: textOptions) {
+  //@Override
+  public custom(): void {
+    this.dragButton.disabled = true;
+  }
+
+  //重写被选中后的样式
+  public drawSelected(paint: Painter): void {
+    const width = this.rect.size.width,
+      height = this.rect.size.height;
+    paint.fillStyle = GestiConfig.theme.textSelectedMaskBgColor;
+    paint.fillRect(-width >> 1, -height >> 1, width, height);
+    paint.fill();
+  }
+  private async initPrototypes(text: string, options: textOptions) {
     this._text = text;
     const {
       fontFamily = this._fontFamily,
@@ -63,6 +92,9 @@ class TextBox extends ViewObject {
       lineWidth = this.lineWidth,
       lineColor = this.lineColor,
       lineOffsetY = this.lineOffsetY,
+      lineHeight = this.lineHeight,
+      height,
+      width,
     } = options ?? {};
     this._fontFamily = fontFamily;
     this.fontsize = fontSize;
@@ -72,18 +104,22 @@ class TextBox extends ViewObject {
     this.lineWidth = lineWidth;
     this.lineColor = lineColor;
     this.lineOffsetY = lineOffsetY;
+    this.lineHeight = lineHeight;
+    this.width = width;
+    this.height = height;
     //计算出行距与字体大小的比例
     this._spacing_scale = this.fontsize / this._spacing;
     this._painter.font = this.fontsize + "px " + this._fontFamily;
     if (this.rect == null)
       this.rect = new Rect({
-        width: this.getWidthSize(),
-        height: this.fontsize,
-        x: this.rect?.position.x || 0,
-        y: this.rect?.position.y || 0,
+        width: width ?? this.getWidthSize(),
+        height: height ?? this.fontsize,
+        x: 0,
+        y: 0,
       });
+    //默认生成在画布中心
+    this.center(canvasConfig.rect.size);
     this.init();
-    this.dragButton.setAxis("horizontal");
     this.initLine();
   }
   /**
@@ -111,18 +147,18 @@ class TextBox extends ViewObject {
     return metrics.width + this._spacing * this._text.length;
   }
   //@Override
-  public drawImage(paint: Painter): void {
+  public drawImage(paint: Painter, isReRendered?: boolean): void {
     /**
      * 只用这个宽就行了，因为初始化时已经做好宽度处理，放大缩小是等比例方法缩小。
      */
     const width: number = this.rect.size.width;
-    //渲染文本的偏移量
-    const height = this.fontsize >> 1;
+    //渲染文本的高度，起始点
+    const height = (this.fontsize >> 1) + (this.lineHeight >> 1);
     const textList: Array<string> = this._text.split("");
     const len = textList.length;
     //现在的宽度，渲染在currentWidth列
     let currentWidth = 0;
-    this.column = 1;
+    this.column = 0;
     let oldColumn = this.column;
     paint.closePath();
     paint.beginPath();
@@ -132,7 +168,8 @@ class TextBox extends ViewObject {
     const text_len = textList.length;
     for (let ndx = 0; ndx < text_len; ndx++) {
       const text = textList[ndx];
-      const text_width = ~~this._painter.measureText(text).width;
+      const measureText = this._painter.measureText(text);
+      const text_width = ~~measureText.width;
       const beforeText = this._text[ndx - 1];
       const nextText = this._text[ndx + 1];
       const spacing = this.fontsize / this._spacing_scale;
@@ -142,31 +179,44 @@ class TextBox extends ViewObject {
       /**
        * 宽度不足一个字体，接下来要换行才行，还未换行
        */
-      if (width - currentWidth - text_width < text_width || isAutoColumn&&this.column==oldColumn) {
+      if (
+        width - currentWidth - x < text_width ||
+        (isAutoColumn && this.column == oldColumn)
+      ) {
         //上一个为1,且马上要被替换的必须为0
-        if (this.currentLineState == 1 && this.lineOneHotMark[ndx] == 0&&this.lineOneHotMark[ndx-1]!=4)
+        if (
+          this.currentLineState == 1 &&
+          this.lineOneHotMark[ndx] == 0 &&
+          this.lineOneHotMark[ndx - 1] != 4
+        )
           this.lineOneHotMark[ndx] = 4;
       }
 
       //字数达到宽度后需要换行   或者出发换行字符
-      if (currentWidth + text_width > width || isAutoColumn) {
+      if (currentWidth + x > width || isAutoColumn) {
         this.column += 1;
         currentWidth = 0;
       }
       const drawX = width * -0.5 + currentWidth;
       const drawY =
-        (this.column == 1 ? height * 2 : height * (this.column * 2)) -
+        (this.column == 0 ? height * 0 : height * (this.column * 2)) -
         (this.rect.size.height >> 1);
 
       //换行后需要连接起始点不在同意行的线段
-      if (this.currentLineState == 1 && this.column > oldColumn&&this.lineOneHotMark[ndx-1]==4&& this.lineOneHotMark[ndx]==0) {
+      if (
+        this.currentLineState == 1 &&
+        this.column > oldColumn &&
+        this.lineOneHotMark[ndx - 1] == 4 &&
+        this.lineOneHotMark[ndx] == 0
+      ) {
         this.lineOneHotMark[ndx] = 3;
-         this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
+        this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
         oldColumn = this.column;
       }
       if (!isAutoColumn) {
-        paint.fillText(text, drawX, drawY);
-       // paint.fillText(""+this.lineOneHotMark[ndx], drawX, drawY);
+        const offsetY = height + (this.fontsize >> 1) - this.fontsize * 0.1;
+        const offsetX = (x - text_width) >> 1;
+        paint.fillText(text, drawX + offsetX, drawY + offsetY);
         currentWidth += x;
       }
       this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
@@ -180,6 +230,51 @@ class TextBox extends ViewObject {
     paint.closePath();
     this.setData();
   }
+
+  private initColumns() {
+    /**
+     * 只用这个宽就行了，因为初始化时已经做好宽度处理，放大缩小是等比例方法缩小。
+     */
+    const width: number = this.rect.size.width;
+    //渲染文本的高度，起始点
+    const height = (this.fontsize >> 1) + (this.lineHeight >> 1);
+    const textList: Array<string> = this._text.split("");
+    const len = textList.length;
+    //现在的宽度，渲染在currentWidth列
+    let currentWidth = 0;
+    this.column = 0;
+    //设置字体大小与风格
+    this._painter.font = this.fontsize + "px " + this._fontFamily;
+    const text_len = textList.length;
+    for (let ndx = 0; ndx < text_len; ndx++) {
+      const text = textList[ndx];
+      const measureText = this._painter.measureText(text);
+      const text_width = ~~measureText.width;
+      const beforeText = this._text[ndx - 1];
+      const nextText = this._text[ndx + 1];
+      const spacing = this.fontsize / this._spacing_scale;
+      const x = text_width + spacing;
+      const rep = / &n/g;
+      const isAutoColumn = rep.test(beforeText + text + nextText);
+
+      //字数达到宽度后需要换行   或者出发换行字符
+      if (currentWidth + x > width || isAutoColumn) {
+        this.column += 1;
+        currentWidth = 0;
+      }
+
+      if (!isAutoColumn) {
+        currentWidth += x;
+      }
+      if (isAutoColumn) {
+        ndx += 1;
+        continue;
+      }
+    }
+    this.setData();
+    this.update(this._painter);
+  }
+
   /**
    * @description 添加下划线,[start,end,start,end]
    * 当遍历line的下表为2偶数时，转为 lineTo,奇数转为moveTo
@@ -199,25 +294,32 @@ class TextBox extends ViewObject {
     height: number,
     textWidth: number
   ) {
-    const lineY: number = drawY + this.fontsize * 0.2 + this.lineOffsetY;
+    const lineY: number =
+      drawY +
+      this.fontsize * 0.2 +
+      this.lineOffsetY +
+      this.lineHeight +
+      this.fontsize;
     //使用标记，1是起始点，2是终点
     const code = this.lineOneHotMark[ndx];
-    const beforeCode=this.lineOneHotMark[ndx-1];
+    const beforeCode = this.lineOneHotMark[ndx - 1];
     paint.strokeStyle = this.lineColor;
     paint.lineWidth = this.lineWidth;
     if (code == 1 || code == 2) this.currentLineState = code as 1 | 2;
 
-    if (code == 1) return paint.moveTo(drawX - textWidth, lineY);
-    if (code == 2&&beforeCode!=4) return paint.lineTo(drawX, lineY);
+    if (code == 1)
+      return paint.moveTo(drawX - (textWidth + this._spacing), lineY);
+    if (code == 2 && beforeCode != 4) return paint.lineTo(drawX, lineY);
     if (code == 3) return paint.moveTo(drawX, lineY);
-    if (code == 4&&beforeCode!=4&&beforeCode!=1) return paint.lineTo(drawX + textWidth, lineY);
+    if (code == 4 && beforeCode != 4 && beforeCode != 1)
+      return paint.lineTo(drawX + (textWidth + this._spacing), lineY);
   }
 
   //@Override
   public didChangeScale(scale: number): void {
     this.initLine();
     this.setData();
-    this.drawImage(this._painter);
+    this.update(this._painter);
   }
 
   //更新文字内容
@@ -227,7 +329,7 @@ class TextBox extends ViewObject {
       this._text = text;
       this.initLine();
       this.initPrototypes(text, options);
-      this.drawImage(this._painter);
+      this.update(this._painter);
       r();
     });
   }
@@ -238,15 +340,25 @@ class TextBox extends ViewObject {
   /**
    * @description 宽不随文字变化，但文字随宽变化,高度随字体变化
    */
-  private setData() {
+  private async setData() {
+    const padding = 10;
     const { size } = this.rect;
-    const newHeight = this.fontsize * this.column;
-    this.rect.setSize(this.rect.size.width, newHeight);
+    let newHeight = (this.fontsize + this.lineHeight) * (this.column + 1);
+    if (newHeight < size.height) {
+      newHeight = size.height;
+    }
+    let newWidth = this.rect.size.width;
+    if (newWidth >= canvasConfig.rect.size.width)
+      newWidth = canvasConfig.rect.size.width;
+    this.rect.setSize(newWidth, newHeight);
     this.resetButtons(["rotate"]);
-     this.dragButton.setAxis("horizontal");
-    if (size.width <= this.fontsize)
-      this.rect.setSize(this.fontsize, newHeight);
-    //this.relativeRect.setSize(this.rect.size.width,newHeight);
+    // this.dragButton.setAxis("horizontal");
+    if (size.width <= this.fontsize + this._spacing)
+      this.rect.setSize(this.fontsize + this._spacing, newHeight);
+    return Promise.resolve();
+  }
+  get value(): any {
+    return this._text;
   }
 }
 

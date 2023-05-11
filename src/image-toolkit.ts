@@ -3,6 +3,7 @@ import { RecordNode } from "./abstract/operation-observer";
 import ViewObject from "./abstract/view-object";
 import WriteBase from "./abstract/write-category";
 import CatchPointUtil from "./catchPointUtil";
+import GestiConfig from "./config/gestiConfig";
 import Drag from "./drag";
 import { FuncButtonTrigger } from "./enums";
 import GestiEventManager, { GestiEvent } from "./event";
@@ -208,7 +209,7 @@ class ImageToolkit implements GestiController {
       try {
         const jsons: Array<Object> = [];
         for await (const item of this.ViewObjectList) {
-          if (item.disabled) return;
+          if (item.disabled) continue;
           jsons.push(await item.export());
         }
         r(JSON.stringify(jsons));
@@ -480,7 +481,7 @@ class ImageToolkit implements GestiController {
       this.listen.onSelect(selectedViewObject);
       this._inObjectArea = true;
       //之前是否有被选中图层 如果有就取消之前的选中
-      if (this.selectedViewObject ?? false) {
+      if (this.selectedViewObject&&selectedViewObject.key!=this.selectedViewObject.key) {
         this.selectedViewObject.cancel();
         this.listen.onCancel(this.selectedViewObject);
       }
@@ -580,7 +581,7 @@ class ImageToolkit implements GestiController {
    */
   public addText(text: string, options?: textOptions): Promise<boolean> {
     const textBox: TextBox = new TextBox(text, this.paint, options);
-    textBox.center(this.canvasRect.size);
+    textBox.center(this.canvasRect.size)
     this.ViewObjectList.push(textBox);
     //测试
     // this.selectedViewObject=textBox;

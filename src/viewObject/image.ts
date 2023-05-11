@@ -5,27 +5,10 @@ import { classIs, fileToBase64, imageHtmltoBase64 } from "../utils/index";
 import XImage from "../ximage";
 
 class ImageBox extends ViewObject {
-  async export(): Promise<Object> {
-    const base64Head = "data:image/jpeg;base64,";
-    let base64 = "";
-    //img标签导出
-    if (classIs(this.ximage.originData, "HTMLImageElement")) {
-      base64 = await imageHtmltoBase64(this.ximage.originData);
-    } else if (classIs(this.ximage.originData, "File")) {
-      base64 = await fileToBase64(this.ximage.originData);
-    }
-
-    const json: toJSONInterface = {
-      viewObjType: "image",
-      options: {
-        options: {
-          data: base64,
-        },
-        ...this.getBaseInfo(),
-      },
-    };
-    return json;
+  get value(): any {
+    return this.image;
   }
+ 
   private ximage: XImage;
   private image:
     | HTMLOrSVGImageElement
@@ -50,6 +33,30 @@ class ImageBox extends ViewObject {
       this.rect.size.height
     );
   }
-}
+  async export(): Promise<Object> {
+    const base64Head = "data:image/jpeg;base64,";
+    let base64 = "";
+    //img标签导出
+    if (classIs(this.ximage.originData, "HTMLImageElement")) {
+      base64 = await imageHtmltoBase64(this.ximage.originData);
+    } else if (classIs(this.ximage.originData, "File")) {
+      base64 = await fileToBase64(this.ximage.originData);
+    }
+    
+    const json: toJSONInterface = {
+      viewObjType: "image",
+      options: {
+        options: {
+          data: base64,
+        },
+        ...this.getBaseInfo(),
+      },
+    };
+    return json;
+  }
 
+  public didDrag(value: { size: Size; angle: number; }): void {
+    this.resetButtons(["rotate"]);
+  }
+}
 export default ImageBox;

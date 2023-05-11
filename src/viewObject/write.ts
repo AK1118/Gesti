@@ -61,6 +61,7 @@ class WriteViewObj extends ViewObject {
     this.config = config;
   }
   drawImage(paint: Painter): void {
+    paint.closePath();
     paint.strokeStyle = this.color;
     const len = this.points.length;
     paint.beginPath();
@@ -112,6 +113,7 @@ class WriteViewObj extends ViewObject {
     }
     else paint.stroke();
     if (this.type == "write") paint.closePath();
+    paint.closePath();
   }
   private getCircleParams(p1: Vector, p2: Vector) {
     const sx = p1.x * this._scalex,
@@ -138,6 +140,12 @@ class WriteViewObj extends ViewObject {
     this._scaley = this.rect.size.height / this.relativeRect.size.height;
     if (this.type == "rect") {
     }
+  }
+  get value(): any {
+      return {
+        ...this.config,
+        points:this.points
+      };
   }
 }
 

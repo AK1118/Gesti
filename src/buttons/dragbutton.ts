@@ -6,6 +6,7 @@ import Rect from "../rect";
 import Vector from "../vector";
 import Widgets from "../widgets";
 import ViewObject from "../abstract/view-object";
+import GestiConfig from "../config/gestiConfig";
 
 class DragButton extends Button {
     public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
@@ -47,7 +48,7 @@ class DragButton extends Button {
      * 为拖拽改变大小初始化
      */
     private initScale() {
-        this.setRelativePositionRect([.5, .5]);
+        this.setRelativePositionRect(this.options.percentage);
         this.oldRadius = Vector.mag(this.relativeRect.position);
     }
     effect(newRect: Rect): void {
@@ -106,7 +107,7 @@ class DragButton extends Button {
         const x=this.relativeRect.position.x,y=this.relativeRect.position.y;
 
         paint.beginPath();
-        paint.fillStyle = "#fff";
+        paint.fillStyle = GestiConfig.theme.buttonsBgColor;
         paint.arc(x, y, this.radius, 0, Math.PI * 2);
         paint.closePath();
         paint.fill();
