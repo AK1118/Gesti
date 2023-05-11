@@ -1,10 +1,10 @@
 import canvasConfig from "./config/canvasConfig";
 import GestiConfig, { gesticonfig } from "./config/gestiConfig";
 import GesteControllerImpl from "./controller";
+import { ViewObjectFamily } from "./enums";
 import ImageToolkit from "./image-toolkit";
 import GestiController from "./interfaces/gesticontroller";
 import XImage from "./ximage";
-
 /**
  * 初始化该 @Gesti 实例时，由于平台不确定，用户必须传入 @CanvasRenderingContext2D 画笔作为
  */
@@ -61,6 +61,7 @@ class Gesti {
     Gesti.config.setParams(config);
     this.kit.update();
   }
+  static Family=ViewObjectFamily;
 }
 
 export default Gesti;

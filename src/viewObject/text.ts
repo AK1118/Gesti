@@ -2,13 +2,14 @@ import Button from "../abstract/button";
 import ViewObject, { toJSONInterface } from "../abstract/view-object";
 import canvasConfig from "../config/canvasConfig";
 import GestiConfig from "../config/gestiConfig";
+import { ViewObjectFamily } from "../enums";
 import Painter from "../painter";
 import Rect from "../rect";
-import Widgets from "../widgets";
 /**
  * 文字
  */
 class TextBox extends ViewObject {
+  family: ViewObjectFamily=ViewObjectFamily.text;
   async export(): Promise<Object> {
     const json: toJSONInterface = {
       viewObjType: "text",
@@ -70,7 +71,7 @@ class TextBox extends ViewObject {
 
   //@Override
   public custom(): void {
-    this.dragButton.disabled = true;
+    this.unInstallButton([this.dragButton]);
   }
 
   //重写被选中后的样式

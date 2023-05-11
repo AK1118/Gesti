@@ -26,6 +26,9 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  select(select: ViewObject): Promise<void> {
+    return this.kit.select(select);
+  }
   get currentViewObject(): Promise<ViewObject> {
     return this.kit.currentViewObject;
   }
@@ -55,8 +58,8 @@ class GesteControllerImpl implements GestiController {
     lineWidth?: number;
     color?: string;
     isFill?: boolean;
-  }) {
-    this.kit.addWrite(options);
+  }) :Promise<ViewObject>{
+   return this.kit.addWrite(options);
   }
   addListener(
     listenType: "onSelect" | "onHide" | "onCancel",
@@ -74,7 +77,7 @@ class GesteControllerImpl implements GestiController {
   addText(
     text: string,
     options?:textOptions,
-  ): Promise<boolean> {
+  ): Promise<ViewObject> {
     return this.kit.addText(text, options);
   }
   cancel(): void {
@@ -207,16 +210,14 @@ class GesteControllerImpl implements GestiController {
       callback.bind(this.kit)(vector);
     }
   }
-  async addImage(ximage: XImage | Promise<XImage>): Promise<boolean> {
+  async addImage(ximage: XImage | Promise<XImage>): Promise<ViewObject> {
     if (ximage.constructor.name == "Promise") {
       const _ximage = await ximage;
-      this.kit.addImage(_ximage);
-      return true;
+      return this.kit.addImage(_ximage);
     }
     //使用any类型强制转换
     const _ximage: XImage = ximage as any;
-    this.kit.addImage(_ximage);
-    return true;
+    return this.kit.addImage(_ximage);
   }
   /**
    * @description 根据传入的image生成一个 @ImageBitmap 实例，拿到图片的宽高数据，创建XImage对象

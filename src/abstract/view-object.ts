@@ -15,6 +15,7 @@ import GestiConfig from "../config/gestiConfig";
 import canvasConfig from "../config/canvasConfig";
 import VerticalButton from "../buttons/verticalButton";
 import HorizonButton from "../buttons/horizonButton";
+import { ViewObjectFamily } from "../enums";
 //转换为json的类型
 export type toJsonType = "image" | "text" | "write";
 
@@ -55,6 +56,8 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public lockButton: LockButton;
   public delockButton: DelockButton;
   public rotateButton: RotateButton;
+  public name: string;
+  abstract family: ViewObjectFamily;
   constructor() {
     super();
     //根据配置判断是否设置参考线
@@ -62,6 +65,12 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   }
   //获取对象值
   abstract get value(): any;
+  /**
+   * @description 设置名字
+   */
+  public setName(name: string) {
+    this.name = name;
+  }
   public init() {
     //注册功能按钮
     /**
@@ -97,13 +106,16 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.addObserver(this);
     this.inited = true;
   }
+  public unInstallButton(buttons:Array<Button>){
+    this.funcButton= this.funcButton.filter(item=>!buttons.includes(item))
+  }
   /**
    * 重置按钮
    */
   public resetButtons(excludeNames?: Array<string>) {
     const arr = excludeNames ?? [];
     this.funcButton.forEach((button: Button) => {
-      if (!arr.includes(button.name)) button.reset();
+      if (!arr.includes(button.name)&&!button.disabled) button.reset();
     });
   }
   /**
@@ -343,18 +355,18 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public getBaseInfo(): Object {
     return {
       rect: {
-        x: this.rect.position.x,
-        y: this.rect.position.y,
-        width: this.rect.size.width,
-        height: this.rect.size.height,
+        x: ~~this.rect.position.x,
+        y: ~~this.rect.position.y,
+        width: ~~this.rect.size.width,
+        height: ~~this.rect.size.height,
         angle: this.rect.getAngle,
       },
       relativeRect: {
-        x: this.relativeRect.position.x,
-        y: this.relativeRect.position.y,
-        width: this.relativeRect.size.width,
-        height: this.relativeRect.size.height,
-        angle: this.rect.getAngle,
+        x: ~~this.relativeRect.position.x,
+        y:~~ this.relativeRect.position.y,
+        width:~~ this.relativeRect.size.width,
+        height: ~~this.relativeRect.size.height,
+        angle: this.rect.getAngle
       },
       mirror: this.isMirror,
       locked: this.isLock,

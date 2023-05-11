@@ -22,8 +22,13 @@ enum OperationTypeEmum{
     mirror
     //
 }
-
+enum ViewObjectFamily{
+    image,
+    write,
+    text,
+  }
 export {
     FuncButtonTrigger,
-    OperationTypeEmum
+    OperationTypeEmum,
+    ViewObjectFamily
 }

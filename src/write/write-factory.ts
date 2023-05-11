@@ -105,9 +105,11 @@ class WriteFactory {
         this.current = writecircle;
         return writecircle;
     }
+    //绘制完毕，返回一个可操作对象
     async done(): Promise<ViewObject> {
         if (!this.current) return;
         const obj = await this.current.getWriteViewObject();
+        obj?.custom();
         this.current = null;
         return obj;
     }

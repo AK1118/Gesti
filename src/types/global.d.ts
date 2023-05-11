@@ -6,7 +6,6 @@ declare interface Size {
   width: number;
   height: number;
 }
-
 declare interface CanvasRenderingContext2D {
   draw(): void;
 }
@@ -90,3 +89,4 @@ declare interface textOptions {
 }
 
 declare type CenterAxis="vertical"|"horizon";
+declare type GestiControllerListenerTypes="onSelect" | "onHide" | "onCancel";

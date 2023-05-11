@@ -49,12 +49,16 @@
 | 方法名      | 返回值类型  |  所属    |    参数    |   说明   |
 | :----:      |   :----: | :----:   |  :----:   | :----:      | 
 | init      |    void      |     Gesti   |    (canvas?: HTMLCanvasElement, paint?: CanvasRenderingContext2D, rect?:rectParam)   |     初始化 Gesti 时调用，共3个可选参数。canvas 和 paint 必须二选一，且没有传入canvas时，必须传入paint 和 rect.       |
+| setConfig      |    void      |     Gesti   |   (config?: gesticonfig)   |     修改或设置配置，修改后会自动调用GestiController.update函数       |
+
 
 | 属性名      | 返回值类型  |  所属    |    参数    |   说明   |
 | :----:      |   :----: | :----:   |  :----:   | :----: | 
-|  constructor | Gesti    |  Gesti |    config?: gesticonfig    |     构造函数,传入配置参数，当前只有一个可选参数  auxiliary?:boolean 控制辅助线开关     |
+|  constructor | Gesti    |  Gesti |    config?: gesticonfig    |     构造函数,传入配置参数，当前只有两个可选参数  auxiliary?:boolean 控制辅助线开关和dashedLine?:boolean 控制包裹对象的虚线     |
 |  static XImage | XImage  |  Gesti |    -    |     暴露给外部声明Ximage对象类型     |
 |  controller | GestiController  |  Gesti |    -    |     控制器，获取控制器，详情请查看下方  GestiController   |
+|  static config | GestiConfig  |  Gesti |    -    |     Gesti全局配置对象   |
+
 
 #### init
 
@@ -109,6 +113,20 @@
 | 属性名      | 返回值类型         |  所属    |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |    :----:   |   :----: |
 | currentViewObject| Promise\<ViewObject\> | GestiController | - | 获取当前选中对象|
+
+
+## ViewObject
+- 画布内的可操作对象，每一张图片对象或者文字对象或者其他都是它在画布上的映射。
+- 获取它的途径一般来自于controller.currentViewObject , 或者controller.addListener的回调
+
+| 方法名      | 返回值类型              |  所属    |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |    :----:   |   :----: |
+| getBaseInfo    | Object |      ViewObject     |    -   |    获取对象的位置，大小，旋转，镜像，锁定值    |
+| value    | any |      ViewObject     |    -   |    获取对象的值，比如一个文字对象内的文字    |
+
+| 属性名      | 返回值类型         |  所属    |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |    :----:   |   :----: |
+| rect    | Rect |      ViewObject     |    -   |    获取对象的位置，大小，旋转值    |
 
 
 # 保存

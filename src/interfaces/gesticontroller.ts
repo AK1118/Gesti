@@ -82,6 +82,11 @@ interface LayerController {
    * 获取当前选中对象
    */
   get currentViewObject():Promise<ViewObject>;
+  /**
+   * 选中传入的可操作对象
+   * @param select 
+   */
+  select(select:ViewObject):Promise<void>;
 }
 
 type ListenerCallback = (object: any) => void;
@@ -104,7 +109,7 @@ interface ImageToolKitController {
    * 新增图片
    * @param @XImage
    */
-  addImage(ximage: XImage | Promise<XImage>): Promise<boolean>;
+  addImage(ximage: XImage | Promise<XImage>) :Promise<ViewObject>;
   /**
      * @description 传入对应的值返回一个Promise<XImage>对象,option可传入 图片width、height、scale,maxScale,minScale,
      * @param image 
@@ -136,9 +141,9 @@ interface ImageToolKitController {
    * @param text
    * @param options
    */
-  addText(text: string, options?: textOptions): Promise<boolean>;
+  addText(text: string, options?: textOptions): Promise<ViewObject>;
   addListener(
-    listenType: "onSelect" | "onHide" | "onCancel",
+    listenType:GestiControllerListenerTypes,
     callback: ListenerCallback
   ): void;
   addWrite(options: {
@@ -146,7 +151,7 @@ interface ImageToolKitController {
     lineWidth?: number,
     color?: string,
     isFill?:boolean,
-  });
+  }):Promise<ViewObject>;
   /**
    * @description 导出所有对象成JSON字符串
    */

@@ -46,6 +46,7 @@ interface ListenerTypes {
   onSelect(viewObject: ViewObject): void;
   onHide(viewObject: ViewObject): void;
   onCancel(viewObject: ViewObject): void;
+  onHover(viewObject: ViewObject): void;
 }
 
 /**
@@ -55,6 +56,7 @@ class Listeners implements ListenerTypes {
   onHide(viewObject: ViewObject): void {}
   onSelect(viewObject: ViewObject): void {}
   onCancel(viewObject: ViewObject): void {}
+  onHover(viewObject: ViewObject): void {}
 }
 
 class ImageToolkit implements GestiController {
@@ -97,28 +99,36 @@ class ImageToolkit implements GestiController {
   private isWriting: boolean = false;
   //绘制对象工厂  //绘制对象，比如签字、矩形、圆形等
   private writeFactory: WriteFactory;
-  public get getCanvasRect():Rect{
+  public get getCanvasRect(): Rect {
     return this.canvasRect;
   }
-  public get getViewObjects(){
+  public get getViewObjects() {
     return this.ViewObjectList;
   }
   constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
     const { x: offsetx, y: offsety, width, height } = rect;
     this.offset = new Vector(offsetx || 0, offsety || 0);
-    rect.x=this.offset.x;
-    rect.y=this.offset.y;
+    rect.x = this.offset.x;
+    rect.y = this.offset.y;
     this.canvasRect = new Rect(rect);
     this.paint = new Painter(paint);
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  select(select: ViewObject): Promise<void> {
+    if (select && select.onSelected) {
+      select.onSelected();
+      this.listen.onSelect(select);
+      return Promise.resolve();
+    }
+    return Promise.resolve();
+  }
   get currentViewObject(): Promise<ViewObject> {
     return Promise.resolve(this.selectedViewObject);
   }
-  async rotate(angle:number): Promise<void> {
-     if(!this.selectedViewObject)return null;
-     this.selectedViewObject.rect.setAngle(angle);
+  async rotate(angle: number): Promise<void> {
+    if (!this.selectedViewObject) return null;
+    this.selectedViewObject.rect.setAngle(angle);
   }
   upward(viewObject?: ViewObject): number {
     if (viewObject) {
@@ -199,6 +209,9 @@ class ImageToolkit implements GestiController {
       case "onCancel": {
         this.listen.onCancel = callback;
       }
+      case "onHover": {
+        this.listen.onHover = callback;
+      }
     }
   }
   /**
@@ -221,9 +234,11 @@ class ImageToolkit implements GestiController {
   updateText(text: string, options?: textOptions): void {
     const isTextBox = classTypeIs(this.selectedViewObject, TextBox);
     if (isTextBox) {
-      (this.selectedViewObject as TextBox).updateText(text, options).then(()=>{
-        this.update()
-      });
+      (this.selectedViewObject as TextBox)
+        .updateText(text, options)
+        .then(() => {
+          this.update();
+        });
     }
   }
   center(axis?: CenterAxis): void {
@@ -355,7 +370,7 @@ class ImageToolkit implements GestiController {
       }
     );
     this.gesture.addListenGesti("globalClick", (position: Vector) => {
-     // const selected = this.clickViewObject(position);
+      // const selected = this.clickViewObject(position);
       // if (selected == null && this.selectedViewObject) {
       //     this.drag.cancel();
       //     this.cancel();
@@ -436,7 +451,7 @@ class ImageToolkit implements GestiController {
     this.debug(["Event Up,", v]);
     const event: Vector | Vector[] = this.correctEventPosition(v);
     //判断是否选中对象
-     this.clickViewObject(event);
+    this.clickViewObject(event);
     this.eventHandlerState = EventHandlerState.up;
     //手势解析处理
     this.gesture.onUp(this.selectedViewObject, event);
@@ -481,7 +496,10 @@ class ImageToolkit implements GestiController {
       this.listen.onSelect(selectedViewObject);
       this._inObjectArea = true;
       //之前是否有被选中图层 如果有就取消之前的选中
-      if (this.selectedViewObject&&selectedViewObject.key!=this.selectedViewObject.key) {
+      if (
+        this.selectedViewObject &&
+        selectedViewObject.key != this.selectedViewObject.key
+      ) {
         this.selectedViewObject.cancel();
         this.listen.onCancel(this.selectedViewObject);
       }
@@ -545,6 +563,8 @@ class ImageToolkit implements GestiController {
     }
     this.ViewObjectList.forEach((item: ViewObject, ndx: number) => {
       if (!item.disabled) {
+        //扫除
+        this.cleaning(item);
         item.update(this.paint);
       } else if (this.currentViewObjectState[ndx] == 1) {
         //标记过后不会再次标记
@@ -555,11 +575,22 @@ class ImageToolkit implements GestiController {
     });
   }
   /**
+   * 扫除没用的对象，根据大小判断
+   * 清扫细微到不可见的对象
+   * @param item 
+   */
+  private cleaning(item:ViewObject){
+    if(item&&item.rect){
+      const {width,height}=item.rect.size;
+      if(width<=3||height<=3)item.hide();
+    }
+  }
+  /**
    * @description 新增图片
    * @param ximage
    * @returns
    */
-  public addImage(ximage: XImage): Promise<boolean> {
+  public addImage(ximage: XImage): Promise<ViewObject> {
     this.debug("Add a Ximage");
     if (ximage.constructor.name != "XImage") throw Error("不是XImage类");
     const image: XImage = ximage;
@@ -571,7 +602,7 @@ class ImageToolkit implements GestiController {
     setTimeout(() => {
       this.update();
     }, 100);
-    return Promise.resolve(true);
+    return Promise.resolve(imageBox);
   }
   /**
    * @description 新增文字
@@ -579,9 +610,9 @@ class ImageToolkit implements GestiController {
    * @param options
    * @returns
    */
-  public addText(text: string, options?: textOptions): Promise<boolean> {
+  public addText(text: string, options?: textOptions): Promise<ViewObject> {
     const textBox: TextBox = new TextBox(text, this.paint, options);
-    textBox.center(this.canvasRect.size)
+    textBox.center(this.canvasRect.size);
     this.ViewObjectList.push(textBox);
     //测试
     // this.selectedViewObject=textBox;
@@ -589,15 +620,16 @@ class ImageToolkit implements GestiController {
     setTimeout(() => {
       this.update();
     }, 100);
-    return Promise.resolve(true);
+    return Promise.resolve(textBox);
   }
   public addWrite(options: {
     type: "circle" | "write" | "line" | "rect" | "none";
     lineWidth?: number;
     color?: string;
     isFill?: boolean;
-  }) {
+  }): Promise<ViewObject> {
     this.writeFactory.setConfig(options);
+    return null;
   }
   private debug(message: any): void {
     if (!this.isDebug) return;
@@ -695,4 +727,4 @@ class _Tools {
     kit.update();
   }
 }
-export default ImageToolkit; 
+export default ImageToolkit;

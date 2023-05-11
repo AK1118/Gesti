@@ -1,14 +1,20 @@
 import OperationObserver from "../abstract/operation-observer";
 import ViewObject, { toJSONInterface } from "../abstract/view-object";
 import Painter from "../painter";
-
+import { ViewObjectFamily } from "../enums";
+import GestiConfig from "../config/gestiConfig";
 /**
  * 实现逻辑
  * 新建一个 canvas等宽高的矩阵,锁定它，
  *
  */
 class WriteViewObj extends ViewObject {
+  family: ViewObjectFamily = ViewObjectFamily.write;
   async export(): Promise<Object> {
+    this.points.forEach((item) => {
+      item.x = ~~item.x;
+      item.y = ~~item.y;
+    });
     const json: toJSONInterface = {
       viewObjType: "write",
       options: {
@@ -51,7 +57,6 @@ class WriteViewObj extends ViewObject {
   ) {
     super();
     this.points = points;
-    this.color = color;
     this.type = config.type;
     this.color = config.color ?? "black";
     this.isFill = config.isFill ?? false;
@@ -59,6 +64,44 @@ class WriteViewObj extends ViewObject {
     this._scalex = config.scaleX ?? 1;
     this._scaley = config.scaleY ?? 1;
     this.config = config;
+  }
+  //供外部设置数据
+  public setParams(config: {
+    color?: string;
+    lineWidth?: number;
+    type: "circle" | "write" | "line" | "rect" | "none";
+    scaleX?: number;
+    scaleY?: number;
+    isFill?: boolean;
+  }) {
+    this.type = config.type;
+    this.color = config.color ?? "black";
+    this.isFill = config.isFill ?? false;
+    this.lineWidth = config.lineWidth ?? 3;
+    this._scalex = config.scaleX ?? 1;
+    this._scaley = config.scaleY ?? 1;
+    this.config = config;
+  }
+
+  public custom(): void {
+    //线条不需要显示镜像，高度、拖拽按钮
+    if (this.type == "line") {
+      this.unInstallButton([
+        this.dragButton,
+        this.verticalButton,
+        this.mirrorButton,
+      ]);
+    } else if (this.type == "circle") {
+      this.unInstallButton([this.mirrorButton]);
+    }
+  }
+  //重写被选中后的样式
+  public drawSelected(paint: Painter): void {
+    const width = this.rect.size.width,
+      height = this.rect.size.height;
+    paint.fillStyle = GestiConfig.theme.textSelectedMaskBgColor;
+    paint.fillRect(-width >> 1, -height >> 1, width, height);
+    paint.fill();
   }
   drawImage(paint: Painter): void {
     paint.closePath();
@@ -108,10 +151,9 @@ class WriteViewObj extends ViewObject {
     paint.strokeStyle = this.color;
     if (this.type != "write") paint.closePath();
     if (this.isFill) {
-      paint.fillStyle=this.color;
+      paint.fillStyle = this.color;
       paint.fill();
-    }
-    else paint.stroke();
+    } else paint.stroke();
     if (this.type == "write") paint.closePath();
     paint.closePath();
   }
@@ -142,10 +184,10 @@ class WriteViewObj extends ViewObject {
     }
   }
   get value(): any {
-      return {
-        ...this.config,
-        points:this.points
-      };
+    return {
+      ...this.config,
+      points: this.points,
+    };
   }
 }
 

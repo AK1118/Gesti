@@ -12,6 +12,7 @@ export abstract class Button implements RenderObject {
   constructor(master: ViewObject) {
     this.master = master;
   }
+  
   name: string = "";
   //隐藏
   disabled: boolean = false;
@@ -57,6 +58,7 @@ export abstract class Button implements RenderObject {
     percentage?: [x: number, y: number];
     position?: Vector;
   }) {
+    if(this.disabled)return;
     this.options = options;
     const { percentage, position } = options;
 
@@ -141,6 +143,9 @@ export abstract class Button implements RenderObject {
   }
   public setRelativePosition(position: Vector) {
     this.relativeRect.position = position;
+  }
+  hide(): void {
+    this.disabled=true;
   }
 }
 

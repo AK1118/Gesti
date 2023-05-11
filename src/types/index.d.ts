@@ -1,5 +1,6 @@
 declare interface gesticonfig{
   auxiliary?: boolean,
+  dashedLine?:boolean,
 }
 declare interface textOptions {
   fontFamily?: string;
@@ -10,6 +11,9 @@ declare interface textOptions {
   lineWidth?: number;
   lineColor?: string;
   lineOffsetY?: number;
+  lineHeight?:number,
+  width?:number,
+  height?:number,
 }
 declare interface createImageOptions {
   data:
@@ -29,6 +33,11 @@ declare interface createImageOptions {
   maxScale?: number;
   minScale?: number;
 }
+declare enum ViewObjectFamily{
+  image,
+  write,
+  text,
+}
 export declare interface Rect{
   readonly key: string;
   get position(): Vector;
@@ -43,9 +52,14 @@ export declare interface Rect{
   copy(key?: string):Rect;
 }
 declare class ImageToolkit {}
+
 export declare class ViewObject {
   getBaseInfo():Object;
   rect:Rect;
+  get value():any;
+  family:ViewObjectFamily;
+  name:string;
+  setName(name:string):void;
 }
 export declare interface XImage {
   new(params: createImageOptions):XImage;
@@ -66,6 +80,7 @@ declare class Gesti{
   new(config?:gesticonfig):Gesti;
   constructor(config?:gesticonfig);
   get controller():GestiController;
+  static Family:ViewObjectFamily;
   static XImage:XImage;
   /**
    * canvas必传，在h5端时paint可不传
@@ -83,6 +98,10 @@ declare class Gesti{
       height: number;
     }):void;
 }
+/**
+ * 添加监听
+ */
+declare type GestiControllerListenerTypes="onSelect" | "onHide" | "onCancel"|"onHover";
 export declare class GestiController {
   /**
    * @ImageToolkit
@@ -104,7 +123,7 @@ export declare class GestiController {
     isFill?: boolean;
   }): void;
   addListener(
-    listenType: "onSelect" | "onHide" | "onCancel",
+    listenType: GestiControllerListenerTypes,
     callback: (obj: any) => void
   ): void;
   updateText(text: string, options?: textOptions): void;
@@ -192,5 +211,11 @@ export declare class GestiController {
     options?: createImageOptions
   ): Promise<XImage>;
 }
+
+
+
+export declare const onSelected:(hook:()=>any)=>void;
+export declare const createGesti:()=>Gesti;
+
 
 export default Gesti;

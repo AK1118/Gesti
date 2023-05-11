@@ -168,5 +168,17 @@ class Widgets {
         paint.fill();
         paint.closePath();
     }
+
+    //预设竖线，后使用importAll导入即可
+    public static verticalLine='[{"viewObjType":"write","options":{"config":{"type":"line","color":"black","lineWidth":1,"isFill":false,"scaleX":1,"scaleY":1},"points":[{"x":-176,"y":0},{"x":176,"y":0}],"rect":{"x":287,"y":348,"width":352,"height":30,"angle":1.56},"relativeRect":{"x":0,"y":0,"width":352,"height":30,"angle":1.56},"mirror":false,"locked":false}}]';
+
+    //预设横线
+    public static horizonLine='[{"viewObjType":"write","options":{"config":{"type":"line","color":"black","lineWidth":1,"isFill":false,"scaleX":0.9,"scaleY":1},"points":[{"x":-176,"y":0},{"x":176,"y":0}],"rect":{"x":288,"y":347,"width":328,"height":30,"angle":0},"relativeRect":{"x":0,"y":0,"width":352,"height":30,"angle":0},"mirror":false,"locked":false}}]';
+
+    //预设矩形
+    public static rect='[{"viewObjType":"write","options":{"config":{"type":"rect","color":"black","lineWidth":1,"isFill":false,"scaleX":1,"scaleY":1},"points":[{"x":-115,"y":-74},{"x":115,"y":-74},{"x":115,"y":74},{"x":-115,"y":74}],"rect":{"x":299,"y":355,"width":231,"height":148,"angle":0},"relativeRect":{"x":0,"y":0,"width":231,"height":148,"angle":0},"mirror":false,"locked":false}}]';
+
+    //预设源泉
+    public static circle='[{"viewObjType":"write","options":{"config":{"type":"circle","color":"black","lineWidth":1,"isFill":false,"scaleX":1,"scaleY":1},"points":[{"x":-78,"y":-57},{"x":78,"y":57}],"rect":{"x":297,"y":342,"width":157,"height":114,"angle":0},"relativeRect":{"x":0,"y":0,"width":157,"height":114,"angle":0},"mirror":false,"locked":false}}]';
 }
 export default Widgets;

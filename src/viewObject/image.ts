@@ -1,10 +1,11 @@
 import ViewObject, { toJSONInterface } from "../abstract/view-object";
+import { ViewObjectFamily } from "../enums";
 import Painter from "../painter";
 import Rect from "../rect";
 import { classIs, fileToBase64, imageHtmltoBase64 } from "../utils/index";
 import XImage from "../ximage";
-
 class ImageBox extends ViewObject {
+  family: ViewObjectFamily=ViewObjectFamily.image;
   get value(): any {
     return this.image;
   }
