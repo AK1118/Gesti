@@ -17,6 +17,8 @@ export enum WriteType {
     Line,
 }
 
+
+
 /**
  * down在已被选中图册上时不能绘制，
  * 当down图册上时  current=null,
@@ -30,15 +32,16 @@ class WriteFactory {
     private currentType: WriteType = WriteType.None;
     public current: WriteBase;
     private paint: Painter;
+    public listen:(obj:ViewObject)=>void;
     private config: {
         color?: string,
         lineWidth?: number,
-        type: "circle" | "write" | "line" | "rect"|"none",
+        type: GraffitiType,
     };
     public setConfig(config: {
         color?: string,
         lineWidth?: number,
-        type: "circle" | "write" | "line" | "rect"|"none",
+        type: GraffitiType,
     }) {
         this.config = config;
         this.setWriteType();

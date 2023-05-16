@@ -85,7 +85,7 @@
 | layerTop  | void             |      GestiController     |     -     |    图层置于最顶层    |
 | layerBottom  | void             |      GestiController     |    -      |    图层置于最底层    |
 | lock    | void             |      GestiController     |     -     |    锁定当前选中图层    |
-| deLock    | void             |      GestiController     |     -     |    解锁当前选中图层    |
+| unLock    | void             |      GestiController     |     -     |    解锁当前选中图层    |
 | cancel    | void             |      GestiController     |      -    |    取消当前被聚焦对象    |
 | cancelAll    | void             |      GestiController     |     -     |    取消所有被聚焦对象    |
 | fallback(暂未全局兼容)    | void             |      GestiController     |     -     |    撤销    |

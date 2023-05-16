@@ -3,6 +3,7 @@ import { RecordNode } from "./abstract/operation-observer";
 import ViewObject from "./abstract/view-object";
 import WriteBase from "./abstract/write-category";
 import CatchPointUtil from "./catchPointUtil";
+import canvasConfig from "./config/canvasConfig";
 import GestiConfig from "./config/gestiConfig";
 import Drag from "./drag";
 import { FuncButtonTrigger } from "./enums";
@@ -42,21 +43,32 @@ enum LayerOperationType {
   bottom,
 }
 
-interface ListenerTypes {
-  onSelect(viewObject: ViewObject): void;
-  onHide(viewObject: ViewObject): void;
-  onCancel(viewObject: ViewObject): void;
-  onHover(viewObject: ViewObject): void;
-}
+type ListenerHook = (viewObject: ViewObject) => void;
 
 /**
  * 监听类
  */
-class Listeners implements ListenerTypes {
-  onHide(viewObject: ViewObject): void {}
-  onSelect(viewObject: ViewObject): void {}
-  onCancel(viewObject: ViewObject): void {}
-  onHover(viewObject: ViewObject): void {}
+class Listeners {
+  hooks: any = {};
+  addHook(
+    hookType: GestiControllerListenerTypes,
+    hook: any,
+    prepend: boolean = false
+  ) {
+    const hooks: Array<ListenerHook> =
+      this.hooks[hookType] || (this.hooks[hookType] = []);
+    const wrappedHook = hook.__weh || (hook.__weh = (arg) => hook(arg));
+    //优先级
+    if (prepend) {
+      hooks.unshift(wrappedHook);
+    } else {
+      hooks.push(wrappedHook);
+    }
+  }
+  callHooks(hookType: GestiControllerListenerTypes, arg: ViewObject) {
+    const hooks = this.hooks[hookType] || [];
+    hooks.forEach((hook: ListenerHook) => hook(arg));
+  }
 }
 
 class ImageToolkit implements GestiController {
@@ -99,6 +111,8 @@ class ImageToolkit implements GestiController {
   private isWriting: boolean = false;
   //绘制对象工厂  //绘制对象，比如签字、矩形、圆形等
   private writeFactory: WriteFactory;
+  //目前Hover的对象
+  private hoverViewObject: ViewObject = null;
   public get getCanvasRect(): Rect {
     return this.canvasRect;
   }
@@ -112,13 +126,19 @@ class ImageToolkit implements GestiController {
     rect.y = this.offset.y;
     this.canvasRect = new Rect(rect);
     this.paint = new Painter(paint);
+    canvasConfig.setGlobalPaint(this.paint);
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
+  }
+  load(view: ViewObject): void {
+    this.addViewObject(view);
   }
   select(select: ViewObject): Promise<void> {
     if (select && select.onSelected) {
       select.onSelected();
-      this.listen.onSelect(select);
+      this.selectedViewObject=select;
+      this.callHook("onSelect", select);
+      this.update();
       return Promise.resolve();
     }
     return Promise.resolve();
@@ -126,9 +146,17 @@ class ImageToolkit implements GestiController {
   get currentViewObject(): Promise<ViewObject> {
     return Promise.resolve(this.selectedViewObject);
   }
-  async rotate(angle: number): Promise<void> {
-    if (!this.selectedViewObject) return null;
-    this.selectedViewObject.rect.setAngle(angle);
+  async rotate(
+    angle: number,
+    existing?: boolean,
+    view?: ViewObject
+  ): Promise<void> {
+    let obj=view||this.selectedViewObject;
+    if(!obj) return Promise.resolve(null);
+    let _angle=existing?angle + obj.rect.getAngle:angle;
+    obj.rect.setAngle(_angle);
+    this.update();
+    return Promise.resolve(null);
   }
   upward(viewObject?: ViewObject): number {
     if (viewObject) {
@@ -176,12 +204,12 @@ class ImageToolkit implements GestiController {
       try {
         if (json == "[]" || !json) throw Error("Import Json is Empty");
         const str = JSON.parse(json);
-        const reader = new GestiReader(this.paint);
+        const reader = new GestiReader();
         for await (const item of str) {
           const obj: ViewObject = await reader.getObjectByJson(
             JSON.stringify(item)
           );
-          if (obj) this.ViewObjectList.push(obj);
+          if (obj) this.addViewObject(obj);
         }
         this.update();
         r();
@@ -192,27 +220,11 @@ class ImageToolkit implements GestiController {
   }
 
   addListener(
-    listenType: keyof ListenerTypes,
-    callback: (obj: any) => void
+    listenType: GestiControllerListenerTypes,
+    hook: ListenerHook,
+    prepend: boolean = false
   ): void {
-    switch (listenType) {
-      case "onSelect":
-        {
-          this.listen.onSelect = callback;
-        }
-        break;
-      case "onHide":
-        {
-          this.listen.onHide = callback;
-        }
-        break;
-      case "onCancel": {
-        this.listen.onCancel = callback;
-      }
-      case "onHover": {
-        this.listen.onHover = callback;
-      }
-    }
+    this.listen.addHook(listenType, hook, prepend);
   }
   /**
    * @description 导出画布内所有对象成json字符串
@@ -241,13 +253,14 @@ class ImageToolkit implements GestiController {
         });
     }
   }
-  center(axis?: CenterAxis): void {
+  center(axis?: CenterAxis,view?:ViewObject): void {
+    if(view)view.center(this.canvasRect.size, axis);
     this.selectedViewObject?.center(this.canvasRect.size, axis);
   }
   cancel(): void {
     this.selectedViewObject?.cancel();
     if (this.selectedViewObject) {
-      this.listen.onCancel(this.selectedViewObject);
+      this.callHook("onCancel", this.selectedViewObject);
       this.selectedViewObject = null;
     }
     this.update();
@@ -284,8 +297,8 @@ class ImageToolkit implements GestiController {
       LayerOperationType.bottom
     );
   }
-  deLock(): void {
-    this.selectedViewObject?.deblock();
+  unLock(): void {
+    this.selectedViewObject?.unLock();
   }
   lock(): void {
     this.selectedViewObject?.lock();
@@ -445,6 +458,23 @@ class ImageToolkit implements GestiController {
       this.drag.update(event);
       //有被选中对象才刷新
       if (this.selectedViewObject != null) this.update();
+    } else {
+      const event: Vector | Vector[] = this.correctEventPosition(v);
+      //Hover检测
+      const selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(
+        this.ViewObjectList,
+        event
+      );
+      if (
+        selectedViewObject &&
+        this.hoverViewObject?.key != selectedViewObject.key
+      ) {
+        this.callHook("onHover", selectedViewObject);
+        this.hoverViewObject = selectedViewObject;
+      } else if (!selectedViewObject && this.hoverViewObject) {
+        this.callHook("onLeave", this.hoverViewObject);
+        this.hoverViewObject = null;
+      }
     }
   }
   public onUp(v: GestiEventParams): void {
@@ -460,7 +490,7 @@ class ImageToolkit implements GestiController {
     const writeObj = this.writeFactory.done();
     writeObj.then((value) => {
       if (value) {
-        this.ViewObjectList.push(value);
+        this.addViewObject(value);
       }
     });
 
@@ -493,7 +523,7 @@ class ImageToolkit implements GestiController {
     );
     if (selectedViewObject ?? false) {
       this.debug(["选中了", selectedViewObject]);
-      this.listen.onSelect(selectedViewObject);
+      this.callHook("onSelect", selectedViewObject);
       this._inObjectArea = true;
       //之前是否有被选中图层 如果有就取消之前的选中
       if (
@@ -501,7 +531,7 @@ class ImageToolkit implements GestiController {
         selectedViewObject.key != this.selectedViewObject.key
       ) {
         this.selectedViewObject.cancel();
-        this.listen.onCancel(this.selectedViewObject);
+        this.callHook("onCancel", this.selectedViewObject);
       }
       this.selectedViewObject = selectedViewObject;
       //选中后变为选中状态
@@ -545,12 +575,21 @@ class ImageToolkit implements GestiController {
     this.gesture.cancel();
     return false;
   }
+  private callHook(type: GestiControllerListenerTypes, arg = null) {
+    this.listen.callHooks(type, arg);
+  }
+  private addViewObject(obj: ViewObject): void {
+    this.ViewObjectList.push(obj);
+    this.callHook("onLoad", obj);
+    this.update();
+  }
   public update() {
     /**
      * 在使用绘制对象时，根据值来判断是否禁止重绘
      */
     //  if (this.writeFactory.current?.disableCanvasUpdate) return;
     this.debug("Update the Canvas");
+    this.callHook("onUpdate", null);
     this.paint.clearRect(
       0,
       0,
@@ -570,19 +609,19 @@ class ImageToolkit implements GestiController {
         //标记过后不会再次标记
         this.currentViewObjectState[ndx] = 0;
         item.cancel();
-        this.listen.onHide(item);
+        this.callHook("onHide", item);
       }
     });
   }
   /**
    * 扫除没用的对象，根据大小判断
    * 清扫细微到不可见的对象
-   * @param item 
+   * @param item
    */
-  private cleaning(item:ViewObject){
-    if(item&&item.rect){
-      const {width,height}=item.rect.size;
-      if(width<=3||height<=3)item.hide();
+  private cleaning(item: ViewObject) {
+    if (item && item.rect) {
+      const { width, height } = item.rect.size;
+      if (width <= 3 || height <= 3) item.hide();
     }
   }
   /**
@@ -598,7 +637,7 @@ class ImageToolkit implements GestiController {
     image.height *= image.scale;
     const imageBox: ImageBox = new ImageBox(image);
     imageBox.center(this.canvasRect.size);
-    this.ViewObjectList.push(imageBox);
+    this.addViewObject(imageBox);
     setTimeout(() => {
       this.update();
     }, 100);
@@ -611,9 +650,9 @@ class ImageToolkit implements GestiController {
    * @returns
    */
   public addText(text: string, options?: textOptions): Promise<ViewObject> {
-    const textBox: TextBox = new TextBox(text, this.paint, options);
+    const textBox: TextBox = new TextBox(text, options);
     textBox.center(this.canvasRect.size);
-    this.ViewObjectList.push(textBox);
+    this.addViewObject(textBox);
     //测试
     // this.selectedViewObject=textBox;
     // this.selectedViewObject.onSelected()
@@ -627,9 +666,8 @@ class ImageToolkit implements GestiController {
     lineWidth?: number;
     color?: string;
     isFill?: boolean;
-  }): Promise<ViewObject> {
+  }): void {
     this.writeFactory.setConfig(options);
-    return null;
   }
   private debug(message: any): void {
     if (!this.isDebug) return;

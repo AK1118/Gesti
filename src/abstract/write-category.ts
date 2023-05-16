@@ -25,7 +25,7 @@ abstract class WriteBase {
     public config: {
         color?: string,
         lineWidth?: number,
-        type: "circle" | "write" | "line" | "rect"|"none",
+        type: GraffitiType,
         isFill?:boolean,
     };
     constructor(paint: Painter) {
@@ -69,7 +69,7 @@ abstract class WriteBase {
     public setConfig(config: {
         color?: string,
         lineWidth?: number,
-        type: "circle" | "write" | "line" | "rect"|"none",
+        type: GraffitiType,
     }) {
         this.config = config;
         //设置默认数值

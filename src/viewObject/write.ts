@@ -85,15 +85,15 @@ class WriteViewObj extends ViewObject {
 
   public custom(): void {
     //线条不需要显示镜像，高度、拖拽按钮
-    if (this.type == "line") {
-      this.unInstallButton([
-        this.dragButton,
-        this.verticalButton,
-        this.mirrorButton,
-      ]);
-    } else if (this.type == "circle") {
-      this.unInstallButton([this.mirrorButton]);
-    }
+    // if (this.type == "line") {
+    //   this.unInstallButton([
+    //     this.dragButton,
+    //     this.verticalButton,
+    //     this.mirrorButton,
+    //   ]);
+    // } else if (this.type == "circle") {
+    //   this.unInstallButton([this.mirrorButton]);
+    // }
   }
   //重写被选中后的样式
   public drawSelected(paint: Painter): void {

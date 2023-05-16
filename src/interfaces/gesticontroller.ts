@@ -6,27 +6,27 @@ interface LayerController {
   /**
    * 图层向下移动一位
    */
-  layerLower(): void;
+  layerLower(view?:ViewObject): void;
   /**
    * 图层向上移动一位
    */
-  layerRise(): void;
+  layerRise(view?:ViewObject): void;
   /**
    * 置于最顶层
    */
-  layerTop(): void;
+  layerTop(view?:ViewObject): void;
   /**
    * 置于最底层
    */
-  layerBottom(): void;
+  layerBottom(view?:ViewObject): void;
   /**
    * 解锁图层
    */
-  deLock(): void;
+  unLock(view?:ViewObject): void;
   /**
    * 锁定图层
    */
-  lock(): void;
+  lock(view?:ViewObject): void;
   /**
    * 取消所有被聚焦的对象
    */
@@ -34,11 +34,11 @@ interface LayerController {
   /**
    * 取消当前被聚焦对象
    */
-  cancel(): void;
+  cancel(view?:ViewObject): void;
   /**
    * 被选中对象居中画布
    */
-  center(axis?:CenterAxis): void;
+  center(axis?:CenterAxis,view?:ViewObject): void;
   /**
      * 更新文字图层内容
      * @param text:String
@@ -74,10 +74,12 @@ interface LayerController {
    */
   rightward(viewObject?:ViewObject):number;
   /**
-   * @description 旋转已被选中对象  传入弧度  可使用公式【 angle++ * Math.PI / 180  】转换角度为弧度
+   *  旋转已被选中对象  传入弧度  可使用公式【 angle++ * Math.PI / 180  】转换角度为弧度
    * @param angle 
+   * @param existing //是否在现有基础上旋转
+   * @param view 
    */
-  rotate(angle:number):Promise<void>;
+  rotate(angle:number,existing?:boolean,view?:ViewObject):Promise<void>;
   /**
    * 获取当前选中对象
    */
@@ -93,6 +95,11 @@ type ListenerCallback = (object: any) => void;
 
 //画布控制器
 interface ImageToolKitController {
+  /**
+   * 
+   * @param view 将可操作对象载入gesti内
+   */
+  load(view:ViewObject):void;
   /**
    * 回退操作
    */
@@ -144,14 +151,15 @@ interface ImageToolKitController {
   addText(text: string, options?: textOptions): Promise<ViewObject>;
   addListener(
     listenType:GestiControllerListenerTypes,
-    callback: ListenerCallback
+    callback: ListenerCallback,
+    prepend?:boolean,
   ): void;
   addWrite(options: {
-    type: "circle" | "write" | "line" | "rect" | "none",
+    type: GraffitiType,
     lineWidth?: number,
     color?: string,
     isFill?:boolean,
-  }):Promise<ViewObject>;
+  }):void;
   /**
    * @description 导出所有对象成JSON字符串
    */

@@ -74,6 +74,24 @@ declare interface createImageOptions {
   minScale?: number;
 }
 
+declare interface XImageOptions {
+  data?:
+    | HTMLImageElement
+    | SVGImageElement
+    | HTMLVideoElement
+    | HTMLCanvasElement
+    | Blob
+    | ImageData
+    | ImageBitmap
+    | OffscreenCanvas;
+  originData?: any;
+  width?: number;
+  height?: number;
+  scale?: number;
+  maxScale?: number;
+  minScale?: number;
+}
+
 declare interface textOptions {
   fontFamily?: string;
   fontSize?: number;
@@ -89,4 +107,10 @@ declare interface textOptions {
 }
 
 declare type CenterAxis="vertical"|"horizon";
-declare type GestiControllerListenerTypes="onSelect" | "onHide" | "onCancel";
+declare type GestiControllerListenerTypes="onSelect" | "onHide" | "onCancel"|"onHover"|"onLeave"|"onUpdate"|"onLoad";
+
+declare function textHandler(options?:textOptions):any;
+
+
+declare type GraffitiType="circle" | "write" | "line" | "rect"|"none";
+

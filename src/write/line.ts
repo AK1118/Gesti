@@ -52,7 +52,7 @@ class WriteLine extends WriteBase {
         const viewobj =new WriteViewObj(this.points,this.color, this.config);
         viewobj.rect = rect;
         viewobj.init();
-        viewobj.dragButton.setAxis("horizontal");
+        // viewobj.dragButton.setAxis("horizontal");
         this.reset();
         this.points=[];
         return viewobj;

@@ -1,5 +1,5 @@
 import { CloseButton, MirrorButton, RotateButton } from "../buttons";
-import DelockButton from "../buttons/delockButton";
+import UnLockButton from "../buttons/delockButton";
 import DragButton from "../buttons/dragbutton";
 import LockButton from "../buttons/lockbutton";
 
@@ -54,7 +54,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public mirrorButton: MirrorButton;
   public closeButton: CloseButton;
   public lockButton: LockButton;
-  public delockButton: DelockButton;
+  public delockButton: UnLockButton;
   public rotateButton: RotateButton;
   public name: string;
   abstract family: ViewObjectFamily;
@@ -77,25 +77,25 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
      * 如果需要某个图层对象自定义某个按钮是否显示或者其他自定义操作
      * 提供 @custom 方法使用
      */
-    this.dragButton = new DragButton(this);
-    this.verticalButton = new VerticalButton(this);
-    this.horizonButton = new HorizonButton(this);
-    this.mirrorButton = new MirrorButton(this);
-    this.closeButton = new CloseButton(this);
-    this.rotateButton = new RotateButton(this);
-    this.lockButton = new LockButton(this);
-    this.delockButton = new DelockButton(this);
+    // this.dragButton = new DragButton(this);
+    // this.verticalButton = new VerticalButton(this);
+    // this.horizonButton = new HorizonButton(this);
+    // this.mirrorButton = new MirrorButton(this);
+    // this.closeButton = new CloseButton(this);
+    // this.rotateButton = new RotateButton(this);
+    // this.lockButton = new LockButton(this);
+    // this.delockButton = new UnLockButton(this);
 
-    this.funcButton = [
-      this.dragButton,
-      this.verticalButton,
-      this.horizonButton,
-      this.mirrorButton,
-      this.closeButton,
-      this.rotateButton,
-      this.lockButton,
-      this.delockButton,
-    ];
+    // this.funcButton = [
+    //   this.dragButton,
+    //   this.verticalButton,
+    //   this.horizonButton,
+    //   this.mirrorButton,
+    //   this.closeButton,
+    //   this.rotateButton,
+    //   this.lockButton,
+    //   this.delockButton,
+    // ];
 
     this.relativeRect = new Rect({
       x: 0,
@@ -106,8 +106,21 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.addObserver(this);
     this.inited = true;
   }
-  public unInstallButton(buttons:Array<Button>){
-    this.funcButton= this.funcButton.filter(item=>!buttons.includes(item))
+  //设置大小
+  public setSize(size:{
+    width?:number,
+    height?:number,
+  }){
+    const {width,height}=size;
+    this.rect.setSize(width??this.rect.size.width,height??this.rect.size.height);
+  }
+  //卸载按钮
+  public unInstallButton(buttons: Array<Button>) {
+    this.funcButton = this.funcButton.filter((item) => !buttons.includes(item));
+  }
+  //安装按钮
+  public installButton(button: Button) {
+    this.funcButton.push(button);
   }
   /**
    * 重置按钮
@@ -115,7 +128,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public resetButtons(excludeNames?: Array<string>) {
     const arr = excludeNames ?? [];
     this.funcButton.forEach((button: Button) => {
-      if (!arr.includes(button.name)&&!button.disabled) button.reset();
+      if (!arr.includes(button.name) && !button.disabled) button.reset();
     });
   }
   /**
@@ -128,9 +141,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   /**
    * @description 解锁
    */
-  public deblock() {
+  public unLock(): void {
     this._lock = false;
-    this.onDelock();
+    this.onUnLock();
   }
   /**
    * @description 查看是否锁住
@@ -187,7 +200,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     });
   }
   //解锁时触发
-  private onDelock() {
+  private onUnLock() {
     //解锁时，自由的按钮消失,反之会显示
     this.funcButton.forEach((button: Button) => {
       button.disabled = button.isFree;
@@ -271,13 +284,13 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
      */
     const event: Vector = Vector.sub(eventPosition, this.rect.position);
     const button: Button = this.funcButton.find((button: Button) => {
+      if (button.disabled) return false;
       const angle = button.oldAngle + this.rect.getAngle;
       const x = Math.cos(angle) * button.originDistance;
       const y = Math.sin(angle) * button.originDistance;
       const buttonPosi: Vector = new Vector(x, y);
       return button.isInArea(event, buttonPosi);
     });
-
     return button;
   }
   public hide() {
@@ -363,10 +376,10 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       },
       relativeRect: {
         x: ~~this.relativeRect.position.x,
-        y:~~ this.relativeRect.position.y,
-        width:~~ this.relativeRect.size.width,
+        y: ~~this.relativeRect.position.y,
+        width: ~~this.relativeRect.size.width,
         height: ~~this.relativeRect.size.height,
-        angle: this.rect.getAngle
+        angle: this.rect.getAngle,
       },
       mirror: this.isMirror,
       locked: this.isLock,

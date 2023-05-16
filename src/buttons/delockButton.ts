@@ -10,7 +10,7 @@ import GestiConfig from "../config/gestiConfig";
 
 
 
-class DelockButton extends Button {
+class UnLockButton extends Button {
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
     key: string | number;
@@ -35,7 +35,7 @@ class DelockButton extends Button {
         this.master = master;
     }
     effect(): void {
-        this.master.deblock();
+        this.master.unLock();
     }
     draw(paint: Painter): void {
         const {
@@ -63,4 +63,4 @@ class DelockButton extends Button {
 
 }
 
-export default DelockButton;
+export default UnLockButton;

@@ -58,9 +58,9 @@ class TextBox extends ViewObject {
   private width: number = 0;
   //划线状态，1是从起点开始中 2是已经画完上一个线段了，等待下一次
   private currentLineState: 1 | 2 | 3 | 4 | 0 | 5 = 0;
-  constructor(text: string, painter: Painter, options?: textOptions) {
+  constructor(text: string, options?: textOptions) {
     super();
-    this._painter = painter;
+    this._painter=canvasConfig.globalPaint;
     this._options = options;
     this.initPrototypes(text, options);
     this.initColumns();
@@ -71,7 +71,7 @@ class TextBox extends ViewObject {
 
   //@Override
   public custom(): void {
-    this.unInstallButton([this.dragButton]);
+    
   }
 
   //重写被选中后的样式
@@ -353,7 +353,6 @@ class TextBox extends ViewObject {
       newWidth = canvasConfig.rect.size.width;
     this.rect.setSize(newWidth, newHeight);
     this.resetButtons(["rotate"]);
-    // this.dragButton.setAxis("horizontal");
     if (size.width <= this.fontsize + this._spacing)
       this.rect.setSize(this.fontsize + this._spacing, newHeight);
     return Promise.resolve();

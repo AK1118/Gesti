@@ -26,14 +26,17 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  load(view: ViewObject): void {
+    return this.kit.load(view);
+  }
   select(select: ViewObject): Promise<void> {
     return this.kit.select(select);
   }
   get currentViewObject(): Promise<ViewObject> {
     return this.kit.currentViewObject;
   }
-  rotate(angle:number): Promise<void> {
-    return this.kit.rotate(angle);
+  rotate(angle:number,existing?:boolean,view?:ViewObject): Promise<void> {
+    return this.kit.rotate(angle,existing,view);
   }
   upward(viewObject?: ViewObject): number {
     return this.kit.upward(viewObject);
@@ -58,12 +61,13 @@ class GesteControllerImpl implements GestiController {
     lineWidth?: number;
     color?: string;
     isFill?: boolean;
-  }) :Promise<ViewObject>{
+  }) :void{
    return this.kit.addWrite(options);
   }
   addListener(
     listenType: "onSelect" | "onHide" | "onCancel",
-    callback: (obj: any) => void
+    callback: (obj: any) => void,
+    prepend?:boolean
   ): void {
     this.kit.addListener(listenType, callback);
   }
@@ -71,8 +75,8 @@ class GesteControllerImpl implements GestiController {
   updateText(text: string, options?: textOptions): void {
     this.kit.updateText(text, options);
   }
-  center(axis?: CenterAxis): void {
-    this.kit.center(axis);
+  center(axis?: CenterAxis,view?:ViewObject): void {
+    this.kit.center(axis,view);
   }
   addText(
     text: string,
@@ -105,8 +109,8 @@ class GesteControllerImpl implements GestiController {
   cancelEvent(): void {
     this.kit.cancelEvent();
   }
-  deLock(): void {
-    this.kit.deLock();
+  unLock(): void {
+    this.kit.unLock();
   }
   lock(): void {
     this.kit.lock();

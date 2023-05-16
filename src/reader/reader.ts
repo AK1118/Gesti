@@ -9,10 +9,7 @@ import WriteViewObj from "../viewObject/write";
 import XImage from "../ximage";
 
 class GestiReader {
-  private painter: Painter;
-  constructor(painter: Painter) {
-    this.painter = painter;
-  }
+  constructor() {}
   public async getObjectByJson(str: string) {
     const json = JSON.parse(str);
     const { options } = json;
@@ -43,7 +40,7 @@ class GestiReader {
         break;
       case "text":
         {
-          viewObject = new TextBox(options.text, this.painter, options.options);
+          viewObject = new TextBox(options.text, options.options);
         }
         break;
     }
@@ -61,8 +58,8 @@ class GestiReader {
     viewObject.relativeRect.setAngle(options.relativeRect.getAngle);
     viewObject.init();
     //init包括生成按钮
-    options.locked&&viewObject.lock();
-    viewObject.custom()
+    options.locked && viewObject.lock();
+    viewObject.custom();
     return viewObject;
   }
   private getRectByRectJson(rectJson: any): Rect {
