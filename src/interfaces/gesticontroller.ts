@@ -83,7 +83,7 @@ interface LayerController {
   /**
    * 获取当前选中对象
    */
-  get currentViewObject():Promise<ViewObject>;
+  get currentViewObject():ViewObject;
   /**
    * 选中传入的可操作对象
    * @param select 

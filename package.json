@@ -1,6 +1,6 @@
 {
   "name": "gesti",
-  "version": "1.2.15",
+  "version": "1.3.13",
   "description": "一个运行飞快的前端Canvas贴图工具",
   "main": "dist/index.esm.js",
   "module": "dist/index.amd.js",
@@ -21,14 +21,14 @@
     }
   },
   "keywords": [
-    "贴纸",
     "图片贴图",
-    "图片旋转",
+    "图文编辑",
     "Picture editor",
     "Sticker",
     "图片拖拽缩放",
     "Typescript",
-    "微信小程序贴纸编辑"
+    "微信小程序贴纸编辑",
+    "Hooks"
   ],
   "files": [
     "dist"

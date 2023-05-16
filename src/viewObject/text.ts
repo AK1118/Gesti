@@ -71,7 +71,8 @@ class TextBox extends ViewObject {
 
   //@Override
   public custom(): void {
-    
+    //默认生成在画布中心
+    this.center(canvasConfig.rect.size);
   }
 
   //重写被选中后的样式
@@ -118,8 +119,7 @@ class TextBox extends ViewObject {
         x: 0,
         y: 0,
       });
-    //默认生成在画布中心
-    this.center(canvasConfig.rect.size);
+    
     this.init();
     this.initLine();
   }

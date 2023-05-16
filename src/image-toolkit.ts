@@ -143,8 +143,8 @@ class ImageToolkit implements GestiController {
     }
     return Promise.resolve();
   }
-  get currentViewObject(): Promise<ViewObject> {
-    return Promise.resolve(this.selectedViewObject);
+  get currentViewObject(): ViewObject {
+    return this.selectedViewObject;
   }
   async rotate(
     angle: number,

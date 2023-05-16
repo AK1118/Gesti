@@ -32,7 +32,7 @@ class GesteControllerImpl implements GestiController {
   select(select: ViewObject): Promise<void> {
     return this.kit.select(select);
   }
-  get currentViewObject(): Promise<ViewObject> {
+  get currentViewObject(): ViewObject {
     return this.kit.currentViewObject;
   }
   rotate(angle:number,existing?:boolean,view?:ViewObject): Promise<void> {

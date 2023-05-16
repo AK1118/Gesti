@@ -71,6 +71,8 @@ export declare class ViewObject {
   //卸载按钮
   unInstallButton(buttons: Array<Button>): void;
   setSize(size: { width?: number; height?: number }): void;
+    //是否已被选中
+    selected:boolean;
 }
 export declare interface XImage {
   new (params: createImageOptions): XImage;
@@ -113,6 +115,7 @@ export declare class Gesti {
     }
   ): void;
 }
+declare type EventHandle=null;
 /**
  * 添加监听
  */
@@ -282,10 +285,10 @@ export declare const useController: (
 /**
  * 添加预设图形
  */
-export declare const addVerticalLine: (target?: Gesti) => Promise<void>;
-export declare const addHorizonLine: (target?: Gesti) => Promise<void>;
-export declare const addRect: (target?: Gesti) => Promise<void>;
-export declare const addCircle: (target?: Gesti) => Promise<void>;
+export declare const addVerticalLine: (target?: Gesti) => Promise<ViewObject>;
+export declare const addHorizonLine: (target?: Gesti) => Promise<ViewObject>;
+export declare const addRect: (target?: Gesti) => Promise<ViewObject>;
+export declare const addCircle: (target?: Gesti) => Promise<ViewObject>;
 /**
  * 创建可操作对象
  */
@@ -430,6 +433,6 @@ export declare const doRotate: (
   view?: ViewObject,
   target?: Gesti
 ) => void;
-
+export declare const currentViewObject:(target?: Gesti) =>ViewObject; 
 export declare const useReader: (json: string) => Promise<ViewObject>;
 export default Gesti;

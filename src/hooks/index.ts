@@ -375,17 +375,21 @@ const doDownward = doSomething("downward");
 const doLeftward = doSomething("leftward");
 const doRightward = doSomething("rightward");
 const doUpdate = doSomething("update");
-const doCenter = (view?: ViewObject,axis?: CenterAxis, target: Gesti = currentInstance)=>{
+const doCenter = (
+  view?: ViewObject,
+  axis?: CenterAxis,
+  target: Gesti = currentInstance
+) => {
   //不安全的做法
-  target.controller.center(axis,view)
-}
+  target.controller.center(axis, view);
+};
 const doRotate = (
   angle: number,
   existing?: boolean,
   view?: ViewObject,
   target: Gesti = currentInstance
 ) => {
-   //不安全的做法
+  //不安全的做法
   target.controller.rotate(angle, existing, view);
 };
 
@@ -399,7 +403,21 @@ const useReader = (json: string): Promise<ViewObject> => {
   return reader.getObjectByJson(json);
 };
 
-
+/**
+ * @description 获取当前选中对象
+ * @param target 
+ * @returns 
+ */
+const currentViewObject = (target: Gesti = currentInstance):ViewObject=> {
+  if (!target) {
+    error("Target is empty");
+    return;
+  }
+  setCurrentInstance(target);
+  const controller = getCurrentController();
+  if(!controller)error("Gesti not registered");
+  return controller.currentViewObject;
+};
 
 export {
   createGesti /**创建Gesti实例 */,
@@ -450,4 +468,5 @@ export {
   doCenter,
   doUpdate,
   useReader,
+  currentViewObject,
 };

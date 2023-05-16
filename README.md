@@ -85,7 +85,7 @@
 | layerTop  | void             |      GestiController     |     -     |    图层置于最顶层    |
 | layerBottom  | void             |      GestiController     |    -      |    图层置于最底层    |
 | lock    | void             |      GestiController     |     -     |    锁定当前选中图层    |
-| unLock    | void             |      GestiController     |     -     |    解锁当前选中图层    |
+| deLock    | void             |      GestiController     |     -     |    解锁当前选中图层    |
 | cancel    | void             |      GestiController     |      -    |    取消当前被聚焦对象    |
 | cancelAll    | void             |      GestiController     |     -     |    取消所有被聚焦对象    |
 | fallback(暂未全局兼容)    | void             |      GestiController     |     -     |    撤销    |
@@ -127,6 +127,69 @@
 | 属性名      | 返回值类型         |  所属    |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |    :----:   |   :----: |
 | rect    | Rect |      ViewObject     |    -   |    获取对象的位置，大小，旋转值    |
+
+
+# Hooks
+- 对于React和Vue3开发者来说,组合式Api无疑是干净的
+
+### 创建对象系列
+| Hook      | 返回值类型         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|createGesti | Gesti |     (config?: gesticonfig)    |    创建一个Gesti实例      |
+|useController | GestiController |    (target?: Gesti)    |  得到一个Gesti实例的控制器    |
+
+### 监听系列
+| Hook      | 返回值类型         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|onSelected  |   -    |    (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    选中对象时回调      |
+|onHover | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    是的，就像CSS3的Hover一样      |
+|onLeave | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    离开对象时调用      |
+|onCancel | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    取消选中时      |
+|onHide | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    隐藏可操作对象时      |
+|onUpdate | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    刷新画布时      |
+|onLoad | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    载入新的对象到画布内时      |
+
+### 添加预设系列
+| Hook      | 返回值类型         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|addVerticalLine | Promise\<ViewObject> |    -     |    新增预设垂直线到画布内      |
+|addHorizonLine | Promise\<ViewObject> |    -     |    新增预设水平线到画布内      |
+|addRect | Promise\<ViewObject> |    -     |    新增预设矩形到画布内      |
+|addCircle | Promise\<ViewObject> |    -     |    新增预设圆形到画布内      |
+
+
+### 创建ViewObject可操作对象系列
+- 自己创建的对象，用着放心
+
+| Hook      | 返回值类型         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|createTextBox | TextBox |   (text: string, options?: textOptions)     |    创建一个文本对象      |
+|createXImage | XImage |   (option: {data,width:number,height:number})  |    创建一个XImage对象，注意，这个并不是你所看到的那个图片，可以理解为它是图片源，渲染由下面这个类做到      |
+|createImageBox | ImageBox |   (xImage: XImage)     |    创建一个图片对象      |
+|createDragButton | Button | (view: ViewObject)    |    创建一个拖拽按钮      |
+|createHorizonButton | Button | (view: ViewObject)    |    创建一个水平拖拽按钮      |
+|createVerticalButton | Button | (view: ViewObject)    |    创建一个垂直拖拽按钮      |
+|createRotateButton | Button | (view: ViewObject)    |    创建一个旋转按钮      |
+|createLockButton | Button | (view: ViewObject)    |    创建一个上锁按钮      |
+|createUnlockButton | Button | (view: ViewObject)    |    创建一个解锁按钮      |
+|installButton | - | (view: ViewObject, button: Button \| Array<Button>)    |    安装按钮到ViewObject上      |
+|unInstallButton | - | (view: ViewObject, button: Button \| Array<Button>)   |    卸载ViewObject上的按钮   |
+|loadToGesti | - |    (view: ViewObject, target?: Gesti)    |    以防万一，这个放这里更显眼。加入一个ViewObject对象到画布内,以上的类都是继承于ViewObjet      |
+
+
+### Use系列
+| Hook      | 返回值类型         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|useGraffitiRect | - |    (option?: {...}, target?: Gesti    | 开启涂鸦功能，矩形     |
+|useGraffitiCircle | - |    (option?: {...}, target?: Gesti    | 开启涂鸦功能，圆形     |
+|useGraffitiLine | - |    (option?: {...}, target?: Gesti    | 开启涂鸦功能，线条     |
+|useGraffitiWrite | - |    (option?: {...}, target?: Gesti    | 开启涂鸦功能，手写板     |
+|useCloseGraffiti | - |    (option?: {...}, target?: Gesti    | 关闭涂鸦功能    |
+|useTextHandler | - |    (option?: {...}, target?: Gesti    | 得到一个TextBox实例控制器，用于控制它的参数    |
+|useReader | Promise<ViewObject> |    (json: string)    | 传入特定格式的json，返回一个ViewObject对象    |
+
+
+
 
 
 # 保存
