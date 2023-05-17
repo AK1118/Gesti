@@ -5,12 +5,14 @@ module.exports={
     output:[
         {
             file:"./dist/index.amd.js",
-            format:"amd"
+            format:"amd",
+            exports:"named"
         },
         {
             file:"./dist/index.esm.js",
-            format:"es"
-        }
+            format:"es",
+            exports:"named"
+        },
     ],
     plugins:[
         typescript(),

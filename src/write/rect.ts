@@ -53,7 +53,6 @@ class WriteRect extends WriteBase{
         const viewobj =new WriteViewObj(this.points,this.color, this.config);
         viewobj.rect = rect;
         viewobj.init();
-        viewobj.dragButton.setAxis("free");
         this.reset();
         this.points=[];
         return viewobj;

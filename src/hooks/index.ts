@@ -1,6 +1,11 @@
 import Button from "../abstract/button";
 import ViewObject from "../abstract/view-object";
-import { DragButton, RotateButton } from "../buttons";
+import {
+  CloseButton,
+  DragButton,
+  MirrorButton,
+  RotateButton,
+} from "../buttons";
 import UnLockButton from "../buttons/delockButton";
 import HorizonButton from "../buttons/horizonButton";
 import LockButton from "../buttons/lockbutton";
@@ -273,9 +278,10 @@ const createHorizonButton = (view: ViewObject): Button =>
 const createRotateButton = (view: ViewObject): Button => new RotateButton(view);
 const createLockButton = (view: ViewObject): Button => new LockButton(view);
 const createUnlockButton = (view: ViewObject): Button => new UnLockButton(view);
+const createCloseButton = (view: ViewObject): Button => new CloseButton(view);
 const createVerticalButton = (view: ViewObject): Button =>
   new VerticalButton(view);
-
+const createMirrorButton = (view: ViewObject): Button => new MirrorButton(view);
 /**
  * @description 给某个可操作对象安装按钮
  * @param view
@@ -314,6 +320,9 @@ const doSomething =
       | "rightward"
       | "rotate"
       | "update"
+      | "cancel"
+      | "cancelEvent"
+      | "cancelAll"
   ) =>
   (view?: ViewObject, target: Gesti = currentInstance) => {
     if (!target) {
@@ -359,6 +368,15 @@ const doSomething =
       case "update":
         controller.update();
         break;
+      case "cancel":
+        controller.cancel(view);
+        break;
+      case "cancelEvent":
+        controller.cancelEvent();
+        break;
+      case "cancelAll":
+        controller.cancelAll();
+        break;
       default:
     }
   };
@@ -375,9 +393,12 @@ const doDownward = doSomething("downward");
 const doLeftward = doSomething("leftward");
 const doRightward = doSomething("rightward");
 const doUpdate = doSomething("update");
+const doCancel = doSomething("cancel");
+const doCancelAll = doSomething("cancelAll");
+const doCancelEvent = doSomething("cancelEvent");
 const doCenter = (
-  view?: ViewObject,
   axis?: CenterAxis,
+  view?: ViewObject,
   target: Gesti = currentInstance
 ) => {
   //不安全的做法
@@ -405,20 +426,38 @@ const useReader = (json: string): Promise<ViewObject> => {
 
 /**
  * @description 获取当前选中对象
- * @param target 
- * @returns 
+ * @param target
+ * @returns
  */
-const currentViewObject = (target: Gesti = currentInstance):ViewObject=> {
+const currentViewObject = (target: Gesti = currentInstance): ViewObject => {
   if (!target) {
     error("Target is empty");
     return;
   }
   setCurrentInstance(target);
   const controller = getCurrentController();
-  if(!controller)error("Gesti not registered");
+  if (!controller) error("Gesti not registered");
   return controller.currentViewObject;
 };
 
+const drive = (type: "move" | "up" | "down" | "wheel") => {
+  return (
+    e: MouseEvent | Event | EventHandle,
+    target: Gesti = currentInstance
+  ) => {
+    setCurrentInstance(target);
+    const controller = getCurrentController();
+    if (!controller) error("Gesti not registered");
+    if (type == "move") controller.move(e as any);
+    else if (type == "down") controller.down(e as any);
+    else if (type == "up") controller.up(e as any);
+    else if (type == "wheel") controller.wheel(e as any);
+  };
+};
+const driveMove = drive("move");
+const driveUp = drive("up");
+const driveDown = drive("down");
+const driveWheel = drive("wheel");
 export {
   createGesti /**创建Gesti实例 */,
   onSelected /*监听选中Hook */,
@@ -451,6 +490,8 @@ export {
   createRotateButton,
   createLockButton,
   createUnlockButton,
+  createMirrorButton,
+  createCloseButton,
   installButton /**安装按钮*/,
   unInstallButton /**卸载按钮 */,
   doSelect,
@@ -469,4 +510,11 @@ export {
   doUpdate,
   useReader,
   currentViewObject,
+  doCancel,
+  driveMove,
+  driveUp,
+  driveDown,
+  driveWheel,
+  doCancelEvent,
+  doCancelAll,
 };

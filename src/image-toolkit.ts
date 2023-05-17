@@ -136,7 +136,7 @@ class ImageToolkit implements GestiController {
   select(select: ViewObject): Promise<void> {
     if (select && select.onSelected) {
       select.onSelected();
-      this.selectedViewObject=select;
+      this.selectedViewObject = select;
       this.callHook("onSelect", select);
       this.update();
       return Promise.resolve();
@@ -151,9 +151,9 @@ class ImageToolkit implements GestiController {
     existing?: boolean,
     view?: ViewObject
   ): Promise<void> {
-    let obj=view||this.selectedViewObject;
-    if(!obj) return Promise.resolve(null);
-    let _angle=existing?angle + obj.rect.getAngle:angle;
+    let obj = view || this.selectedViewObject;
+    if (!obj) return Promise.resolve(null);
+    let _angle = existing ? angle + obj.rect.getAngle : angle;
     obj.rect.setAngle(_angle);
     this.update();
     return Promise.resolve(null);
@@ -253,15 +253,17 @@ class ImageToolkit implements GestiController {
         });
     }
   }
-  center(axis?: CenterAxis,view?:ViewObject): void {
-    if(view)view.center(this.canvasRect.size, axis);
-    this.selectedViewObject?.center(this.canvasRect.size, axis);
+  center(axis?: CenterAxis, view?: ViewObject): void {
+    if (view) view.center(this.canvasRect.size, axis);
+    else this.selectedViewObject?.center(this.canvasRect.size, axis);
   }
-  cancel(): void {
-    this.selectedViewObject?.cancel();
-    if (this.selectedViewObject) {
-      this.callHook("onCancel", this.selectedViewObject);
-      this.selectedViewObject = null;
+  cancel(view?: ViewObject): void {
+    const _view = view || this.selectedViewObject;
+    if (_view) {
+      _view?.cancel();
+      this.callHook("onCancel", _view);
+      if (_view.key == this.selectedViewObject.key)
+        this.selectedViewObject = null;
     }
     this.update();
   }
@@ -269,39 +271,37 @@ class ImageToolkit implements GestiController {
     this.ViewObjectList.forEach((item: ViewObject) => item.cancel());
     this.update();
   }
-  layerLower(): void {
+  layerLower(view?: ViewObject): void {
+    let _view = view || this.selectedViewObject;
     this.tool.arrangeLayer(
       this.ViewObjectList,
-      this.selectedViewObject,
+      _view,
       LayerOperationType.lower
     );
   }
-  layerRise(): void {
-    this.tool.arrangeLayer(
-      this.ViewObjectList,
-      this.selectedViewObject,
-      LayerOperationType.rise
-    );
+  layerRise(view?: ViewObject): void {
+    let _view = view || this.selectedViewObject;
+    this.tool.arrangeLayer(this.ViewObjectList, _view, LayerOperationType.rise);
   }
-  layerTop(): void {
-    this.tool.arrangeLayer(
-      this.ViewObjectList,
-      this.selectedViewObject,
-      LayerOperationType.top
-    );
+  layerTop(view?: ViewObject): void {
+    let _view = view || this.selectedViewObject;
+    this.tool.arrangeLayer(this.ViewObjectList, _view, LayerOperationType.top);
   }
-  layerBottom(): void {
+  layerBottom(view?: ViewObject): void {
+    let _view = view || this.selectedViewObject;
     this.tool.arrangeLayer(
       this.ViewObjectList,
-      this.selectedViewObject,
+      _view,
       LayerOperationType.bottom
     );
   }
-  unLock(): void {
-    this.selectedViewObject?.unLock();
+  unLock(view?: ViewObject): void {
+    if (view) view?.unLock();
+    else this.selectedViewObject?.unLock();
   }
-  lock(): void {
-    this.selectedViewObject?.lock();
+  lock(view?: ViewObject): void {
+    if (view) view?.lock();
+    else this.selectedViewObject?.lock();
   }
   async fallback() {
     const node: RecordNode = await this.recorder.fallback();
@@ -621,7 +621,7 @@ class ImageToolkit implements GestiController {
   private cleaning(item: ViewObject) {
     if (item && item.rect) {
       const { width, height } = item.rect.size;
-      if (width <= 3 || height <= 3) item.hide();
+      if (width <= 3 && height <= 3) item.hide();
     }
   }
   /**
@@ -633,8 +633,8 @@ class ImageToolkit implements GestiController {
     this.debug("Add a Ximage");
     if (ximage.constructor.name != "XImage") throw Error("不是XImage类");
     const image: XImage = ximage;
-    image.width *= image.scale;
-    image.height *= image.scale;
+    // image.width *= image.scale;
+    // image.height *= image.scale;
     const imageBox: ImageBox = new ImageBox(image);
     imageBox.center(this.canvasRect.size);
     this.addViewObject(imageBox);

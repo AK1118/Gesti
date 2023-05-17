@@ -84,23 +84,19 @@ class WriteViewObj extends ViewObject {
   }
 
   public custom(): void {
-    //线条不需要显示镜像，高度、拖拽按钮
-    // if (this.type == "line") {
-    //   this.unInstallButton([
-    //     this.dragButton,
-    //     this.verticalButton,
-    //     this.mirrorButton,
-    //   ]);
-    // } else if (this.type == "circle") {
-    //   this.unInstallButton([this.mirrorButton]);
-    // }
+    //线条没有填充
+    if (this.type == "line") {
+      this.isFill=false;
+    } 
   }
   //重写被选中后的样式
   public drawSelected(paint: Painter): void {
+    paint.beginPath();
     const width = this.rect.size.width,
       height = this.rect.size.height;
     paint.fillStyle = GestiConfig.theme.textSelectedMaskBgColor;
     paint.fillRect(-width >> 1, -height >> 1, width, height);
+    paint.closePath();
     paint.fill();
   }
   drawImage(paint: Painter): void {

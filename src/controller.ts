@@ -65,7 +65,7 @@ class GesteControllerImpl implements GestiController {
    return this.kit.addWrite(options);
   }
   addListener(
-    listenType: "onSelect" | "onHide" | "onCancel",
+    listenType: GestiControllerListenerTypes,
     callback: (obj: any) => void,
     prepend?:boolean
   ): void {
@@ -84,24 +84,24 @@ class GesteControllerImpl implements GestiController {
   ): Promise<ViewObject> {
     return this.kit.addText(text, options);
   }
-  cancel(): void {
-    this.kit.cancel();
+  cancel(view?:ViewObject): void {
+    this.kit.cancel(view);
   }
   cancelAll(): void {
     this.kit.cancelAll();
   }
 
-  layerLower(): void {
-    this.kit.layerLower();
+  layerLower(view?:ViewObject): void {
+    this.kit.layerLower(view);
   }
-  layerRise(): void {
-    this.kit.layerRise();
+  layerRise(view?:ViewObject): void {
+    this.kit.layerRise(view);
   }
-  layerTop(): void {
-    this.kit.layerTop();
+  layerTop(view?:ViewObject): void {
+    this.kit.layerTop(view);
   }
-  layerBottom(): void {
-    this.kit.layerBottom();
+  layerBottom(view?:ViewObject): void {
+    this.kit.layerBottom(view);
   }
   update(): void {
     this.kit.update();
@@ -109,11 +109,11 @@ class GesteControllerImpl implements GestiController {
   cancelEvent(): void {
     this.kit.cancelEvent();
   }
-  unLock(): void {
-    this.kit.unLock();
+  unLock(view?:ViewObject): void {
+    this.kit.unLock(view);
   }
-  lock(): void {
-    this.kit.lock();
+  lock(view?:ViewObject): void {
+    this.kit.lock(view);
   }
   fallback(): void {
     this.kit.fallback();

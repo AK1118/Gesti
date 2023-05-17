@@ -16,6 +16,7 @@ class Widgets {
         } = offset;
         // 填充三角形
         paint.beginPath();
+        paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.fillStyle = GestiConfig.theme.buttonIconColor;
         paint.moveTo(25 * scale + offsetx, 25 * scale + offsety);
         paint.lineTo(105 * scale + offsetx, 25 * scale + offsety);
@@ -42,11 +43,13 @@ class Widgets {
         // 填充三角形
         paint.beginPath();
         paint.fillStyle = GestiConfig.theme.buttonIconColor;
+        paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.arc(offsetx,offsety,4,0,Math.PI*.6);
         paint.stroke();
         paint.closePath();
         paint.beginPath();
         paint.fillStyle = GestiConfig.theme.buttonIconColor;
+        paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.arc(offsetx,offsety,4,Math.PI,Math.PI*1.6);
         paint.stroke();
         paint.closePath();
@@ -65,6 +68,7 @@ class Widgets {
 
         paint.beginPath();
         paint.fillStyle = GestiConfig.theme.buttonIconColor;
+        paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.moveTo(10 * scale + offsetx, 5 * scale + offsety);
         paint.lineTo(0 * scale + offsetx, 15 * scale + offsety);
         paint.lineTo(10 * scale + offsetx, 25 * scale + offsety);
@@ -103,7 +107,6 @@ class Widgets {
         paint.moveTo(10 * scale + offsetx, 0 * scale + offsety);
         paint.lineTo(0 * scale + offsetx, 10 * scale + offsety);
         paint.stroke();
-        
         paint.closePath();
     }
 

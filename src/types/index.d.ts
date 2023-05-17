@@ -53,11 +53,11 @@ export declare interface Rect {
 }
 export declare class ImageToolkit {}
 
-export declare class ViewObject {
+export declare abstract class ViewObject {
   getBaseInfo(): Object;
-  rect: Rect;
+  readonly rect: Rect;
   get value(): any;
-  family: ViewObjectFamily;
+  readonly family: ViewObjectFamily;
   name: string;
   setName(name: string): void;
   //上锁
@@ -71,12 +71,12 @@ export declare class ViewObject {
   //卸载按钮
   unInstallButton(buttons: Array<Button>): void;
   setSize(size: { width?: number; height?: number }): void;
-    //是否已被选中
-    selected:boolean;
+  //是否已被选中
+  readonly selected: boolean;
 }
-export declare interface XImage {
-  new (params: createImageOptions): XImage;
-  constructor(params: createImageOptions): XImage;
+export declare class XImage {
+  new(params: createImageOptions): XImage;
+  constructor(params: createImageOptions);
   originData: any;
   data: any;
   width: number;
@@ -88,7 +88,16 @@ export declare interface XImage {
   //矩形位置大小信息
   toJson(): rectparams;
 }
-export declare class TextBox extends ViewObject {}
+export declare class TextBox extends ViewObject {
+  new(text: string, options?: textOptions): TextBox;
+  constructor(text: string, options?: textOptions);
+}
+export declare class ImageBox extends ViewObject {
+  new(xImage: XImage): ImageBox;
+  constructor(ximage: XImage);
+}
+export declare class WriteViewObj extends ViewObject {}
+
 export declare type CenterAxis = "vertical" | "horizon";
 
 export declare class Gesti {
@@ -115,7 +124,7 @@ export declare class Gesti {
     }
   ): void;
 }
-declare type EventHandle=null;
+declare type EventHandle = null;
 /**
  * 添加监听
  */
@@ -123,15 +132,21 @@ export declare type GestiControllerListenerTypes =
   | "onSelect"
   | "onHide"
   | "onCancel"
-  | "onHover";
-export declare class GestiController {
+  | "onHover"
+  | "onLeave"
+  | "onUpdate"
+  | "onLoad";
+export declare abstract class GestiController {
   /**
    * @ImageToolkit
    * @private
    */
   private kit;
   constructor(kit: ImageToolkit);
-  rotate(angle: number): Promise<void>;
+  load(view: ViewObject): void;
+  select(select: ViewObject): Promise<void>;
+  get currentViewObject(): ViewObject;
+  rotate(angle: number, existing?: boolean, view?: ViewObject): Promise<void>;
   upward(viewObject?: ViewObject): number;
   downward(viewObject?: ViewObject): number;
   leftward(viewObject?: ViewObject): number;
@@ -150,24 +165,20 @@ export declare class GestiController {
     prepend?: boolean
   ): void;
   updateText(text: string, options?: textOptions): void;
-  center(axis?: CenterAxis): void;
-  addText(text: string, options?: textOptions): Promise<boolean>;
-  cancel(): void;
+  center(axis?: CenterAxis, view?: ViewObject): void;
+  addText(text: string, options?: textOptions): Promise<ViewObject>;
+  cancel(view?: ViewObject): void;
   cancelAll(): void;
-  layerLower(): void;
-  layerRise(): void;
-  layerTop(): void;
-  layerBottom(): void;
+  layerLower(view?: ViewObject): void;
+  layerRise(view?: ViewObject): void;
+  layerTop(view?: ViewObject): void;
+  layerBottom(view?: ViewObject): void;
   update(): void;
   cancelEvent(): void;
-  unLock(): void;
-  lock(): void;
+  unLock(view?: ViewObject): void;
+  lock(view?: ViewObject): void;
   fallback(): void;
   cancelFallback(): void;
-  /**
-   * 获取当前选中对象
-   */
-  get currentViewObject(): Promise<ViewObject>;
   /**
    * @param {Event} e
    * @description  点击
@@ -211,7 +222,7 @@ export declare class GestiController {
    * @private
    */
   private action;
-  addImage(ximage: XImage | Promise<XImage>): Promise<boolean>;
+  addImage(ximage: XImage | Promise<XImage>): Promise<ViewObject>;
   /**
    * @description 根据传入的image生成一个 @ImageBitmap 实例，拿到图片的宽高数据，创建XImage对象
    * @param image
@@ -231,15 +242,39 @@ export declare class GestiController {
     options?: createImageOptions
   ): Promise<XImage>;
 }
-export declare class Button {}
-export declare class CloseButton extends Button {}
-export declare class DragButton extends Button {}
-export declare class MirrorButton extends Button {}
-export declare class LockButton extends Button {}
-export declare class RotateButton extends Button {}
-export declare class UnLockButton extends Button {}
-export declare class VerticalButton extends Button {}
-export declare class HorizonButton extends Button {}
+export declare abstract class Button {}
+export declare class CloseButton extends Button {
+  new(view: ViewObject): CloseButton;
+  constructor(view: ViewObject);
+}
+export declare class DragButton extends Button {
+  new(view: ViewObject): DragButton;
+  constructor(view: ViewObject);
+}
+export declare class MirrorButton extends Button {
+  new(view: ViewObject): MirrorButton;
+  constructor(view: ViewObject);
+}
+export declare class LockButton extends Button {
+  new(view: ViewObject): LockButton;
+  constructor(view: ViewObject);
+}
+export declare class RotateButton extends Button {
+  new(view: ViewObject): RotateButton;
+  constructor(view: ViewObject);
+}
+export declare class UnLockButton extends Button {
+  new(view: ViewObject): UnLockButton;
+  constructor(view: ViewObject);
+}
+export declare class VerticalButton extends Button {
+  new(view: ViewObject): VerticalButton;
+  constructor(view: ViewObject);
+}
+export declare class HorizonButton extends Button {
+  new(view: ViewObject): HorizonButton;
+  constructor(view: ViewObject);
+}
 export declare const createGesti: (config?: gesticonfig) => Gesti;
 /**
  * Hook 分发
@@ -396,7 +431,9 @@ export declare const createHorizonButton: (view: ViewObject) => Button;
 export declare const createRotateButton: (view: ViewObject) => Button;
 export declare const createLockButton: (view: ViewObject) => Button;
 export declare const createUnlockButton: (view: ViewObject) => Button;
+export declare const createCloseButton: (view: ViewObject) => Button;
 export declare const createVerticalButton: (view: ViewObject) => Button;
+export declare const createMirrorButton: (view: ViewObject) => Button;
 /**
  * @description 给某个可操作对象安装按钮
  * @param view
@@ -421,7 +458,10 @@ export declare const doUpward: (view?: ViewObject, target?: Gesti) => void;
 export declare const doDownward: (view?: ViewObject, target?: Gesti) => void;
 export declare const doLeftward: (view?: ViewObject, target?: Gesti) => void;
 export declare const doRightward: (view?: ViewObject, target?: Gesti) => void;
+export declare const doCancel: (view?: ViewObject, target?: Gesti) => void;
 export declare const doUpdate: (view?: ViewObject, target?: Gesti) => void;
+export declare const doCancelAll: (view?: ViewObject, target?: Gesti) => void;
+export declare const doCancelEvent: (view?: ViewObject, target?: Gesti) => void;
 export declare const doCenter: (
   axis?: CenterAxis,
   view?: ViewObject,
@@ -433,6 +473,22 @@ export declare const doRotate: (
   view?: ViewObject,
   target?: Gesti
 ) => void;
-export declare const currentViewObject:(target?: Gesti) =>ViewObject; 
+export declare const currentViewObject: (target?: Gesti) => ViewObject;
 export declare const useReader: (json: string) => Promise<ViewObject>;
+export declare const driveMove: (
+  e: MouseEvent | Event | EventHandle,
+  target?: Gesti
+) => void;
+export declare const driveDown: (
+  e: MouseEvent | Event | EventHandle,
+  target?: Gesti
+) => void;
+export declare const driveUp: (
+  e: MouseEvent | Event | EventHandle,
+  target?: Gesti
+) => void;
+export declare const driveWheel: (
+  e: MouseEvent | Event | EventHandle,
+  target?: Gesti
+) => void;
 export default Gesti;
