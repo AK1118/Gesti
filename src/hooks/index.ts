@@ -12,6 +12,7 @@ import LockButton from "../buttons/lockbutton";
 import VerticalButton from "../buttons/verticalButton";
 import { gesticonfig } from "../config/gestiConfig";
 import Gesti from "../gesti";
+import { ImageBox } from "../index";
 import GestiReader from "../reader/reader";
 import Vertex from "../vertex";
 import TextBox from "../viewObject/text";
@@ -48,11 +49,14 @@ function injectHook(
   hook: (_args: any) => {},
   target: Gesti = currentInstance,
   prepend: boolean = false
-) {
-  if (!target) return error("Target is empty");
+): (_args: any) => void {
+  if (!target) {
+    error("Target is empty");
+    return;
+  }
   setCurrentInstance(target);
   const controller = getCurrentController();
-  controller.addListener(type, hook, prepend);
+  return controller.addListener(type, hook, prepend);
 }
 
 /**
@@ -80,6 +84,16 @@ const onCancel = createHook("onCancel");
 const onHide = createHook("onHide");
 const onUpdate = createHook("onUpdate");
 const onLoad = createHook("onLoad"); //载入一个可操作对象完毕
+const removeListener = (
+  type: GestiControllerListenerTypes,
+  hook: (_args: any) => any,
+  target: Gesti = currentInstance
+) => {
+  if (!target) return error("Target is empty");
+  setCurrentInstance(target);
+  const controller = getCurrentController();
+  controller.removeListener(type, hook);
+};
 
 const useController = (target: Gesti = currentInstance) => {
   if (!target) return null;
@@ -234,6 +248,7 @@ const useGraffitiLine = createGraffiti("line");
 const useGraffitiWrite = createGraffiti("write");
 const useCloseGraffiti = createGraffiti("none");
 
+
 /**
  * @description 导入json到画布内,该json数据格式必须由 exportAll Hook导出
  * @param json
@@ -379,6 +394,7 @@ const doSomething =
         break;
       default:
     }
+    setTimeout(() => controller.update(), 10);
   };
 
 const doSelect = doSomething("select");
@@ -404,6 +420,9 @@ const doCenter = (
   //不安全的做法
   target.controller.center(axis, view);
 };
+
+
+
 const doRotate = (
   angle: number,
   existing?: boolean,
@@ -458,6 +477,7 @@ const driveMove = drive("move");
 const driveUp = drive("up");
 const driveDown = drive("down");
 const driveWheel = drive("wheel");
+
 export {
   createGesti /**创建Gesti实例 */,
   onSelected /*监听选中Hook */,
@@ -517,4 +537,5 @@ export {
   driveWheel,
   doCancelEvent,
   doCancelAll,
+  removeListener,
 };

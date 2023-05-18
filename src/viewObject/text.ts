@@ -9,7 +9,7 @@ import Rect from "../rect";
  * 文字
  */
 class TextBox extends ViewObject {
-  family: ViewObjectFamily=ViewObjectFamily.text;
+  family: ViewObjectFamily = ViewObjectFamily.text;
   async export(): Promise<Object> {
     const json: toJSONInterface = {
       viewObjType: "text",
@@ -20,7 +20,7 @@ class TextBox extends ViewObject {
           color: this._color,
           spacing: this._spacing,
           fontFamily: this._fontFamily,
-          linesMarks: this.linesMarks,
+          // linesMarks: this.linesMarks,
           lineWidth: this.lineWidth,
           lineColor: this.lineColor,
           lineOffsetY: this.lineOffsetY,
@@ -60,7 +60,7 @@ class TextBox extends ViewObject {
   private currentLineState: 1 | 2 | 3 | 4 | 0 | 5 = 0;
   constructor(text: string, options?: textOptions) {
     super();
-    this._painter=canvasConfig.globalPaint;
+    this._painter = canvasConfig.globalPaint;
     this._options = options;
     this.initPrototypes(text, options);
     this.initColumns();
@@ -90,7 +90,6 @@ class TextBox extends ViewObject {
       fontSize = this.fontsize,
       spacing = this._spacing,
       color = this._color,
-      linesMarks = this.linesMarks,
       lineWidth = this.lineWidth,
       lineColor = this.lineColor,
       lineOffsetY = this.lineOffsetY,
@@ -102,7 +101,6 @@ class TextBox extends ViewObject {
     this.fontsize = fontSize;
     this._spacing = spacing;
     this._color = color;
-    this.linesMarks = linesMarks;
     this.lineWidth = lineWidth;
     this.lineColor = lineColor;
     this.lineOffsetY = lineOffsetY;
@@ -119,22 +117,7 @@ class TextBox extends ViewObject {
         x: 0,
         y: 0,
       });
-    
     this.init();
-    this.initLine();
-  }
-  /**
-   * 初始化划线
-   */
-  private initLine() {
-    //初始化划线标记独热数组，用内存换运行速度
-    this.lineOneHotMark = new Array(this._text.length).fill(0);
-    for (let ndx = 0; ndx < this.lineOneHotMark.length; ndx++) {
-      const markNdx = this.linesMarks.findIndex((mark) => mark == ndx);
-      if (markNdx != -1) {
-        this.lineOneHotMark[ndx] = (markNdx + 1) % 2 == 0 ? 2 : 1;
-      }
-    }
   }
   /**
    * 获取文本长度
@@ -148,7 +131,7 @@ class TextBox extends ViewObject {
     return metrics.width + this._spacing * this._text.length;
   }
   //@Override
-  public drawImage(paint: Painter, isReRendered?: boolean): void {
+  public drawImage(paint: Painter): void {
     /**
      * 只用这个宽就行了，因为初始化时已经做好宽度处理，放大缩小是等比例方法缩小。
      */
@@ -163,6 +146,7 @@ class TextBox extends ViewObject {
     let oldColumn = this.column;
     paint.closePath();
     paint.beginPath();
+    paint.textBaseLine = "bottom";
     paint.fillStyle = this._color;
     //设置字体大小与风格
     paint.font = this.fontsize + "px " + this._fontFamily;
@@ -202,31 +186,22 @@ class TextBox extends ViewObject {
       const drawY =
         (this.column == 0 ? height * 0 : height * (this.column * 2)) -
         (this.rect.size.height >> 1);
-
-      //换行后需要连接起始点不在同意行的线段
-      if (
-        this.currentLineState == 1 &&
-        this.column > oldColumn &&
-        this.lineOneHotMark[ndx - 1] == 4 &&
-        this.lineOneHotMark[ndx] == 0
-      ) {
-        this.lineOneHotMark[ndx] = 3;
-        this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
-        oldColumn = this.column;
-      }
       if (!isAutoColumn) {
         const offsetY = height + (this.fontsize >> 1) - this.fontsize * 0.1;
         const offsetX = (x - text_width) >> 1;
+        paint.moveTo(drawX, drawY + offsetY+this.lineOffsetY);
+        paint.lineTo(drawX + (text_width + this._spacing), drawY + offsetY+this.lineOffsetY);
         paint.fillText(text, drawX + offsetX, drawY + offsetY);
         currentWidth += x;
       }
-      this.drawLine(x, ndx, drawX, drawY, paint, width, height, text_width);
       if (isAutoColumn) {
         ndx += 1;
         paint.stroke();
         continue;
       }
     }
+    paint.strokeStyle=this.lineColor;
+    paint.lineWidth=this.lineWidth;
     paint.stroke();
     paint.closePath();
     this.setData();
@@ -257,7 +232,6 @@ class TextBox extends ViewObject {
       const x = text_width + spacing;
       const rep = / &n/g;
       const isAutoColumn = rep.test(beforeText + text + nextText);
-
       //字数达到宽度后需要换行   或者出发换行字符
       if (currentWidth + x > width || isAutoColumn) {
         this.column += 1;
@@ -276,49 +250,9 @@ class TextBox extends ViewObject {
     this.update(this._painter);
   }
 
-  /**
-   * @description 添加下划线,[start,end,start,end]
-   * 当遍历line的下表为2偶数时，转为 lineTo,奇数转为moveTo
-   * @param wordWidth
-   * @param ndx
-   * @param drawX
-   * @param drawY
-   * @param paint
-   */
-  private drawLine(
-    wordWidth: number,
-    ndx: number,
-    drawX: number,
-    drawY: number,
-    paint: Painter,
-    width: number,
-    height: number,
-    textWidth: number
-  ) {
-    const lineY: number =
-      drawY +
-      this.fontsize * 0.2 +
-      this.lineOffsetY +
-      this.lineHeight +
-      this.fontsize;
-    //使用标记，1是起始点，2是终点
-    const code = this.lineOneHotMark[ndx];
-    const beforeCode = this.lineOneHotMark[ndx - 1];
-    paint.strokeStyle = this.lineColor;
-    paint.lineWidth = this.lineWidth;
-    if (code == 1 || code == 2) this.currentLineState = code as 1 | 2;
-
-    if (code == 1)
-      return paint.moveTo(drawX - (textWidth + this._spacing), lineY);
-    if (code == 2 && beforeCode != 4) return paint.lineTo(drawX, lineY);
-    if (code == 3) return paint.moveTo(drawX, lineY);
-    if (code == 4 && beforeCode != 4 && beforeCode != 1)
-      return paint.lineTo(drawX + (textWidth + this._spacing), lineY);
-  }
-
+  // - (textWidth + this._spacing)
   //@Override
   public didChangeScale(scale: number): void {
-    this.initLine();
     this.setData();
     this.update(this._painter);
   }
@@ -326,15 +260,19 @@ class TextBox extends ViewObject {
   //更新文字内容
   public updateText(text: string, options?: textOptions): Promise<void> {
     return new Promise((r, j) => {
-      //  console.log(text,options)
       this._text = text;
-      this.initLine();
       this.initPrototypes(text, options);
       this.update(this._painter);
+      this.setData();
       r();
     });
   }
 
+  public setDecoration(options: textOptions): void {
+    this.initPrototypes(this._text, options);
+    this.update(this._painter);
+    this.setData();
+  }
   public didFallback(): void {
     this.setData();
   }
@@ -345,9 +283,9 @@ class TextBox extends ViewObject {
     const padding = 10;
     const { size } = this.rect;
     let newHeight = (this.fontsize + this.lineHeight) * (this.column + 1);
-    if (newHeight < size.height) {
-      newHeight = size.height;
-    }
+    // if (newHeight < size.height) {
+    //   newHeight = size.height;
+    // }
     let newWidth = this.rect.size.width;
     if (newWidth >= canvasConfig.rect.size.width)
       newWidth = canvasConfig.rect.size.width;
@@ -359,6 +297,12 @@ class TextBox extends ViewObject {
   }
   get value(): any {
     return this._text;
+  }
+  get fontColor(): string {
+    return this._color;
+  }
+  get fontSize(): number {
+    return this.fontsize;
   }
 }
 

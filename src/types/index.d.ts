@@ -2,6 +2,12 @@ export declare interface gesticonfig {
   auxiliary?: boolean;
   dashedLine?: boolean;
 }
+declare interface RectParams {
+  x?: number;
+  y?: number;
+  width: number;
+  height: number;
+}
 export declare interface textOptions {
   fontFamily?: string;
   fontSize?: number;
@@ -86,17 +92,31 @@ export declare class XImage {
   //背书
   scale: number;
   //矩形位置大小信息
-  toJson(): rectparams;
+  toJson(): RectParams;
 }
+
 export declare class TextBox extends ViewObject {
   new(text: string, options?: textOptions): TextBox;
   constructor(text: string, options?: textOptions);
+  setDecoration(options: textOptions): void;
+  get fontSize(): number;
+  updateText(text: string, options?: textOptions): Promise<void>;
 }
+
 export declare class ImageBox extends ViewObject {
   new(xImage: XImage): ImageBox;
+  setDecoration(xImage:XImage): void;
   constructor(ximage: XImage);
 }
-export declare class WriteViewObj extends ViewObject {}
+
+export declare class WriteViewObj extends ViewObject {
+  setDecoration(decoration: {
+    strokeColor?: string;
+    fillColor?: string;
+    isFill?: boolean;
+    lineWidth?: number;
+  }): void;
+}
 
 export declare type CenterAxis = "vertical" | "horizon";
 
@@ -283,36 +303,41 @@ export declare const onSelected: (
   hook: (_args: any) => any,
   target?: Gesti,
   prepend?: boolean
-) => void;
+) => any;
 export declare const onHover: (
   hook: (_args: any) => any,
   target?: Gesti,
   prepend?: boolean
-) => void;
+) => any;
 export declare const onLeave: (
   hook: (_args: any) => any,
   target?: Gesti,
   prepend?: boolean
-) => void;
+) => any;
 export declare const onCancel: (
   hook: (_args: any) => any,
   target?: Gesti,
   prepend?: boolean
-) => void;
+) => any;
 export declare const onHide: (
   hook: (_args: any) => any,
   target?: Gesti,
   prepend?: boolean
-) => void;
+) => any;
 export declare const onUpdate: (
   hook: (_args: any) => any,
   target?: Gesti,
   prepend?: boolean
-) => void;
+) => any;
 export declare const onLoad: (
   hook: (_args: any) => any,
   target?: Gesti,
   prepend?: boolean
+) => any;
+export declare const removeListener: (
+  type: GestiControllerListenerTypes,
+  hook: (_args: any) => any,
+  target?: Gesti
 ) => void;
 export declare const useController: (
   target?: Gesti

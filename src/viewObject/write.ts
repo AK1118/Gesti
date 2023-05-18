@@ -65,6 +65,16 @@ class WriteViewObj extends ViewObject {
     this._scaley = config.scaleY ?? 1;
     this.config = config;
   }
+  public setDecoration(decoration: {
+    strokeColor?: string;
+    fillColor?: string;
+    isFill?: boolean;
+    lineWidth?: number;
+  }) :void{
+    this.color ??= decoration?.strokeColor;
+    this.isFill ??= decoration?.isFill;
+    this.lineWidth ??= decoration?.lineWidth;
+  }
   //供外部设置数据
   public setParams(config: {
     color?: string;
@@ -81,13 +91,21 @@ class WriteViewObj extends ViewObject {
     this._scalex = config.scaleX ?? 1;
     this._scaley = config.scaleY ?? 1;
     this.config = config;
+    this.custom();
   }
 
   public custom(): void {
     //线条没有填充
     if (this.type == "line") {
-      this.isFill=false;
-    } 
+      this.isFill = false;
+      this.family = ViewObjectFamily.line;
+    } else if (this.type == "rect") {
+      this.family = ViewObjectFamily.rect;
+    } else if (this.type == "circle") {
+      this.family = ViewObjectFamily.circle;
+    } else if (this.type == "write") {
+      this.family = ViewObjectFamily.write;
+    }
   }
   //重写被选中后的样式
   public drawSelected(paint: Painter): void {

@@ -74,11 +74,13 @@
 
 ***在H5端，推荐您直接传入一个canvas即可***
 
+- 带有 ❗ 的方法都不建议使用
+
 ## GestiController
 
 | 方法名      | 返回值类型              |  所属    |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |    :----:   |   :----: |
-| addText    | Promise\<boolean\>|      GestiController     |    text: string, options?: textOptions ) |    新增文字图层到画布内    |
+| ❗addText    | Promise\<boolean\>|      GestiController     |    text: string, options?: textOptions ) |    新增文字图层到画布内    |
 | updateText  | void              |    GestiController  |       (text: string, options?:textOptions )     |      更新被选中的文字图层的文字内容，或者文字属性   |
 | layerLower  | void             |      GestiController     |    -      |    图层向下移动一层    |
 | layerRise  | void             |      GestiController     |     -     |    图层向上移动一层    |
@@ -94,25 +96,26 @@
 | up    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标\|手指抬起事件时调用    |
 | move    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标\|手指移动事件时调用    |
 | wheel    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标滚轮事件时调用    |
-| addListener    | void  |   GestiController |    (listenType:"onSelect"\|"onHide"\|"onCancel",callback:ListenerCallback)     |   监听图层操作，目前支持监听选中、取消选中和隐藏    |
+| addListener    | any  |   GestiController |    (listenType:"onSelect"\|"onHide"\|"onCancel",callback:ListenerCallback)     |   监听图层操作，目前支持监听选中、取消选中和隐藏    |
+| removeListener    | void  |   GestiController |    (listenType:GestiControllerListenerTypes,hook:ListenerCallback)     |   根据addListener返回值，移除监听函数    |
 | rotate    | Promise\<void\>  |   GestiController |    angle: number     |   旋转被选中对象,传入弧度。可传入  角度*Math.PI/180     |
 | upward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向上移动距离 1     |
 | downward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向下移动距离 1     |
 | leftward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向左移动距离 1     |
 | rightward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向右移动距离 1     |
 | update    | void  |   GestiController |    -    |   调用后会重绘canvas,一般在改变数据后画布未刷新时使用     |
-| importAll(试行)    | Promise\<void\>  |   GestiController |    (json: string)   |   以json形式导入对象集合 |
-| exportAll(试行)   | Promise\<void\>  |   GestiController |    -   |   以json形式导出对象集合, 小图片支持base64导出，大型图片会溢base64    |
+| ❗importAll(试行)    | Promise\<void\>  |   GestiController |    (json: string)   |   以json形式导入对象集合 |
+| ❗exportAll(试行)   | Promise\<void\>  |   GestiController |    -   |   以json形式导出对象集合, 小图片支持base64导出，大型图片会溢base64    |
 | center   | void  |   GestiController |   (axis?: "vertical" \| "horizon")   |  垂直居中或者水平居中，不填写参数水平垂直居中    |
-| addImage   | 	Promise\<boolean\>  |   GestiController |   (ximage: XImage \| Promise<XImage>)   |  添加一张图片到画布内    |
-| createImage   | 	Promise\<XImage\>  |   GestiController |   (image: HTMLImageElement \| SVGImageElement \| HTMLVideoElement \| HTMLCanvasElement \| Blob \| ImageData \| ImageBitmap \| OffscreenCanvas, options?: createImageOptions)   |  传入图片数据，返回一个Ximage对象,详细使用方法参考Demo    |
+| ❗addImage   | 	Promise\<boolean\>  |   GestiController |   (ximage: XImage \| Promise<XImage>)   |  添加一张图片到画布内    |
+| ❗createImage   | 	Promise\<XImage\>  |   GestiController |   (image: HTMLImageElement \| SVGImageElement \| HTMLVideoElement \| HTMLCanvasElement \| Blob \| ImageData \| ImageBitmap \| OffscreenCanvas, options?: createImageOptions)   |  传入图片数据，返回一个Ximage对象,详细使用方法参考Demo    |
 | cancelEvent   | void  |   GestiController |   -   |  取消Gesti自带的鼠标手指时间监听。使用该函数后需要自行调用鼠标各个事件，请参考上方  down,up,move  ,使用详情参考Demo    |
 | addWrite   | 	void  |   GestiController |   (options: {type: "circle" \| "write" \| "line" \| "rect" \| "none";lineWidth?: number;color?: string;isFill?: boolean;})   |  添加涂鸦功能，调用该函数且传入options.type不为"none"时，下一次在canvas内滑动会触发生成对应的涂鸦对象,直到再次调用该函数且options.type为"none"时停止    |
 
 
 | 属性名      | 返回值类型         |  所属    |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |    :----:   |   :----: |
-| currentViewObject| Promise\<ViewObject\> | GestiController | - | 获取当前选中对象|
+| currentViewObject| ViewObject | GestiController | - | 获取当前选中对象|
 
 
 ## ViewObject
@@ -129,7 +132,7 @@
 | rect    | Rect |      ViewObject     |    -   |    获取对象的位置，大小，旋转值    |
 
 
-# Hooks
+# Hooks 🚀
 - 对于React和Vue3开发者来说,组合式Api无疑是干净的
 
 ### 创建对象系列
@@ -139,6 +142,7 @@
 |useController | GestiController |    (target?: Gesti)    |  得到一个Gesti实例的控制器    |
 
 ### 监听系列
+
 | Hook      | 返回值类型         |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |   :----: |
 |onSelected  |   -    |    (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    选中对象时回调      |
@@ -148,8 +152,12 @@
 |onHide | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    隐藏可操作对象时      |
 |onUpdate | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    刷新画布时      |
 |onLoad | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    载入新的对象到画布内时      |
+|removeListener | - | (type: GestiControllerListenerTypes,hook: (_args: any) => any, target?: Gesti)    |    根据addListener返回值，移除监听函数    |
+
+
 
 ### 添加预设系列
+
 | Hook      | 返回值类型         |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |   :----: |
 |addVerticalLine | Promise\<ViewObject> |    -     |    新增预设垂直线到画布内      |
@@ -172,12 +180,16 @@
 |createRotateButton | Button | (view: ViewObject)    |    创建一个旋转按钮      |
 |createLockButton | Button | (view: ViewObject)    |    创建一个上锁按钮      |
 |createUnlockButton | Button | (view: ViewObject)    |    创建一个解锁按钮      |
+|createMirrorButton  | Button | (view: ViewObject)    |    创建一个镜像翻转按钮      |
+|createCloseButton  | Button | (view: ViewObject)    |    创建一个关闭按钮      |
 |installButton | - | (view: ViewObject, button: Button \| Array<Button>)    |    安装按钮到ViewObject上      |
 |unInstallButton | - | (view: ViewObject, button: Button \| Array<Button>)   |    卸载ViewObject上的按钮   |
 |loadToGesti | - |    (view: ViewObject, target?: Gesti)    |    以防万一，这个放这里更显眼。加入一个ViewObject对象到画布内,以上的类都是继承于ViewObjet      |
 
 
-### Use系列
+### use系列
+- 涂鸦功能藏于此处
+
 | Hook      | 返回值类型         |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |   :----: |
 |useGraffitiRect | - |    (option?: {...}, target?: Gesti    | 开启涂鸦功能，矩形     |
@@ -187,6 +199,41 @@
 |useCloseGraffiti | - |    (option?: {...}, target?: Gesti    | 关闭涂鸦功能    |
 |useTextHandler | - |    (option?: {...}, target?: Gesti    | 得到一个TextBox实例控制器，用于控制它的参数    |
 |useReader | Promise<ViewObject> |    (json: string)    | 传入特定格式的json，返回一个ViewObject对象    |
+
+
+
+### do系列
+- 需要做一些操作? 交给它们
+
+| Hook      | 返回值类型         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|doSelect | - |    (view?: ViewObject, target?: Gesti)    |  选中传入对象  |
+|doRotate | - |     (angle: number, existing?: boolean, view?: ViewObject, target?: Gesti)    |  旋转一个对象  |
+|doLayerLower | - |    (view?: ViewObject, target?: Gesti)    |  所在图层向下一层  |
+|doLayerRise | - |    (view?: ViewObject, target?: Gesti)    |  所在图层向上一层  |
+|doLayerTop | - |    (view?: ViewObject, target?: Gesti)    |  置于顶层  |
+|doLayerBottom | - |    (view?: ViewObject, target?: Gesti)    |  置于底层  |
+|doLock | - |    (view?: ViewObject, target?: Gesti)    |  锁住对象  |
+|doUnLock | - |    (view?: ViewObject, target?: Gesti)    |  解锁对象  |
+|doUpward | - |    (view?: ViewObject, target?: Gesti)    |  位置微调，上一个单位  |
+|doDownward | - |    (view?: ViewObject, target?: Gesti)    |  位置微调，下一个单位 |
+|doLeftward | - |    (view?: ViewObject, target?: Gesti)    |   位置微调，左一个单位  |
+|doRightward | - |    (view?: ViewObject, target?: Gesti)    |  位置微调，右一个单位  |
+|doCenter | - |   (view?: ViewObject, axis?: CenterAxis, target?: Gesti)    |  居中，可选水平或者垂直，不填就垂直水平居中  |
+|doCancel | - |    (view?: ViewObject, target?: Gesti)    |  取消选中单个/现在被选中的对象  |
+|doCancelAll | - |    -    |  取消所有被选中对象  |
+|doUpdate | - |    -    |  手动刷新画布  |
+|doCancelEvent | - |    -    |  取消原有画布事件代理,调用该方法后需要自定调用drive系列Hook,否则Gesti无法监听到您的手指/鼠标的位置  |
+
+### drive系列
+- 自定义鼠标/手指事件代理
+
+| Hook      | 返回值类型         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|driveMove | - |   (e:Event)    |  鼠标/手指移动时  |
+|driveUp | - |   (e:Event)    |  鼠标/手指抬起时  |
+|driveDown | - |   (e:Event)    |  鼠标/手指放下时  |
+|driveWheel | - |   (e:Event)    |  鼠标滚轮时  |
 
 
 
@@ -202,6 +249,8 @@
 - 详细操作请参考Demo:  https://ext.dcloud.net.cn/plugin?id=10867
 # 可能会遇到的问题
 - 在执行操作方法后可能会出现画布为刷新问题，为您提供了controller.update方法手动刷新。
+- hooks和普通模式有啥区别吗? 个人认为Hooks更适合FP爱好者，普通模式适合OOP爱好者。
+- 图片 | 文字上没有可以直接操作的按钮吗？ 有,不过需要您自己new成按钮对象安装上去。
 - Demo下载地址:  https://ext.dcloud.net.cn/plugin?id=10867 
 
 # 示例

@@ -25,6 +25,9 @@ enum OperationTypeEmum{
 enum ViewObjectFamily{
     image,
     write,
+    line,
+    circle,
+    rect,
     text,
   }
 export {

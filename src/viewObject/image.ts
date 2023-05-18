@@ -5,11 +5,11 @@ import Rect from "../rect";
 import { classIs, fileToBase64, imageHtmltoBase64 } from "../utils/index";
 import XImage from "../ximage";
 class ImageBox extends ViewObject {
-  family: ViewObjectFamily=ViewObjectFamily.image;
+  family: ViewObjectFamily = ViewObjectFamily.image;
   get value(): any {
     return this.image;
   }
- 
+
   private ximage: XImage;
   private image:
     | HTMLOrSVGImageElement
@@ -24,14 +24,23 @@ class ImageBox extends ViewObject {
     this.rect = new Rect(ximage.toJson());
     this.init();
   }
+  setDecoration(xImage: XImage): void {
+    this.ximage = xImage;
+    this.image = xImage.data;
+    const {width,height}=xImage.toJson();
+    const oldPosition:Vector=this.rect.position.copy();
+    this.rect.setPosition(oldPosition);
+    this.rect.setSize(width,height);
+    this.init();
+  }
   //@Override
   public drawImage(paint: Painter): void {
     paint.drawImage(
       this.image,
-      this.rect.position.x,
-      this.rect.position.y,
-      this.rect.size.width,
-      this.rect.size.height
+      ~~this.rect.position.x,
+      ~~this.rect.position.y,
+      ~~this.rect.size.width,
+      ~~this.rect.size.height
     );
   }
   async export(): Promise<Object> {
@@ -43,7 +52,7 @@ class ImageBox extends ViewObject {
     } else if (classIs(this.ximage.originData, "File")) {
       base64 = await fileToBase64(this.ximage.originData);
     }
-    
+
     const json: toJSONInterface = {
       viewObjType: "image",
       options: {
@@ -56,7 +65,7 @@ class ImageBox extends ViewObject {
     return json;
   }
 
-  public didDrag(value: { size: Size; angle: number; }): void {
+  public didDrag(value: { size: Size; angle: number }): void {
     this.resetButtons(["rotate"]);
   }
 }

@@ -26,6 +26,9 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  removeListener(listenType:GestiControllerListenerTypes,hook: (object: any) => void): void {
+      this.kit.removeListener(listenType,hook);
+  }
   load(view: ViewObject): void {
     return this.kit.load(view);
   }
@@ -68,8 +71,8 @@ class GesteControllerImpl implements GestiController {
     listenType: GestiControllerListenerTypes,
     callback: (obj: any) => void,
     prepend?:boolean
-  ): void {
-    this.kit.addListener(listenType, callback);
+  ): any {
+    return this.kit.addListener(listenType, callback,prepend);
   }
 
   updateText(text: string, options?: textOptions): void {

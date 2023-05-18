@@ -97,7 +97,7 @@ declare interface textOptions {
   fontSize?: number;
   spacing?: number;
   color?: string;
-  linesMarks?: Array<number>;
+ // linesMarks?: Array<number>;
   lineWidth?: number;
   lineColor?: string;
   lineOffsetY?: number;

@@ -164,6 +164,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     if (!this.inited) return;
     this.draw(paint);
   }
+  abstract setDecoration(args:any):void;
   public draw(paint: Painter): void {
     paint.beginPath();
     paint.save();

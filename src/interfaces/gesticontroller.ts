@@ -153,7 +153,8 @@ interface ImageToolKitController {
     listenType:GestiControllerListenerTypes,
     callback: ListenerCallback,
     prepend?:boolean,
-  ): void;
+  ): any;
+  removeListener(listenType:GestiControllerListenerTypes,hook:ListenerCallback):void;
   addWrite(options: {
     type: GraffitiType,
     lineWidth?: number,

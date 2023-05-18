@@ -64,10 +64,16 @@ class Listeners {
     } else {
       hooks.push(wrappedHook);
     }
+    return wrappedHook;
   }
   callHooks(hookType: GestiControllerListenerTypes, arg: ViewObject) {
     const hooks = this.hooks[hookType] || [];
     hooks.forEach((hook: ListenerHook) => hook(arg));
+  }
+  removeHook(hookType: GestiControllerListenerTypes, hook: ListenerHook) {
+    const hooks: Array<ListenerHook> = this.hooks[hookType] || [];
+    const ndx: number = hooks.indexOf(hook);
+    hooks.splice(ndx, 1);
   }
 }
 
@@ -113,6 +119,8 @@ class ImageToolkit implements GestiController {
   private writeFactory: WriteFactory;
   //目前Hover的对象
   private hoverViewObject: ViewObject = null;
+  //测试 将canvas快照下来，除了被选中的对象，其他都按按照这个渲染
+  private snapshot:ImageData=null;
   public get getCanvasRect(): Rect {
     return this.canvasRect;
   }
@@ -130,6 +138,7 @@ class ImageToolkit implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+
   load(view: ViewObject): void {
     this.addViewObject(view);
   }
@@ -223,8 +232,14 @@ class ImageToolkit implements GestiController {
     listenType: GestiControllerListenerTypes,
     hook: ListenerHook,
     prepend: boolean = false
+  ): any {
+    return this.listen.addHook(listenType, hook, prepend);
+  }
+  removeListener(
+    listenType: GestiControllerListenerTypes,
+    hook: (object: any) => void
   ): void {
-    this.listen.addHook(listenType, hook, prepend);
+    this.listen.removeHook(listenType, hook);
   }
   /**
    * @description 导出画布内所有对象成json字符串
@@ -260,10 +275,10 @@ class ImageToolkit implements GestiController {
   cancel(view?: ViewObject): void {
     const _view = view || this.selectedViewObject;
     if (_view) {
-      _view?.cancel();
-      this.callHook("onCancel", _view);
       if (_view.key == this.selectedViewObject.key)
         this.selectedViewObject = null;
+      _view?.cancel();
+      this.callHook("onCancel", _view);
     }
     this.update();
   }
@@ -531,7 +546,8 @@ class ImageToolkit implements GestiController {
         selectedViewObject.key != this.selectedViewObject.key
       ) {
         this.selectedViewObject.cancel();
-        this.callHook("onCancel", this.selectedViewObject);
+        //换的时候不需要
+        //   this.callHook("onCancel", this.selectedViewObject);
       }
       this.selectedViewObject = selectedViewObject;
       //选中后变为选中状态
@@ -578,6 +594,7 @@ class ImageToolkit implements GestiController {
   private callHook(type: GestiControllerListenerTypes, arg = null) {
     this.listen.callHooks(type, arg);
   }
+
   private addViewObject(obj: ViewObject): void {
     this.ViewObjectList.push(obj);
     this.callHook("onLoad", obj);

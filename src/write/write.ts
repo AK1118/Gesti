@@ -48,22 +48,21 @@ class Write extends WriteBase {
             this.paint.quadraticCurveTo(prex,prey,cx,cy);
             this.paint.lineWidth =3;//this.lineWidth(this.lastPosition, position);
         }
-        this.paint.lineWidth =3;
         this.paint.strokeStyle=this.config.color;
         this.paint.lineWidth=this.config.lineWidth;
          this.paint.stroke();
         this.paint.closePath();
     }
     //速度越快，线越细
-    lineWidth(v1: Vector, v2: Vector): number {
-        const maxWidth:number=10;
-        const minWidth:number=3;
-        const dt: number = Vector.dist(v1, v2);
-        const speed=dt/maxWidth;
+    // private lineWidth(v1: Vector, v2: Vector): number {
+    //     const maxWidth:number=10;
+    //     const minWidth:number=3;
+    //     const dt: number = Vector.dist(v1, v2);
+    //     const speed=dt/maxWidth;
 
-        const width = (maxWidth-minWidth)*speed+minWidth;
-        return width;
-    }
+    //     const width = (maxWidth-minWidth)*speed+minWidth;
+    //     return width;
+    // }
 }
 
 export default Write;
