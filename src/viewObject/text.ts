@@ -33,6 +33,7 @@ class TextBox extends ViewObject {
     };
     return json;
   }
+  public originFamily: ViewObjectFamily=ViewObjectFamily.text;
   private _text: string = "";
   private fontsize: number = 36;
   private _painter: Painter;

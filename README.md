@@ -118,18 +118,33 @@
 | currentViewObject| ViewObject | GestiController | - | 获取当前选中对象|
 
 
-## ViewObject
+## ViewObject（重要的阅读）
 - 画布内的可操作对象，每一张图片对象或者文字对象或者其他都是它在画布上的映射。
-- 获取它的途径一般来自于controller.currentViewObject , 或者controller.addListener的回调
+- 获取它的途径一般来自于创建对象，它是一个基类，其子类还有TextBox , ImageBox ,WriteViewObj
 
-| 方法名      | 返回值类型              |  所属    |    参数    |   说明   |
-| :---       |    :----:         |  :----:   |    :----:   |   :----: |
-| getBaseInfo    | Object |      ViewObject     |    -   |    获取对象的位置，大小，旋转，镜像，锁定值    |
-| value    | any |      ViewObject     |    -   |    获取对象的值，比如一个文字对象内的文字    |
 
-| 属性名      | 返回值类型         |  所属    |    参数    |   说明   |
-| :---       |    :----:         |  :----:   |    :----:   |   :----: |
-| rect    | Rect |      ViewObject     |    -   |    获取对象的位置，大小，旋转值    |
+| 属性名      |   返回值         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|getBaseInfo | Object |   -    |    获取对象的向量信息      |
+|setName | void |  (name: string)    |    给对象设置名字      |
+|lock | void |  -   |    锁住它，不让他被操作      |
+|unLock | void |  -   |    解锁      |
+|hide  | void |  -   |    隐藏它，不是删除，删除我还没实现      |
+|show  | void |  -   |    显示      |
+|installButton  | void | (button: Button)   |   Gesti内不是没有按钮，是需要自己new过后安装     |
+|unInstallButton  | void | (buttons: Array<Button>)   |   卸载按钮     |
+|setSize  | void | (size: { width?: number; height?: number })   |   设置大小     |
+|setDecoration  | void | (args:any)   |  设置对象装饰，比如颜色，线条高度等，每个子类传入的参数不一     |
+
+| 属性名      |   返回值         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|rect | Rect |   -    |  获取对象大小最为合适    |
+|family | ViewObjectFamily |   -    |  获取对象类型,Gesti内可操作对象有多个家族，用来区分哪个对象是哪类    |
+|name | string |   -    |  有时候对象可以拥有一个名字    |
+|selected | boolean |   -    |  已经被选中了吗    |
+|originFamily | ViewObjectFamily |   -    |  家族起源家族，比如write是起源家族，它下面有line,rect，circle等分支家族    |
+
+
 
 
 # Hooks 🚀
@@ -235,6 +250,17 @@
 |driveDown | - |   (e:Event)    |  鼠标/手指放下时  |
 |driveWheel | - |   (e:Event)    |  鼠标滚轮时  |
 
+
+### 尺寸适配
+- 物理单位转换像素  此处dpi取96   
+- 值得注意:Gesti内没有一个标准的单位，所有的单位都由您决定，比如画布创建设置大小时，图片创建传入时，字体设置大小时。总之，您输入多大，Gesti就为您显示多大（比如输入图片高宽为物理单位一厘米，那么在Gesti内您所看到的图片大小也会是一厘米高宽）
+- 以下提供的方法仅供参考，如需更精准的方案您可以自己实现。
+
+| Hook      | 返回值类型         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|mmToIn       | number          |   (mm:number)    |  毫米转换为英寸  |
+|inToPx       |number            |  (inch:number)    | 英寸转换为像素  |
+|ptToPx       | number             |   (pt:number)    | 英榜转换为像素（一般设置字体时用它）  |
 
 
 

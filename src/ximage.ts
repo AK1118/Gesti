@@ -19,7 +19,7 @@ class XImage {
  */
   constructor(params: createImageOptions) {
     const { data, width, height, scale, originData } = params;
-    if (!data || !width || !height) throw Error("宽或高不能为0");
+    if (!data || !width || !height) throw Error("数据或宽或高不能为空");
     this.originData = originData;
     this.data = data;
     this.width = width;

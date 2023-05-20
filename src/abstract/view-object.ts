@@ -58,6 +58,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public rotateButton: RotateButton;
   public name: string;
   abstract family: ViewObjectFamily;
+  public originFamily:ViewObjectFamily;
   constructor() {
     super();
     //根据配置判断是否设置参考线

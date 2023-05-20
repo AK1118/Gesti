@@ -42,6 +42,9 @@ export declare interface createImageOptions {
 export declare enum ViewObjectFamily {
   image,
   write,
+  line,
+  circle,
+  rect,
   text,
 }
 export declare interface Rect {
@@ -64,7 +67,8 @@ export declare abstract class ViewObject {
   readonly rect: Rect;
   get value(): any;
   readonly family: ViewObjectFamily;
-  name: string;
+  readonly originFamily:ViewObjectFamily;
+  readonly name: string;
   setName(name: string): void;
   //上锁
   lock(): void;
@@ -72,10 +76,14 @@ export declare abstract class ViewObject {
   unLock(): void;
   //隐藏
   hide(): void;
+  //显示
+  show():void;
   //安装按钮
   installButton(button: Button): void;
   //卸载按钮
   unInstallButton(buttons: Array<Button>): void;
+  //设置样式
+  setDecoration(args:any):void;
   setSize(size: { width?: number; height?: number }): void;
   //是否已被选中
   readonly selected: boolean;
@@ -105,14 +113,13 @@ export declare class TextBox extends ViewObject {
 
 export declare class ImageBox extends ViewObject {
   new(xImage: XImage): ImageBox;
-  setDecoration(xImage:XImage): void;
+  setDecoration(xImage: XImage): void;
   constructor(ximage: XImage);
 }
 
 export declare class WriteViewObj extends ViewObject {
   setDecoration(decoration: {
-    strokeColor?: string;
-    fillColor?: string;
+    color?: string;
     isFill?: boolean;
     lineWidth?: number;
   }): void;
@@ -517,3 +524,18 @@ export declare const driveWheel: (
   target?: Gesti
 ) => void;
 export default Gesti;
+
+/**
+ * @description 毫米转换为英寸
+ */
+export declare const mmToIn:(mm:number)=>number;
+
+/**
+ * @description 英寸转换为像素
+ */
+export declare const inToPx:(inch:number)=>number;
+
+/**
+ * @description 榜转换为像素
+ */
+export declare const ptToPx:(pt:number)=>number;

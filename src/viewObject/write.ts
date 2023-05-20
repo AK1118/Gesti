@@ -35,6 +35,7 @@ class WriteViewObj extends ViewObject {
   private _scaley: number = 1;
   private color: string = "";
   private isFill: boolean = false;
+  public originFamily: ViewObjectFamily=ViewObjectFamily.write;
   private type: "circle" | "write" | "line" | "rect" | "none" = "write";
   private config: {
     color?: string;
@@ -66,14 +67,14 @@ class WriteViewObj extends ViewObject {
     this.config = config;
   }
   public setDecoration(decoration: {
-    strokeColor?: string;
-    fillColor?: string;
+    //strokeColor?: string;
+    color?: string;
     isFill?: boolean;
     lineWidth?: number;
   }) :void{
-    this.color ??= decoration?.strokeColor;
-    this.isFill ??= decoration?.isFill;
-    this.lineWidth ??= decoration?.lineWidth;
+    this.color = decoration?.color;
+    this.isFill = decoration?.isFill;
+    this.lineWidth = decoration?.lineWidth;
   }
   //供外部设置数据
   public setParams(config: {

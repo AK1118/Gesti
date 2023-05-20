@@ -17,6 +17,7 @@ class ImageBox extends ViewObject {
     | HTMLCanvasElement
     | ImageBitmap
     | OffscreenCanvas;
+  public originFamily: ViewObjectFamily=ViewObjectFamily.image;
   constructor(ximage: XImage) {
     super();
     this.ximage = ximage;
@@ -31,16 +32,17 @@ class ImageBox extends ViewObject {
     const oldPosition:Vector=this.rect.position.copy();
     this.rect.setPosition(oldPosition);
     this.rect.setSize(width,height);
+    
     this.init();
   }
   //@Override
   public drawImage(paint: Painter): void {
     paint.drawImage(
       this.image,
-      ~~this.rect.position.x,
-      ~~this.rect.position.y,
-      ~~this.rect.size.width,
-      ~~this.rect.size.height
+      this.rect.position.x>>0,
+      this.rect.position.y>>0,
+      this.rect.size.width>>0,
+      this.rect.size.height>>0
     );
   }
   async export(): Promise<Object> {
