@@ -158,45 +158,57 @@ export {
 };
 export default Gesti;
 
-const canvas: HTMLCanvasElement = document.querySelector("canvas");
-const gesti = createGesti({
-  dashedLine: true,
-});
-const img: HTMLImageElement = document.querySelector("#dog");
-canvas.width = 400;
-canvas.height =  600;
-gesti.init(canvas);
-// gesti.addImage(gesti.createImage(img,{
-//     scale:.1,
-// }))
-
-const controller = useController();
-
-// controller.addImage(controller.createImage(img,{
-//     scale:.5,
-//     width:90,
-//     height:90,
-// }))
-// onLoad((res) => {
-//   doUpdate();
+// const canvas: HTMLCanvasElement = document.querySelector("canvas");
+// const gesti = createGesti({
+//   dashedLine: true,
 // });
-const ximage = createXImage({
-  data: img,
-  width:img.width,
-  height:img.height,
-  scale: .2,
-});
-const imageBox = createImageBox(ximage);
-doCenter(null, imageBox);
-loadToGesti(imageBox);
+// const img: HTMLImageElement = document.querySelector("#dog");
+// canvas.width = 400;
+// canvas.height =  600;
+// gesti.init(canvas);
+// // gesti.addImage(gesti.createImage(img,{
+// //     scale:.1,
+// // }))
 
-addHorizonLine().then((res:WriteViewObj)=>{
-  res.setDecoration({
-    lineWidth:1,
-    color:"red",
-  })
-  loadToGesti(res);
-})
+// const controller = useController();
 
-doUpdate()
+// // controller.addImage(controller.createImage(img,{
+// //     scale:.5,
+// //     width:90,
+// //     height:90,
+// // }))
+// // onLoad((res) => {
+// //   doUpdate();
+// // });
+// const ximage = createXImage({
+//   data: img,
+//   width:img.width,
+//   height:img.height,
+//   scale: .2,
+// });
+// const imageBox = createImageBox(ximage);
+// doCenter(null, imageBox);
+// loadToGesti(imageBox);
 
+// addHorizonLine().then((res:WriteViewObj)=>{
+//   res.setDecoration({
+//     lineWidth:1,
+//     color:"red",
+//   })
+//   loadToGesti(res);
+// })
+
+
+// const text=createTextBox("卧槽111111",{
+//   line:true,
+//   lineWidth:1,
+// });
+
+// setInterval(()=>{
+//   text.updateText(text.value+Math.random());
+// },2000);
+
+// loadToGesti(text);
+
+
+// doUpdate()

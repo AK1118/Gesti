@@ -21,10 +21,12 @@ class TextBox extends ViewObject {
           spacing: this._spacing,
           fontFamily: this._fontFamily,
           // linesMarks: this.linesMarks,
+          line: this._line,
           lineWidth: this.lineWidth,
           lineColor: this.lineColor,
           lineOffsetY: this.lineOffsetY,
           lineHeight: this.lineHeight,
+
           width: this.width,
           height: this.height,
         },
@@ -33,13 +35,14 @@ class TextBox extends ViewObject {
     };
     return json;
   }
-  public originFamily: ViewObjectFamily=ViewObjectFamily.text;
+  public originFamily: ViewObjectFamily = ViewObjectFamily.text;
   private _text: string = "";
   private fontsize: number = 36;
   private _painter: Painter;
   private _fontFamily = "微软雅黑";
   private _spacing: number = 0;
   private _spacing_scale: number = 0;
+  private _line: boolean = false;
   private _color: string = "black";
   //划线从 奇数画到偶数，所以一般成对出现
   private linesMarks: Array<number> = [];
@@ -95,6 +98,7 @@ class TextBox extends ViewObject {
       lineColor = this.lineColor,
       lineOffsetY = this.lineOffsetY,
       lineHeight = this.lineHeight,
+      line = this._line,
       height,
       width,
     } = options ?? {};
@@ -102,6 +106,7 @@ class TextBox extends ViewObject {
     this.fontsize = fontSize;
     this._spacing = spacing;
     this._color = color;
+    this._line = line;
     this.lineWidth = lineWidth;
     this.lineColor = lineColor;
     this.lineOffsetY = lineOffsetY;
@@ -190,8 +195,13 @@ class TextBox extends ViewObject {
       if (!isAutoColumn) {
         const offsetY = height + (this.fontsize >> 1) - this.fontsize * 0.1;
         const offsetX = (x - text_width) >> 1;
-        paint.moveTo(drawX, drawY + offsetY+this.lineOffsetY);
-        paint.lineTo(drawX + (text_width + this._spacing), drawY + offsetY+this.lineOffsetY);
+        if (this._line) {
+          paint.moveTo(drawX, drawY + offsetY + this.lineOffsetY);
+          paint.lineTo(
+            drawX + (text_width + this._spacing),
+            drawY + offsetY + this.lineOffsetY
+          );
+        }
         paint.fillText(text, drawX + offsetX, drawY + offsetY);
         currentWidth += x;
       }
@@ -201,8 +211,8 @@ class TextBox extends ViewObject {
         continue;
       }
     }
-    paint.strokeStyle=this.lineColor;
-    paint.lineWidth=this.lineWidth;
+    paint.strokeStyle = this.lineColor;
+    paint.lineWidth = this.lineWidth;
     paint.stroke();
     paint.closePath();
     this.setData();

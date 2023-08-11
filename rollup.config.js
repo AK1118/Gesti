@@ -1,5 +1,7 @@
 
 const typescript=require("@rollup/plugin-typescript");
+const terser=require("@rollup/plugin-terser");
+const cleanup=require("rollup-plugin-cleanup")
 module.exports={
     input:"./src/index.ts",
     output:[
@@ -16,5 +18,7 @@ module.exports={
     ],
     plugins:[
         typescript(),
+        terser(),
+        cleanup(),
     ]
 }
