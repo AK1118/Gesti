@@ -165,3 +165,82 @@ export {
 export default Gesti;
 
 
+// const canvas: HTMLCanvasElement = document.querySelector("canvas");
+
+// const img: HTMLImageElement = document.querySelector("#dog");
+// canvas.width = 400;
+// canvas.height =  600;
+// const gesti = createGesti({
+//   dashedLine: true,
+// });
+// gesti.init(canvas);
+// // gesti.addImage(gesti.createImage(img,{
+// //     scale:.1,
+// // }))
+
+// const controller = useController();
+
+// // controller.addImage(controller.createImage(img,{
+// //     scale:.5,
+// //     width:90,
+// //     height:90,
+// // }))
+// // onLoad((res) => {
+// //   doUpdate();
+// // });
+// const ximage = createXImage({
+//   data: img,
+//   width:img.width,
+//   height:img.height,
+//   scale: .2,
+// });
+// const imageBox = createImageBox(ximage);
+// doCenter(null, imageBox);
+// loadToGesti(imageBox);
+
+// addHorizonLine().then((res:WriteViewObj)=>{
+//   res.setDecoration({
+//     lineWidth:1,
+//     color:"red",
+//   })
+//   loadToGesti(res);
+// })
+
+
+// const text=createTextBox("新建文本文档",{
+//   line:true,
+//   lineWidth:1,
+//    maxFontSize:20,
+//   resetFontSizeWithRect:true,
+// });
+// text.installButton(createDragButton(text));
+// // setInterval(()=>{
+// //   text.updateText(text.value+Math.random());
+// // },2000);
+
+// loadToGesti(text);
+
+// onDestroy(()=>{
+//   console.log("销毁")
+// });
+// onBeforeDestroy(()=>{
+//   console.log("销毁前");
+// })
+// setTimeout(()=>{
+//   doDestroyGesti();
+//   console.log(gesti);
+//   const gesti1 = createGesti({
+//     dashedLine: true,
+//   });
+//   gesti1.init(canvas);
+//   const ximage = createXImage({
+//     data: img,
+//     width:img.width,
+//     height:img.height,
+//     scale: .2,
+//   });
+//   const imageBox = createImageBox(ximage);
+//   doCenter(null, imageBox);
+//   loadToGesti(imageBox);
+// },3000)
+
