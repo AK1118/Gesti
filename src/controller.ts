@@ -26,6 +26,9 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  destroyGesti(): void {
+    this.kit.destroyGesti();
+  }
   removeListener(listenType:GestiControllerListenerTypes,hook: (object: any) => void): void {
       this.kit.removeListener(listenType,hook);
   }

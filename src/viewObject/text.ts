@@ -61,7 +61,13 @@ class TextBox extends ViewObject {
   private height: number = 0;
   private width: number = 0;
   //划线状态，1是从起点开始中 2是已经画完上一个线段了，等待下一次
+
   private currentLineState: 1 | 2 | 3 | 4 | 0 | 5 = 0;
+  //随着选框的变化而改变字体大小
+  private resetFontSizeWithRect: boolean = false;
+  //字体大小最大值
+  private maxFontSize:number=9999;
+
   constructor(text: string, options?: textOptions) {
     super();
     this._painter = canvasConfig.globalPaint;
@@ -101,7 +107,10 @@ class TextBox extends ViewObject {
       line = this._line,
       height,
       width,
+      maxFontSize,
+      resetFontSizeWithRect,
     } = options ?? {};
+
     this._fontFamily = fontFamily;
     this.fontsize = fontSize;
     this._spacing = spacing;
@@ -113,6 +122,10 @@ class TextBox extends ViewObject {
     this.lineHeight = lineHeight;
     this.width = width;
     this.height = height;
+    this.resetFontSizeWithRect=resetFontSizeWithRect;
+    this.maxFontSize=maxFontSize??this.maxFontSize;
+    //限制字体大小
+    this.fontsize=Math.min(this.maxFontSize===9999?fontSize:this.maxFontSize,fontSize);
     //计算出行距与字体大小的比例
     this._spacing_scale = this.fontsize / this._spacing;
     this._painter.font = this.fontsize + "px " + this._fontFamily;
@@ -291,19 +304,26 @@ class TextBox extends ViewObject {
    * @description 宽不随文字变化，但文字随宽变化,高度随字体变化
    */
   private async setData() {
-    const padding = 10;
-    const { size } = this.rect;
-    let newHeight = (this.fontsize + this.lineHeight) * (this.column + 1);
-    // if (newHeight < size.height) {
-    //   newHeight = size.height;
-    // }
-    let newWidth = this.rect.size.width;
-    if (newWidth >= canvasConfig.rect.size.width)
-      newWidth = canvasConfig.rect.size.width;
-    this.rect.setSize(newWidth, newHeight);
-    this.resetButtons(["rotate"]);
-    if (size.width <= this.fontsize + this._spacing)
-      this.rect.setSize(this.fontsize + this._spacing, newHeight);
+    //随着选框的变化改变字体大小
+    if (this.resetFontSizeWithRect) {
+      this.fontsize =Math.min( this.rect.size.height,this.maxFontSize);
+    } else {
+      //静态文本大小，文字会被选框束缚
+      const padding = 10;
+      const { size } = this.rect;
+      let newHeight = (this.fontsize + this.lineHeight) * (this.column + 1);
+      // if (newHeight < size.height) {
+      //   newHeight = size.height;
+      // }
+      let newWidth = this.rect.size.width;
+      if (newWidth >= canvasConfig.rect.size.width)
+        newWidth = canvasConfig.rect.size.width;
+      this.rect.setSize(newWidth, newHeight);
+      this.resetButtons(["rotate"]);
+      if (size.width <= this.fontsize + this._spacing)
+        this.rect.setSize(this.fontsize + this._spacing, newHeight);
+    }
+
     return Promise.resolve();
   }
   get value(): any {

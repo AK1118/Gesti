@@ -138,6 +138,18 @@ class ImageToolkit implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  destroyGesti(): void {
+    this.callHook("onBeforeDestroy");
+    this.ViewObjectList=[];
+    this.eventHandler=null;
+    this.tool=null;
+    new Promise((v,r)=>{
+      this.callHook("onDestroy");
+    }).then(e=>{
+      this.listen=null;
+    })
+    //监听器最后销毁，因为要执行回调
+  }
 
   load(view: ViewObject): void {
     this.addViewObject(view);

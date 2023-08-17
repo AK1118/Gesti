@@ -170,6 +170,11 @@ interface ImageToolKitController {
    * @param json 
    */
   importAll(json:string):Promise<void>;
+
+  /**
+   * @description 销毁Gesti对象
+   */
+  destroyGesti():void;
 }
 /**
  * 控制器类，提供接口供给用户使用

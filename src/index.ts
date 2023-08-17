@@ -71,6 +71,9 @@ import {
   doCancelEvent,
   doCancelAll,
   removeListener,
+  onDestroy,
+  onBeforeDestroy,
+  doDestroyGesti,
 } from "./hooks/index";
 import { inToPx, mmToIn, ptToPx } from "./utils";
 import ImageBox from "./viewObject/image";
@@ -101,6 +104,9 @@ export {
   onCancel /*取消选中时 */,
   onHide /*隐藏可操作对象时 */,
   onUpdate /*刷新画布时 */,
+  onDestroy,/*销毁实例回调 */
+  onBeforeDestroy,/*销毁实例前回调 */
+  doDestroyGesti,/*销毁实例 */
   onLoad /**载入新的对象到画布内时 */,
   addVerticalLine /**新增预设垂直线到画布内 */,
   addHorizonLine /**新增预设水平线到画布内 */,
@@ -158,57 +164,4 @@ export {
 };
 export default Gesti;
 
-// const canvas: HTMLCanvasElement = document.querySelector("canvas");
-// const gesti = createGesti({
-//   dashedLine: true,
-// });
-// const img: HTMLImageElement = document.querySelector("#dog");
-// canvas.width = 400;
-// canvas.height =  600;
-// gesti.init(canvas);
-// // gesti.addImage(gesti.createImage(img,{
-// //     scale:.1,
-// // }))
 
-// const controller = useController();
-
-// // controller.addImage(controller.createImage(img,{
-// //     scale:.5,
-// //     width:90,
-// //     height:90,
-// // }))
-// // onLoad((res) => {
-// //   doUpdate();
-// // });
-// const ximage = createXImage({
-//   data: img,
-//   width:img.width,
-//   height:img.height,
-//   scale: .2,
-// });
-// const imageBox = createImageBox(ximage);
-// doCenter(null, imageBox);
-// loadToGesti(imageBox);
-
-// addHorizonLine().then((res:WriteViewObj)=>{
-//   res.setDecoration({
-//     lineWidth:1,
-//     color:"red",
-//   })
-//   loadToGesti(res);
-// })
-
-
-// const text=createTextBox("卧槽111111",{
-//   line:true,
-//   lineWidth:1,
-// });
-
-// setInterval(()=>{
-//   text.updateText(text.value+Math.random());
-// },2000);
-
-// loadToGesti(text);
-
-
-// doUpdate()

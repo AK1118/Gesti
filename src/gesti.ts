@@ -15,9 +15,11 @@ class Gesti {
   constructor(config?: gesticonfig) {
     Gesti.config = new GestiConfig(config);
   }
+  private _controller:GestiController;
   get controller(): GestiController {
-    return new GesteControllerImpl(this.kit);
+    return this._controller||(this._controller=new GesteControllerImpl(this.kit));
   }
+
   set debug(value: boolean) {
     this.kit.isDebug = true;
   }
@@ -60,6 +62,12 @@ class Gesti {
   public setConfig(config?: gesticonfig):void{
     Gesti.config.setParams(config);
     this.kit.update();
+  }
+  public destroy():void{
+    this.controller.destroyGesti();
+    this._controller=null;
+    this.kit=null;
+
   }
   static Family=ViewObjectFamily;
 }

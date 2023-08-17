@@ -119,8 +119,8 @@ class Painter implements Painter {
   getImageData(x: number, y: number, w: number, h: number) {
     return this.paint.getImageData(x, y, w, h);
   }
-  fillText(text: string, x: number, y: number, maxWidth?: number) {
-    this.paint.fillText(text, x, y, maxWidth);
+  fillText(text: string, x: number, y: number) {
+    this.paint.fillText(text, x, y);
   }
   strokeText(text: string, x: number, y: number, maxWidth?: number) {
     this.paint.strokeText(text, x, y, maxWidth);

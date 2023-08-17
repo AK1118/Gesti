@@ -84,6 +84,9 @@ const onCancel = createHook("onCancel");
 const onHide = createHook("onHide");
 const onUpdate = createHook("onUpdate");
 const onLoad = createHook("onLoad"); //载入一个可操作对象完毕
+const onDestroy = createHook("onDestroy");
+const onBeforeDestroy = createHook("onBeforeDestroy");
+
 const removeListener = (
   type: GestiControllerListenerTypes,
   hook: (_args: any) => any,
@@ -248,7 +251,6 @@ const useGraffitiLine = createGraffiti("line");
 const useGraffitiWrite = createGraffiti("write");
 const useCloseGraffiti = createGraffiti("none");
 
-
 /**
  * @description 导入json到画布内,该json数据格式必须由 exportAll Hook导出
  * @param json
@@ -338,6 +340,7 @@ const doSomething =
       | "cancel"
       | "cancelEvent"
       | "cancelAll"
+      | "destroyGesti"
   ) =>
   (view?: ViewObject, target: Gesti = currentInstance) => {
     if (!target) {
@@ -392,6 +395,10 @@ const doSomething =
       case "cancelAll":
         controller.cancelAll();
         break;
+      case "destroyGesti": {
+        currentInstance.destroy();
+        setCurrentInstance(null);
+      }
       default:
     }
     setTimeout(() => controller.update(), 10);
@@ -412,6 +419,7 @@ const doUpdate = doSomething("update");
 const doCancel = doSomething("cancel");
 const doCancelAll = doSomething("cancelAll");
 const doCancelEvent = doSomething("cancelEvent");
+const doDestroyGesti = doSomething("destroyGesti");
 const doCenter = (
   axis?: CenterAxis,
   view?: ViewObject,
@@ -420,8 +428,6 @@ const doCenter = (
   //不安全的做法
   target.controller.center(axis, view);
 };
-
-
 
 const doRotate = (
   angle: number,
@@ -478,6 +484,11 @@ const driveUp = drive("up");
 const driveDown = drive("down");
 const driveWheel = drive("wheel");
 
+// //销毁gesti实例
+// const destroy=()=>{
+//   setCurrentInstance(null);
+// }
+
 export {
   createGesti /**创建Gesti实例 */,
   onSelected /*监听选中Hook */,
@@ -487,6 +498,8 @@ export {
   onCancel /*取消选中时 */,
   onHide /*隐藏可操作对象时 */,
   onUpdate /*刷新画布时 */,
+  onDestroy /*销毁Gesti实例后调用 */,
+  onBeforeDestroy /*销毁Gesti实例前调用 */,
   onLoad /**载入新的对象到画布内时 */,
   addVerticalLine /**新增预设垂直线到画布内 */,
   addHorizonLine /**新增预设水平线到画布内 */,
@@ -528,6 +541,7 @@ export {
   doRightward,
   doCenter,
   doUpdate,
+  doDestroyGesti,
   useReader,
   currentViewObject,
   doCancel,
