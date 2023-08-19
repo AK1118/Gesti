@@ -70,5 +70,9 @@ class ImageBox extends ViewObject {
   public didDrag(value: { size: Size; angle: number }): void {
     this.resetButtons(["rotate"]);
   }
+
+  public getXImage():XImage{
+    return this.ximage;
+  }
 }
 export default ImageBox;

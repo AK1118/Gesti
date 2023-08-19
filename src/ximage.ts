@@ -7,6 +7,11 @@ class XImage {
   y: number = 0;
   scale: number = 1;
   /**
+   * 原始数据大小
+   */
+  fixedWidth:number;
+  fixedHeight:number;
+  /**
  *   interface createImageOptions {
         data?: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions,
         width?: number,
@@ -25,8 +30,12 @@ class XImage {
     this.width = width;
     this.height = height;
     this.scale = scale || 1;
+    this.fixedWidth=width;
+    this.fixedHeight=height;
     this.width *= this.scale;
     this.height *= this.scale;
+    this.width=~~this.width;
+    this.height=~~this.height;
   }
   toJson(): rectparams {
     return {

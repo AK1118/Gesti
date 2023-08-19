@@ -120,7 +120,10 @@ class ImageToolkit implements GestiController {
   //目前Hover的对象
   private hoverViewObject: ViewObject = null;
   //测试 将canvas快照下来，除了被选中的对象，其他都按按照这个渲染
-  private snapshot:ImageData=null;
+  private snapshot: ImageData = null;
+  //休眠,休眠时不能有任何操作
+  private sleep: boolean = true;
+
   public get getCanvasRect(): Rect {
     return this.canvasRect;
   }
@@ -140,14 +143,14 @@ class ImageToolkit implements GestiController {
   }
   destroyGesti(): void {
     this.callHook("onBeforeDestroy");
-    this.ViewObjectList=[];
-    this.eventHandler=null;
-    this.tool=null;
-    new Promise((v,r)=>{
+    this.ViewObjectList = [];
+    this.eventHandler = null;
+    this.tool = null;
+    new Promise((v, r) => {
       this.callHook("onDestroy");
-    }).then(e=>{
-      this.listen=null;
-    })
+    }).then((e) => {
+      this.listen = null;
+    });
     //监听器最后销毁，因为要执行回调
   }
 
@@ -417,12 +420,19 @@ class ImageToolkit implements GestiController {
       // }
     });
   }
+  //唤醒,可以继续操作
+  public wakeUp():void{
+      this.sleep=false;
+      this.update();
+  }
   public cancelEvent(): void {
     if (this.eventHandler == null) return;
     this.eventHandler.disable();
   }
   public onDown(v: GestiEventParams): void {
     this.debug(["Event Down,", v]);
+    //休眠不执行任何操作
+    if (this.sleep) return;
     this.eventHandlerState = EventHandlerState.down;
     const event: Vector | Vector[] = this.correctEventPosition(v);
 
@@ -465,6 +475,8 @@ class ImageToolkit implements GestiController {
   }
   public onMove(v: GestiEventParams): void {
     this.debug(["Event Move,", v]);
+    //休眠不执行任何操作
+    if (this.sleep) return;
     if (this.eventHandlerState === EventHandlerState.down) {
       const event: Vector | Vector[] = this.correctEventPosition(v);
 
@@ -506,6 +518,8 @@ class ImageToolkit implements GestiController {
   }
   public onUp(v: GestiEventParams): void {
     this.debug(["Event Up,", v]);
+    //休眠不执行任何操作
+    if (this.sleep) return;
     const event: Vector | Vector[] = this.correctEventPosition(v);
     //判断是否选中对象
     this.clickViewObject(event);
@@ -613,6 +627,8 @@ class ImageToolkit implements GestiController {
     this.update();
   }
   public update() {
+    //休眠不执行任何操作
+    if (this.sleep) return;
     /**
      * 在使用绘制对象时，根据值来判断是否禁止重绘
      */
@@ -662,8 +678,6 @@ class ImageToolkit implements GestiController {
     this.debug("Add a Ximage");
     if (ximage.constructor.name != "XImage") throw Error("不是XImage类");
     const image: XImage = ximage;
-    // image.width *= image.scale;
-    // image.height *= image.scale;
     const imageBox: ImageBox = new ImageBox(image);
     imageBox.center(this.canvasRect.size);
     this.addViewObject(imageBox);

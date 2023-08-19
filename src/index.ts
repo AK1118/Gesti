@@ -75,7 +75,11 @@ import {
   onBeforeDestroy,
   doDestroyGesti,
 } from "./hooks/index";
+import Painter from "./painter";
+import { ImageChunk } from "./types/index";
 import { inToPx, mmToIn, ptToPx } from "./utils";
+import Cutter from "./utils/cutter";
+import ImageChunkConverter from "./utils/image-chunk-converter";
 import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
 import WriteViewObj from "./viewObject/write";
@@ -174,20 +178,9 @@ const gesti = createGesti({
   dashedLine: true,
 });
 gesti.init(canvas);
-// gesti.addImage(gesti.createImage(img,{
-//     scale:.1,
-// }))
-
+const painter:Painter=new Painter(canvas.getContext("2d"));
 const controller = useController();
 
-// controller.addImage(controller.createImage(img,{
-//     scale:.5,
-//     width:90,
-//     height:90,
-// }))
-// onLoad((res) => {
-//   doUpdate();
-// });
 const ximage = createXImage({
   data: img,
   width:img.width,
@@ -204,63 +197,20 @@ installButton(imageBox,[
   createDragButton(imageBox),
 ]);
 doCenter(null, imageBox);
-loadToGesti(imageBox);
-setTimeout(()=>{
-  const ximage2=new XImage({
-    data: img,
-    width:img.width,
-    height:img.height,
-    scale: .3,
-  });
-  imageBox.setDecoration(ximage2);
-  doUpdate()
-},3000);
-
-addHorizonLine().then((res:WriteViewObj)=>{
-  res.setDecoration({
-    lineWidth:1,
-    color:"red",
-  })
-  loadToGesti(res);
-})
+// loadToGesti(imageBox);
 
 
-const text=createTextBox("新建文本文档",{
-  line:true,
-  lineWidth:1,
-   maxFontSize:20,
-  resetFontSizeWithRect:true,
+doUpdate();
+
+const cutter=new Cutter(painter);
+const coverter=new ImageChunkConverter();
+const chunks= cutter.getChunks(ximage.width,ximage.height,100,ximage);
+console.log(chunks)
+const coverterd=coverter.coverAllImageChunkToBase64(chunks);
+console.log(coverter.coverAllImageChunkBase64ToChunk((coverterd)));
+
+
+coverter.coverAllImageChunkBase64ToChunk((coverterd)).forEach((item:ImageChunk)=>{
+  console.log(item);
+  painter.putImageData(item.imageData,item.x,item.y);
 });
-text.installButton(createDragButton(text));
-text.installButton(createUnlockButton(text));
-doLock(text);
-// setInterval(()=>{
-//   text.updateText(text.value+Math.random());
-// },2000);
-
-loadToGesti(text);
-
-// onDestroy(()=>{
-//   console.log("销毁")
-// });
-// onBeforeDestroy(()=>{
-//   console.log("销毁前");
-// })
-// setTimeout(()=>{
-//   doDestroyGesti();
-//   console.log(gesti);
-//   const gesti1 = createGesti({
-//     dashedLine: true,
-//   });
-//   gesti1.init(canvas);
-//   const ximage = createXImage({
-//     data: img,
-//     width:img.width,
-//     height:img.height,
-//     scale: .2,
-//   });
-//   const imageBox = createImageBox(ximage);
-//   doCenter(null, imageBox);
-//   loadToGesti(imageBox);
-// },3000)
-

@@ -61,13 +61,20 @@ export declare interface Rect {
   copy(key?: string): Rect;
 }
 export declare class ImageToolkit {}
-
+export declare interface ImageChunk {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  imageData: ImageData;
+  base64:string,
+}
 export declare abstract class ViewObject {
   getBaseInfo(): Object;
   readonly rect: Rect;
   get value(): any;
   readonly family: ViewObjectFamily;
-  readonly originFamily:ViewObjectFamily;
+  readonly originFamily: ViewObjectFamily;
   readonly name: string;
   setName(name: string): void;
   //上锁
@@ -77,13 +84,13 @@ export declare abstract class ViewObject {
   //隐藏
   hide(): void;
   //显示
-  show():void;
+  show(): void;
   //安装按钮
   installButton(button: Button): void;
   //卸载按钮
   unInstallButton(buttons: Array<Button>): void;
   //设置样式
-  setDecoration(args:any):void;
+  setDecoration(args: any): void;
   setSize(size: { width?: number; height?: number }): void;
   //是否已被选中
   readonly selected: boolean;
@@ -528,14 +535,14 @@ export default Gesti;
 /**
  * @description 毫米转换为英寸
  */
-export declare const mmToIn:(mm:number)=>number;
+export declare const mmToIn: (mm: number) => number;
 
 /**
  * @description 英寸转换为像素
  */
-export declare const inToPx:(inch:number)=>number;
+export declare const inToPx: (inch: number) => number;
 
 /**
  * @description 榜转换为像素
  */
-export declare const ptToPx:(pt:number)=>number;
+export declare const ptToPx: (pt: number) => number;
