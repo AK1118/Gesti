@@ -165,60 +165,80 @@ export {
 export default Gesti;
 
 
-// const canvas: HTMLCanvasElement = document.querySelector("canvas");
+const canvas: HTMLCanvasElement = document.querySelector("canvas");
 
-// const img: HTMLImageElement = document.querySelector("#dog");
-// canvas.width = 400;
-// canvas.height =  600;
-// const gesti = createGesti({
-//   dashedLine: true,
+const img: HTMLImageElement = document.querySelector("#dog");
+canvas.width = 400;
+canvas.height =  600;
+const gesti = createGesti({
+  dashedLine: true,
+});
+gesti.init(canvas);
+// gesti.addImage(gesti.createImage(img,{
+//     scale:.1,
+// }))
+
+const controller = useController();
+
+// controller.addImage(controller.createImage(img,{
+//     scale:.5,
+//     width:90,
+//     height:90,
+// }))
+// onLoad((res) => {
+//   doUpdate();
 // });
-// gesti.init(canvas);
-// // gesti.addImage(gesti.createImage(img,{
-// //     scale:.1,
-// // }))
+const ximage = createXImage({
+  data: img,
+  width:img.width,
+  height:img.height,
+  scale: .2,
+});
 
-// const controller = useController();
+const imageBox = createImageBox(ximage);
+const lockButton=new LockButton(imageBox);
+const unLockButton=new UnLockButton(imageBox);
+installButton(imageBox,[
+  lockButton,
+  unLockButton,
+  createDragButton(imageBox),
+]);
+doCenter(null, imageBox);
+loadToGesti(imageBox);
+setTimeout(()=>{
+  const ximage2=new XImage({
+    data: img,
+    width:img.width,
+    height:img.height,
+    scale: .3,
+  });
+  imageBox.setDecoration(ximage2);
+  doUpdate()
+},3000);
 
-// // controller.addImage(controller.createImage(img,{
-// //     scale:.5,
-// //     width:90,
-// //     height:90,
-// // }))
-// // onLoad((res) => {
-// //   doUpdate();
-// // });
-// const ximage = createXImage({
-//   data: img,
-//   width:img.width,
-//   height:img.height,
-//   scale: .2,
-// });
-// const imageBox = createImageBox(ximage);
-// doCenter(null, imageBox);
-// loadToGesti(imageBox);
-
-// addHorizonLine().then((res:WriteViewObj)=>{
-//   res.setDecoration({
-//     lineWidth:1,
-//     color:"red",
-//   })
-//   loadToGesti(res);
-// })
+addHorizonLine().then((res:WriteViewObj)=>{
+  res.setDecoration({
+    lineWidth:1,
+    color:"red",
+  })
+  loadToGesti(res);
+})
 
 
-// const text=createTextBox("新建文本文档",{
-//   line:true,
-//   lineWidth:1,
-//    maxFontSize:20,
-//   resetFontSizeWithRect:true,
-// });
-// text.installButton(createDragButton(text));
-// // setInterval(()=>{
-// //   text.updateText(text.value+Math.random());
-// // },2000);
+const text=createTextBox("新建文本文档",{
+  line:true,
+  lineWidth:1,
+   maxFontSize:20,
+  resetFontSizeWithRect:true,
+});
+text.installButton(createDragButton(text));
+text.installButton(createUnlockButton(text));
+doLock(text);
+// setInterval(()=>{
+//   text.updateText(text.value+Math.random());
+// },2000);
 
-// loadToGesti(text);
+loadToGesti(text);
 
 // onDestroy(()=>{
 //   console.log("销毁")
