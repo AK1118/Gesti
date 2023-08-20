@@ -122,7 +122,7 @@ class ImageToolkit implements GestiController {
   //测试 将canvas快照下来，除了被选中的对象，其他都按按照这个渲染
   private snapshot: ImageData = null;
   //休眠,休眠时不能有任何操作
-  private sleep: boolean = true;
+  private sleep: boolean = false;
 
   public get getCanvasRect(): Rect {
     return this.canvasRect;

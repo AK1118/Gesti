@@ -1,3 +1,4 @@
+import ViewObject from "./abstract/view-object";
 import {
   CloseButton,
   DragButton,
@@ -76,6 +77,7 @@ import {
   doDestroyGesti,
 } from "./hooks/index";
 import Painter from "./painter";
+import GestiReader from "./reader/reader";
 import { ImageChunk } from "./types/index";
 import { inToPx, mmToIn, ptToPx } from "./utils";
 import Cutter from "./utils/cutter";
@@ -95,7 +97,7 @@ export {
   VerticalButton,
   HorizonButton,
 };
-export { ImageBox, XImage, TextBox,WriteViewObj };
+export { ImageBox, XImage, TextBox, WriteViewObj };
 //枚举
 export { ViewObjectFamily };
 //Hooks
@@ -172,45 +174,107 @@ export default Gesti;
 const canvas: HTMLCanvasElement = document.querySelector("canvas");
 
 const img: HTMLImageElement = document.querySelector("#dog");
-canvas.width = 400;
-canvas.height =  600;
+canvas.width = 1080;
+canvas.height = 2244;
+const g = canvas.getContext("2d");
+const painter: Painter = new Painter(g);
 const gesti = createGesti({
   dashedLine: true,
 });
 gesti.init(canvas);
-const painter:Painter=new Painter(canvas.getContext("2d"));
+
 const controller = useController();
 
 const ximage = createXImage({
   data: img,
-  width:img.width,
-  height:img.height,
-  scale: .2,
+  width: img.width,
+  height: img.height,
+  scale: 1,
 });
 
 const imageBox = createImageBox(ximage);
-const lockButton=new LockButton(imageBox);
-const unLockButton=new UnLockButton(imageBox);
-installButton(imageBox,[
+const lockButton = new LockButton(imageBox);
+const unLockButton = new UnLockButton(imageBox);
+installButton(imageBox, [
   lockButton,
   unLockButton,
   createDragButton(imageBox),
 ]);
 doCenter(null, imageBox);
-// loadToGesti(imageBox);
+ loadToGesti(imageBox);
 
 
 doUpdate();
 
-const cutter=new Cutter(painter);
-const coverter=new ImageChunkConverter();
-const chunks= cutter.getChunks(ximage.width,ximage.height,100,ximage);
-console.log(chunks)
-const coverterd=coverter.coverAllImageChunkToBase64(chunks);
-console.log(coverter.coverAllImageChunkBase64ToChunk((coverterd)));
 
 
-coverter.coverAllImageChunkBase64ToChunk((coverterd)).forEach((item:ImageChunk)=>{
-  console.log(item);
-  painter.putImageData(item.imageData,item.x,item.y);
+const reader: GestiReader = new GestiReader();
+
+
+const cutter = new Cutter();
+const coverter = new ImageChunkConverter();
+
+// exportAll().then(str=>{
+//   console.log(str);
+//  importAll(str)
+// })
+
+
+
+imageBox.export().then((e:any)=>{
+   const json=JSON.stringify(e);
+  console.log(json)
+  // const c:ImageData=cutter.merge(ximage.fixedWidth,ximage.fixedHeight,e.options.options.data);
+  // console.log(c.data)
+  // painter.putImageData(c,0,0)
+  reader.getObjectByJson(json).then((view:ImageBox)=>{
+    console.log("得到",view.getXImage().data)
+     loadToGesti(view);
+      
+  });
 });
+// const chunks = coverter.coverAllImageChunkToBase64(cutter.getChunks(100, ximage));
+// console.log(chunks)
+// const data: ImageData=cutter.merge(ximage.fixedWidth,ximage.fixedHeight,chunks);
+// // console.log(data)
+// painter.putImageData(data,0, 0);
+
+// let i = 0;
+// const t: ImageData = new ImageData(ximage.fixedWidth, ximage.fixedHeight, {
+//   colorSpace: "srgb"
+// })
+
+// let ndx=0;
+// chunks.forEach((item:ImageChunk)=>{
+//     console.log(item);
+//     item.imageData.data.forEach(item=>{
+//         t.data[ndx++]=item;
+//     })
+//     // t.data.set([...item.imageData.data]);
+//   });
+//   painter.putImageData(t,0,0)
+//   console.log("合并完成",t.data);
+// setInterval(() => {
+//   if (i >= chunks.length) return;
+//   const chunk = chunks[i];
+//   console.log(chunk.imageData.data)
+//   painter.putImageData(chunk.imageData, chunk.x, chunk.y);
+ 
+//   i += 1;
+// }, 100);
+
+// console.log(ximage.fixedWidth,ximage.fixedHeight)
+// console.log(chunks)
+// painter.clearRect(0,0,1000,1000)
+// // chunks.forEach((item:ImageChunk)=>{
+// //     console.log(item);
+// //     painter.putImageData(item.imageData,item.x,400+item.y);
+// //   });
+// const coverterd=coverter.coverAllImageChunkToBase64(chunks);
+// console.log(coverter.coverAllImageChunkBase64ToChunk((coverterd)));
+
+
+
+// coverter.coverAllImageChunkBase64ToChunk((coverterd)).forEach((item:ImageChunk)=>{
+//   painter.putImageData(item.imageData,item.x,100+item.y);
+// });

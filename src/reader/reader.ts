@@ -2,6 +2,8 @@ import ViewObject from "../abstract/view-object";
 import GesteControllerImpl from "../controller";
 import Painter from "../painter";
 import Rect from "../rect";
+import Cutter from "../utils/cutter";
+import ImageChunkConverter from "../utils/image-chunk-converter";
 import { dataURLtoBlob } from "../utils/index";
 import ImageBox from "../viewObject/image";
 import TextBox from "../viewObject/text";
@@ -29,12 +31,12 @@ class GestiReader {
         break;
       case "image":
         {
-          const blob: Blob = dataURLtoBlob(options.options.data, "name");
-          const image = new Image();
-          image.src = options.options.data;
+          const cutter=new Cutter();
+          const coverter:ImageChunkConverter=new ImageChunkConverter();
+          const source:ImageData=cutter.merge(options.fixedWidth,options.fixedHeight,options.options.data);
           const ximage: XImage = await new GesteControllerImpl(
             null
-          ).createImage(blob);
+          ).createImage(source);
           viewObject = new ImageBox(ximage);
         }
         break;

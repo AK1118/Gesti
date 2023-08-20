@@ -1,6 +1,7 @@
 export const base64Head = "data:image/jpeg;base64,";
 
 /**
+ * @deprecated
  * img标签转换base64
  * @returns
  */
@@ -13,6 +14,7 @@ export function imageHtmltoBase64(_img: HTMLImageElement): Promise<string> {
         method: "GET",
       });
       const stream: ReadableStream = res.body;
+      
       const read = await stream.getReader().read();
       const arr8: Uint8Array = read.value as Uint8Array;
       r(base64Head + window?.btoa(String.fromCharCode(...arr8)));
