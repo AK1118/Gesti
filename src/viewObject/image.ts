@@ -60,7 +60,7 @@ class ImageBox extends ViewObject {
 
     const cutter:Cutter=new Cutter();
 
-    const chunkSize:number=10;
+    const chunkSize:number=500;
     
     const chunks:ImageChunk[]=cutter.getChunks(chunkSize,this.ximage);
 

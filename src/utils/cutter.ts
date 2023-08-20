@@ -3,6 +3,7 @@ import Painter from "../painter";
 import { ImageChunk } from "../types/index";
 import Vector from "../vector";
 import ImageChunkConverter from "./image-chunk-converter";
+import { classIs } from "./index";
 
 /**
  * 图片切割
@@ -17,8 +18,20 @@ class Cutter {
    * @param painter 
    */
   constructor(offScreen?: boolean, painter?: Painter) {
-    if (offScreen ?? true)
-      this.offScreenPainter = new OffscreenCanvas(10000, 10000).getContext("2d");
+    if (offScreen ?? true) {
+      if (typeof OffscreenCanvas !== 'undefined')
+      //原生
+        this.offScreenPainter = new OffscreenCanvas(10000, 10000).getContext("2d");
+      else if(typeof wx!=='undefined'){
+        //微信
+        this.offScreenPainter=wx.createOffscreenCanvas({type: '2d', width: 10000, height: 10000});
+      }else if(typeof tt!=='undefined'){
+        //抖音
+        this.offScreenPainter=tt.createOffscreenCanvas({type: '2d', width: 10000, height: 10000});
+      }else{
+        throw Error("This platform does not have off-screen rendering function, please select painter");
+      }
+    }
     else {
       if (!painter) throw Error("When you give up off-screen rendering, you must pass in a painter object")
       this.painter = painter;

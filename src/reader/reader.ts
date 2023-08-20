@@ -17,7 +17,7 @@ class GestiReader {
     const { options } = json;
     const rect: Rect = this.getRectByRectJson(options.rect);
     const relativeRect: Rect = this.getRectByRectJson(options.relativeRect);
-
+    
     let viewObject: ViewObject;
     switch (json.viewObjType) {
       case "write":
@@ -48,8 +48,8 @@ class GestiReader {
     }
     if (!viewObject.rect) viewObject.rect = rect;
     if (!viewObject.relativeRect) viewObject.relativeRect = relativeRect;
+  
     viewObject.setMirror(options.mirror);
-    viewObject.rect.position = rect.position;
     viewObject.rect.setSize(rect.size.width, rect.size.height);
     viewObject.rect.setAngle(options.rect.angle);
     viewObject.relativeRect.position = relativeRect.position;
@@ -62,6 +62,7 @@ class GestiReader {
     //init包括生成按钮
     options.locked && viewObject.lock();
     viewObject.custom();
+    viewObject.rect.setPosition(rect.position);
     return viewObject;
   }
   private getRectByRectJson(rectJson: any): Rect {

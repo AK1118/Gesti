@@ -368,6 +368,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
    * @returns
    */
   public getBaseInfo(): Object {
+    console.log("按钮集合",this.funcButton)
     return {
       rect: {
         x: ~~this.rect.position.x,
@@ -385,6 +386,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       },
       mirror: this.isMirror,
       locked: this.isLock,
+      buttons:this.funcButton,
     };
   }
   /**

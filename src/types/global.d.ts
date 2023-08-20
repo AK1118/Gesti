@@ -1,5 +1,9 @@
+//uniapp
 declare const uni: any;
+//微信小程序
 declare const wx: any;
+//抖音小程序
+declare const tt: any;
 declare var document: Document;
 declare interface EventHandle {}
 declare interface Size {

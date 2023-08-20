@@ -1,24 +1,25 @@
 import { ImageChunk } from "../types/index";
-
+const pako=require("pako");
 /**
  * base64转换器
  */
 class ImageChunkConverter {
    
     public chunkToBase64(chunk: ImageChunk): ImageChunk {
-        const base64 =this.customBtoa(String.fromCharCode(...chunk.imageData.data));
+       const base64 =pako.gzip(chunk.imageData.data);
         chunk.base64 = base64;
         chunk.imageData = null;
         return chunk;
     }
     public base64ToChunk(chunk: ImageChunk): ImageChunk {
         const a: ImageChunk = chunk;
-        const charCodes: string = this.customAtob(a.base64);
-        let len = charCodes.length;
-        const arr = [];
-        while (len--) {
-            arr[len] = charCodes.charCodeAt(len);
-        }
+        // console.log( pako.inflate(a.base64))
+        // const charCodes: string = pako.inflate(a.base64);
+        // let len = charCodes.length;
+        const arr = pako.inflate(a.base64);
+        // while (len--) {
+        //     arr[len] = charCodes.charCodeAt(len);
+        // }
         // const arr=window?.atob(a.base64).split(",").map(str=>+str);
         const imageData = new ImageData(a.width, a.height, {
             colorSpace: "srgb"

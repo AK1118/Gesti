@@ -8,6 +8,7 @@ import ViewObject from "../abstract/view-object";
 import GestiConfig from "../config/gestiConfig";
 
 class CloseButton extends Button {
+
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
     key: string | number;

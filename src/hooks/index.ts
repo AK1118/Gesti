@@ -275,7 +275,8 @@ const importAll = (
 };
 
 /**
- * @description 导出可操作对象为json，不建议导出图片
+ * @description 导出可操作对象为json格式的 Array\<Object\> 
+ * 注意: 功能使用离屏渲染
  * @param target
  * @returns
  */
