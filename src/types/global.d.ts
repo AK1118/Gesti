@@ -94,6 +94,14 @@ declare interface createImageOptions {
    * 最小缩小倍数
    */
   minScale?: number;
+    /**
+   * 图片原始宽度
+   */
+    fixedWidth?: number;
+    /**
+     * 图片原始高度
+     */
+    fixedHeight?: number;
 }
 
 declare interface XImageOptions {
@@ -130,6 +138,14 @@ declare interface XImageOptions {
    * 最小缩小倍数
    */
   minScale?: number;
+   /**
+   * 图片原始宽度
+   */
+   fixedWidth?: number;
+   /**
+    * 图片原始高度
+    */
+   fixedHeight?: number;
 }
 
 declare interface textOptions {

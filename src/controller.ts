@@ -26,6 +26,34 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  /**
+   * @description 设置某个对象的位置
+   * @param x 
+   * @param y 
+   * @param view 
+   */
+  position(x: number, y: number, view?: ViewObject): void {
+      this.kit.position(x,y,view);
+  }
+  /**
+   * @description 微信小程序导出
+   * @param offScreenPainter 离屏画笔
+   * @returns 
+   */
+  exportAllWithWeChat(offScreenPainter: CanvasRenderingContext2D): Promise<string> {
+    return this.kit.exportAllWithWeChat(offScreenPainter);
+  }
+/**
+   * @description 微信小程序导入
+   * @param offScreenPainter 离屏画布
+   * @returns 
+   */
+  importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
+    return this.kit.importAllWithWeChat(json,weChatCanvas);
+  }
+  cleanAll(): Promise<void> {
+    return this.kit.cleanAll();
+  }
   destroyGesti(): void {
     this.kit.destroyGesti();
   }
@@ -59,8 +87,10 @@ class GesteControllerImpl implements GestiController {
   importAll(json: string): Promise<void> {
     return this.kit.importAll(json);
   }
-  exportAll(): Promise<string> {
-    return this.kit.exportAll();
+ 
+
+  exportAll(offScreenPainter:CanvasRenderingContext2D): Promise<string> {
+    return this.kit.exportAll(offScreenPainter);
   }
   addWrite(options: {
     type: "circle" | "write" | "line" | "rect" | "none";

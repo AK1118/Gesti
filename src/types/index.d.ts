@@ -91,7 +91,10 @@ export declare abstract class ViewObject {
   unInstallButton(buttons: Array<Button>): void;
   //设置样式
   setDecoration(args: any): void;
+  //设置矩形大小
   setSize(size: { width?: number; height?: number }): void;
+  //设置位置
+  setPosition(x:number,y:number):void;
   //是否已被选中
   readonly selected: boolean;
 }

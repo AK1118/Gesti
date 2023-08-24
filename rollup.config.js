@@ -18,6 +18,7 @@ module.exports={
     ],
     plugins:[
         typescript(),
+        //压缩打包代码
         terser(),
         cleanup(),
     ]

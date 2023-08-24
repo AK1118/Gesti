@@ -6,27 +6,27 @@ interface LayerController {
   /**
    * 图层向下移动一位
    */
-  layerLower(view?:ViewObject): void;
+  layerLower(view?: ViewObject): void;
   /**
    * 图层向上移动一位
    */
-  layerRise(view?:ViewObject): void;
+  layerRise(view?: ViewObject): void;
   /**
    * 置于最顶层
    */
-  layerTop(view?:ViewObject): void;
+  layerTop(view?: ViewObject): void;
   /**
    * 置于最底层
    */
-  layerBottom(view?:ViewObject): void;
+  layerBottom(view?: ViewObject): void;
   /**
    * 解锁图层
    */
-  unLock(view?:ViewObject): void;
+  unLock(view?: ViewObject): void;
   /**
    * 锁定图层
    */
-  lock(view?:ViewObject): void;
+  lock(view?: ViewObject): void;
   /**
    * 取消所有被聚焦的对象
    */
@@ -34,11 +34,11 @@ interface LayerController {
   /**
    * 取消当前被聚焦对象
    */
-  cancel(view?:ViewObject): void;
+  cancel(view?: ViewObject): void;
   /**
    * 被选中对象居中画布
    */
-  center(axis?:CenterAxis,view?:ViewObject): void;
+  center(axis?: CenterAxis, view?: ViewObject): void;
   /**
      * 更新文字图层内容
      * @param text:String
@@ -55,40 +55,46 @@ interface LayerController {
   updateText(text: string, options?: textOptions): void;
   /**
    * @description 选中图册位移变化 向上移动一距离
-   * @param viewObject 
+   * @param viewObject
    */
-  upward(viewObject?:ViewObject):number;
- /**
+  upward(viewObject?: ViewObject): number;
+  /**
    * @description 选中图册位移变化 向下移动一距离
-   * @param viewObject 
+   * @param viewObject
    */
-  downward(viewObject?:ViewObject):number;
+  downward(viewObject?: ViewObject): number;
   /**
    * @description 选中图册位移变化 向左移动一距离
-   * @param viewObject 
+   * @param viewObject
    */
-  leftward(viewObject?:ViewObject):number;
+  leftward(viewObject?: ViewObject): number;
   /**
    * @description 选中图册位移变化 向右移动一距离
-   * @param viewObject 
+   * @param viewObject
    */
-  rightward(viewObject?:ViewObject):number;
+  rightward(viewObject?: ViewObject): number;
   /**
    *  旋转已被选中对象  传入弧度  可使用公式【 angle++ * Math.PI / 180  】转换角度为弧度
-   * @param angle 
+   * @param angle
    * @param existing //是否在现有基础上旋转
-   * @param view 
+   * @param view
    */
-  rotate(angle:number,existing?:boolean,view?:ViewObject):Promise<void>;
+  rotate(angle: number, existing?: boolean, view?: ViewObject): Promise<void>;
   /**
    * 获取当前选中对象
    */
-  get currentViewObject():ViewObject;
+  get currentViewObject(): ViewObject;
   /**
    * 选中传入的可操作对象
-   * @param select 
+   * @param select
    */
-  select(select:ViewObject):Promise<void>;
+  select(select: ViewObject): Promise<void>;
+  /**
+   * 清空所有元素
+   */
+  cleanAll(): Promise<void>;
+
+  position(x:number,y:number,view?:ViewObject):void;
 }
 
 type ListenerCallback = (object: any) => void;
@@ -96,10 +102,10 @@ type ListenerCallback = (object: any) => void;
 //画布控制器
 interface ImageToolKitController {
   /**
-   * 
+   *
    * @param view 将可操作对象载入gesti内
    */
-  load(view:ViewObject):void;
+  load(view: ViewObject): void;
   /**
    * 回退操作
    */
@@ -116,7 +122,7 @@ interface ImageToolKitController {
    * 新增图片
    * @param @XImage
    */
-  addImage(ximage: XImage | Promise<XImage>) :Promise<ViewObject>;
+  addImage(ximage: XImage | Promise<XImage>): Promise<ViewObject>;
   /**
      * @description 传入对应的值返回一个Promise<XImage>对象,option可传入 图片width、height、scale,maxScale,minScale,
      * @param image 
@@ -150,31 +156,46 @@ interface ImageToolKitController {
    */
   addText(text: string, options?: textOptions): Promise<ViewObject>;
   addListener(
-    listenType:GestiControllerListenerTypes,
+    listenType: GestiControllerListenerTypes,
     callback: ListenerCallback,
-    prepend?:boolean,
+    prepend?: boolean
   ): any;
-  removeListener(listenType:GestiControllerListenerTypes,hook:ListenerCallback):void;
+  removeListener(
+    listenType: GestiControllerListenerTypes,
+    hook: ListenerCallback
+  ): void;
   addWrite(options: {
-    type: GraffitiType,
-    lineWidth?: number,
-    color?: string,
-    isFill?:boolean,
-  }):void;
+    type: GraffitiType;
+    lineWidth?: number;
+    color?: string;
+    isFill?: boolean;
+  }): void;
   /**
    * @description 导出所有对象成JSON字符串
+   * @param offScreenPainter  离屏渲染对象
    */
-  exportAll():Promise<string>;
+  exportAll(offScreenPainter: CanvasRenderingContext2D): Promise<string>;
+  /**
+   * @description 导出所有对象成JSON字符串
+   * @param offScreenPainter  离屏渲染对象
+   */
+  exportAllWithWeChat(offScreenPainter: CanvasRenderingContext2D): Promise<string>;
   /**
    * @description 导入Json字符串解析成canvas对象
-   * @param json 
+   * @param json
    */
-  importAll(json:string):Promise<void>;
+  importAll(json: string): Promise<void>;
+  /**
+   * 在微信小程序内导入
+   * @param json 导入JSON
+   * @param weChatCanvas 微信2d画布
+   */
+  importAllWithWeChat(json: string, weChatCanvas: any): Promise<void>;
 
   /**
    * @description 销毁Gesti对象
    */
-  destroyGesti():void;
+  destroyGesti(): void;
 }
 /**
  * 控制器类，提供接口供给用户使用

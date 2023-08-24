@@ -9,6 +9,7 @@ import GestiConfig from "../config/gestiConfig";
  *
  */
 class WriteViewObj extends ViewObject {
+  
   family: ViewObjectFamily = ViewObjectFamily.write;
   async export(): Promise<Object> {
     this.points.forEach((item) => {
@@ -29,6 +30,9 @@ class WriteViewObj extends ViewObject {
       },
     };
     return json;
+  }
+  exportWeChat(painter?: Painter, canvas?: any): Promise<Object> {
+    return this.export();
   }
   private points: Array<Vector> = [];
   private _scalex: number = 1;

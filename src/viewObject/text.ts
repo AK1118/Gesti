@@ -35,6 +35,9 @@ class TextBox extends ViewObject {
     };
     return json;
   }
+  exportWeChat(painter?: Painter, canvas?: any): Promise<Object> {
+    return this.export();
+  }
   public originFamily: ViewObjectFamily = ViewObjectFamily.text;
   private _text: string = "";
   private fontsize: number = 36;

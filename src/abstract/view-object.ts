@@ -73,31 +73,6 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.name = name;
   }
   public init() {
-    //注册功能按钮
-    /**
-     * 如果需要某个图层对象自定义某个按钮是否显示或者其他自定义操作
-     * 提供 @custom 方法使用
-     */
-    // this.dragButton = new DragButton(this);
-    // this.verticalButton = new VerticalButton(this);
-    // this.horizonButton = new HorizonButton(this);
-    // this.mirrorButton = new MirrorButton(this);
-    // this.closeButton = new CloseButton(this);
-    // this.rotateButton = new RotateButton(this);
-    // this.lockButton = new LockButton(this);
-    // this.delockButton = new UnLockButton(this);
-
-    // this.funcButton = [
-    //   this.dragButton,
-    //   this.verticalButton,
-    //   this.horizonButton,
-    //   this.mirrorButton,
-    //   this.closeButton,
-    //   this.rotateButton,
-    //   this.lockButton,
-    //   this.delockButton,
-    // ];
-
     this.relativeRect = new Rect({
       x: 0,
       y: 0,
@@ -361,14 +336,15 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
    * 撤销 | 取消撤销回调
    */
   public didFallback() {}
-  //到处为JSON
-  abstract export(): Promise<Object>;
+  //导出为JSON
+  abstract export(painter?:Painter): Promise<Object>;
+  //微信端导出
+  abstract exportWeChat(painter?:Painter,canvas?:any):Promise<Object>;
   /**
    * @description 提供公用基础信息导出
    * @returns
    */
   public getBaseInfo(): Object {
-    console.log("按钮集合",this.funcButton)
     return {
       rect: {
         x: ~~this.rect.position.x,
@@ -386,13 +362,17 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       },
       mirror: this.isMirror,
       locked: this.isLock,
-      buttons:this.funcButton,
+      buttons:this.funcButton.map((button:Button)=>button.constructor.name),
     };
   }
   /**
    * 自定义一些操作
    */
   public custom() {}
+
+  public setPosition(x:number,y:number):void{
+      this.rect.setPosition(new Vector(x,y));
+  }
 }
 
 export default ViewObject;

@@ -9,7 +9,6 @@ import ViewObject from "./view-object";
 
 //按钮抽象类
 export abstract class Button implements RenderObject {
-
   constructor(master: ViewObject) {
     this.master = master;
   }

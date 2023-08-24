@@ -13,7 +13,7 @@ import VerticalButton from "../buttons/verticalButton";
 import { gesticonfig } from "../config/gestiConfig";
 import Gesti from "../gesti";
 import { ImageBox } from "../index";
-import GestiReader from "../reader/reader";
+import GestiReader from "../abstract/reader";
 import Vertex from "../vertex";
 import TextBox from "../viewObject/text";
 import Widgets from "../widgets";
@@ -252,7 +252,7 @@ const useGraffitiWrite = createGraffiti("write");
 const useCloseGraffiti = createGraffiti("none");
 
 /**
- * @description 导入json到画布内,该json数据格式必须由 exportAll Hook导出
+ * @description H5专用,导入json到画布内,该json数据格式必须由 exportAll Hook导出
  * @param json
  * @param target
  * @returns
@@ -273,21 +273,67 @@ const importAll = (
   const controller = getCurrentController();
   return controller.importAll(json);
 };
+/**
+ * @description 导入json到画布内,该json数据格式必须由 exportAll Hook导出
+ * @param json
+ * @param weChatCanvas 微信小程序离屏画布
+ * @param target
+ * @returns
+ */
+const importAllWithWeChat = (
+  json: string,
+  weChatCanvas: any,
+  target: Gesti = currentInstance
+): Promise<void> => {
+  if (!target) {
+    error("Target is empty");
+    return Promise.reject("Target is empty");
+  }
+  if (!json) {
+    warn("Json is empty");
+    return Promise.reject("json is empty");
+  }
+  setCurrentInstance(target);
+  const controller = getCurrentController();
+  return controller.importAllWithWeChat(json, weChatCanvas);
+};
 
 /**
- * @description 导出可操作对象为json格式的 Array\<Object\> 
+ * @description H5专用,导出可操作对象为json格式的 Array\<Object\>
  * 注意: 功能使用离屏渲染
  * @param target
  * @returns
  */
-const exportAll = (target: Gesti = currentInstance): Promise<string> => {
+const exportAll = (
+  offscreenPainter: CanvasRenderingContext2D,
+  target: Gesti = currentInstance
+): Promise<string> => {
   if (!target) {
     error("Target is empty");
     return Promise.reject("Target is empty");
   }
   setCurrentInstance(target);
   const controller = getCurrentController();
-  return controller.exportAll();
+  return controller.exportAll(offscreenPainter);
+};
+
+/**
+ * @description 微信小程序专用,导出可操作对象为json格式的 Array\<Object\>
+ * 注意: 功能使用离屏渲染
+ * @param target
+ * @returns
+ */
+const exportAllWithWeChat = (
+  offscreenPainter: CanvasRenderingContext2D,
+  target: Gesti = currentInstance
+): Promise<string> => {
+  if (!target) {
+    error("Target is empty");
+    return Promise.reject("Target is empty");
+  }
+  setCurrentInstance(target);
+  const controller = getCurrentController();
+  return controller.exportAllWithWeChat(offscreenPainter);
 };
 
 const createDragButton = (view: ViewObject): Button => new DragButton(view);
@@ -342,6 +388,7 @@ const doSomething =
       | "cancelEvent"
       | "cancelAll"
       | "destroyGesti"
+      | "cleanAll"
   ) =>
   (view?: ViewObject, target: Gesti = currentInstance) => {
     if (!target) {
@@ -399,12 +446,17 @@ const doSomething =
       case "destroyGesti": {
         currentInstance.destroy();
         setCurrentInstance(null);
-      }
+        break;
+      };
+      case "cleanAll":
+        controller.cleanAll();
+        break;
       default:
     }
     setTimeout(() => controller.update(), 10);
   };
 
+//选中某个元素
 const doSelect = doSomething("select");
 const doLayerLower = doSomething("layerLower");
 const doLayerBottom = doSomething("layerBottom");
@@ -416,11 +468,22 @@ const doUpward = doSomething("upward");
 const doDownward = doSomething("downward");
 const doLeftward = doSomething("leftward");
 const doRightward = doSomething("rightward");
+//更新画布
 const doUpdate = doSomething("update");
+//取消选中某个元素
 const doCancel = doSomething("cancel");
+//取消选中所有被选中元素
 const doCancelAll = doSomething("cancelAll");
+/**
+ * @description 取消Gesti原有提供的手势监听，
+ * 注意：取消后你会失去所有的跟Gesti内元素交互的事件，需要自己实现手势监听
+ * 详情在文档内查看 drive 系列
+ */
 const doCancelEvent = doSomething("cancelEvent");
+//销毁Gesti对象
 const doDestroyGesti = doSomething("destroyGesti");
+//清空画布内所有元素
+const doCleanAll = doSomething("cleanAll");
 const doCenter = (
   axis?: CenterAxis,
   view?: ViewObject,
@@ -429,7 +492,18 @@ const doCenter = (
   //不安全的做法
   target.controller.center(axis, view);
 };
-
+//设置坐标位置
+const doPosition=(x:number,y:number,view?:ViewObject,target: Gesti = currentInstance)=>{
+  //不安全的做法
+  target.controller.position(x,y,view);
+}
+/**
+ * @description 旋转某个元素
+ * @param angle 
+ * @param existing 
+ * @param view 
+ * @param target 
+ */
 const doRotate = (
   angle: number,
   existing?: boolean,
@@ -443,11 +517,13 @@ const doRotate = (
 /**
  * 转换json成可读取对象
  * @param json
+ * @deprecated
  * @returns
  */
 const useReader = (json: string): Promise<ViewObject> => {
-  const reader = new GestiReader();
-  return reader.getObjectByJson(json);
+  // const reader = new GestiReader();
+  // return reader.getObjectByJson(json);
+  return null;
 };
 
 /**
@@ -485,10 +561,6 @@ const driveUp = drive("up");
 const driveDown = drive("down");
 const driveWheel = drive("wheel");
 
-// //销毁gesti实例
-// const destroy=()=>{
-//   setCurrentInstance(null);
-// }
 
 export {
   createGesti /**创建Gesti实例 */,
@@ -518,6 +590,8 @@ export {
   useCloseGraffiti /**关闭涂鸦输入 */,
   importAll,
   exportAll,
+  importAllWithWeChat,
+  exportAllWithWeChat,
   createDragButton,
   createHorizonButton,
   createVerticalButton,
@@ -539,6 +613,7 @@ export {
   doUpward,
   doDownward,
   doLeftward,
+  doPosition/*设置对象位置*/,
   doRightward,
   doCenter,
   doUpdate,
@@ -552,5 +627,6 @@ export {
   driveWheel,
   doCancelEvent,
   doCancelAll,
+  doCleanAll,
   removeListener,
 };

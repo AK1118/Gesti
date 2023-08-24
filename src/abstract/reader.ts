@@ -1,25 +1,37 @@
-import ViewObject from "../abstract/view-object";
+import ViewObject from "./view-object";
 import GesteControllerImpl from "../controller";
-import Painter from "../painter";
 import Rect from "../rect";
-import Cutter from "../utils/cutter";
-import ImageChunkConverter from "../utils/image-chunk-converter";
-import { dataURLtoBlob } from "../utils/index";
 import ImageBox from "../viewObject/image";
 import TextBox from "../viewObject/text";
 import WriteViewObj from "../viewObject/write";
 import XImage from "../ximage";
-
-class GestiReader {
+import {
+  CloseButton,
+  DragButton,
+  MirrorButton,
+  RotateButton,
+  LockButton,
+  UnLockButton,
+  VerticalButton,
+  HorizonButton,
+} from "../buttons";
+import Button from "./button";
+import CutterH5 from "../cutters/cutter-H5";
+abstract class GestiReader {
   constructor() {}
-  public async getObjectByJson(str: string) {
-    const json = JSON.parse(str);
-    const { options } = json;
-    const rect: Rect = this.getRectByRectJson(options.rect);
-    const relativeRect: Rect = this.getRectByRectJson(options.relativeRect);
-    
+  private buttonClazzList = {
+    CloseButton,
+    DragButton,
+    MirrorButton,
+    RotateButton,
+    LockButton,
+    UnLockButton,
+    VerticalButton,
+    HorizonButton,
+  };
+  public async  getViewObject(type:string,options:any):Promise<ViewObject>{
     let viewObject: ViewObject;
-    switch (json.viewObjType) {
+    switch (type) {
       case "write":
         {
           viewObject = new WriteViewObj(
@@ -31,9 +43,12 @@ class GestiReader {
         break;
       case "image":
         {
-          const cutter=new Cutter();
-          const coverter:ImageChunkConverter=new ImageChunkConverter();
-          const source:ImageData=cutter.merge(options.fixedWidth,options.fixedHeight,options.options.data);
+          const cutter = new CutterH5();
+          const source: ImageData = await cutter.merge(
+            options.fixedWidth,
+            options.fixedHeight,
+            options.options.data
+          );
           const ximage: XImage = await new GesteControllerImpl(
             null
           ).createImage(source);
@@ -46,9 +61,22 @@ class GestiReader {
         }
         break;
     }
+    return viewObject;
+  }
+
+  public async getObjectByJson(str: string) {
+    const json = JSON.parse(str);
+    const { options } = json;
+    const rect: Rect = this.getRectByRectJson(options.rect);
+    const relativeRect: Rect = this.getRectByRectJson(options.relativeRect);
+    let viewObject: ViewObject=await this.getViewObject(json.viewObjType,options);
+    this.buildUp(viewObject,rect,relativeRect,options);
+    return viewObject;
+  }
+  
+  public buildUp(viewObject:ViewObject,rect:Rect,relativeRect:Rect,options:any):ViewObject{
     if (!viewObject.rect) viewObject.rect = rect;
     if (!viewObject.relativeRect) viewObject.relativeRect = relativeRect;
-  
     viewObject.setMirror(options.mirror);
     viewObject.rect.setSize(rect.size.width, rect.size.height);
     viewObject.rect.setAngle(options.rect.angle);
@@ -63,9 +91,19 @@ class GestiReader {
     options.locked && viewObject.lock();
     viewObject.custom();
     viewObject.rect.setPosition(rect.position);
+    this.installButton(viewObject, options.buttons);
     return viewObject;
   }
-  private getRectByRectJson(rectJson: any): Rect {
+
+  //安装按钮
+  private installButton(viewObject: ViewObject, buttons: Array<string>) {
+    buttons.forEach((item) => {
+      const button: Button = new this.buttonClazzList[item](viewObject);
+      viewObject.installButton(button);
+    });
+  }
+
+  public getRectByRectJson(rectJson: any): Rect {
     const jsonObj: any = rectJson;
     const rect = new Rect({
       width: jsonObj.width,

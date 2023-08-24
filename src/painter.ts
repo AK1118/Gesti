@@ -104,17 +104,26 @@ class Painter implements Painter {
     y: number,
     width: number,
     height: number,
-    dx?:number,
-    dy?:number,
-    dw?:number,
-    dh?:number,
+    dx?: number,
+    dy?: number,
+    dw?: number,
+    dh?: number
   ) {
-    if(dx&&dy){
-      this.paint.drawImage(image, -width / 2, -height / 2, width, height,dx,dy,dw,dh);
-    }else{
+    if (dx && dy) {
+      this.paint.drawImage(
+        image,
+        -width / 2,
+        -height / 2,
+        width,
+        height,
+        dx,
+        dy,
+        dw,
+        dh
+      );
+    } else {
       this.paint.drawImage(image, -width / 2, -height / 2, width, height);
     }
-    
   }
   scale(a: number, b: number) {
     this.paint.scale(a, b);
@@ -125,7 +134,7 @@ class Painter implements Painter {
   lineTo(x: number, y: number) {
     this.paint.lineTo(x, y);
   }
-  getImageData(x: number, y: number, w: number, h: number) {
+  getImageData(x: number, y: number, w: number, h: number):ImageData{
     return this.paint.getImageData(x, y, w, h);
   }
   fillText(text: string, x: number, y: number) {
@@ -152,8 +161,8 @@ class Painter implements Painter {
   setlineDash(dash: any) {
     this.paint?.setLineDash(dash);
   }
-  putImageData(imagedata: ImageData, dx: number, dy: number):void{
-    this.paint.putImageData(imagedata,dx,dy);
+  putImageData(imagedata: ImageData, dx: number, dy: number): void {
+    this.paint.putImageData(imagedata, dx, dy);
   }
   /*清空画布|刷新画布*/
   update() {}

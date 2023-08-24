@@ -13,7 +13,8 @@ import GestiController from "./interfaces/gesticontroller";
 import RecorderInterface from "./interfaces/recorder";
 import RenderObject from "./interfaces/render-object";
 import Painter from "./painter";
-import GestiReader from "./reader/reader";
+import GestiReader from "./abstract/reader";
+import GestiReaderH5 from "./reader/reader-H5";
 import Recorder from "./recorder";
 import Rect from "./rect";
 import { classTypeIs } from "./utils";
@@ -22,6 +23,7 @@ import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
 import WriteFactory, { WriteType } from "./write/write-factory";
 import XImage from "./ximage";
+import GestiReaderWechat from "./reader/reader-WeChat";
 
 enum EventHandlerState {
   down,
@@ -141,6 +143,25 @@ class ImageToolkit implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  position(x: number, y: number, view?: ViewObject): void {
+      if(view){
+        view.setPosition(x,y);
+      }
+      this.selectedViewObject?.setPosition(x,y);
+      this.update();
+  }
+
+  /**
+   * @description 清空所有元素
+   * @returns
+   */
+  cleanAll(): Promise<void> {
+    return new Promise((r, v) => {
+      this.ViewObjectList = [];
+      this.update();
+      r();
+    });
+  }
   destroyGesti(): void {
     this.callHook("onBeforeDestroy");
     this.ViewObjectList = [];
@@ -219,7 +240,7 @@ class ImageToolkit implements GestiController {
     return this.selectedViewObject.rect.position.x;
   }
   /**
-   * @description 导入json解析成对象
+   * @description 导入json解析成对象  H5
    * @param json
    * @returns
    */
@@ -228,7 +249,7 @@ class ImageToolkit implements GestiController {
       try {
         if (json == "[]" || !json) throw Error("Import Json is Empty");
         const str = JSON.parse(json);
-        const reader = new GestiReader();
+        const reader = new GestiReaderH5();
         for await (const item of str) {
           const obj: ViewObject = await reader.getObjectByJson(
             JSON.stringify(item)
@@ -243,6 +264,33 @@ class ImageToolkit implements GestiController {
     });
   }
 
+  /**
+   * @description 微信专用导入
+   * @param json
+   * @param weChatCanvas
+   * @returns
+   */
+  importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
+    return new Promise(async (r, j) => {
+      try {
+        if (json == "[]" || !json) throw Error("Import Json is Empty");
+        const str = JSON.parse(json);
+        const reader: GestiReaderWechat = new GestiReaderWechat();
+        for await (const item of str) {
+          const obj: ViewObject = await reader.getObjectByJson(
+            JSON.stringify(item),
+            this.paint,
+            weChatCanvas
+          );
+          if (obj) this.addViewObject(obj);
+        }
+        this.update();
+        r();
+      } catch (error) {
+        j(error);
+      }
+    });
+  }
   addListener(
     listenType: GestiControllerListenerTypes,
     hook: ListenerHook,
@@ -259,19 +307,33 @@ class ImageToolkit implements GestiController {
   /**
    * @description 导出画布内所有对象成json字符串
    */
-  exportAll(): Promise<string> {
+  exportAll(
+    offScreenPainter: CanvasRenderingContext2D,
+    type: "H5" | "WeChat" = "H5"
+  ): Promise<string> {
+    const offPainter = new Painter(offScreenPainter);
     return new Promise(async (r, j) => {
       try {
         const jsons: Array<Object> = [];
         for await (const item of this.ViewObjectList) {
           if (item.disabled) continue;
-          jsons.push(await item.export());
+          if (type == "H5") jsons.push(await item.export(offPainter));
+          else if (type == "WeChat")
+            jsons.push(await item.exportWeChat(offPainter));
         }
         r(JSON.stringify(jsons));
       } catch (error) {
         j(error);
       }
     });
+  }
+  /**
+   * @description 导出画布内所有对象成json字符串  微信
+   */
+  exportAllWithWeChat(
+    offScreenPainter: CanvasRenderingContext2D
+  ): Promise<string> {
+    return this.exportAll(offScreenPainter, "WeChat");
   }
   updateText(text: string, options?: textOptions): void {
     const isTextBox = classTypeIs(this.selectedViewObject, TextBox);
@@ -421,9 +483,9 @@ class ImageToolkit implements GestiController {
     });
   }
   //唤醒,可以继续操作
-  public wakeUp():void{
-      this.sleep=false;
-      this.update();
+  public wakeUp(): void {
+    this.sleep = false;
+    this.update();
   }
   public cancelEvent(): void {
     if (this.eventHandler == null) return;

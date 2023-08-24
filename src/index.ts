@@ -1,4 +1,3 @@
-import ViewObject from "./abstract/view-object";
 import {
   CloseButton,
   DragButton,
@@ -75,13 +74,12 @@ import {
   onDestroy,
   onBeforeDestroy,
   doDestroyGesti,
+  doCleanAll,
+  exportAllWithWeChat,
+  importAllWithWeChat,
+  doPosition,
 } from "./hooks/index";
-import Painter from "./painter";
-import GestiReader from "./reader/reader";
-import { ImageChunk } from "./types/index";
 import { inToPx, mmToIn, ptToPx } from "./utils";
-import Cutter from "./utils/cutter";
-import ImageChunkConverter from "./utils/image-chunk-converter";
 import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
 import WriteViewObj from "./viewObject/write";
@@ -131,6 +129,8 @@ export {
   loadToGesti /**加载某个可操作对象到画布内 */,
   importAll,
   exportAll,
+  exportAllWithWeChat,
+  importAllWithWeChat,
   createDragButton,
   createHorizonButton,
   createVerticalButton,
@@ -160,6 +160,7 @@ export {
   useReader,
   currentViewObject,
   doCancel,
+  doCleanAll,
   driveMove,
   driveUp,
   driveDown,
@@ -168,63 +169,6 @@ export {
   inToPx,
   mmToIn,
   ptToPx,
+  doPosition,
 };
 export default Gesti;
-
-
-const canvas: HTMLCanvasElement = document.querySelector("#canvas");
-const offScreenCanvas:HTMLCanvasElement=document.querySelector("#offScreenCanvas");
-const img: HTMLImageElement = document.querySelector("#dog");
-canvas.width = 500;
-canvas.height = 500;
-const g = canvas.getContext("2d");
-const painter: Painter = new Painter(g);
-const gesti = createGesti({
-  dashedLine: true,
-});
-gesti.init(canvas);
-
-const controller = useController();
-
-const ximage = createXImage({
-  data: img,
-  width: img.width,
-  height: img.height,
-  scale: 1,
-});
-
-const imageBox = createImageBox(ximage);
-const lockButton = new LockButton(imageBox);
-const unLockButton = new UnLockButton(imageBox);
-installButton(imageBox, [
-  lockButton,
-  unLockButton,
-  createDragButton(imageBox),
-]);
-doCenter(null, imageBox);
-  loadToGesti(imageBox);
-
-  const textBox=createTextBox("卧槽",{});
-textBox.installButton(createDragButton(textBox))
-  loadToGesti(textBox)
-doUpdate();
-
-
-
-
-
-document.getElementById("import").addEventListener("click",()=>{
-  console.log("导入")
-  importAll(window.localStorage.getItem("aa")).then(e=>{
-    console.log("导入成功")
-  })
-})
-
-document.getElementById("export").addEventListener("click",()=>{
-  console.log("导出")
-  exportAll().then(json=>{
-   window.localStorage.setItem("aa",json);
-   console.log("导出成功")
-  })
-  
-})
