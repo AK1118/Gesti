@@ -23,6 +23,9 @@ import {
   createTextBoxView,
   createXImageFun,
 } from "./create";
+import GestiReaderH5 from "../reader/reader-H5";
+import GestiReaderWechat from "../reader/reader-WeChat";
+import Painter from "../painter";
 
 let currentInstance: Gesti = null;
 
@@ -515,6 +518,7 @@ const doRotate = (
 };
 
 /**
+ * 已弃用，请使用 useReaderH5 或者useReaderWeChat
  * 转换json成可读取对象
  * @param json
  * @deprecated
@@ -525,6 +529,27 @@ const useReader = (json: string): Promise<ViewObject> => {
   // return reader.getObjectByJson(json);
   return null;
 };
+/**
+ * @description 转换json为可读对象 H5专用
+ * @param json 特定格式json
+ * @returns 
+ */
+const useReaderH5=(json:string):Promise<ViewObject>=>{
+    const reader:GestiReader=new GestiReaderH5();
+    return reader.getObjectByJson(json);
+}
+/**
+ * @description 转换json为可读对象 微信小程序专用
+ * @param json 特定格式json
+ * @param painter 画笔
+ * @param weChatCanvas 画布 
+ * @returns 
+ */
+const useReaderWeChat=(json: string,painter:CanvasRenderingContext2D,weChatCanvas: any):Promise<ViewObject>=>{
+  const reader:GestiReaderWechat=new GestiReaderWechat();
+  const _painter=new Painter(painter);
+  return reader.getObjectByJson(json,_painter,weChatCanvas);
+}
 
 /**
  * @description 获取当前选中对象
@@ -629,4 +654,6 @@ export {
   doCancelAll,
   doCleanAll,
   removeListener,
+  useReaderH5,
+  useReaderWeChat,
 };

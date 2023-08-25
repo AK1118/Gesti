@@ -78,6 +78,8 @@ import {
   exportAllWithWeChat,
   importAllWithWeChat,
   doPosition,
+  useReaderH5,
+  useReaderWeChat,
 } from "./hooks/index";
 import { inToPx, mmToIn, ptToPx } from "./utils";
 import ImageBox from "./viewObject/image";
@@ -170,6 +172,7 @@ export {
   mmToIn,
   ptToPx,
   doPosition,
+  useReaderWeChat,
+  useReaderH5
 };
 export default Gesti;
-
