@@ -20,16 +20,16 @@ import CutterH5 from "../cutters/cutter-H5";
 abstract class GestiReader {
   constructor() {}
   private buttonClazzList = {
-    CloseButton,
     DragButton,
     MirrorButton,
+    CloseButton,
     RotateButton,
-    LockButton,
     UnLockButton,
-    VerticalButton,
     HorizonButton,
+    LockButton,
+    VerticalButton,
   };
-  public async  getViewObject(type:string,options:any):Promise<ViewObject>{
+  public async getViewObject(type: string, options: any): Promise<ViewObject> {
     let viewObject: ViewObject;
     switch (type) {
       case "write":
@@ -69,12 +69,20 @@ abstract class GestiReader {
     const { options } = json;
     const rect: Rect = this.getRectByRectJson(options.rect);
     const relativeRect: Rect = this.getRectByRectJson(options.relativeRect);
-    let viewObject: ViewObject=await this.getViewObject(json.viewObjType,options);
-    this.buildUp(viewObject,rect,relativeRect,options);
+    let viewObject: ViewObject = await this.getViewObject(
+      json.viewObjType,
+      options
+    );
+    this.buildUp(viewObject, rect, relativeRect, options);
     return viewObject;
   }
-  
-  public buildUp(viewObject:ViewObject,rect:Rect,relativeRect:Rect,options:any):ViewObject{
+
+  public buildUp(
+    viewObject: ViewObject,
+    rect: Rect,
+    relativeRect: Rect,
+    options: any
+  ): ViewObject {
     if (!viewObject.rect) viewObject.rect = rect;
     if (!viewObject.relativeRect) viewObject.relativeRect = relativeRect;
     viewObject.setMirror(options.mirror);
@@ -98,7 +106,14 @@ abstract class GestiReader {
   //安装按钮
   private installButton(viewObject: ViewObject, buttons: Array<string>) {
     buttons.forEach((item) => {
-      const button: Button = new this.buttonClazzList[item](viewObject);
+      const buttonConstructor = this.buttonClazzList[item];
+      if (!buttonConstructor)
+        return console.error(
+          "This buttonConstructor is not a constructor.",
+          buttonConstructor,
+          this.buttonClazzList[item]
+        );
+      const button: Button = new buttonConstructor(viewObject);
       viewObject.installButton(button);
     });
   }

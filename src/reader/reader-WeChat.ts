@@ -12,7 +12,12 @@ import CutterWeChat from "../cutters/cutter-WeChat";
  * 解析器  微信
  */
 class GestiReaderWechat extends GestiReader {
-  public async getViewObject(type: string, options: any,painter?:Painter,weChatCanvas?:any): Promise<ViewObject> {
+  public async getViewObject(
+    type: string,
+    options: any,
+    painter?: Painter,
+    weChatCanvas?: any
+  ): Promise<ViewObject> {
     let viewObject: ViewObject;
     switch (type) {
       case "write":
@@ -33,7 +38,6 @@ class GestiReaderWechat extends GestiReader {
             options.options.data,
             weChatCanvas
           );
-
           const image = weChatCanvas.createImage();
           const offCanvas = wx.createOffscreenCanvas({
             type: "2d",
@@ -42,12 +46,18 @@ class GestiReaderWechat extends GestiReader {
           });
           const offPaint = offCanvas.getContext("2d");
           offPaint.putImageData(source, 0, 0);
+          image.src = offCanvas.toDataURL();
+          await new Promise((r, v) => {
+            image.onload  = () => {
+              r(null);
+            };
+          });
           const ximage = new XImage({
-            data: offCanvas,
+            data: image,
             width: options.rect.width,
             height: options.rect.height,
-            fixedWidth:options.fixedWidth,
-            fixedHeight:options.fixedHeight,
+            fixedWidth: options.fixedWidth,
+            fixedHeight: options.fixedHeight,
           });
           viewObject = new ImageBox(ximage);
         }
@@ -61,7 +71,11 @@ class GestiReaderWechat extends GestiReader {
     return viewObject;
   }
 
-  public async getObjectByJson(str: string,painter?:Painter,weChatCanvas?:any) {
+  public async getObjectByJson(
+    str: string,
+    painter?: Painter,
+    weChatCanvas?: any
+  ) {
     const json = JSON.parse(str);
     const { options } = json;
     const rect: Rect = this.getRectByRectJson(options.rect);
@@ -76,6 +90,5 @@ class GestiReaderWechat extends GestiReader {
     return viewObject;
   }
 }
-
 
 export default GestiReaderWechat;

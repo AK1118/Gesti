@@ -46,7 +46,7 @@ class CutterWeChat implements CutterInterface {
     canvas?: any
   ): Promise<ImageData> {
     const converter:ImageChunkConverterWeChat = new ImageChunkConverterWeChat();
-    const imageData = canvas.createImageData([], width, height);
+    const imageData = canvas.createImageData(new Uint8ClampedArray(width*height*4), width, height);
     //数组合并
     let curentNdx = 0;
     chunks.forEach((item) => {
