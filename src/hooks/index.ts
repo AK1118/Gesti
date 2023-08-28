@@ -567,6 +567,19 @@ const currentViewObject = (target: Gesti = currentInstance): ViewObject => {
   return controller.currentViewObject;
 };
 
+
+/**
+ * @description 获取节点
+ * @param type 
+ * @returns 
+ */
+const useGetViewObjectById=(target: Gesti = currentInstance)=>{
+  setCurrentInstance(target);
+  const controller = getCurrentController();
+  return controller.getViewObjectById;
+}
+
+
 const drive = (type: "move" | "up" | "down" | "wheel") => {
   return (
     e: MouseEvent | Event | EventHandle,
@@ -656,4 +669,5 @@ export {
   removeListener,
   useReaderH5,
   useReaderWeChat,
+  useGetViewObjectById/* 通过id获取对象 */,
 };

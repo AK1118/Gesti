@@ -146,6 +146,9 @@ class Painter implements Painter {
   set font(font: string) {
     this.paint.font = font;
   }
+  set globalAlpha(alpha:number){
+    this.paint.globalAlpha=alpha;
+  }
   measureText(text: string): TextMetrics {
     return this.paint?.measureText(text);
   }

@@ -80,6 +80,7 @@ import {
   doPosition,
   useReaderH5,
   useReaderWeChat,
+  useGetViewObjectById
 } from "./hooks/index";
 import { inToPx, mmToIn, ptToPx } from "./utils";
 import ImageBox from "./viewObject/image";
@@ -173,73 +174,71 @@ export {
   ptToPx,
   doPosition,
   useReaderWeChat,
-  useReaderH5
+  useReaderH5,
+  useGetViewObjectById
 };
 export default Gesti;
 
-// const canvas: HTMLCanvasElement = document.querySelector("#canvas");
-// const offScreenCanvas:HTMLCanvasElement=document.querySelector("#offScreenCanvas");
-// const img: HTMLImageElement = document.querySelector("#dog");
-// canvas.width = 500;
-// canvas.height = 500;
-// offScreenCanvas.width=10000;
-// offScreenCanvas.height=500;
-// const g = canvas.getContext("2d");
-// const offScreenPainter=offScreenCanvas.getContext("2d");
-// const painter: Painter = new Painter(g);
-// const gesti = createGesti({
-//   dashedLine: true,
-// });
-// gesti.init(canvas);
+const canvas: HTMLCanvasElement = document.querySelector("#canvas");
+const offScreenCanvas:HTMLCanvasElement=document.querySelector("#offScreenCanvas");
+const img: HTMLImageElement = document.querySelector("#dog");
+canvas.width = 500;
+canvas.height = 500;
+offScreenCanvas.width=10000;
+offScreenCanvas.height=500;
+const g = canvas.getContext("2d");
+const offScreenPainter=offScreenCanvas.getContext("2d");
+const gesti = createGesti({
+  dashedLine: false,
+  auxiliary:false,
+});
+gesti.init(canvas);
 
-// const controller = useController();
+const controller = useController();
 
-// const ximage = createXImage({
-//   data: img,
-//   width: img.width,
-//   height: img.height,
-//   scale: 1,
-// });
+const ximage = createXImage({
+  data: img,
+  width: img.width,
+  height: img.height,
+  scale: 1,
+});
 
-// const imageBox = createImageBox(ximage);
-// const lockButton = new LockButton(imageBox);
-// const unLockButton = new UnLockButton(imageBox);
-// installButton(imageBox, [
-//   lockButton,
-//   unLockButton,
-//   createDragButton(imageBox),
-// ]);
-// doCenter(null, imageBox);
-//   loadToGesti(imageBox);
+const imageBox = createImageBox(ximage);
+const lockButton = new LockButton(imageBox);
+const unLockButton = new UnLockButton(imageBox);
+installButton(imageBox, [
+  lockButton,
+  unLockButton,
+  createDragButton(imageBox),
+]);
+doCenter(null, imageBox);
+  loadToGesti(imageBox);
 
-//   const textBox=createTextBox("新建文本",{
-//     resetFontSizeWithRect:true,
-//   });
-// textBox.installButton(createDragButton(textBox))
-//   loadToGesti(textBox)
-// doUpdate();
+  const textBox=createTextBox("新建文本",{
+    resetFontSizeWithRect:true,
+  });
+  textBox.installButton(createDragButton(textBox));
+  textBox.updateText(textBox.value,{
+    fontFamily:"",
+  });
+  textBox.id="wenz";
+  loadToGesti(textBox)
+doUpdate();
 
 
 
-// document.getElementById("import").addEventListener("click",()=>{
-//   console.log("导入")
-//   importAll(window.localStorage.getItem("aa")).then(e=>{
-//     console.log("导入成功")
-//   })
-// })
+document.getElementById("import").addEventListener("click",()=>{
+  console.log("导入")
+  importAll(window.localStorage.getItem("aa")).then(e=>{
+    console.log("导入成功")
+  })
+})
 
-// document.getElementById("export").addEventListener("click",()=>{
-//   console.log("导出")
-//   exportAll(offScreenPainter).then(json=>{
-//    window.localStorage.setItem("aa",json);
-//    console.log("导出成功");
-//   })
+document.getElementById("export").addEventListener("click",()=>{
+  console.log("导出")
+  exportAll(offScreenPainter).then(json=>{
+   window.localStorage.setItem("aa",json);
+   console.log("导出成功");
+  })
 
-// })
-
-// const clazzList={
-//   CloseButton,
-//   LockButton
-// };
-
-// console.log(new clazzList['LockButton'](textBox));
+})

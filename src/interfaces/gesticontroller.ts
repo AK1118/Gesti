@@ -1,6 +1,7 @@
 import ViewObject from "../abstract/view-object";
+import { ViewObjectFamily } from "../enums";
 import XImage from "../ximage";
-
+type View = ViewObject;
 //图层控制器
 interface LayerController {
   /**
@@ -196,6 +197,11 @@ interface ImageToolKitController {
    * @description 销毁Gesti对象
    */
   destroyGesti(): void;
+
+  querySelector(select:string|ViewObjectFamily):Promise<ViewObject|ViewObject[]>;
+
+  getViewObjectById<T extends ViewObject>(id:string):Promise<T>;
+  
 }
 /**
  * 控制器类，提供接口供给用户使用

@@ -104,8 +104,10 @@
 | leftward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向左移动距离 1     |
 | rightward    | number  |   GestiController |    (viewObject?: ViewObject)     |   被选中对象微调，向右移动距离 1     |
 | update    | void  |   GestiController |    -    |   调用后会重绘canvas,一般在改变数据后画布未刷新时使用     |
-| ❗importAll(试行)    | Promise\<void\>  |   GestiController |    (json: string)   |   以json形式导入对象集合 |
-| ❗exportAll(试行)   | Promise\<void\>  |   GestiController |    -   |   以json形式导出对象集合, 小图片支持base64导出，大型图片会溢base64    |
+| importAll    | Promise\<void\>  |   GestiController |    (json: string)   |   以json形式导入对象集合 H5 |
+| exportAll  | Promise\<string\>  |   GestiController |    -   |   以json形式导出对象集合 H5    |
+| exportAllWithWeChat| Promise\<string\>  |   GestiController |    (json: string)   |   以json形式导入对象集合 微信小程序 canvas 2D |
+| importAllWithWeChat| Promise\<void\>  |   GestiController |    -   |   以json形式导出对象集合    微信小程序 canvas 2D |
 | center   | void  |   GestiController |   (axis?: "vertical" \| "horizon")   |  垂直居中或者水平居中，不填写参数水平垂直居中    |
 | ❗addImage   | 	Promise\<boolean\>  |   GestiController |   (ximage: XImage \| Promise<XImage>)   |  添加一张图片到画布内    |
 | ❗createImage   | 	Promise\<XImage\>  |   GestiController |   (image: HTMLImageElement \| SVGImageElement \| HTMLVideoElement \| HTMLCanvasElement \| Blob \| ImageData \| ImageBitmap \| OffscreenCanvas, options?: createImageOptions)   |  传入图片数据，返回一个Ximage对象,详细使用方法参考Demo    |
@@ -135,6 +137,8 @@
 |unInstallButton  | void | (buttons: Array<Button>)   |   卸载按钮     |
 |setSize  | void | (size: { width?: number; height?: number })   |   设置大小     |
 |setDecoration  | void | (args:any)   |  设置对象装饰，比如颜色，线条高度等，每个子类传入的参数不一     |
+|setOpacity  | void | (opacity:number)   |  设置对象不透明度，取值 0.0~1.0     |
+
 
 | 属性名      |   返回值         |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |   :----: |
@@ -148,7 +152,7 @@
 
 
 # Hooks 🚀
-- 对于React和Vue3开发者来说,组合式Api无疑是干净的
+- 还挺好用
 
 ### 创建对象系列
 | Hook      | 返回值类型         |    参数    |   说明   |
@@ -167,7 +171,11 @@
 |onHide | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    隐藏可操作对象时      |
 |onUpdate | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    刷新画布时      |
 |onLoad | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    载入新的对象到画布内时      |
+|onBeforeDestroy  | - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    销毁Gesti实例前执行      |
+|onDestroy| - |     (hook: (_args: any) => any, target?: Gesti, prepend?: boolean)    |    销毁Gesti实例后执行      |
 |removeListener | - | (type: GestiControllerListenerTypes,hook: (_args: any) => any, target?: Gesti)    |    根据addListener返回值，移除监听函数    |
+
+
 
 
 
@@ -213,8 +221,9 @@
 |useGraffitiWrite | - |    (option?: {...}, target?: Gesti    | 开启涂鸦功能，手写板     |
 |useCloseGraffiti | - |    (option?: {...}, target?: Gesti    | 关闭涂鸦功能    |
 |useTextHandler | - |    (option?: {...}, target?: Gesti    | 得到一个TextBox实例控制器，用于控制它的参数    |
-|useReader | Promise<ViewObject> |    (json: string)    | 传入特定格式的json，返回一个ViewObject对象    |
-
+|~~useReader~~ | Promise<ViewObject> |    (json: string)    | 传入特定格式的json，返回一个ViewObject对象    |
+|useReaderH5 | Promise<ViewObject> |    (json: string)    | 传入特定格式的json，返回一个ViewObject对象  H5    |
+|useReaderWeChat | Promise<ViewObject> |    (json: string)    | 传入特定格式的json，返回一个ViewObject对象 微信小程序 canvas 2d   |
 
 
 ### do系列
@@ -223,7 +232,9 @@
 | Hook      | 返回值类型         |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |   :----: |
 |doSelect | - |    (view?: ViewObject, target?: Gesti)    |  选中传入对象  |
-|doRotate | - |     (angle: number, existing?: boolean, view?: ViewObject, target?: Gesti)    |  旋转一个对象  |
+|doRotate | - |     (angle: number, existing?: boolean, view?: ViewObject, target?: Gesti)    |  旋转一个对象，不传入view默认当前选中对象  |
+|doPosition | - |     (x: number, x: number, view?: ViewObject, target?: Gesti)    |  设置一个对象的位置，不传入view默认当前选中对象  |
+|doCleanAll | - |    (view?: ViewObject, target?: Gesti)    |  画布内清空所有元素  |
 |doLayerLower | - |    (view?: ViewObject, target?: Gesti)    |  所在图层向下一层  |
 |doLayerRise | - |    (view?: ViewObject, target?: Gesti)    |  所在图层向上一层  |
 |doLayerTop | - |    (view?: ViewObject, target?: Gesti)    |  置于顶层  |
@@ -239,6 +250,7 @@
 |doCancelAll | - |    -    |  取消所有被选中对象  |
 |doUpdate | - |    -    |  手动刷新画布  |
 |doCancelEvent | - |    -    |  取消原有画布事件代理,调用该方法后需要自定调用drive系列Hook,否则Gesti无法监听到您的手指/鼠标的位置  |
+
 
 ### drive系列
 - 自定义鼠标/手指事件代理
@@ -269,14 +281,12 @@
 
 - 该库只是为您提供了canvas的代理操作，并没有改变canvas的任何原有API，所以您可以使用canvas自带的API进行存储。
 
-# 在 微信小程序 | uniapp 端使用
-- 微信小程序端我无法监听屏幕事件，但是您可以使用我提供的  [GestiController](#gesticontroller-1)  实现自定义事件。为canvas提供事件并在方法里面调用 [GestiController](#gesticontroller-1) 的各个方法。
-- 如果您的uniapp运行在H5端，那您无需担心任何问题，如果您在其他端，请参考以上微信小程序方案
-- 详细操作请参考Demo:  https://ext.dcloud.net.cn/plugin?id=10867
 # 可能会遇到的问题
-- 在执行操作方法后可能会出现画布为刷新问题，为您提供了controller.update方法手动刷新。
+- 图片导入不出现？数据变了图片没动？试试update方法刷新一下。
 - hooks和普通模式有啥区别吗? 个人认为Hooks更适合FP爱好者，普通模式适合OOP爱好者。
 - 图片 | 文字上没有可以直接操作的按钮吗？ 有,不过需要您自己new成按钮对象安装上去。
+- 为什么路由切换后再返回页面会发生报错？重新init一下，记得controller也要重新赋值。
+- 其他问题可以加下面QQ群
 - Demo下载地址:  https://ext.dcloud.net.cn/plugin?id=10867 
 
 # 示例

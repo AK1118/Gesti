@@ -36,6 +36,8 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   private isMirror: boolean = false;
   public disabled: boolean = false;
   public rect: Rect;
+  //不透明度
+  private opacity:number=1;
   public beforeRect: Rect;
   private layer: number = 0;
   private funcButton: Array<Button> = new Array<Button>();
@@ -57,6 +59,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public delockButton: UnLockButton;
   public rotateButton: RotateButton;
   public name: string;
+  public id:string;
   abstract family: ViewObjectFamily;
   public originFamily:ViewObjectFamily;
   constructor() {
@@ -147,7 +150,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     paint.translate(this.rect.position.x, this.rect.position.y);
     paint.rotate(this.rect.getAngle);
     if (this.isMirror) paint.scale(-1, 1);
+    paint.globalAlpha=this.opacity;
     this.drawImage(paint);
+    paint.globalAlpha=1;
     if (this.isMirror) paint.scale(-1, 1);
     if (this.selected) {
       //边框
@@ -363,6 +368,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       mirror: this.isMirror,
       locked: this.isLock,
       buttons:this.funcButton.map((button:Button)=>button.constructor.name),
+      id:this.id,
     };
   }
   /**
@@ -372,6 +378,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
 
   public setPosition(x:number,y:number):void{
       this.rect.setPosition(new Vector(x,y));
+  }
+  public setOpacity(opacity:number):void{
+    this.opacity=opacity;
   }
 }
 

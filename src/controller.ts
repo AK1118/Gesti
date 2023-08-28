@@ -1,4 +1,5 @@
 import ViewObject from "./abstract/view-object";
+import { ViewObjectFamily } from "./enums";
 import ImageToolkit from "./image-toolkit";
 import GestiController from "./interfaces/gesticontroller";
 import Vector from "./vector";
@@ -25,6 +26,13 @@ class GesteControllerImpl implements GestiController {
   constructor(kit: ImageToolkit) {
     //使用控制器时，取消原有控制
     this.kit = kit;
+  }
+  querySelector(select: string | ViewObjectFamily): Promise<ViewObject | ViewObject[]> {
+    throw new Error("Method not implemented.");
+  }
+  getViewObjectById<T extends ViewObject>(id:string): Promise<T> {
+      if(!id)throw Error("Invalid id");
+      return this.kit.getViewObjectById<T>(id);
   }
   /**
    * @description 设置某个对象的位置

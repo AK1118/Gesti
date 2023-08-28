@@ -95,6 +95,11 @@ export declare abstract class ViewObject {
   setSize(size: { width?: number; height?: number }): void;
   //设置位置
   setPosition(x:number,y:number):void;
+  /**
+   * @description 设置不透明度
+   * @param opacity  0.0~1.0
+   */
+  setOpacity(opacity:number):void;
   //是否已被选中
   readonly selected: boolean;
 }

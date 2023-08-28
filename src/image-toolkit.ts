@@ -6,7 +6,7 @@ import CatchPointUtil from "./catchPointUtil";
 import canvasConfig from "./config/canvasConfig";
 import GestiConfig from "./config/gestiConfig";
 import Drag from "./drag";
-import { FuncButtonTrigger } from "./enums";
+import { FuncButtonTrigger, ViewObjectFamily } from "./enums";
 import GestiEventManager, { GestiEvent } from "./event";
 import Gesture from "./gesture";
 import GestiController from "./interfaces/gesticontroller";
@@ -142,6 +142,14 @@ class ImageToolkit implements GestiController {
     canvasConfig.setGlobalPaint(this.paint);
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
+  }
+  querySelector(select: string | ViewObjectFamily): Promise<ViewObject | ViewObject[]> {
+    throw new Error("Method not implemented.");
+  }
+  getViewObjectById<T extends ViewObject>(id:string): Promise<T> {
+      const arr=this.ViewObjectList;
+      const obj:T|null=arr.find(item=>item.id===id) as T;
+      return Promise.resolve<T>(obj);
   }
   position(x: number, y: number, view?: ViewObject): void {
       if(view){
