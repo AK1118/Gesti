@@ -83,6 +83,7 @@ import {
   useGetViewObjectById
 } from "./hooks/index";
 import { inToPx, mmToIn, ptToPx } from "./utils";
+import { parseUint8Array, uint8ArrayConvert } from "./utils/utils";
 import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
 import WriteViewObj from "./viewObject/write";
@@ -175,70 +176,8 @@ export {
   doPosition,
   useReaderWeChat,
   useReaderH5,
-  useGetViewObjectById
+  useGetViewObjectById,
+  parseUint8Array,
+  uint8ArrayConvert,
 };
 export default Gesti;
-
-const canvas: HTMLCanvasElement = document.querySelector("#canvas");
-const offScreenCanvas:HTMLCanvasElement=document.querySelector("#offScreenCanvas");
-const img: HTMLImageElement = document.querySelector("#dog");
-canvas.width = 500;
-canvas.height = 500;
-offScreenCanvas.width=10000;
-offScreenCanvas.height=500;
-const g = canvas.getContext("2d");
-const offScreenPainter=offScreenCanvas.getContext("2d");
-const gesti = createGesti({
-  dashedLine: false,
-  auxiliary:false,
-});
-gesti.init(canvas);
-
-const controller = useController();
-
-const ximage = createXImage({
-  data: img,
-  width: img.width,
-  height: img.height,
-  scale: 1,
-});
-
-const imageBox = createImageBox(ximage);
-const lockButton = new LockButton(imageBox);
-const unLockButton = new UnLockButton(imageBox);
-installButton(imageBox, [
-  lockButton,
-  unLockButton,
-  createDragButton(imageBox),
-]);
-doCenter(null, imageBox);
-  loadToGesti(imageBox);
-
-  const textBox=createTextBox("新建文本",{
-    resetFontSizeWithRect:true,
-  });
-  textBox.installButton(createDragButton(textBox));
-  textBox.updateText(textBox.value,{
-    fontFamily:"",
-  });
-  textBox.id="wenz";
-  loadToGesti(textBox)
-doUpdate();
-
-
-
-document.getElementById("import").addEventListener("click",()=>{
-  console.log("导入")
-  importAll(window.localStorage.getItem("aa")).then(e=>{
-    console.log("导入成功")
-  })
-})
-
-document.getElementById("export").addEventListener("click",()=>{
-  console.log("导出")
-  exportAll(offScreenPainter).then(json=>{
-   window.localStorage.setItem("aa",json);
-   console.log("导出成功");
-  })
-
-})

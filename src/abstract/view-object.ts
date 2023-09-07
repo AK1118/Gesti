@@ -37,9 +37,8 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public disabled: boolean = false;
   public rect: Rect;
   //不透明度
-  private opacity:number=1;
+  private opacity: number = 1;
   public beforeRect: Rect;
-  private layer: number = 0;
   private funcButton: Array<Button> = new Array<Button>();
   public relativeRect: Rect;
   //辅助线
@@ -59,9 +58,12 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public delockButton: UnLockButton;
   public rotateButton: RotateButton;
   public name: string;
-  public id:string;
+  public id: string;
   abstract family: ViewObjectFamily;
-  public originFamily:ViewObjectFamily;
+  public originFamily: ViewObjectFamily;
+  private layer: number = 0;
+  //是否属于背景，如果是背景，就不能被选中，且永远置于最底层
+  private background: boolean = false;
   constructor() {
     super();
     //根据配置判断是否设置参考线
@@ -75,6 +77,21 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public setName(name: string) {
     this.name = name;
   }
+  get isBackground():boolean{
+    return this.background;
+  }
+  /**
+   * 将对象设置为背景
+   */
+  public toBackground():void{
+    this.background=true;
+  }
+  /**
+   * 取消图片背景图片
+   */
+  public unBackground():void{
+    this.background=false;
+  }
   public init() {
     this.relativeRect = new Rect({
       x: 0,
@@ -86,12 +103,12 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.inited = true;
   }
   //设置大小
-  public setSize(size:{
-    width?:number,
-    height?:number,
-  }){
-    const {width,height}=size;
-    this.rect.setSize(width??this.rect.size.width,height??this.rect.size.height);
+  public setSize(size: { width?: number; height?: number }) {
+    const { width, height } = size;
+    this.rect.setSize(
+      width ?? this.rect.size.width,
+      height ?? this.rect.size.height
+    );
   }
   //卸载按钮
   public unInstallButton(buttons: Array<Button>) {
@@ -130,10 +147,10 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   get isLock(): boolean {
     return this._lock;
   }
-  set setLayer(layer: number) {
+  public setLayer(layer: number) {
     this.layer = layer;
   }
-  get getLayer(): number {
+  public getLayer(): number {
     return this.layer;
   }
   public mirror() {
@@ -143,16 +160,16 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     if (!this.inited) return;
     this.draw(paint);
   }
-  abstract setDecoration(args:any):void;
+  abstract setDecoration(args: any): void;
   public draw(paint: Painter): void {
     paint.beginPath();
     paint.save();
     paint.translate(this.rect.position.x, this.rect.position.y);
     paint.rotate(this.rect.getAngle);
     if (this.isMirror) paint.scale(-1, 1);
-    paint.globalAlpha=this.opacity;
+    paint.globalAlpha = this.opacity;
     this.drawImage(paint);
-    paint.globalAlpha=1;
+    paint.globalAlpha = 1;
     if (this.isMirror) paint.scale(-1, 1);
     if (this.selected) {
       //边框
@@ -342,9 +359,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
    */
   public didFallback() {}
   //导出为JSON
-  abstract export(painter?:Painter): Promise<Object>;
+  abstract export(painter?: Painter): Promise<Object>;
   //微信端导出
-  abstract exportWeChat(painter?:Painter,canvas?:any):Promise<Object>;
+  abstract exportWeChat(painter?: Painter, canvas?: any): Promise<Object>;
   /**
    * @description 提供公用基础信息导出
    * @returns
@@ -356,19 +373,20 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
         y: ~~this.rect.position.y,
         width: ~~this.rect.size.width,
         height: ~~this.rect.size.height,
-        angle: this.rect.getAngle,
+        angle: this.rect.getAngle.toFixed(3),
       },
       relativeRect: {
         x: ~~this.relativeRect.position.x,
         y: ~~this.relativeRect.position.y,
         width: ~~this.relativeRect.size.width,
         height: ~~this.relativeRect.size.height,
-        angle: this.rect.getAngle,
+        angle: this.rect.getAngle.toFixed(3),
       },
       mirror: this.isMirror,
       locked: this.isLock,
-      buttons:this.funcButton.map((button:Button)=>button.constructor.name),
-      id:this.id,
+      buttons: this.funcButton.map((button: Button) => button.constructor.name),
+      id: this.id,
+      layer: this.layer,
     };
   }
   /**
@@ -376,11 +394,11 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
    */
   public custom() {}
 
-  public setPosition(x:number,y:number):void{
-      this.rect.setPosition(new Vector(x,y));
+  public setPosition(x: number, y: number): void {
+    this.rect.setPosition(new Vector(x, y));
   }
-  public setOpacity(opacity:number):void{
-    this.opacity=opacity;
+  public setOpacity(opacity: number): void {
+    this.opacity = opacity;
   }
 }
 

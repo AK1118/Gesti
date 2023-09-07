@@ -69,7 +69,7 @@ class TextBox extends ViewObject {
   //随着选框的变化而改变字体大小
   private resetFontSizeWithRect: boolean = false;
   //字体大小最大值
-  private maxFontSize:number=9999;
+  private maxFontSize: number = 9999;
 
   constructor(text: string, options?: textOptions) {
     super();
@@ -114,7 +114,7 @@ class TextBox extends ViewObject {
       resetFontSizeWithRect,
     } = options ?? {};
 
-    this._fontFamily = fontFamily;
+    this._fontFamily = fontFamily||this._fontFamily;
     this.fontsize = fontSize;
     this._spacing = spacing;
     this._color = color;
@@ -125,10 +125,13 @@ class TextBox extends ViewObject {
     this.lineHeight = lineHeight;
     this.width = width;
     this.height = height;
-    this.resetFontSizeWithRect=resetFontSizeWithRect;
-    this.maxFontSize=maxFontSize??this.maxFontSize;
+    this.resetFontSizeWithRect = resetFontSizeWithRect??this.resetFontSizeWithRect;
+    this.maxFontSize = maxFontSize ?? this.maxFontSize;
     //限制字体大小
-    this.fontsize=Math.min(this.maxFontSize===9999?fontSize:this.maxFontSize,fontSize);
+    this.fontsize = Math.min(
+      this.maxFontSize === 9999 ? fontSize : this.maxFontSize,
+      fontSize
+    );
     //计算出行距与字体大小的比例
     this._spacing_scale = this.fontsize / this._spacing;
     this._painter.font = this.fontsize + "px " + this._fontFamily;
@@ -288,6 +291,9 @@ class TextBox extends ViewObject {
   public updateText(text: string, options?: textOptions): Promise<void> {
     return new Promise((r, j) => {
       this._text = text;
+      if (options){
+       if( this.resetFontSizeWithRect)options.resetFontSizeWithRect = true;
+      }
       this.initPrototypes(text, options);
       this.update(this._painter);
       this.setData();
@@ -309,7 +315,7 @@ class TextBox extends ViewObject {
   private async setData() {
     //随着选框的变化改变字体大小
     if (this.resetFontSizeWithRect) {
-      this.fontsize =Math.min( this.rect.size.height,this.maxFontSize);
+      this.fontsize = Math.min(this.rect.size.height, this.maxFontSize);
     } else {
       //静态文本大小，文字会被选框束缚
       const padding = 10;

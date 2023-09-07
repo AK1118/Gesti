@@ -31,9 +31,6 @@ enum EventHandlerState {
   move,
 }
 
-/**
- * 图层操作枚举
- */
 enum LayerOperationType {
   //下降一层
   lower,
@@ -43,7 +40,8 @@ enum LayerOperationType {
   top,
   //至于底层
   bottom,
-}
+ }
+ 
 
 type ListenerHook = (viewObject: ViewObject) => void;
 
@@ -378,14 +376,17 @@ class ImageToolkit implements GestiController {
       _view,
       LayerOperationType.lower
     );
+    this.update();
   }
   layerRise(view?: ViewObject): void {
     let _view = view || this.selectedViewObject;
     this.tool.arrangeLayer(this.ViewObjectList, _view, LayerOperationType.rise);
+    this.update();
   }
   layerTop(view?: ViewObject): void {
     let _view = view || this.selectedViewObject;
     this.tool.arrangeLayer(this.ViewObjectList, _view, LayerOperationType.top);
+    this.update();
   }
   layerBottom(view?: ViewObject): void {
     let _view = view || this.selectedViewObject;
@@ -394,6 +395,7 @@ class ImageToolkit implements GestiController {
       _view,
       LayerOperationType.bottom
     );
+    this.update();
   }
   unLock(view?: ViewObject): void {
     if (view) view?.unLock();
@@ -524,12 +526,16 @@ class ImageToolkit implements GestiController {
       this.ViewObjectList,
       event
     );
+
+    /**
+     * 选中元素存在 且不是已选中元素,且不是锁定,且不是背景元素
+     */
     if (
       selectedViewObject &&
       this.selectedViewObject === selectedViewObject &&
-      !this.selectedViewObject.isLock
+      !this.selectedViewObject.isLock&&!selectedViewObject.isBackground
     )
-      this.drag.catchViewObject(selectedViewObject.rect, event);
+    this.drag.catchViewObject(selectedViewObject.rect, event);
 
     /**
      * 画笔代码块 可以有被选中的图层，前提是当前下落的位置必定不能在上一个被选中的图册内
@@ -633,6 +639,8 @@ class ImageToolkit implements GestiController {
       event
     );
     if (selectedViewObject ?? false) {
+      //背景不给选中
+      if(selectedViewObject.isBackground)return this.selectedViewObject;
       this.debug(["选中了", selectedViewObject]);
       this.callHook("onSelect", selectedViewObject);
       this._inObjectArea = true;
@@ -695,6 +703,7 @@ class ImageToolkit implements GestiController {
     this.ViewObjectList.push(obj);
     this.callHook("onLoad", obj);
     this.update();
+    // this.tool.arrangeLayer(this.ViewObjectList,obj,obj.);
   }
   public update() {
     //休眠不执行任何操作
@@ -795,7 +804,7 @@ class _Tools {
    * @param selectedViewObject
    */
   public arrangeLayer(
-    ViewObjectList: Array<RenderObject>,
+    ViewObjectList: Array<ViewObject>,
     selectedViewObject: ViewObject,
     operationType: LayerOperationType
   ): void {
@@ -812,37 +821,51 @@ class _Tools {
       case LayerOperationType.top:
         {
           let temp = ViewObjectList[len];
-          ViewObjectList[len] = selectedViewObject;
-          ViewObjectList[ndx] = temp;
+          temp.setLayer(ndx);
+          selectedViewObject.setLayer(len);
+          // ViewObjectList[len] = selectedViewObject;
+          // ViewObjectList[ndx] = temp;
         }
         break;
       case LayerOperationType.bottom:
         {
           let temp = ViewObjectList[0];
-          ViewObjectList[0] = selectedViewObject;
-          ViewObjectList[ndx] = temp;
+          temp.setLayer(ndx);
+          selectedViewObject.setLayer(0);
+          // ViewObjectList[0] = selectedViewObject;
+          // ViewObjectList[ndx] = temp;
         }
         break;
       case LayerOperationType.rise:
         {
           if (ndx == len) break;
           let temp = ViewObjectList[ndx + 1];
-          ViewObjectList[ndx + 1] = selectedViewObject;
-          ViewObjectList[ndx] = temp;
+          temp.setLayer(ndx);
+          selectedViewObject.setLayer(ndx + 1);
+          // ViewObjectList[ndx + 1] = selectedViewObject;
+          // ViewObjectList[ndx] = temp;
         }
         break;
       case LayerOperationType.lower:
         {
-          console.log(ndx);
           if (ndx == 0) break;
           const temp = ViewObjectList[ndx - 1];
-          ViewObjectList[ndx - 1] = selectedViewObject;
-          ViewObjectList[ndx] = temp;
+          temp.setLayer(ndx);
+          selectedViewObject.setLayer(ndx - 1);
+          // ViewObjectList[ndx - 1] = selectedViewObject;
+          // ViewObjectList[ndx] = temp;
         }
         break;
     }
+    this.sortByLayer(ViewObjectList);
   }
-
+  /**
+   * @description 根据layer排序
+   * @param ViewObjectList 
+   */
+  public sortByLayer(ViewObjectList: Array<RenderObject>):void{
+    ViewObjectList.sort((a:ViewObject,b:ViewObject)=>a.getLayer()-b.getLayer());
+  }
   public fallbackViewObject(
     ViewObjectList: Array<ViewObject>,
     node: RecordNode,

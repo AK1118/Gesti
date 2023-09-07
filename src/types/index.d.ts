@@ -102,6 +102,14 @@ export declare abstract class ViewObject {
   setOpacity(opacity:number):void;
   //是否已被选中
   readonly selected: boolean;
+  /**
+   * 将对象设置为背景
+   */
+  public toBackground():void;
+  /**
+   * 取消对象为背景
+   */
+  public unBackground():void;
 }
 export declare class XImage {
   new(params: createImageOptions): XImage;

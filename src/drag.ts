@@ -6,8 +6,7 @@ class Drag {
     private offset: Vector;
     public catchViewObject(rect: Rect, position: Vector | any): void {
         this.rect = rect;
-       this.offset=new Vector( this.rect.position.x - position.x,
-       this.rect.position.y - position.y,)
+       this.offset=new Vector( this.rect.position.x - position.x,this.rect.position.y - position.y,)
     }
     public cancel(): void {
         this.rect = null;

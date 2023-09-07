@@ -3,3 +3,6 @@ public
 NEED.md
 dist
 public
+*.zip
+*.7z
+*.rar

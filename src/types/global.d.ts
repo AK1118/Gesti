@@ -211,3 +211,4 @@ declare type GestiControllerListenerTypes =
 declare function textHandler(options?: textOptions): any;
 
 declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";
+
