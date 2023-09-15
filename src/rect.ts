@@ -5,7 +5,7 @@ import Vector from "./vector";
 import Vertex from "./vertex";
 
 /**
- * @typedef 拖拽的回调函数
+ * @ 拖拽的回调函数
  */
 declare interface onDragFunction {
     (rect: Rect): void;

@@ -1,9 +1,9 @@
-import { ImageBox, XImage } from "../index";
 import CutterInterface from "../interfaces/cutter";
 import Painter from "../painter";
 import { ImageChunk } from "../types/index";
 import Vector from "../vector";
 import ImageChunkConverter from "../utils/image-chunk-converter-H5";
+import XImage from "../ximage";
 
 /**
  * 图片切割
@@ -58,10 +58,10 @@ class CutterH5 implements CutterInterface {
       //获取切割图片终点，预防临界点溢出
       const endY = Math.min(y + chunkSize, imgHeight);
       const height = endY - y;
-      for (let x: number = 0; x < imgWidth; x += imgWidth) {
-        const endX = Math.min(x + imgWidth, imgWidth);
+      for (let x: number = 0; x < imgWidth; x += chunkSize) {
+        const endX = Math.min(x + chunkSize, imgWidth);
         const width = endX - x;
-      
+
         (g?.paint ? g?.paint : g).drawImage(
           image,
           x,
@@ -98,14 +98,30 @@ class CutterH5 implements CutterInterface {
     const imageData: ImageData = new ImageData(width, height, {
       colorSpace: "srgb",
     });
-    //数组合并法，效率高，容错率低
-    let curentNdx: number = 0;
-    chunks.forEach((item: ImageChunk) => {
+    chunks.forEach((item) => {
       const chunk = coverter.base64ToChunk(item);
-      chunk.imageData.data.forEach((item) => {
-        imageData.data[curentNdx++] = item;
+      const A = 4;
+      //切片数组开始位置
+      const sx = Math.max(0, chunk.x),
+        sy = Math.max(0, chunk.y);
+      //小切片最大宽度
+      const mw: number = chunk.width * A;
+      //在imageData中的下标
+      let index: number = 0;
+      //目前小切片下标在第几行了  目前小切片下标在第几个
+      let y: number = 0,
+        x: number = 0;
+      chunk.imageData.data.forEach((item: number, ndx: number) => {
+        x = ndx % mw;
+        y = ~~(ndx / mw);
+        //(sy+y)*width*A) 计算切片合并起始点Y
+        //再加上起始点X x代表目前切片遍历x ，y代表目前切片遍历y
+        //二位坐标转一维公式  x*y = index
+        index = (sy + y) * width * A + (x + sx * A);
+        imageData.data[index] = item;
       });
     });
+    console.info("[H5] Merge successful.");
     return imageData;
   }
 }

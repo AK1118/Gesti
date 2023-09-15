@@ -39,6 +39,7 @@ class Gesti {
     }
   ) {
     if (!canvas && !rect) throw Error("未指定Canvas大小或Canvas节点");
+    if(this._controller)this.destroy();
     if (typeof document != "undefined" && canvas) {
       let canvasRect: DOMRect = canvas.getBoundingClientRect();
       //优先使用自定义的rect
@@ -64,7 +65,7 @@ class Gesti {
     this.kit.update();
   }
   public destroy():void{
-    this.controller.destroyGesti();
+    this.controller?.destroyGesti();
     this._controller=null;
     this.kit=null;
 

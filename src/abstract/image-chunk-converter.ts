@@ -1,5 +1,4 @@
 import { ImageChunk } from "../types/index";
-const pako=require("pako");
 /**
  * 解析器基类
  */

@@ -12,7 +12,6 @@ import LockButton from "../buttons/lockbutton";
 import VerticalButton from "../buttons/verticalButton";
 import { gesticonfig } from "../config/gestiConfig";
 import Gesti from "../gesti";
-import { ImageBox } from "../index";
 import GestiReader from "../abstract/reader";
 import Vertex from "../vertex";
 import TextBox from "../viewObject/text";

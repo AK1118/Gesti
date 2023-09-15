@@ -95,7 +95,7 @@ abstract class GestiReader {
     );
     viewObject.id=options.id;
     viewObject.setLayer(options?.layer||0);
-    viewObject.relativeRect.setAngle(options.relativeRect.getAngle);
+    viewObject.relativeRect.setAngle(options.relativeRect.angle);
     viewObject.init();
     //init包括生成按钮
     options.locked && viewObject.lock();
