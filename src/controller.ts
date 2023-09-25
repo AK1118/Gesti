@@ -27,6 +27,9 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  setBoundary(boundaryRect: Boundary): void {
+    throw new Error("Method not implemented.");
+  }
   querySelector(select: string | ViewObjectFamily): Promise<ViewObject | ViewObject[]> {
     throw new Error("Method not implemented.");
   }

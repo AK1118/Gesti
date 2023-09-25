@@ -1,5 +1,6 @@
 import ViewObject from "../abstract/view-object";
 import Painter from "../painter";
+import Vector from "../vector";
 import Widgets from "../widgets";
 import DragButton from "./dragbutton";
 
@@ -8,6 +9,9 @@ class HorizonButton extends DragButton {
     super(master);
   }
   draw(paint: Painter): void {
+    this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
+  }
+  drawButton(position: Vector, size: Size, radius: number, paint: Painter): void {
     this.setAxis("horizontal");
     this.init({ percentage: [0.55, 0] });
     //按钮渲染样式

@@ -96,12 +96,16 @@ abstract class GestiReader {
     viewObject.id=options.id;
     viewObject.setLayer(options?.layer||0);
     viewObject.relativeRect.setAngle(options.relativeRect.angle);
+     //init包括生成按钮
     viewObject.init();
-    //init包括生成按钮
-    options.locked && viewObject.lock();
     viewObject.custom();
     viewObject.rect.setPosition(rect.position);
+    //安装按钮
     this.installButton(viewObject, options.buttons);
+    //设置成为背景
+    options.isBackground&&viewObject.toBackground();
+    //是否锁定
+     options.locked && viewObject.lock();
     return viewObject;
   }
 

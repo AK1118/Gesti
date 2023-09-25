@@ -82,9 +82,16 @@ class RotateButton extends Button {
         this.disable = false;
     }
     draw(paint: Painter) {
-
         if (this.disable) return;
-        const x = this.relativeRect.position.x, y = this.relativeRect.position.y;
+        this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);       
+    }
+    drawButton(position: Vector, size: Size,radius:number, paint: Painter): void {
+        const {
+            width,
+            height
+        } = size;
+        const halfRadius = this.radius * .75;
+        const x = position.x, y = position.y;
         paint.beginPath();
         paint.fillStyle = GestiConfig.theme.buttonsBgColor;
         paint.arc(x, y, this.radius, 0, Math.PI * 2);

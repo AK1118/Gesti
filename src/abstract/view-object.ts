@@ -387,6 +387,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       buttons: this.funcButton.map((button: Button) => button.constructor.name),
       id: this.id,
       layer: this.layer,
+      isBackground:this.isBackground,
     };
   }
   /**

@@ -123,7 +123,7 @@ class ImageToolkit implements GestiController {
   private snapshot: ImageData = null;
   //休眠,休眠时不能有任何操作
   private sleep: boolean = false;
-
+  private boundary:Boundary;
   public get getCanvasRect(): Rect {
     return this.canvasRect;
   }
@@ -140,6 +140,9 @@ class ImageToolkit implements GestiController {
     canvasConfig.setGlobalPaint(this.paint);
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
+  }
+  setBoundary(boundaryRect:Boundary): void {
+    throw new Error("Method not implemented.");
   }
   querySelector(select: string | ViewObjectFamily): Promise<ViewObject | ViewObject[]> {
     throw new Error("Method not implemented.");
@@ -639,8 +642,6 @@ class ImageToolkit implements GestiController {
       event
     );
     if (selectedViewObject ?? false) {
-      //背景不给选中
-      if(selectedViewObject.isBackground)return this.selectedViewObject;
       this.debug(["选中了", selectedViewObject]);
       this.callHook("onSelect", selectedViewObject);
       this._inObjectArea = true;

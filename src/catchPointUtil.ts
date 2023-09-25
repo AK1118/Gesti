@@ -17,7 +17,8 @@ class CatchPointUtil{
         for(let i=len;i>=0;i--){
             const item:ViewObject=ViewObjectList[i];
             //隐藏过后不需要检测位置
-            if(item.disabled)continue;
+            //是背景元素也不需要检测位置
+            if(item.disabled||item.isBackground)continue;
             if(CatchPointUtil.inArea(item.rect,position)){
                 return item;
             }

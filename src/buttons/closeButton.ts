@@ -34,13 +34,15 @@ class CloseButton extends Button {
         this.master.hide();
     }
     draw(paint: Painter): void {
+        this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
+    }
+    drawButton(position: Vector, size: Size,radius:number, paint: Painter): void {
         const {
             width,
             height
-        } = this.master.rect.size;
+        } = size;
         const halfRadius = this.radius * .75;
-
-        const x = this.relativeRect.position.x, y = this.relativeRect.position.y;
+        const x = position.x, y = position.y;
         paint.beginPath();
         paint.fillStyle = GestiConfig.theme.buttonsBgColor;
         paint.arc(x, y, this.radius, 0, Math.PI * 2);

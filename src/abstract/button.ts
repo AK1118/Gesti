@@ -44,7 +44,7 @@ export abstract class Button implements RenderObject {
     position?: Vector;
   };
   /**
-   * 充值按钮坐标
+   * 重置按钮坐标
    */
   public reset() {
     this.init(this.options);
@@ -146,6 +146,12 @@ export abstract class Button implements RenderObject {
   hide(): void {
     this.disabled=true;
   }
+  setSenseRadius(senseRadius:number){
+    this.senseRadius=senseRadius;
+    this.radius=senseRadius;
+    this.reset()
+  }
+  abstract drawButton(position:Vector,size:Size,radius:number,paint:Painter):void;
 }
 
 export default Button;

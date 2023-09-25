@@ -8,8 +8,11 @@ class VerticalButton extends DragButton {
     super(master);
   }
   draw(paint: Painter): void {
-    this.setAxis("vertical");
-    this.init({ percentage: [0, -.6] });
+    this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
+  }
+  drawButton(position: Vector, size: Size, radius: number, paint: Painter): void {
+    this.setAxis("horizontal");
+    this.init({ percentage: [0.55, 0] });
     //按钮渲染样式
     this.draw = function (paint) {
       const { x, y } = this.relativeRect.position;

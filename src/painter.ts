@@ -125,6 +125,38 @@ class Painter implements Painter {
       this.paint.drawImage(image, -width / 2, -height / 2, width, height);
     }
   }
+  deepDrawImage(
+    image:
+      | HTMLOrSVGImageElement
+      | HTMLVideoElement
+      | HTMLCanvasElement
+      | ImageBitmap
+      | OffscreenCanvas,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    dx?: number,
+    dy?: number,
+    dw?: number,
+    dh?: number
+  ) {
+    if (dx && dy) {
+      this.paint.drawImage(
+        image,
+        x,
+       y,
+        width,
+        height,
+        dx,
+        dy,
+        dw,
+        dh
+      );
+    } else {
+      this.paint.drawImage(image,x,y, width, height);
+    }
+  }
   scale(a: number, b: number) {
     this.paint.scale(a, b);
   }
@@ -134,7 +166,7 @@ class Painter implements Painter {
   lineTo(x: number, y: number) {
     this.paint.lineTo(x, y);
   }
-  getImageData(x: number, y: number, w: number, h: number):ImageData{
+  getImageData(x: number, y: number, w: number, h: number): ImageData {
     return this.paint.getImageData(x, y, w, h);
   }
   fillText(text: string, x: number, y: number) {
@@ -146,8 +178,8 @@ class Painter implements Painter {
   set font(font: string) {
     this.paint.font = font;
   }
-  set globalAlpha(alpha:number){
-    this.paint.globalAlpha=alpha;
+  set globalAlpha(alpha: number) {
+    this.paint.globalAlpha = alpha;
   }
   measureText(text: string): TextMetrics {
     return this.paint?.measureText(text);

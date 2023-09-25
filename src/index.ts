@@ -80,8 +80,9 @@ import {
   doPosition,
   useReaderH5,
   useReaderWeChat,
-  useGetViewObjectById
+  useGetViewObjectById,
 } from "./hooks/index";
+import Painter from "./painter";
 import { inToPx, mmToIn, ptToPx } from "./utils";
 import { parseUint8Array, uint8ArrayConvert } from "./utils/utils";
 import ImageBox from "./viewObject/image";
@@ -113,9 +114,9 @@ export {
   onCancel /*取消选中时 */,
   onHide /*隐藏可操作对象时 */,
   onUpdate /*刷新画布时 */,
-  onDestroy,/*销毁实例回调 */
-  onBeforeDestroy,/*销毁实例前回调 */
-  doDestroyGesti,/*销毁实例 */
+  onDestroy /*销毁实例回调 */,
+  onBeforeDestroy /*销毁实例前回调 */,
+  doDestroyGesti /*销毁实例 */,
   onLoad /**载入新的对象到画布内时 */,
   addVerticalLine /**新增预设垂直线到画布内 */,
   addHorizonLine /**新增预设水平线到画布内 */,
@@ -182,79 +183,88 @@ export {
 };
 export default Gesti;
 
+const canvas: HTMLCanvasElement = document.querySelector("#canvas");
+const offScreenCanvas: HTMLCanvasElement =
+  document.querySelector("#offScreenCanvas");
+const img: HTMLImageElement = document.querySelector("#dog");
+const bg: HTMLImageElement = document.querySelector("#bg");
+canvas.width = 500;
+canvas.height = 500;
+offScreenCanvas.width = 10000;
+offScreenCanvas.height = 500;
+const g = canvas.getContext("2d");
+const offScreenPainter = offScreenCanvas.getContext("2d");
+const gesti = createGesti({
+  dashedLine: false,
+  auxiliary: false,
+});
+gesti.init(canvas);
 
-// const canvas: HTMLCanvasElement = document.querySelector("#canvas");
-// const offScreenCanvas:HTMLCanvasElement=document.querySelector("#offScreenCanvas");
-// const img: HTMLImageElement = document.querySelector("#dog");
-// canvas.width = 500;
-// canvas.height = 500;
-// offScreenCanvas.width=10000;
-// offScreenCanvas.height=500;
-// const g = canvas.getContext("2d");
-// const offScreenPainter=offScreenCanvas.getContext("2d");
-// const gesti = createGesti({
-//   dashedLine: false,
-//   auxiliary:false,
+const controller = useController();
+
+const ximage = createXImage({
+  data: img,
+  width: img.width,
+  height: img.height,
+  scale: 1,
+});
+const imageBox = createImageBox(ximage);
+const lockButton = new LockButton(imageBox);
+
+const dragButton=new DragButton(imageBox);
+dragButton.setSenseRadius(60);
+const unLockButton = new UnLockButton(imageBox);
+imageBox.id = "tup1";
+installButton(imageBox, [lockButton, unLockButton, dragButton]);
+doCenter(null, imageBox);
+loadToGesti(imageBox);
+
+
+console.log(bg)
+const bgi = createXImage({
+  data: bg,
+  width: bg.width,
+  height: bg.height,
+  scale: 1,
+});
+const bgBox = createImageBox(bgi);
+doCenter(null, bgBox);
+loadToGesti(bgBox);
+bgBox.toBackground();
+HorizonButton
+controller.layerTop(bgBox);
+doUpdate()
+// const textBox = createTextBox("新建文本", {
+//   resetFontSizeWithRect: true,
 // });
-// gesti.init(canvas);
-
-// const controller = useController();
-
-// const ximage = createXImage({
-//   data: img,
-//   width: img.width,
-//   height: img.height,
-//   scale: 1,
+// textBox.installButton(createDragButton(textBox));
+// textBox.updateText(textBox.value, {
+//   color: "red",
+//   fontFamily: "隶书",
 // });
-
-// const imageBox = createImageBox(ximage);
-// const lockButton = new LockButton(imageBox);
-// const unLockButton = new UnLockButton(imageBox);
-// imageBox.id="tup1";
-// controller.getViewObjectById("tup1")
-
-
-// installButton(imageBox, [
-//   lockButton,
-//   unLockButton,
-//   createDragButton(imageBox),
-// ]);
-// // imageBox.toBackground();
-// doCenter(null, imageBox);
-//   loadToGesti(imageBox);
-//   const textBox=createTextBox("新建文本",{
-//     resetFontSizeWithRect:true,
-//   });
-//   textBox.installButton(createDragButton(textBox));
-//   textBox.updateText(textBox.value,{
-//     color:"red",
-//     fontFamily:"隶书"
-//   });
-//   textBox.id="wenz";
-//   loadToGesti(textBox)
+// textBox.id = "wenz";
+// loadToGesti(textBox);
 // doUpdate();
+//controller.layerBottom(textBox);
 
-// controller.layerBottom(textBox);
+// setInterval((timer)=>{
 
-// // setInterval((timer)=>{
-  
-// //   if(+new Date()%2===0)controller.layerRise(textBox);
-// //   else{controller.layerLower(textBox);}
-// //   doUpdate()
-// // },100);
+//   if(+new Date()%2===0)controller.layerRise(textBox);
+//   else{controller.layerLower(textBox);}
+//   doUpdate()
+// },100);
 
-// document.getElementById("import").addEventListener("click",()=>{
-//   console.log("导入")
-//   importAll(window.localStorage.getItem("aa")).then(e=>{
-//     console.log("导入成功")
-//   })
-// })
+document.getElementById("import").addEventListener("click", () => {
+  console.log("导入");
+  importAll(window.localStorage.getItem("aa")).then((e) => {
+    console.log("导入成功");
+  });
+});
 
-// document.getElementById("export").addEventListener("click",()=>{
-//   console.log("导出")
-//   exportAll(offScreenPainter).then(json=>{
-//    window.localStorage.setItem("aa",json);
-//    console.log("导出成功");
-//   })
-// });
-
+document.getElementById("export").addEventListener("click", () => {
+  console.log("导出");
+  exportAll(offScreenPainter).then((json) => {
+    window.localStorage.setItem("aa", json);
+    console.log("导出成功");
+  });
+});
