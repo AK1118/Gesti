@@ -183,6 +183,8 @@ export {
 };
 export default Gesti;
 
+
+
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const offScreenCanvas: HTMLCanvasElement =
   document.querySelector("#offScreenCanvas");

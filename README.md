@@ -113,6 +113,7 @@
 | ❗createImage   | 	Promise\<XImage\>  |   GestiController |   (image: HTMLImageElement \| SVGImageElement \| HTMLVideoElement \| HTMLCanvasElement \| Blob \| ImageData \| ImageBitmap \| OffscreenCanvas, options?: createImageOptions)   |  传入图片数据，返回一个Ximage对象,详细使用方法参考Demo    |
 | cancelEvent   | void  |   GestiController |   -   |  取消Gesti自带的鼠标手指时间监听。使用该函数后需要自行调用鼠标各个事件，请参考上方  down,up,move  ,使用详情参考Demo    |
 | addWrite   | 	void  |   GestiController |   (options: {type: "circle" \| "write" \| "line" \| "rect" \| "none";lineWidth?: number;color?: string;isFill?: boolean;})   |  添加涂鸦功能，调用该函数且传入options.type不为"none"时，下一次在canvas内滑动会触发生成对应的涂鸦对象,直到再次调用该函数且options.type为"none"时停止    |
+| getViewObjectById  | Promise\<ViewObject\>  |   GestiController |    (id:string)   |  通过id获取ViewObject对象    |
 
 
 | 属性名      | 返回值类型         |  所属    |    参数    |   说明   |
@@ -125,7 +126,7 @@
 - 获取它的途径一般来自于创建对象，它是一个基类，其子类还有TextBox , ImageBox ,WriteViewObj
 
 
-| 属性名      |   返回值         |    参数    |   说明   |
+| 方法名      |   返回值         |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |   :----: |
 |getBaseInfo | Object |   -    |    获取对象的向量信息      |
 |setName | void |  (name: string)    |    给对象设置名字      |
@@ -138,6 +139,7 @@
 |setSize  | void | (size: { width?: number; height?: number })   |   设置大小     |
 |setDecoration  | void | (args:any)   |  设置对象装饰，比如颜色，线条高度等，每个子类传入的参数不一     |
 |setOpacity  | void | (opacity:number)   |  设置对象不透明度，取值 0.0~1.0     |
+|toBackground  | void |  -   |  将该对象设置为背景,设置背景后可设置层级。所有事件将会被穿透   |
 
 
 | 属性名      |   返回值         |    参数    |   说明   |
@@ -147,8 +149,17 @@
 |name | string |   -    |  有时候对象可以拥有一个名字    |
 |selected | boolean |   -    |  已经被选中了吗    |
 |originFamily | ViewObjectFamily |   -    |  家族起源家族，比如write是起源家族，它下面有line,rect，circle等分支家族    |
+|id | string |   -    |  设置该对象id    |
 
 
+
+## Button 对象
+- 控制ViewObject的功能按钮
+
+
+| 方法名      |   返回值         |    参数    |   说明   |
+| :---       |    :----:         |  :----:   |   :----: |
+|drawButton | -  |   Function(position: Vector, size: Size,radius:number, paint: Painter)    |    可重写该方法实现自定义按钮样式      |
 
 
 # Hooks 🚀
@@ -207,11 +218,12 @@
 |createCloseButton  | Button | (view: ViewObject)    |    创建一个关闭按钮      |
 |installButton | - | (view: ViewObject, button: Button \| Array<Button>)    |    安装按钮到ViewObject上      |
 |unInstallButton | - | (view: ViewObject, button: Button \| Array<Button>)   |    卸载ViewObject上的按钮   |
-|loadToGesti | - |    (view: ViewObject, target?: Gesti)    |    以防万一，这个放这里更显眼。加入一个ViewObject对象到画布内,以上的类都是继承于ViewObjet      |
+|loadToGesti | - |    (view: ViewObject, target?: Gesti)    |   加入一个ViewObject对象到画布内,以上的类都是继承于ViewObjet      |
+
 
 
 ### use系列
-- 涂鸦功能藏于此处
+- 涂鸦功能
 
 | Hook      | 返回值类型         |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |   :----: |
@@ -224,6 +236,7 @@
 |~~useReader~~ | Promise<ViewObject> |    (json: string)    | 传入特定格式的json，返回一个ViewObject对象    |
 |useReaderH5 | Promise<ViewObject> |    (json: string)    | 传入特定格式的json，返回一个ViewObject对象  H5    |
 |useReaderWeChat | Promise<ViewObject> |    (json: string)    | 传入特定格式的json，返回一个ViewObject对象 微信小程序 canvas 2d   |
+|useGetViewObject | Promise<ViewObject> |    (id: string)    |  通过id获取ViewObject对象    |
 
 
 ### do系列
