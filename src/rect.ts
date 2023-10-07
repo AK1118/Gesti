@@ -85,14 +85,14 @@ class Rect extends ObserverObj {
         return this._angle;
     }
     public set position(position: Vector) {
-        this.beforeReport(position, "position");
+        this.beforeReport(this._position, "position");
         this._position = position;
         this._position.x=~~this._position.x;
         this._position.y=~~this._position.y;
         this.report(position, "position");
     }
     public setPosition(position: Vector):void {
-        this.beforeReport(position, "position");
+        this.beforeReport(this._position, "position");
         this._position = position;
         this._position.x=~~this._position.x;
         this._position.y=~~this._position.y;

@@ -212,3 +212,8 @@ declare function textHandler(options?: textOptions): any;
 
 declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";
 
+declare interface Delta{
+  readonly deltaX:number,
+  readonly deltaY:number
+}
+

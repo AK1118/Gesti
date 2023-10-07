@@ -164,6 +164,12 @@ abstract class OperationObserver implements OperationObserverType {
     beforeReport(value: any, type: keyof OperationType): void {
         //设置旧的状态
         this.recordClazz.recordBefore(value,type,this.obj);
+        switch (type) {
+            case "position":
+                this.beforeChangePosition(value);
+                break;
+            default:{}
+        }
     }
     /**
      * 汇报观察情况，调用对应函数
@@ -171,7 +177,6 @@ abstract class OperationObserver implements OperationObserverType {
      * @param type 
      */
     report(value: any, type: keyof OperationType): void {
-     
         this.record(value,type);
         switch (type) {
             case "size":
@@ -202,6 +207,7 @@ abstract class OperationObserver implements OperationObserverType {
     public didChangeAngle(angle: number) {}
     public didChangeSize(size: Size): void {}
     public didChangePosition(position: Vector): void {}
+    public beforeChangePosition(position: Vector): void {}
     public didChangeScale(scale: number): void { }
     public didDrag(value: { size: Size; angle: number; }): void {}
 }

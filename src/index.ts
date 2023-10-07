@@ -84,6 +84,7 @@ import {
 } from "./hooks/index";
 import { inToPx, mmToIn, ptToPx } from "./utils";
 import { parseUint8Array, uint8ArrayConvert } from "./utils/utils";
+import Group from "./viewObject/group";
 import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
 import WriteViewObj from "./viewObject/write";
@@ -214,34 +215,37 @@ imageBox.id="tup1";
 controller.getViewObjectById("tup1")
 
 
-installButton(imageBox, [
-  lockButton,
-  unLockButton,
-  createDragButton(imageBox),
-]);
-imageBox.toBackground();
-doCenter(null, imageBox);
-  loadToGesti(imageBox);
+
+const group:Group=new Group();
+group.add(imageBox);
+loadToGesti(imageBox);
+loadToGesti(group);
+
+doCenter(null,group);
+
+// installButton(imageBox, [
+//   lockButton,
+//   unLockButton,
+//   createDragButton(imageBox),
+// ]);
+// imageBox.toBackground();
+// imageBox.unBackground();
+// doCenter(null, imageBox);
+// // loadToGesti(imageBox);
   const textBox=createTextBox("新建文本",{
     resetFontSizeWithRect:true,
   });
-  textBox.installButton(createDragButton(textBox));
-  textBox.updateText(textBox.value,{
-    color:"red",
-    fontFamily:"隶书"
-  });
-  textBox.id="wenz";
-  loadToGesti(textBox)
-doUpdate();
+//   textBox.installButton(createDragButton(textBox));
+//   textBox.updateText(textBox.value,{
+//     color:"red",
+//     fontFamily:"隶书"
+//   });
+//   textBox.id="wenz";
+  loadToGesti(textBox);
+   group.add(textBox)
+// doUpdate();
 
-controller.layerBottom(textBox);
 
-// setInterval((timer)=>{
-  
-//   if(+new Date()%2===0)controller.layerRise(textBox);
-//   else{controller.layerLower(textBox);}
-//   doUpdate()
-// },100);
 
 document.getElementById("import").addEventListener("click",()=>{
   console.log("导入")
@@ -257,3 +261,4 @@ document.getElementById("export").addEventListener("click",()=>{
    console.log("导出成功");
   })
 });
+
