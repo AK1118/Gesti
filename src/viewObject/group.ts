@@ -30,6 +30,7 @@ class Group extends ViewObject{
     const [deltaX,deltaY]=this.delta.delta;
     this.views.forEach(_=>{
       _.addPosition(deltaX,deltaY);
+      
     });
     this.delta.clean();
   }

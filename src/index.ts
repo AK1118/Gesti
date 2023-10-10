@@ -223,11 +223,11 @@ loadToGesti(group);
 
 doCenter(null,group);
 
-// installButton(imageBox, [
-//   lockButton,
-//   unLockButton,
-//   createDragButton(imageBox),
-// ]);
+installButton(group, [
+  lockButton,
+  unLockButton,
+  createDragButton(imageBox),
+]);
 // imageBox.toBackground();
 // imageBox.unBackground();
 // doCenter(null, imageBox);
