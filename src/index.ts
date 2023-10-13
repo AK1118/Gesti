@@ -84,7 +84,7 @@ import {
 } from "./hooks/index";
 import Painter from "./painter";
 import { inToPx, mmToIn, ptToPx } from "./utils";
-import { parseUint8Array, uint8ArrayConvert } from "./utils/utils";
+import { parseUint8Array, uint8ArrayConvert, uint8ArrayToChunks } from "./utils/utils";
 import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
 import WriteViewObj from "./viewObject/write";
@@ -180,93 +180,7 @@ export {
   useGetViewObjectById,
   parseUint8Array,
   uint8ArrayConvert,
+  uint8ArrayToChunks,
 };
 export default Gesti;
 
-
-
-const canvas: HTMLCanvasElement = document.querySelector("#canvas");
-const offScreenCanvas: HTMLCanvasElement =
-  document.querySelector("#offScreenCanvas");
-const img: HTMLImageElement = document.querySelector("#dog");
-const bg: HTMLImageElement = document.querySelector("#bg");
-canvas.width = 500;
-canvas.height = 500;
-offScreenCanvas.width = 10000;
-offScreenCanvas.height = 500;
-const g = canvas.getContext("2d");
-const offScreenPainter = offScreenCanvas.getContext("2d");
-const gesti = createGesti({
-  dashedLine: false,
-  auxiliary: false,
-});
-gesti.init(canvas);
-
-const controller = useController();
-
-const ximage = createXImage({
-  data: img,
-  width: img.width,
-  height: img.height,
-  scale: 1,
-});
-const imageBox = createImageBox(ximage);
-const lockButton = new LockButton(imageBox);
-
-const dragButton=new DragButton(imageBox);
-dragButton.setSenseRadius(60);
-const unLockButton = new UnLockButton(imageBox);
-imageBox.id = "tup1";
-installButton(imageBox, [lockButton, unLockButton, dragButton]);
-doCenter(null, imageBox);
-loadToGesti(imageBox);
-
-
-console.log(bg)
-const bgi = createXImage({
-  data: bg,
-  width: bg.width,
-  height: bg.height,
-  scale: 1,
-});
-const bgBox = createImageBox(bgi);
-doCenter(null, bgBox);
-loadToGesti(bgBox);
-bgBox.toBackground();
-HorizonButton
-controller.layerTop(bgBox);
-doUpdate()
-// const textBox = createTextBox("新建文本", {
-//   resetFontSizeWithRect: true,
-// });
-// textBox.installButton(createDragButton(textBox));
-// textBox.updateText(textBox.value, {
-//   color: "red",
-//   fontFamily: "隶书",
-// });
-// textBox.id = "wenz";
-// loadToGesti(textBox);
-// doUpdate();
-//controller.layerBottom(textBox);
-
-// setInterval((timer)=>{
-
-//   if(+new Date()%2===0)controller.layerRise(textBox);
-//   else{controller.layerLower(textBox);}
-//   doUpdate()
-// },100);
-
-document.getElementById("import").addEventListener("click", () => {
-  console.log("导入");
-  importAll(window.localStorage.getItem("aa")).then((e) => {
-    console.log("导入成功");
-  });
-});
-
-document.getElementById("export").addEventListener("click", () => {
-  console.log("导出");
-  exportAll(offScreenPainter).then((json) => {
-    window.localStorage.setItem("aa", json);
-    console.log("导出成功");
-  });
-});

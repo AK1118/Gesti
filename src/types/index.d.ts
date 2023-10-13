@@ -562,3 +562,14 @@ export declare const inToPx: (inch: number) => number;
  * @description 榜转换为像素
  */
 export declare const ptToPx: (pt: number) => number;
+
+
+/**
+ * @description 将Uint8Array数组分割成小切片(压缩后的)
+ */
+export declare const uint8ArrayToChunks:(
+  uint8Array: Uint8Array,
+  width: number,
+  height: number,
+  chunkSize: number
+)=>ImageChunk[];

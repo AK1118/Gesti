@@ -62,7 +62,7 @@ class CutterH5 implements CutterInterface {
         const endX = Math.min(x + chunkSize, imgWidth);
         const width = endX - x;
 
-        (g?.paint ? g?.paint : g).drawImage(
+        g.paint.drawImage(
           image,
           x,
           y,
