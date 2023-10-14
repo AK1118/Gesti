@@ -6,7 +6,7 @@ const pako=require("pako");
  * */
 class ImageChunkConverterH5 extends ImageChunkConverter{
     chunkToBase64(chunk: ImageChunk): ImageChunk  {
-        const base64 =pako.gzip(chunk.imageData.data);
+        const base64 =pako.deflate(chunk.imageData.data);
          chunk.base64 = base64;
          chunk.imageData = null;
          return chunk;

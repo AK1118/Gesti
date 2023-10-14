@@ -28,18 +28,15 @@ const uint8ArrayToChunks = (
 ): ImageChunk[] => {
   const chunks: ImageChunk[] = [];
   const A = 4; // 假设每个像素有4个通道（RGBA）
-
+  // //当切块过小时合并
+  if (width - chunkSize < 20) chunkSize = width;
+  if (height - chunkSize < 20) chunkSize = height;
+ 
   for (let y = 0; y < height; y += chunkSize) {
     for (let x = 0; x < width; x += chunkSize) {
       const chunkWidth = Math.min(chunkSize, width - x);
       const chunkHeight = Math.min(chunkSize, height - y);
-      const imageData: {
-        width:number,
-        height:number,
-        data:Array<number>,
-      } ={
-        width:chunkWidth, height:chunkHeight,data:[],
-      };
+      
       const chunkData = [];
       for (let cy = 0; cy < chunkHeight; cy++) {
         for (let cx = 0; cx < chunkWidth; cx++) {
@@ -52,7 +49,15 @@ const uint8ArrayToChunks = (
           }
         }
       }
-      imageData.data=chunkData;
+      const imageData: {
+        width:number,
+        height:number,
+        data:Uint8Array,
+      } ={
+        width:chunkWidth, height:chunkHeight,data:new Uint8Array(chunkData),
+      };
+      // imageData.data.set(chunkData);
+      
       chunks.push({
         x,
         y,
@@ -61,6 +66,7 @@ const uint8ArrayToChunks = (
         imageData:imageData as unknown as ImageData,
         base64: "",
       });
+      
     }
   }
   const coverter: ImageChunkConverterWeChat = new ImageChunkConverterWeChat();

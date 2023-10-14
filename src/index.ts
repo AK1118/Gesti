@@ -184,3 +184,63 @@ export {
 };
 export default Gesti;
 
+
+const canvas: HTMLCanvasElement = document.querySelector("#canvas");
+const offScreenCanvas:HTMLCanvasElement=document.querySelector("#offScreenCanvas");
+const img: HTMLImageElement = document.querySelector("#bg");
+const img2: HTMLImageElement = document.querySelector("#bg");
+canvas.width = 500;
+canvas.height = 500;
+offScreenCanvas.width=10000;
+offScreenCanvas.height=500;
+const g = canvas.getContext("2d");
+const offScreenPainter=offScreenCanvas.getContext("2d");
+const gesti = createGesti({
+  dashedLine: false,
+  auxiliary:false,
+});
+gesti.init(canvas);
+
+
+
+g.drawImage(img,0,0);
+const data=g.getImageData(0,0,img.width,img.height);
+const chunks=uint8ArrayToChunks(data.data as unknown as Uint8Array,img.width,img.height,200);
+console.log(chunks);
+
+
+const ximage = createXImage({
+  data: img,
+  width: img.width,
+  height: img.height,
+  scale: 1,
+});
+
+const imageBox = createImageBox(ximage);
+const lockButton = new LockButton(imageBox);
+const unLockButton = new UnLockButton(imageBox);
+loadToGesti(imageBox);
+doCenter(null,imageBox);
+doUpdate()
+
+
+document.getElementById("import").addEventListener("click",()=>{
+  console.log("导入")
+  const a=window.localStorage.getItem("aa");
+  const h=JSON.parse(a)[0];
+  h.options.options.data=chunks;
+  h.options.fixedWidth=img.width;
+  h.options.fixedHeight=img.height;
+  importAll(JSON.stringify([h])).then(e=>{
+    console.log("导入成功")
+  })
+})
+
+document.getElementById("export").addEventListener("click",()=>{
+  console.log("导出")
+  exportAll(offScreenPainter).then(json=>{
+   window.localStorage.setItem("aa",json);
+   console.log("导出成功");
+  })
+});
+

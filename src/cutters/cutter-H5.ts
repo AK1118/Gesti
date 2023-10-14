@@ -51,7 +51,10 @@ class CutterH5 implements CutterInterface {
   ): Promise<ImageChunk[]> {
     const imgWidth: number = ximage.fixedWidth,
       imgHeight: number = ximage.fixedHeight;
-    const g: any = this.offScreenPainter || this.painter;
+      //当切块过小时合并
+      if(imgWidth-chunkSize<20)chunkSize=imgWidth;
+      if(imgHeight-chunkSize<20)chunkSize=imgHeight;
+    const g: any = this.painter;
     const chunks: ImageChunk[] = [];
     const image = ximage.data;
     for (let y: number = 0; y < imgHeight; y += chunkSize) {

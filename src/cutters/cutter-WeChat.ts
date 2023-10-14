@@ -14,6 +14,9 @@ class CutterWeChat implements CutterInterface {
   async getChunks(chunkSize: number, ximage: XImage): Promise<ImageChunk[]> {
     const imgWidth: number = ximage.fixedWidth,
       imgHeight: number = ximage.fixedHeight;
+    //当切块过小时合并
+    if (imgWidth - chunkSize < 20) chunkSize = imgWidth;
+    if (imgHeight - chunkSize < 20) chunkSize = imgHeight;
     const g: Painter = this.painter;
     const chunks: ImageChunk[] = [];
     const image = ximage.data;
@@ -59,12 +62,13 @@ class CutterWeChat implements CutterInterface {
       const sx = Math.max(0, chunk.x),
         sy = Math.max(0, chunk.y);
       //小切片最大宽度
-      const mw:number = chunk.width * A;
+      const mw: number = chunk.width * A;
       //在imageData中的下标
-      let index:number = 0;
+      let index: number = 0;
       //目前小切片下标在第几行了  目前小切片下标在第几个
-      let y:number = 0,x:number = 0;
-      chunk.imageData.data.forEach((item:number, ndx:number) => {
+      let y: number = 0,
+        x: number = 0;
+      chunk.imageData.data.forEach((item: number, ndx: number) => {
         x = ndx % mw;
         y = ~~(ndx / mw);
         //(sy+y)*width*A) 计算切片合并起始点Y
