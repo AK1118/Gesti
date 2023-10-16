@@ -699,10 +699,17 @@ class ImageToolkit implements GestiController {
   private callHook(type: GestiControllerListenerTypes, arg = null) {
     this.listen.callHooks(type, arg);
   }
-
+  /**
+   * @description 获取当前所存图层长度
+   * @returns number
+   */
+  public getViewObjectCount():number{
+    return this.ViewObjectList.length;
+  }
   private addViewObject(obj: ViewObject): void {
     this.ViewObjectList.push(obj);
     obj.ready(this);
+    obj.setLayer(this.getViewObjectCount()-1);
     this.callHook("onLoad", obj);
     this.update();
     // this.tool.arrangeLayer(this.ViewObjectList,obj,obj.);
@@ -810,52 +817,45 @@ class _Tools {
     selectedViewObject: ViewObject,
     operationType: LayerOperationType
   ): void {
-    /**
-     * 层级重构算法，使用换位
-     * 如选中了第3个 @ViewObject ，就将第3个和第一个互换位置
-     */
     const ndx = ViewObjectList.findIndex(
       (item: ViewObject) => item.key === selectedViewObject.key
     );
+    if(ndx===-1)return;
     const len = ViewObjectList.length - 1;
-    // 0为底部   len为顶部
+    // 0为底部   len为顶部   0 0 1 0 0 
+    //                      0 0 0 1 0
     switch (operationType) {
       case LayerOperationType.top:
         {
-          let temp = ViewObjectList[len];
-          temp.setLayer(ndx);
+          //暂存对象
+          if (ndx == len) break;
+          for(let i=ndx+1;i<len;i++){
+            ViewObjectList[i].setLayer(ViewObjectList[i].getLayer()-1);
+          }
           selectedViewObject.setLayer(len);
-          // ViewObjectList[len] = selectedViewObject;
-          // ViewObjectList[ndx] = temp;
         }
         break;
       case LayerOperationType.bottom:
         {
-          let temp = ViewObjectList[0];
-          temp.setLayer(ndx);
+          if (ndx == 0) break;
+          for(let i=ndx-1;i<0;i--){
+            ViewObjectList[i].setLayer(ViewObjectList[i].getLayer()+1);
+          }
           selectedViewObject.setLayer(0);
-          // ViewObjectList[0] = selectedViewObject;
-          // ViewObjectList[ndx] = temp;
         }
         break;
       case LayerOperationType.rise:
         {
-          if (ndx == len) break;
-          let temp = ViewObjectList[ndx + 1];
-          temp.setLayer(ndx);
-          selectedViewObject.setLayer(ndx + 1);
-          // ViewObjectList[ndx + 1] = selectedViewObject;
-          // ViewObjectList[ndx] = temp;
+           if (ndx == len) break;
+          ViewObjectList[ndx+1].setLayer(ndx);
+          selectedViewObject.setLayer(ndx+1);
         }
         break;
       case LayerOperationType.lower:
         {
           if (ndx == 0) break;
-          const temp = ViewObjectList[ndx - 1];
-          temp.setLayer(ndx);
-          selectedViewObject.setLayer(ndx - 1);
-          // ViewObjectList[ndx - 1] = selectedViewObject;
-          // ViewObjectList[ndx] = temp;
+          ViewObjectList[ndx-1].setLayer(ndx);
+          selectedViewObject.setLayer(ndx-1);
         }
         break;
     }
@@ -865,8 +865,10 @@ class _Tools {
    * @description 根据layer排序
    * @param ViewObjectList 
    */
-  public sortByLayer(ViewObjectList: Array<RenderObject>):void{
+  public sortByLayer(ViewObjectList: Array<ViewObject>):void{
     ViewObjectList.sort((a:ViewObject,b:ViewObject)=>a.getLayer()-b.getLayer());
+    console.log(ViewObjectList);
+    ViewObjectList.forEach(_=>console.log(_.getLayer()))
   }
   public fallbackViewObject(
     ViewObjectList: Array<ViewObject>,

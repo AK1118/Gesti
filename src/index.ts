@@ -239,14 +239,14 @@ const textBox2 = createTextBox("新建文本2", {
 const group: Group = new Group();
 
 // doCenter(group);
-
+loadToGesti(group);
 loadToGesti(imageBox)
 loadToGesti(textBox);
 loadToGesti(textBox2);
 group.add(imageBox);
 group.add(textBox);
 group.add(textBox2);
-loadToGesti(group);
+
 doCenter(textBox)
 group.installButton(new RotateButton(group));
 

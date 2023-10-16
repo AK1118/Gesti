@@ -7,6 +7,7 @@ import Vector from "../vector";
 
 class Group extends ViewObject{
   private beforeAngle:number=0;
+  private kit:ImageToolkit;
   constructor(){
     super();
     this.rect=new Rect({
@@ -34,7 +35,9 @@ class Group extends ViewObject{
      this.delta.clean();
   }
   public ready(kit: ImageToolkit): void {
-      kit.layerTop(this);
+      //将组合添加到最底层
+      kit.layerBottom(this); 
+      this.kit=kit;
   }
   export(painter?: Painter): Promise<Object> {
     throw new Error("Method not implemented.");
@@ -71,6 +74,9 @@ class Group extends ViewObject{
       const height=rbP.y-ltP.y;
       console.log(width,height);
       this.setSize({width,height});
+
+      //设置层级为最底层
+      this.ready(this.kit);
     }
   }
   addAll(objs:Array<ViewObject>):number{
