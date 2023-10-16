@@ -126,6 +126,11 @@ export declare class XImage {
   toJson(): RectParams;
 }
 
+export declare class Group{
+  remove(id:string):void;
+  removeById(viewObject:ViewObject):void;
+}
+
 export declare class TextBox extends ViewObject {
   new(text: string, options?: textOptions): TextBox;
   constructor(text: string, options?: textOptions);

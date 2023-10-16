@@ -211,10 +211,14 @@ declare type GestiControllerListenerTypes =
 declare function textHandler(options?: textOptions): any;
 
 declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";
-
 declare type Boundary={
   x:number,
   y:number,
   width:number,
   height:number
 };
+declare interface Delta{
+  readonly deltaX:number,
+  readonly deltaY:number
+}
+

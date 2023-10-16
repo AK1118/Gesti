@@ -487,8 +487,8 @@ const doDestroyGesti = doSomething("destroyGesti");
 //清空画布内所有元素
 const doCleanAll = doSomething("cleanAll");
 const doCenter = (
-  axis?: CenterAxis,
   view?: ViewObject,
+  axis?: CenterAxis,
   target: Gesti = currentInstance
 ) => {
   //不安全的做法

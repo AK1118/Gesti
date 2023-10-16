@@ -16,6 +16,8 @@ import canvasConfig from "../config/canvasConfig";
 import VerticalButton from "../buttons/verticalButton";
 import HorizonButton from "../buttons/horizonButton";
 import { ViewObjectFamily } from "../enums";
+import { Delta } from "../event";
+import ImageToolkit from "../image-toolkit";
 //转换为json的类型
 export type toJsonType = "image" | "text" | "write";
 
@@ -57,6 +59,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public lockButton: LockButton;
   public delockButton: UnLockButton;
   public rotateButton: RotateButton;
+  protected delta: Delta=new Delta(0,0);
   public name: string;
   public id: string;
   abstract family: ViewObjectFamily;
@@ -77,20 +80,26 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public setName(name: string) {
     this.name = name;
   }
-  get isBackground():boolean{
+  get isBackground(): boolean {
     return this.background;
   }
   /**
    * 将对象设置为背景
    */
-  public toBackground():void{
-    this.background=true;
+  public toBackground(): void {
+    this.background = true;
   }
   /**
    * 取消图片背景图片
    */
-  public unBackground():void{
-    this.background=false;
+  public unBackground(): void {
+    this.background = false;
+  }
+  /**
+   * 被加入gesti内时调用
+   */
+  public ready(kit:ImageToolkit):void{
+
   }
   public init() {
     this.relativeRect = new Rect({
@@ -99,6 +108,8 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       width: this.rect.size.width,
       height: this.rect.size.height,
     });
+    //初始化矩阵点
+    this.rect.updateVertex();
     this.addObserver(this);
     this.inited = true;
   }
@@ -162,6 +173,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   }
   abstract setDecoration(args: any): void;
   public draw(paint: Painter): void {
+   
     paint.beginPath();
     paint.save();
     paint.translate(this.rect.position.x, this.rect.position.y);
@@ -354,6 +366,13 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       y = canvasSize.height >> 1;
     this.rect.position = new Vector(x, y);
   }
+  public beforeChangePosition(position: Vector): void {
+
+  }
+  public didChangePosition(position: Vector): void {
+    if(!this.delta)this.delta=new Delta(position.x,position.y);
+    this.delta.update(position);
+  }
   /**
    * 撤销 | 取消撤销回调
    */
@@ -398,8 +417,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public setPosition(x: number, y: number): void {
     this.rect.setPosition(new Vector(x, y));
   }
+  public addPosition(deltaX:number,deltaY:number){
+    this.rect.position.add(new Vector(deltaX,deltaY));
+  }
   public setOpacity(opacity: number): void {
     this.opacity = opacity;
+  }
+  public setAngle(angle:number){
+    this.rect.setAngle(angle);
   }
 }
 

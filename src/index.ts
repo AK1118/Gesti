@@ -84,7 +84,12 @@ import {
 } from "./hooks/index";
 import Painter from "./painter";
 import { inToPx, mmToIn, ptToPx } from "./utils";
-import { parseUint8Array, uint8ArrayConvert, uint8ArrayToChunks } from "./utils/utils";
+import {
+  parseUint8Array,
+  uint8ArrayConvert,
+  uint8ArrayToChunks,
+} from "./utils/utils";
+import Group from "./viewObject/group";
 import ImageBox from "./viewObject/image";
 import TextBox from "./viewObject/text";
 import WriteViewObj from "./viewObject/write";
@@ -184,63 +189,83 @@ export {
 };
 export default Gesti;
 
-
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
-const offScreenCanvas:HTMLCanvasElement=document.querySelector("#offScreenCanvas");
+const offScreenCanvas: HTMLCanvasElement =
+  document.querySelector("#offScreenCanvas");
 const img: HTMLImageElement = document.querySelector("#bg");
 const img2: HTMLImageElement = document.querySelector("#bg");
 canvas.width = 500;
 canvas.height = 500;
-offScreenCanvas.width=10000;
-offScreenCanvas.height=500;
+offScreenCanvas.width = 10000;
+offScreenCanvas.height = 500;
 const g = canvas.getContext("2d");
-const offScreenPainter=offScreenCanvas.getContext("2d");
+const offScreenPainter = offScreenCanvas.getContext("2d");
 const gesti = createGesti({
   dashedLine: false,
-  auxiliary:false,
+  auxiliary: false,
 });
 gesti.init(canvas);
 
-
-
-g.drawImage(img,0,0);
-const data=g.getImageData(0,0,img.width,img.height);
-const chunks=uint8ArrayToChunks(data.data as unknown as Uint8Array,img.width,img.height,200);
+g.drawImage(img, 0, 0);
+const data = g.getImageData(0, 0, img.width, img.height);
+const chunks = uint8ArrayToChunks(
+  data.data as unknown as Uint8Array,
+  img.width,
+  img.height,
+  200
+);
 console.log(chunks);
-
 
 const ximage = createXImage({
   data: img,
   width: img.width,
   height: img.height,
-  scale: 1,
+  scale: .5,
 });
 
 const imageBox = createImageBox(ximage);
 const lockButton = new LockButton(imageBox);
 const unLockButton = new UnLockButton(imageBox);
-loadToGesti(imageBox);
-doCenter(null,imageBox);
-doUpdate()
 
+doCenter(imageBox);
+doUpdate();
 
-document.getElementById("import").addEventListener("click",()=>{
-  console.log("导入")
-  const a=window.localStorage.getItem("aa");
-  const h=JSON.parse(a)[0];
-  h.options.options.data=chunks;
-  h.options.fixedWidth=img.width;
-  h.options.fixedHeight=img.height;
-  importAll(JSON.stringify([h])).then(e=>{
-    console.log("导入成功")
-  })
-})
+const textBox = createTextBox("新建文本", {
+  resetFontSizeWithRect: true,
+});
+const textBox2 = createTextBox("新建文本2", {
+  resetFontSizeWithRect: true,
+});
+const group: Group = new Group();
 
-document.getElementById("export").addEventListener("click",()=>{
-  console.log("导出")
-  exportAll(offScreenPainter).then(json=>{
-   window.localStorage.setItem("aa",json);
-   console.log("导出成功");
-  })
+// doCenter(group);
+
+loadToGesti(imageBox)
+loadToGesti(textBox);
+loadToGesti(textBox2);
+group.add(imageBox);
+group.add(textBox);
+group.add(textBox2);
+loadToGesti(group);
+doCenter(textBox)
+group.installButton(new RotateButton(group));
+
+document.getElementById("import").addEventListener("click", () => {
+  console.log("导入");
+  const a = window.localStorage.getItem("aa");
+  const h = JSON.parse(a)[0];
+  h.options.options.data = chunks;
+  h.options.fixedWidth = img.width;
+  h.options.fixedHeight = img.height;
+  importAll(JSON.stringify([h])).then((e) => {
+    console.log("导入成功");
+  });
 });
 
+document.getElementById("export").addEventListener("click", () => {
+  console.log("导出");
+  exportAll(offScreenPainter).then((json) => {
+    window.localStorage.setItem("aa", json);
+    console.log("导出成功");
+  });
+});

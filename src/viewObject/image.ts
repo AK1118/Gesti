@@ -9,12 +9,12 @@ import ImageChunkConverter from "../utils/image-chunk-converter-H5";
 import ImageChunkConverterWeChat from "../utils/image-chunk-converter-WeChat";
 import XImage from "../ximage";
 import CutterWeChat from "../cutters/cutter-WeChat";
+import { OperationType } from "../abstract/operation-observer";
 class ImageBox extends ViewObject {
   family: ViewObjectFamily = ViewObjectFamily.image;
   get value(): any {
     return this.image;
   }
-
   private ximage: XImage;
   private image:
     | HTMLOrSVGImageElement
@@ -95,5 +95,6 @@ class ImageBox extends ViewObject {
   public getXImage(): XImage {
     return this.ximage;
   }
+
 }
 export default ImageBox;
