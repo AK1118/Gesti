@@ -867,8 +867,6 @@ class _Tools {
    */
   public sortByLayer(ViewObjectList: Array<ViewObject>):void{
     ViewObjectList.sort((a:ViewObject,b:ViewObject)=>a.getLayer()-b.getLayer());
-    console.log(ViewObjectList);
-    ViewObjectList.forEach(_=>console.log(_.getLayer()))
   }
   public fallbackViewObject(
     ViewObjectList: Array<ViewObject>,

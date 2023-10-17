@@ -192,7 +192,7 @@ export default Gesti;
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const offScreenCanvas: HTMLCanvasElement =
   document.querySelector("#offScreenCanvas");
-const img: HTMLImageElement = document.querySelector("#bg");
+const img: HTMLImageElement = document.querySelector("#dog");
 const img2: HTMLImageElement = document.querySelector("#bg");
 canvas.width = 500;
 canvas.height = 500;
@@ -208,13 +208,6 @@ gesti.init(canvas);
 
 g.drawImage(img, 0, 0);
 const data = g.getImageData(0, 0, img.width, img.height);
-const chunks = uint8ArrayToChunks(
-  data.data as unknown as Uint8Array,
-  img.width,
-  img.height,
-  200
-);
-console.log(chunks);
 
 const ximage = createXImage({
   data: img,
@@ -227,7 +220,6 @@ const imageBox = createImageBox(ximage);
 const lockButton = new LockButton(imageBox);
 const unLockButton = new UnLockButton(imageBox);
 
-doCenter(imageBox);
 doUpdate();
 
 const textBox = createTextBox("新建文本", {
@@ -237,7 +229,7 @@ const textBox2 = createTextBox("新建文本2", {
   resetFontSizeWithRect: true,
 });
 const group: Group = new Group();
-
+textBox2.setPosition(300,30);
 // doCenter(group);
 loadToGesti(group);
 loadToGesti(imageBox)
@@ -245,19 +237,14 @@ loadToGesti(textBox);
 loadToGesti(textBox2);
 group.add(imageBox);
 group.add(textBox);
-group.add(textBox2);
+ group.add(textBox2);
 
-doCenter(textBox)
 group.installButton(new RotateButton(group));
-
+group.installButton(new DragButton(group));
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");
   const a = window.localStorage.getItem("aa");
-  const h = JSON.parse(a)[0];
-  h.options.options.data = chunks;
-  h.options.fixedWidth = img.width;
-  h.options.fixedHeight = img.height;
-  importAll(JSON.stringify([h])).then((e) => {
+  importAll(a).then((e) => {
     console.log("导入成功");
   });
 });

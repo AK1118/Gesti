@@ -67,6 +67,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   private layer: number = 0;
   //是否属于背景，如果是背景，就不能被选中，且永远置于最底层
   private background: boolean = false;
+  public get position():Vector{
+    return this.rect.position;
+  }
   constructor() {
     super();
     //根据配置判断是否设置参考线
@@ -183,6 +186,17 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.drawImage(paint);
     paint.globalAlpha = 1;
     if (this.isMirror) paint.scale(-1, 1);
+
+    paint.strokeRect(
+      this.rect.size.width * -0.5,
+      this.rect.size.height * -0.5,
+      this.rect.size.width,
+      this.rect.size.height
+    );
+    paint.stroke();
+    paint.fillStyle="red";
+    paint.fillRect(0,0,3,3);
+
     if (this.selected) {
       //边框
       this.drawSelected(paint);
