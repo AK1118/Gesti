@@ -84,6 +84,9 @@ class Vector{
 	static add(v1:Vector, v2:Vector) {
 		return new Vector(v1.x + v2.x, v1.y + v2.y);
 	}
+	static mult(v:Vector,factor:number):Vector{
+		return new Vector(v.x*factor,v.y*factor);
+	}
 	static troweling(v:Vector){
 		v.x=v.x>>0;
 		v.y=v.y>>0;

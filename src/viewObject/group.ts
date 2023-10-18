@@ -57,7 +57,7 @@ abstract class GroupBase extends ViewObject {
     if (obj) this.remove(obj);
   }
   public didChangeAngle(angle: number): void {
-    this.updateChildAngle();
+    this.updateChildrenAngle();
   }
   /**
    * @description 根据子元素设置大小
@@ -99,26 +99,38 @@ abstract class GroupBase extends ViewObject {
     this.setPosition(sum.x, sum.y);
     this.delta.clean();
   }
-  protected updateChildAngle(): void {
+  protected updateChildrenAngle(): void {
     const _angle = this.rect.getAngle - this.beforeAngle;
     const sp = this.rect.position;
     this.views.forEach((view) => {
       const ap = view.rect.position;
       const dv = Vector.sub(ap, sp);
       const newX = dv.x * Math.cos(_angle) - dv.y * Math.sin(_angle) + sp.x;
-      const newY = dv.x * Math.sin(_angle) + dv.y * Math.cos(_angle) + sp.y;
+      const newY = dv.x * Math.sin(_angle) + dv.y * Math.cos(_angle) + sp.y; 
       view.setPosition(newX, newY);
-
       view.setAngle(this.rect.getAngle);
-    });
+    }); 
     this.beforeAngle = this.rect.getAngle;
   }
   public didChangeScale(scale: number): void {
-      console.log(scale)
+    this.views.forEach(_=>{
+      //获取两点偏移量
+      const offset:Vector=Vector.sub(_.position,this.position);
+      //偏移量乘以缩放因子
+      const offsetDel:Vector=Vector.mult(offset,scale);
+      //圆心点加上缩放因子
+      const newPosition:Vector=Vector.add(offsetDel,this.position);
+      // console.log("缩放",scale)
+      _.setPosition(newPosition.x,newPosition.y);
+      _.rect.setScale(scale);
+    });
+    this.updateChildrenAngle();
   }
 }
 
-class Group extends GroupBase{
+
+
+class Group extends GroupBase {
   constructor() {
     super();
     this.rect = new Rect({
@@ -135,6 +147,9 @@ class Group extends GroupBase{
   }
   setDecoration(args: any): void {
     throw new Error("Method not implemented.");
+  }
+  public drawSelected(paint: Painter): void {
+      
   }
   drawImage(paint: Painter): void {
     paint.fillStyle = "#cccccc";

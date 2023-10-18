@@ -18,6 +18,10 @@ class DragButton extends Button {
     public radius: number = 10;
     private disable: boolean = false;
     public relativeRect: Rect;
+    /**
+     * 上次距离
+     */
+    private preDistance:number=0;
     //拉伸变化方式  比例   水平  垂直   自由
     private axis:"ratio"|"horizontal"|"vertical"|"free"="ratio";
     key: string | number = +new Date();
@@ -52,26 +56,29 @@ class DragButton extends Button {
         this.oldRadius = Vector.mag(this.relativeRect.position);
     }
     effect(newRect: Rect): void {
-
+        //目前按钮距离master中心点长度
+        const currentDistance:number=Vector.mag(Vector.sub(this.master.position,newRect.position));
         /**
-         * @param {ImageRect} newRect 新的万向点Rect三个月还有
+         * @param {ImageRect} newRect 
          * @description 万向点的坐标是基于 @ViewObject 内的Rect @ImageRect 的，所以得到的一直是相对坐标
          */
         const oldRect = this.oldViewObjectRect;
         const offsetx = newRect.position.x - oldRect.position.x,
             offsety = newRect.position.y - oldRect.position.y;
         /*等比例缩放*/
-        const scale = Vector.mag(new Vector(offsetx, offsety)) / this.oldRadius;
-        
+        const scale =Vector.mag(new Vector(offsetx, offsety)) / this.oldRadius;
+        let deltaScale=currentDistance/this.preDistance;
+        if(deltaScale>1.3||deltaScale<.8)this.preDistance=0;
+        if(this.preDistance===0)deltaScale=scale;
         /*不适用于scale函数，需要基于原大小改变*/
-        let newWidth = ~~(oldRect.size.width * scale),
-            newHeight = ~~(oldRect.size.height * scale);
+        let newWidth = (oldRect.size.width * scale),
+            newHeight =(oldRect.size.height * scale);
         
         if(this.axis=="horizontal"){
-            newHeight = ~~(oldRect.size.height * 1);
+            newHeight = ~~(oldRect.size.height);
         }
         else if(this.axis=="vertical"){
-            newWidth = ~~(oldRect.size.width * 1);
+            newWidth = ~~(oldRect.size.width);
         }
         else if(this.axis=="ratio"){
 
@@ -82,8 +89,9 @@ class DragButton extends Button {
         this.master.rect.setSize(newWidth, newHeight,true);
         /*this.oldAngle为弧度，偏移量*/
         const angle = Math.atan2(offsety, offsetx) - this.oldAngle;
-       if(this.axis=="ratio") this.master.rect.setAngle(angle,true);
-        this.master.rect.setScale(scale,false);
+        if(this.axis=="ratio") this.master.rect.setAngle(angle,true);
+       this.master.rect.setScale(deltaScale,false);
+       this.preDistance=currentDistance;
     }
     public get getOldAngle(): number {
         return this.oldAngle;

@@ -170,6 +170,8 @@ abstract class OperationObserver implements OperationObserverType {
             case "angle":
                 this.beforeChangeAngle(value);
                 break;
+                case "size":
+                    this.beforeChangeSize(value);
             default:{}
         }
     }
@@ -209,6 +211,7 @@ abstract class OperationObserver implements OperationObserverType {
     public didChangeAngle(angle: number) {}
     public beforeChangeAngle(angle: number): void {}
     public didChangeSize(size: Size): void {}
+    public beforeChangeSize(size: Size): void {}
     public didChangePosition(position: Vector): void {}
     public beforeChangePosition(position: Vector): void {}
     public didChangeScale(scale: number): void { }

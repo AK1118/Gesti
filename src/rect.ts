@@ -117,7 +117,7 @@ class Rect extends ObserverObj {
     //之前
     if (isDrag)
       this.beforeReport(
-        { size: new Size(width, height), angle: this._angle },
+        { size: this.size.copy(), angle: this._angle },
         "drag"
       );
     else this.beforeReport(new Size(width, height), "size");
