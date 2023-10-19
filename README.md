@@ -80,8 +80,8 @@
 
 | 方法名      | 返回值类型              |  所属    |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |    :----:   |   :----: |
-| ❗addText    | Promise\<boolean\>|      GestiController     |    text: string, options?: textOptions ) |    新增文字图层到画布内    |
-| updateText  | void              |    GestiController  |       (text: string, options?:textOptions )     |      更新被选中的文字图层的文字内容，或者文字属性   |
+| ❗addText    | Promise\<boolean\>|      GestiController     |    text: string, options?: TextOptions ) |    新增文字图层到画布内    |
+| updateText  | void              |    GestiController  |       (text: string, options?:TextOptions )     |      更新被选中的文字图层的文字内容，或者文字属性   |
 | layerLower  | void             |      GestiController     |    -      |    图层向下移动一层    |
 | layerRise  | void             |      GestiController     |     -     |    图层向上移动一层    |
 | layerTop  | void             |      GestiController     |     -     |    图层置于最顶层    |
@@ -205,7 +205,7 @@
 
 | Hook      | 返回值类型         |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |   :----: |
-|createTextBox | TextBox |   (text: string, options?: textOptions)     |    创建一个文本对象      |
+|createTextBox | TextBox |   (text: string, options?: TextOptions)     |    创建一个文本对象      |
 |createXImage | XImage |   (option: {data,width:number,height:number})  |    创建一个XImage对象，注意，这个并不是你所看到的那个图片，可以理解为它是图片源，渲染由下面这个类做到      |
 |createImageBox | ImageBox |   (xImage: XImage)     |    创建一个图片对象      |
 |createDragButton | Button | (view: ViewObject)    |    创建一个拖拽按钮      |

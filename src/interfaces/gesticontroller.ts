@@ -53,7 +53,7 @@ interface LayerController {
 
      * 
      */
-  updateText(text: string, options?: textOptions): void;
+  updateText(text: string, options?: TextOptions): void;
   /**
    * @description 选中图册位移变化 向上移动一距离
    * @param viewObject
@@ -155,7 +155,7 @@ interface ImageToolKitController {
    * @param text
    * @param options
    */
-  addText(text: string, options?: textOptions): Promise<ViewObject>;
+  addText(text: string, options?: TextOptions): Promise<ViewObject>;
   addListener(
     listenType: GestiControllerListenerTypes,
     callback: ListenerCallback,

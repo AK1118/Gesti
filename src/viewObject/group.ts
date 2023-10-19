@@ -141,7 +141,7 @@ class Group extends GroupBase {
     });
     this.init();
   }
-  family: ViewObjectFamily;
+  family: ViewObjectFamily=ViewObjectFamily.group;
   get value(): any {
     return this.value;
   }

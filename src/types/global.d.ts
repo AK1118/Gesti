@@ -148,7 +148,7 @@ declare interface XImageOptions {
    fixedHeight?: number;
 }
 
-declare interface textOptions {
+declare interface TextOptions {
   /**
    * 字体风格
    * 可以浏览器搜索   canvas自定义字体
@@ -208,7 +208,7 @@ declare type GestiControllerListenerTypes =
   | "onDestroy"
   | "onBeforeDestroy";
 
-declare function textHandler(options?: textOptions): any;
+declare function textHandler(options?: TextOptions): any;
 
 declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";
 declare type Boundary={

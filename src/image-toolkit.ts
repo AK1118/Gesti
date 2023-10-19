@@ -152,6 +152,9 @@ class ImageToolkit implements GestiController {
       const obj:T|null=arr.find(item=>item.id===id) as T;
       return Promise.resolve<T>(obj);
   }
+  public getPainter():Painter{
+    return this.paint;
+  }
   position(x: number, y: number, view?: ViewObject): void {
       if(view){
         view.setPosition(x,y);
@@ -344,7 +347,7 @@ class ImageToolkit implements GestiController {
   ): Promise<string> {
     return this.exportAll(offScreenPainter, "WeChat");
   }
-  updateText(text: string, options?: textOptions): void {
+  updateText(text: string, options?: TextOptions): void {
     const isTextBox = classTypeIs(this.selectedViewObject, TextBox);
     if (isTextBox) {
       (this.selectedViewObject as TextBox)
@@ -780,7 +783,7 @@ class ImageToolkit implements GestiController {
    * @param options
    * @returns
    */
-  public addText(text: string, options?: textOptions): Promise<ViewObject> {
+  public addText(text: string, options?: TextOptions): Promise<ViewObject> {
     const textBox: TextBox = new TextBox(text, options);
     textBox.center(this.canvasRect.size);
     this.addViewObject(textBox);

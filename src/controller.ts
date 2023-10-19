@@ -4,7 +4,7 @@ import ImageToolkit from "./image-toolkit";
 import GestiController from "./interfaces/gesticontroller";
 import Vector from "./vector";
 import XImage from "./ximage";
-declare interface textOptions {
+declare interface TextOptions {
   fontFamily?: string;
   fontSize?: number;
   spacing?: number;
@@ -119,7 +119,7 @@ class GesteControllerImpl implements GestiController {
     return this.kit.addListener(listenType, callback,prepend);
   }
 
-  updateText(text: string, options?: textOptions): void {
+  updateText(text: string, options?: TextOptions): void {
     this.kit.updateText(text, options);
   }
   center(axis?: CenterAxis,view?:ViewObject): void {
@@ -127,7 +127,7 @@ class GesteControllerImpl implements GestiController {
   }
   addText(
     text: string,
-    options?:textOptions,
+    options?:TextOptions,
   ): Promise<ViewObject> {
     return this.kit.addText(text, options);
   }

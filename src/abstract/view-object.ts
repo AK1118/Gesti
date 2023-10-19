@@ -50,14 +50,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
    * 锁住过后可被选取，但是不能位移和改变大小
    */
   private _lock: boolean = false;
-  public inited: boolean = false;
+  public initialed: boolean = false;
   public dragButton: DragButton;
   public verticalButton: VerticalButton;
   public horizonButton: HorizonButton;
   public mirrorButton: MirrorButton;
   public closeButton: CloseButton;
   public lockButton: LockButton;
-  public delockButton: UnLockButton;
+  public unlockButton: UnLockButton;
   public rotateButton: RotateButton;
   protected delta: Delta=new Delta(0,0);
   public name: string;
@@ -72,9 +72,15 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   }
   constructor() {
     super();
+    this.rect=new Rect({
+      width:100,
+      height:100,
+    });
+    this.init();
     //根据配置判断是否设置参考线
     GestiConfig.auxiliary && (this.auxiliary = new AuxiliaryLine());
   }
+
   //获取对象值
   abstract get value(): any;
   /**
@@ -85,6 +91,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   }
   get isBackground(): boolean {
     return this.background;
+  }
+  get size():Size{
+    return this.rect.size;
   }
   /**
    * 将对象设置为背景
@@ -114,7 +123,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     //初始化矩阵点
     this.rect.updateVertex();
     this.addObserver(this);
-    this.inited = true;
+    this.initialed = true;
   }
   //设置大小
   public setSize(size: { width?: number; height?: number }) {
@@ -171,7 +180,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.isMirror = !this.isMirror;
   }
   public update(paint: Painter) {
-    if (!this.inited) return;
+    if (!this.initialed) return;
     this.draw(paint);
   }
   abstract setDecoration(args: any): void;

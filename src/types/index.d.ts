@@ -8,7 +8,7 @@ declare interface RectParams {
   width: number;
   height: number;
 }
-export declare interface textOptions {
+export declare interface TextOptions {
   fontFamily?: string;
   fontSize?: number;
   spacing?: number;
@@ -132,11 +132,11 @@ export declare class Group{
 }
 
 export declare class TextBox extends ViewObject {
-  new(text: string, options?: textOptions): TextBox;
-  constructor(text: string, options?: textOptions);
-  setDecoration(options: textOptions): void;
+  new(text: string, options?: TextOptions): TextBox;
+  constructor(text: string, options?: TextOptions);
+  setDecoration(options: TextOptions): void;
   get fontSize(): number;
-  updateText(text: string, options?: textOptions): Promise<void>;
+  updateText(text: string, options?: TextOptions): Promise<void>;
 }
 
 export declare class ImageBox extends ViewObject {
@@ -219,9 +219,9 @@ export declare abstract class GestiController {
     callback: (obj: any) => void,
     prepend?: boolean
   ): void;
-  updateText(text: string, options?: textOptions): void;
+  updateText(text: string, options?: TextOptions): void;
   center(axis?: CenterAxis, view?: ViewObject): void;
-  addText(text: string, options?: textOptions): Promise<ViewObject>;
+  addText(text: string, options?: TextOptions): Promise<ViewObject>;
   cancel(view?: ViewObject): void;
   cancelAll(): void;
   layerLower(view?: ViewObject): void;
@@ -389,7 +389,7 @@ export declare const addCircle: (target?: Gesti) => Promise<ViewObject>;
  */
 export declare const createTextBox: (
   text: string,
-  options?: textOptions
+  options?: TextOptions
 ) => TextBox;
 export declare const createImageBox: (
   xImage: XImage
@@ -425,7 +425,7 @@ export declare const createXImage: (option: {
 export declare const useTextHandler: (
   textBox: TextBox,
   target?: Gesti
-) => (text: string, options?: textOptions) => void | Promise<never>;
+) => (text: string, options?: TextOptions) => void | Promise<never>;
 /**
  * @description 将可操作对象载入到画布内
  * @param view

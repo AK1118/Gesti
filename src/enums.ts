@@ -29,6 +29,7 @@ enum ViewObjectFamily{
     circle,
     rect,
     text,
+    group,
   }
 export {
     FuncButtonTrigger,

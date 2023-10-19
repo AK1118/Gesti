@@ -146,7 +146,7 @@ const addCircle = createPresets("circle");
 /**
  * 创建可操作对象
  */
-const createTextBox = (text: string, options?: textOptions) =>
+const createTextBox = (text: string, options?: TextOptions) =>
   createTextBoxView(text, options);
 const createImageBox = (xImage: XImage) => createImageBoxView(xImage);
 /**
@@ -183,7 +183,7 @@ const createXImage = (option: {
 function textHandler(
   text: string,
   textBox: TextBox,
-  options?: textOptions,
+  options?: TextOptions,
   target: Gesti = currentInstance
 ) {
   textBox.updateText(text, options);
@@ -204,7 +204,7 @@ function textHandler(
  */
 const useTextHandler =
   (textBox: TextBox, target: Gesti = currentInstance) =>
-  (text: string, options?: textOptions) => {
+  (text: string, options?: TextOptions) => {
     if (!textBox || textBox.family != Gesti.Family.text) {
       return error("Not a TextBox object");
     }
