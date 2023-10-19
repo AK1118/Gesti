@@ -59,7 +59,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public lockButton: LockButton;
   public unlockButton: UnLockButton;
   public rotateButton: RotateButton;
-  protected delta: Delta=new Delta(0,0);
+  protected delta: Delta = new Delta(0, 0);
   public name: string;
   public id: string;
   abstract family: ViewObjectFamily;
@@ -67,14 +67,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   private layer: number = 0;
   //是否属于背景，如果是背景，就不能被选中，且永远置于最底层
   private background: boolean = false;
-  public get position():Vector{
+  public get position(): Vector {
     return this.rect.position;
   }
   constructor() {
     super();
-    this.rect=new Rect({
-      width:100,
-      height:100,
+    this.rect = new Rect({
+      width: 100,
+      height: 100,
     });
     this.init();
     //根据配置判断是否设置参考线
@@ -92,7 +92,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   get isBackground(): boolean {
     return this.background;
   }
-  get size():Size{
+  get size(): Size {
     return this.rect.size;
   }
   /**
@@ -110,9 +110,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   /**
    * 被加入gesti内时调用
    */
-  public ready(kit:ImageToolkit):void{
-
-  }
+  public ready(kit: ImageToolkit): void {}
   public init() {
     this.relativeRect = new Rect({
       x: 0,
@@ -183,9 +181,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     if (!this.initialed) return;
     this.draw(paint);
   }
+
   abstract setDecoration(args: any): void;
   public draw(paint: Painter): void {
-   
     paint.beginPath();
     paint.save();
     paint.translate(this.rect.position.x, this.rect.position.y);
@@ -203,8 +201,8 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       this.rect.size.height
     );
     paint.stroke();
-    paint.fillStyle="red";
-    paint.fillRect(0,0,3,3);
+    paint.fillStyle = "red";
+    paint.fillRect(0, 0, 3, 3);
 
     if (this.selected) {
       //边框
@@ -389,11 +387,22 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       y = canvasSize.height >> 1;
     this.rect.position = new Vector(x, y);
   }
-  public beforeChangePosition(position: Vector): void {
-
+  protected _didChangeScale(scale: number): void {
+    // console.log("改变", scale);
+    // this.funcButton.forEach((button, ndx) => {
+    //   //获取两点偏移量
+    //   const offset: Vector = Vector.sub(this.position, button.position);
+    //   //偏移量乘以缩放因子 
+    //   const offsetDel: Vector = Vector.mult(offset, scale);
+    //   //圆心点加上缩放因子
+    //   const newPosition: Vector = Vector.add(offsetDel, this.position);
+    //   // console.log("缩放",scale)
+    //   console.log(newPosition);
+    //   button.updatePosition(newPosition);
+    // });
   }
-  public didChangePosition(position: Vector): void {
-    if(!this.delta)this.delta=new Delta(position.x,position.y);
+  protected _didChangePosition(position: Vector): void {
+    if (!this.delta) this.delta = new Delta(position.x, position.y);
     this.delta.update(position);
   }
   /**
@@ -429,7 +438,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       buttons: this.funcButton.map((button: Button) => button.constructor.name),
       id: this.id,
       layer: this.layer,
-      isBackground:this.isBackground,
+      isBackground: this.isBackground,
     };
   }
   /**
@@ -440,13 +449,13 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public setPosition(x: number, y: number): void {
     this.rect.setPosition(new Vector(x, y));
   }
-  public addPosition(deltaX:number,deltaY:number){
-    this.rect.position.add(new Vector(deltaX,deltaY));
+  public addPosition(deltaX: number, deltaY: number) {
+    this.rect.position.add(new Vector(deltaX, deltaY));
   }
   public setOpacity(opacity: number): void {
     this.opacity = opacity;
   }
-  public setAngle(angle:number){
+  public setAngle(angle: number) {
     this.rect.setAngle(angle);
   }
 }

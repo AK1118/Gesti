@@ -146,6 +146,9 @@ export abstract class Button implements RenderObject {
   hide(): void {
     this.disabled=true;
   }
+  get position():Vector{
+    return this.rect.position;
+  }
   setSenseRadius(senseRadius:number){
     this.senseRadius=senseRadius;
     this.radius=senseRadius;

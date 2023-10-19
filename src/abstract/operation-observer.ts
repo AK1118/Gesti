@@ -17,24 +17,6 @@ interface OperationType {
   drag: { angle: number; size: Size };
 }
 
-//操作监听接口
-interface OperationObserverType {
-  //操作后
-  report(value: any, type: keyof OperationType): void;
-  //操作前
-  beforeReport(value: any, type: keyof OperationType): void;
-  //改变角度过后
-  didChangeAngle(angle: number): void;
-  //改变大小过后
-  didChangeSize(size: Size): void;
-  //改变位置过后
-  didChangePosition(position: Vector): void;
-  //改变倍数过后
-  didChangeScale(scale: number): void;
-  //拖拽(angle,size)改变后
-  didDrag(value: { size: Size; angle: number }): void;
-  onHide(): void;
-}
 
 /**
  * 被观察者应该实现的抽象类
@@ -143,7 +125,7 @@ class Record {
 /**
  * 如果需要撤销操作，组件必须继承该抽象类实现
  */
-abstract class OperationObserver implements OperationObserverType {
+abstract class OperationObserver {
   onHide(): void {}
   private obj: RenderObject;
   private recordClazz: Record = new Record();
@@ -201,11 +183,17 @@ abstract class OperationObserver implements OperationObserverType {
         break;
 
       case "scale":
+       {
         this.didChangeScale(value);
+        this._didChangeScale(value);
+       }
         break;
 
       case "position":
-        this.didChangePosition(value);
+        {
+          this.didChangePosition(value);
+          this._didChangePosition(value);
+        }
         break;
       case "drag":
         this.didDrag(value);
@@ -219,14 +207,17 @@ abstract class OperationObserver implements OperationObserverType {
     this.obj.rect.removeObserver();
   }
   //改变角度
-  public didChangeAngle(angle: number) {}
-  public beforeChangeAngle(angle: number): void {}
-  public didChangeSize(size: Size): void {}
-  public beforeChangeSize(size: Size): void {}
-  public didChangePosition(position: Vector): void {}
-  public beforeChangePosition(position: Vector): void {}
-  public didChangeScale(scale: number): void {}
-  public didDrag(value: { size: Size; angle: number }): void {}
+  protected didChangeAngle(angle: number) {}
+  protected beforeChangeAngle(angle: number): void {}
+  protected didChangeSize(size: Size): void {}
+  protected beforeChangeSize(size: Size): void {}
+  protected didChangePosition(position: Vector): void {}
+  protected _didChangePosition(position: Vector): void {}
+  protected beforeChangePosition(position: Vector): void {}
+  protected didChangeScale(scale: number): void {}
+  protected _didChangeScale(scale:number):void{}
+  protected didDrag(value: { size: Size; angle: number }): void {}
+  
 }
 
 export default OperationObserver;

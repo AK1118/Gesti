@@ -232,18 +232,19 @@ const group: Group = new Group();
 textBox2.setPosition(300,30);
 // doCenter(group);
 // loadToGesti(group);
-// loadToGesti(imageBox)
+loadToGesti(imageBox)
 // loadToGesti(textBox);
-loadToGesti(textBox2);
-doCenter(textBox2)
-textBox2.installButton(new HorizonButton(textBox2));
-textBox2.installButton(new RotateButton(textBox2));
+// loadToGesti(textBox2);
+// doCenter(textBox2)
+// textBox2.installButton(new HorizonButton(textBox2));
+// textBox2.installButton(new RotateButton(textBox2));
 // group.add(imageBox);
 // group.add(textBox);
 //  group.add(textBox2);
 
-group.installButton(new RotateButton(group));
-group.installButton(new DragButton(group));
+// imageBox.installButton(new RotateButton(imageBox));
+imageBox.installButton(new DragButton(imageBox));
+doCenter(imageBox)
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");
   const a = window.localStorage.getItem("aa");
