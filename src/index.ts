@@ -219,9 +219,9 @@ const ximage = createXImage({
 });
 
 const imageBox = createImageBox(ximage);
-const lockButton = new LockButton(imageBox);
-const unLockButton = new UnLockButton(imageBox);
-
+const drawButton = new DragButton(imageBox);
+// const unLockButton = new UnLockButton(imageBox);
+imageBox.installButton(drawButton);
 doUpdate();
  
 const textBox = createTextBox("新建文本", {
@@ -229,7 +229,7 @@ const textBox = createTextBox("新建文本", {
 });
 const str=`你好，这是一篇英语短文 Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
 console.log("长度",str.length)
-const textBox2 = createTextBox(str, {
+const textBox2 = createTextBox('你好，这是一篇英语短文', {
   resetFontSizeWithRect: true,
   fontSize:20,
   spacing:0,
@@ -240,21 +240,21 @@ const textBox2 = createTextBox(str, {
 });
 const group: Group = new Group();
 textBox2.setPosition(300,30);
-doCenter(group);
- loadToGesti(group);
+// doCenter(group);
+//  loadToGesti(group);
 loadToGesti(textBox2)
 loadToGesti(imageBox)
 // loadToGesti(textBox);
 // loadToGesti(textBox2);
 // doCenter(textBox2)
-// textBox2.installButton(new HorizonButton(textBox2));
-// textBox2.installButton(new RotateButton(textBox2));
-group.add(imageBox);
-group.add(textBox);
- group.add(textBox2);
-
 textBox2.installButton(new HorizonButton(textBox2));
 textBox2.installButton(new RotateButton(textBox2));
+// group.add(imageBox);
+// group.add(textBox);
+//  group.add(textBox2);
+
+// textBox2.installButton(new HorizonButton(textBox2));
+// textBox2.installButton(new RotateButton(textBox2));
 // textBox2.installButton(new DragButton(textBox2));
 doCenter(textBox2)
 document.getElementById("import").addEventListener("click", () => {

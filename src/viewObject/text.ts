@@ -13,7 +13,10 @@ type TextSingle = {
   width: number;
   height: number;
 };
-
+/**
+ * 普通模式，矩形根据文字而定
+ * 拖拽模式，文字根据缩放倍数而定
+ */
 abstract class TextBoxBase extends ViewObject {
   protected fixedText: string;
   protected fixedOption: TextOptions;
@@ -42,7 +45,7 @@ abstract class TextBoxBase extends ViewObject {
   computeTextSingle(): Array<TextSingle> {
     //设置字体大小
     this.paint.font =
-      this.fixedOption.fontSize + "px " + this.fixedOption.fontFamily;
+     (+this.fixedOption.fontSize.toFixed(2)) + "px " + this.fixedOption.fontFamily;
     //This viewObject rect size
     const size: Size = { width: 0, height: 0 };
     const splitTexts: Array<string> = this.handleSplitText(this.fixedText);
@@ -57,7 +60,6 @@ abstract class TextBoxBase extends ViewObject {
       }) as unknown as Array<TextSingle>;
     };
     this.texts = getTextSingles(splitTexts);
-    this.updateRectSize(size);
     return this.texts;
   }
   private handleSplitText(text: string): Array<string> {
@@ -190,6 +192,10 @@ abstract class TextBoxBase extends ViewObject {
   private computeViewObjectSize(x: number, y: number): Size {
     return { width: x, height: y };
   }
+  protected didChangeScale(scale: number): void {
+    console.log("缩放",scale);
+      
+  }
 }
 
 /**
@@ -200,10 +206,11 @@ class TextBox extends TextBoxBase {
     super();
     this.fixedText = text;
     this.fixedOption = option;
+    console.log("初始化",this.fixedOption)
   }
   public ready(kit: ImageToolkit): void {
     this.paint = kit.getPainter();
-    console.log(this.computeTextSingle());
+    this.computeTextSingle()
   }
   family: ViewObjectFamily = ViewObjectFamily.text;
   get value(): any {

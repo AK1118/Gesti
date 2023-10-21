@@ -18,10 +18,7 @@ class DragButton extends Button {
     public radius: number = 10;
     private disable: boolean = false;
     public relativeRect: Rect;
-    /**
-     * 上次距离
-     */
-    private preDistance:number=0;
+    private preScale:number;
     //拉伸变化方式  比例   水平  垂直   自由
     private axis:"ratio"|"horizontal"|"vertical"|"free"="ratio";
     key: string | number = +new Date();
@@ -56,42 +53,37 @@ class DragButton extends Button {
         this.oldRadius = Vector.mag(this.relativeRect.position);
     }
     effect(newRect: Rect): void {
-        //目前按钮距离master中心点长度
-        const currentDistance:number=Vector.mag(Vector.sub(this.master.position,newRect.position));
         /**
          * @param {ImageRect} newRect 
          * @description 万向点的坐标是基于 @ViewObject 内的Rect @ImageRect 的，所以得到的一直是相对坐标
          */
         const oldRect = this.oldViewObjectRect;
-        const offsetx = newRect.position.x - oldRect.position.x,
-            offsety = newRect.position.y - oldRect.position.y;
+        const offsetX = newRect.position.x - oldRect.position.x,
+               offsetY = newRect.position.y - oldRect.position.y;
         /*等比例缩放*/
-        const scale =Vector.mag(new Vector(offsetx, offsety)) / this.oldRadius;
-        let deltaScale=currentDistance/this.preDistance;
-        if(deltaScale>1.3||deltaScale<.8)this.preDistance=0;
-        if(this.preDistance===0)deltaScale=scale;
+        const scale =Vector.mag(new Vector(offsetX, offsetY)) / this.oldRadius;
+        let deltaScale=1+(scale-this.preScale);
         /*不适用于scale函数，需要基于原大小改变*/
         let newWidth = (oldRect.size.width * scale),
             newHeight =(oldRect.size.height * scale);
-        
         if(this.axis=="horizontal"){
-            newHeight = ~~(oldRect.size.height);
+            newHeight = oldRect.size.height;
         }
         else if(this.axis=="vertical"){
-            newWidth = ~~(oldRect.size.width);
+            newWidth =oldRect.size.width;
         }
         else if(this.axis=="ratio"){
 
         }else if(this.axis=="free"){
-           newWidth=oldRect.size.width*(offsetx*1.5/this.oldRadius);
-           newHeight=oldRect.size.height*(offsety*1.5/this.oldRadius);
+           newWidth=oldRect.size.width*(offsetX*1.5/this.oldRadius);
+           newHeight=oldRect.size.height*(offsetY*1.5/this.oldRadius);
         }
         this.master.rect.setSize(newWidth, newHeight,true);
         /*this.oldAngle为弧度，偏移量*/
-        const angle = Math.atan2(offsety, offsetx) - this.oldAngle;
+        const angle = Math.atan2(offsetY, offsetX) - this.oldAngle;
         if(this.axis=="ratio") this.master.rect.setAngle(angle,true);
        this.master.rect.setScale(deltaScale,false);
-       this.preDistance=currentDistance;
+       this.preScale=scale;
     }
     public get getOldAngle(): number {
         return this.oldAngle;
