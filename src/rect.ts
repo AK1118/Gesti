@@ -36,7 +36,7 @@ class Rect extends ObserverObj {
   private _scale: number;
   public readonly key: string = Math.random().toString(16).substring(2);
   constructor(
-    params?: rectparams,
+    params?: RectParams,
     key?: string,
     options?: {
       angle: number;

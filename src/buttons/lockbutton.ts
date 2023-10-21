@@ -54,7 +54,7 @@ class LockButton extends Button {
             offsety: -height / 2 - halfRadius + 3
         });
     }
-    update(paint: Painter): void {
+    render(paint: Painter): void {
         this.draw(paint);
     }
     onSelected(): void {

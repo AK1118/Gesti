@@ -11,7 +11,7 @@ export interface RenderObject {
      */
     rect: Rect;
     draw(paint: Painter): void;
-    update(paint: Painter): void;
+    render(paint: Painter): void;
     hide():void;
     onSelected(): void;
     //相对坐标，相对于画布在translate

@@ -1,4 +1,3 @@
-import canvasConfig from "../../config/canvasConfig";
 import GestiConfig from "../../config/gestiConfig";
 import Painter from "../../painter";
 import Rect from "../../rect";
@@ -24,12 +23,18 @@ class AuxiliaryLine {
   //虚线
   private readonly dash=[3,3];
   private readonly color=GestiConfig.theme.dashedLineColor
+  private readonly canvasRect:Rect;
+  private readonly views:Array<ViewObject>;
   //参考点
   private referencePoint: Array<Point> = [];
+  constructor(canvasRect:Rect,views:Array<ViewObject>){
+    this.canvasRect=canvasRect;
+    this.views=views;
+  }
   public createReferencePoint(key: string) {
     this.referencePoint = [];
     //获取画布内所有课操作对象
-    const views: Array<ViewObject> = canvasConfig.views;
+    const views: Array<ViewObject> = this.views;
     //如果只有一个必定是自己
     if (views.length <= 1) return;
     views
@@ -75,7 +80,7 @@ class AuxiliaryLine {
   public draw(paint: Painter, view: ViewObject) {
     if (!view.rect.vertex) return;
     const dots = view.getVertex();
-    const canvasRect: Rect = canvasConfig.rect;
+    const canvasRect: Rect = this.canvasRect;//canvasConfig.rect;
     const canvasSize: Size = canvasRect.size;
     const size: Size = view.rect.size;
     const position: Vector = view.rect.position;

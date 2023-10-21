@@ -3,8 +3,6 @@ import { RecordNode } from "./abstract/operation-observer";
 import ViewObject from "./abstract/view-object";
 import WriteBase from "./abstract/write-category";
 import CatchPointUtil from "./catchPointUtil";
-import canvasConfig from "./config/canvasConfig";
-import GestiConfig from "./config/gestiConfig";
 import Drag from "./drag";
 import { FuncButtonTrigger, ViewObjectFamily } from "./enums";
 import GestiEventManager, { GestiEvent } from "./event";
@@ -40,8 +38,7 @@ enum LayerOperationType {
   top,
   //至于底层
   bottom,
- }
- 
+}
 
 type ListenerHook = (viewObject: ViewObject) => void;
 
@@ -76,93 +73,140 @@ class Listeners {
     hooks.splice(ndx, 1);
   }
 }
-
-class ImageToolkit implements GestiController {
+abstract class ImageToolkitBase {
   //所有图层集合
-  private ViewObjectList: Array<ViewObject> = new Array<ViewObject>();
+  protected ViewObjectList: Array<ViewObject> = new Array<ViewObject>();
   //手势监听器
-  private eventHandler: GestiEvent;
+  protected eventHandler: GestiEvent;
   //手势状态
-  private eventHandlerState: EventHandlerState = EventHandlerState.up;
+  protected eventHandlerState: EventHandlerState = EventHandlerState.up;
   //拖拽代理器
-  private drag: Drag = new Drag();
+  protected drag: Drag = new Drag();
   //手势处理识别器
-  private gesture: Gesture = new Gesture();
+  protected gesture: Gesture = new Gesture();
   //当前选中的图层
-  private selectedViewObject: ViewObject = null;
+  protected selectedViewObject: ViewObject = null;
   //canvas偏移量
-  private offset: Vector;
+  protected offset: Vector;
   //画布矩形大小
-  private canvasRect: Rect;
+  protected canvasRect: Rect;
   //画笔代理类 canvasContext 2d
-  private paint: Painter;
+  protected paint: Painter;
   //是否debug模式
   public isDebug: boolean = false;
   //记录操作
-  private recorder: RecorderInterface = Recorder.getInstance();
+  protected recorder: RecorderInterface = Recorder.getInstance();
   /**
    * 本次点击是否有选中到对象，谈起时需要置于false
    */
-  private _inObjectArea: boolean = false;
+  protected _inObjectArea: boolean = false;
   /**
    * 工具
    */
-  private tool: _Tools = new _Tools();
-  private listen: Listeners = new Listeners();
+  protected tool: _Tools = new _Tools();
+  protected listen: Listeners = new Listeners();
   /**
    * 目前图层的显示状态，0表示隐藏，1表示显示
    */
-  private currentViewObjectState: Array<0 | 1> = [];
-  //是否在绘制中
-  private isWriting: boolean = false;
+  protected currentViewObjectState: Array<0 | 1> = [];
   //绘制对象工厂  //绘制对象，比如签字、矩形、圆形等
-  private writeFactory: WriteFactory;
-  //目前Hover的对象
-  private hoverViewObject: ViewObject = null;
-  //测试 将canvas快照下来，除了被选中的对象，其他都按按照这个渲染
-  private snapshot: ImageData = null;
-  //休眠,休眠时不能有任何操作
-  private sleep: boolean = false;
-  private boundary:Boundary;
-  public get getCanvasRect(): Rect {
+  protected writeFactory: WriteFactory;
+  protected hoverViewObject: ViewObject = null;
+  protected debug(message: any): void {
+    if (!this.isDebug) return;
+    if (Array.isArray(message)) console.warn("Gesti debug: ", ...message);
+    else console.warn("Gesti debug: ", message);
+  }
+
+  protected callHook(type: GestiControllerListenerTypes, arg = null) {
+    this.listen.callHooks(type, arg);
+  }
+  /**
+   * 扫除没用的对象，根据大小判断
+   * 清扫细微到不可见的对象
+   * @param item
+   */
+  private cleaning(item: ViewObject) {
+    if (item && item.rect) {
+      const { width, height } = item.rect.size;
+      if (width <= 3 && height <= 3) item.hide();
+    }
+  }
+  public getCanvasRect(): Rect {
     return this.canvasRect;
   }
-  public get getViewObjects() {
+  public getViewObjects() {
     return this.ViewObjectList;
   }
-  constructor(paint: CanvasRenderingContext2D, rect: rectparams) {
-    const { x: offsetx, y: offsety, width, height } = rect;
-    this.offset = new Vector(offsetx || 0, offsety || 0);
-    rect.x = this.offset.x;
-    rect.y = this.offset.y;
-    this.canvasRect = new Rect(rect);
-    this.paint = new Painter(paint);
-    canvasConfig.setGlobalPaint(this.paint);
+  public update() {
+    /**
+     * 在使用绘制对象时，根据值来判断是否禁止重绘
+     */
+    this.debug("Update the Canvas");
+    this.callHook("onUpdate", null);
+    this.paint.clearRect(
+      0,
+      0,
+      this.canvasRect.size.width,
+      this.canvasRect.size.height
+    );
+    //当前显示标记数组初始化数据，且需要实时更新
+    if (this.currentViewObjectState.length != this.ViewObjectList.length) {
+      this.currentViewObjectState.push(1);
+    }
+    this.ViewObjectList.forEach((item: ViewObject, ndx: number) => {
+      if (!item.disabled) {
+        //扫除
+        this.cleaning(item);
+        item.render(this.paint);
+      } else if (this.currentViewObjectState[ndx] == 1) {
+        //标记过后不会再次标记
+        this.currentViewObjectState[ndx] = 0;
+        item.cancel();
+        this.callHook("onHide", item);
+      }
+    });
+  }
+}
+
+class ImageToolkit extends ImageToolkitBase implements GestiController {
+  constructor(option: InitializationOption) {
+    super();
+    const { x: offsetX, y: offsetY, width, height } = option?.rect || {};
+    this.offset = new Vector(offsetX || 0, offsetY || 0);
+    this.canvasRect = new Rect({
+      x: this.offset.x,
+      y: this.offset.y,
+      width: option.rect.width,
+      height: option.rect.height,
+    });
+    this.paint = new Painter(option.renderContext);
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
-  setBoundary(boundaryRect:Boundary): void {
+  setBoundary(boundaryRect: Boundary): void {
     throw new Error("Method not implemented.");
   }
-  querySelector(select: string | ViewObjectFamily): Promise<ViewObject | ViewObject[]> {
+  querySelector(
+    select: string | ViewObjectFamily
+  ): Promise<ViewObject | ViewObject[]> {
     throw new Error("Method not implemented.");
   }
-  getViewObjectById<T extends ViewObject>(id:string): Promise<T> {
-      const arr=this.ViewObjectList;
-      const obj:T|null=arr.find(item=>item.id===id) as T;
-      return Promise.resolve<T>(obj);
+  getViewObjectById<T extends ViewObject>(id: string): Promise<T> {
+    const arr = this.ViewObjectList;
+    const obj: T | null = arr.find((item) => item.id === id) as T;
+    return Promise.resolve<T>(obj);
   }
-  public getPainter():Painter{
+  public getPainter(): Painter {
     return this.paint;
   }
   position(x: number, y: number, view?: ViewObject): void {
-      if(view){
-        view.setPosition(x,y);
-      }
-      this.selectedViewObject?.setPosition(x,y);
-      this.update();
+    if (view) {
+      view.setPosition(x, y);
+    }
+    this.selectedViewObject?.setPosition(x, y);
+    this.update();
   }
-
   /**
    * @description 清空所有元素
    * @returns
@@ -326,14 +370,14 @@ class ImageToolkit implements GestiController {
     const offPainter = new Painter(offScreenPainter);
     return new Promise(async (r, j) => {
       try {
-        const jsons: Array<Object> = [];
+        const viewObjectList: Array<Object> = [];
         for await (const item of this.ViewObjectList) {
           if (item.disabled) continue;
-          if (type == "H5") jsons.push(await item.export(offPainter));
+          if (type == "H5") viewObjectList.push(await item.export(offPainter));
           else if (type == "WeChat")
-            jsons.push(await item.exportWeChat(offPainter));
+            viewObjectList.push(await item.exportWeChat(offPainter));
         }
-        r(JSON.stringify(jsons));
+        r(JSON.stringify(viewObjectList));
       } catch (error) {
         j(error);
       }
@@ -459,49 +503,7 @@ class ImageToolkit implements GestiController {
       .move(this.onMove)
       .up(this.onUp)
       .wheel(this.onWheel);
-    this.addListening();
     this.debug(["Event Bind,", this.eventHandler]);
-  }
-  /**
-   * 添加手势的动作，长按，双击，点击等
-   * @description 只有在选中对象时该监听才生效
-   */
-  public addListening(): void {
-    this.gesture.addListenGesti(
-      "click",
-      (ViewObject: ViewObject, position: Vector) => {}
-    );
-    this.gesture.addListenGesti(
-      "dbclick",
-      (ViewObject: ViewObject, position: Vector) => {
-        //  console.log("双击",position);
-      }
-    );
-    this.gesture.addListenGesti(
-      "longpress",
-      (ViewObject: ViewObject, position: Vector) => {
-        // console.log("长按",position);
-      }
-    );
-    this.gesture.addListenGesti(
-      "twotouch",
-      (ViewObject: ViewObject, position: Vector) => {
-        //console.log("二指",position);
-        // this.gesture.onDown(this.selectedViewObject, position);
-      }
-    );
-    this.gesture.addListenGesti("globalClick", (position: Vector) => {
-      // const selected = this.clickViewObject(position);
-      // if (selected == null && this.selectedViewObject) {
-      //     this.drag.cancel();
-      //     this.cancel();
-      // }
-    });
-  }
-  //唤醒,可以继续操作
-  public wakeUp(): void {
-    this.sleep = false;
-    this.update();
   }
   public cancelEvent(): void {
     if (this.eventHandler == null) return;
@@ -509,8 +511,6 @@ class ImageToolkit implements GestiController {
   }
   public onDown(v: GestiEventParams): void {
     this.debug(["Event Down,", v]);
-    //休眠不执行任何操作
-    if (this.sleep) return;
     this.eventHandlerState = EventHandlerState.down;
     const event: Vector | Vector[] = this.correctEventPosition(v);
 
@@ -539,9 +539,10 @@ class ImageToolkit implements GestiController {
     if (
       selectedViewObject &&
       this.selectedViewObject === selectedViewObject &&
-      !this.selectedViewObject.isLock&&!selectedViewObject.isBackground
+      !this.selectedViewObject.isLock &&
+      !selectedViewObject.isBackground
     )
-    this.drag.catchViewObject(selectedViewObject.rect, event);
+      this.drag.catchViewObject(selectedViewObject.rect, event);
 
     /**
      * 画笔代码块 可以有被选中的图层，前提是当前下落的位置必定不能在上一个被选中的图册内
@@ -557,8 +558,6 @@ class ImageToolkit implements GestiController {
   }
   public onMove(v: GestiEventParams): void {
     this.debug(["Event Move,", v]);
-    //休眠不执行任何操作
-    if (this.sleep) return;
     if (this.eventHandlerState === EventHandlerState.down) {
       const event: Vector | Vector[] = this.correctEventPosition(v);
 
@@ -600,8 +599,6 @@ class ImageToolkit implements GestiController {
   }
   public onUp(v: GestiEventParams): void {
     this.debug(["Event Up,", v]);
-    //休眠不执行任何操作
-    if (this.sleep) return;
     const event: Vector | Vector[] = this.correctEventPosition(v);
     //判断是否选中对象
     this.clickViewObject(event);
@@ -699,67 +696,23 @@ class ImageToolkit implements GestiController {
     this.gesture.cancel();
     return false;
   }
-  private callHook(type: GestiControllerListenerTypes, arg = null) {
-    this.listen.callHooks(type, arg);
-  }
+
   /**
    * @description 获取当前所存图层长度
    * @returns number
    */
-  public getViewObjectCount():number{
+  public getViewObjectCount(): number {
     return this.ViewObjectList.length;
   }
   private addViewObject(obj: ViewObject): void {
     this.ViewObjectList.push(obj);
-    obj.ready(this);
-    obj.setLayer(this.getViewObjectCount()-1);
+    obj.initialization(this);
+    obj.setLayer(this.getViewObjectCount() - 1);
     this.callHook("onLoad", obj);
     this.update();
     // this.tool.arrangeLayer(this.ViewObjectList,obj,obj.);
   }
-  public update() {
-    //休眠不执行任何操作
-    if (this.sleep) return;
-    /**
-     * 在使用绘制对象时，根据值来判断是否禁止重绘
-     */
-    //  if (this.writeFactory.current?.disableCanvasUpdate) return;
-    this.debug("Update the Canvas");
-    this.callHook("onUpdate", null);
-    this.paint.clearRect(
-      0,
-      0,
-      this.canvasRect.size.width,
-      this.canvasRect.size.height
-    );
-    //当前显示标记数组初始化数据，且需要实时更新
-    if (this.currentViewObjectState.length != this.ViewObjectList.length) {
-      this.currentViewObjectState.push(1);
-    }
-    this.ViewObjectList.forEach((item: ViewObject, ndx: number) => {
-      if (!item.disabled) {
-        //扫除
-        this.cleaning(item);
-        item.update(this.paint);
-      } else if (this.currentViewObjectState[ndx] == 1) {
-        //标记过后不会再次标记
-        this.currentViewObjectState[ndx] = 0;
-        item.cancel();
-        this.callHook("onHide", item);
-      }
-    });
-  }
-  /**
-   * 扫除没用的对象，根据大小判断
-   * 清扫细微到不可见的对象
-   * @param item
-   */
-  private cleaning(item: ViewObject) {
-    if (item && item.rect) {
-      const { width, height } = item.rect.size;
-      if (width <= 3 && height <= 3) item.hide();
-    }
-  }
+
   /**
    * @description 新增图片
    * @param ximage
@@ -803,11 +756,6 @@ class ImageToolkit implements GestiController {
   }): void {
     this.writeFactory.setConfig(options);
   }
-  private debug(message: any): void {
-    if (!this.isDebug) return;
-    if (Array.isArray(message)) console.warn("Gesti debug: ", ...message);
-    else console.warn("Gesti debug: ", message);
-  }
 }
 
 class _Tools {
@@ -823,17 +771,17 @@ class _Tools {
     const ndx = ViewObjectList.findIndex(
       (item: ViewObject) => item.key === selectedViewObject.key
     );
-    if(ndx===-1)return;
+    if (ndx === -1) return;
     const len = ViewObjectList.length - 1;
-    // 0为底部   len为顶部   0 0 1 0 0 
+    // 0为底部   len为顶部   0 0 1 0 0
     //                      0 0 0 1 0
     switch (operationType) {
       case LayerOperationType.top:
         {
           //暂存对象
           if (ndx == len) break;
-          for(let i=ndx+1;i<len;i++){
-            ViewObjectList[i].setLayer(ViewObjectList[i].getLayer()-1);
+          for (let i = ndx + 1; i < len; i++) {
+            ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() - 1);
           }
           selectedViewObject.setLayer(len);
         }
@@ -841,24 +789,24 @@ class _Tools {
       case LayerOperationType.bottom:
         {
           if (ndx == 0) break;
-          for(let i=ndx-1;i<0;i--){
-            ViewObjectList[i].setLayer(ViewObjectList[i].getLayer()+1);
+          for (let i = ndx - 1; i < 0; i--) {
+            ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() + 1);
           }
           selectedViewObject.setLayer(0);
         }
         break;
       case LayerOperationType.rise:
         {
-           if (ndx == len) break;
-          ViewObjectList[ndx+1].setLayer(ndx);
-          selectedViewObject.setLayer(ndx+1);
+          if (ndx == len) break;
+          ViewObjectList[ndx + 1].setLayer(ndx);
+          selectedViewObject.setLayer(ndx + 1);
         }
         break;
       case LayerOperationType.lower:
         {
           if (ndx == 0) break;
-          ViewObjectList[ndx-1].setLayer(ndx);
-          selectedViewObject.setLayer(ndx-1);
+          ViewObjectList[ndx - 1].setLayer(ndx);
+          selectedViewObject.setLayer(ndx - 1);
         }
         break;
     }
@@ -866,10 +814,12 @@ class _Tools {
   }
   /**
    * @description 根据layer排序
-   * @param ViewObjectList 
+   * @param ViewObjectList
    */
-  public sortByLayer(ViewObjectList: Array<ViewObject>):void{
-    ViewObjectList.sort((a:ViewObject,b:ViewObject)=>a.getLayer()-b.getLayer());
+  public sortByLayer(ViewObjectList: Array<ViewObject>): void {
+    ViewObjectList.sort(
+      (a: ViewObject, b: ViewObject) => a.getLayer() - b.getLayer()
+    );
   }
   public fallbackViewObject(
     ViewObjectList: Array<ViewObject>,

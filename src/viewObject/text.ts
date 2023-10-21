@@ -1,7 +1,5 @@
-import Button from "../abstract/button";
+
 import ViewObject, { toJSONInterface } from "../abstract/view-object";
-import canvasConfig from "../config/canvasConfig";
-import GestiConfig from "../config/gestiConfig";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../image-toolkit";
 import Painter from "../painter";

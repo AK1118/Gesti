@@ -204,7 +204,10 @@ const gesti = createGesti({
   dashedLine: false,
   auxiliary: false,
 });
-gesti.init(canvas);
+gesti.initialization({
+  canvas,
+  renderContext:g,
+});
 g.drawImage(img, 0, 0);
 const data = g.getImageData(0, 0, img.width, img.height);
 
@@ -237,17 +240,18 @@ const textBox2 = createTextBox(str, {
 });
 const group: Group = new Group();
 textBox2.setPosition(300,30);
-// doCenter(group);
-// loadToGesti(group);
+doCenter(group);
+ loadToGesti(group);
 loadToGesti(textBox2)
+loadToGesti(imageBox)
 // loadToGesti(textBox);
 // loadToGesti(textBox2);
 // doCenter(textBox2)
 // textBox2.installButton(new HorizonButton(textBox2));
 // textBox2.installButton(new RotateButton(textBox2));
-// group.add(imageBox);
-// group.add(textBox);
-//  group.add(textBox2);
+group.add(imageBox);
+group.add(textBox);
+ group.add(textBox2);
 
 textBox2.installButton(new HorizonButton(textBox2));
 textBox2.installButton(new RotateButton(textBox2));

@@ -12,7 +12,6 @@ import Button from "./button";
 import OperationObserver from "./operation-observer";
 import AuxiliaryLine from "./tools/auxiliary-lines";
 import GestiConfig from "../config/gestiConfig";
-import canvasConfig from "../config/canvasConfig";
 import VerticalButton from "../buttons/verticalButton";
 import HorizonButton from "../buttons/horizonButton";
 import { ViewObjectFamily } from "../enums";
@@ -77,8 +76,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       height: 100,
     });
     this.init();
-    //根据配置判断是否设置参考线
-    GestiConfig.auxiliary && (this.auxiliary = new AuxiliaryLine());
+   
   }
 
   //获取对象值
@@ -111,6 +109,11 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
    * 被加入gesti内时调用
    */
   public ready(kit: ImageToolkit): void {}
+  public initialization(kit:ImageToolkit):void{
+    //根据配置判断是否设置参考线
+    GestiConfig.auxiliary && (this.auxiliary = new AuxiliaryLine(kit.getCanvasRect(),kit.getViewObjects()));
+    this.ready(kit);
+  }
   public init() {
     this.relativeRect = new Rect({
       x: 0,
@@ -177,7 +180,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public mirror() {
     this.isMirror = !this.isMirror;
   }
-  public update(paint: Painter) {
+  public render(paint: Painter) {
     if (!this.initialed) return;
     this.draw(paint);
   }
@@ -193,16 +196,6 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.drawImage(paint);
     paint.globalAlpha = 1;
     if (this.isMirror) paint.scale(-1, 1);
-
-    paint.strokeRect(
-      this.rect.size.width * -0.5,
-      this.rect.size.height * -0.5,
-      this.rect.size.width,
-      this.rect.size.height
-    );
-    paint.stroke();
-    paint.fillStyle = "red";
-    paint.fillRect(0, 0, 3, 3);
 
     if (this.selected) {
       //边框
@@ -301,7 +294,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       const newy = Math.sin(angle) * len + y;
       const vector = new Vector(~~newx, ~~newy);
       button.updatePosition(vector);
-      button.update(paint);
+      button.render(paint);
     });
   }
   /**

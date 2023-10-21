@@ -17,13 +17,32 @@ declare interface Offset {
   offsetx: number;
   offsety: number;
 }
-declare interface rectparams {
+declare interface RectParams {
   x?: number;
   y?: number;
   width: number;
   height: number;
 }
-
+/**
+ * @description 初始化传入参数
+ */
+declare interface InitializationOption {
+  //canvas
+  canvas: HTMLCanvasElement;
+  //画笔
+  renderContext: CanvasRenderingContext2D | null;
+  //离屏画布
+  offScreenCanvas?: HTMLCanvasElement;
+  //离屏画笔
+  offScreenCanvasRenderContext?: CanvasRenderingContext2D | null;
+  //画布矩形
+  rect?: {
+    x?: number;
+    y?: number;
+    width: number;
+    height: number;
+  };
+}
 declare class Vector {
   x: number;
   y: number;
@@ -94,14 +113,14 @@ declare interface createImageOptions {
    * 最小缩小倍数
    */
   minScale?: number;
-    /**
+  /**
    * 图片原始宽度
    */
-    fixedWidth?: number;
-    /**
-     * 图片原始高度
-     */
-    fixedHeight?: number;
+  fixedWidth?: number;
+  /**
+   * 图片原始高度
+   */
+  fixedHeight?: number;
 }
 
 declare interface XImageOptions {
@@ -138,14 +157,14 @@ declare interface XImageOptions {
    * 最小缩小倍数
    */
   minScale?: number;
-   /**
+  /**
    * 图片原始宽度
    */
-   fixedWidth?: number;
-   /**
-    * 图片原始高度
-    */
-   fixedHeight?: number;
+  fixedWidth?: number;
+  /**
+   * 图片原始高度
+   */
+  fixedHeight?: number;
 }
 
 declare interface TextOptions {
@@ -198,7 +217,7 @@ declare interface TextOptions {
    */
   maxFontSize?: number;
 
-  backgroundColor?:string,
+  backgroundColor?: string;
 }
 
 declare type CenterAxis = "vertical" | "horizon";
@@ -216,14 +235,13 @@ declare type GestiControllerListenerTypes =
 declare function textHandler(options?: TextOptions): any;
 
 declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";
-declare type Boundary={
-  x:number,
-  y:number,
-  width:number,
-  height:number
+declare type Boundary = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 };
-declare interface Delta{
-  readonly deltaX:number,
-  readonly deltaY:number
+declare interface Delta {
+  readonly deltaX: number;
+  readonly deltaY: number;
 }
-

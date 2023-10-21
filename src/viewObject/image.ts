@@ -51,7 +51,7 @@ class ImageBox extends ViewObject {
     );
   }
   async export(painter?: Painter): Promise<Object> {
-    const cutter: Cutter = new Cutter(false, painter);
+    const cutter: Cutter = new Cutter(painter);
     const chunkSize: number = 200;
     const chunks: ImageChunk[] = await cutter.getChunks(chunkSize, this.ximage);
     const coverter: ImageChunkConverter = new ImageChunkConverterH5();
@@ -69,12 +69,12 @@ class ImageBox extends ViewObject {
     };
     return json;
   }
-  async exportWeChat(painter?: Painter, canvas?: any): Promise<Object> {
+  async exportWeChat(painter?: Painter): Promise<Object> {
     const cutter: CutterWeChat = new CutterWeChat(painter);
     const chunkSize: number = 200;
     const chunks: ImageChunk[] = await cutter.getChunks(chunkSize, this.ximage);
-    const coverter: ImageChunkConverterWeChat = new ImageChunkConverterWeChat();
-    const base64s: ImageChunk[] = coverter.coverAllImageChunkToBase64(chunks);
+    const converter: ImageChunkConverterWeChat = new ImageChunkConverterWeChat();
+    const base64s: ImageChunk[] = converter.coverAllImageChunkToBase64(chunks);
     const json: toJSONInterface = {
       viewObjType: "image",
       options: {

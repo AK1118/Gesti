@@ -100,7 +100,7 @@ export abstract class Button implements RenderObject {
   abstract effect(rect?: Rect): void;
   abstract updatePosition(vector: Vector): void;
   abstract draw(paint: Painter): void;
-  abstract update(paint: Painter): void;
+  abstract render(paint: Painter): void;
   abstract onSelected(): void;
   get getAbsolutePosition(): Vector {
     return Vector.add(this.relativeRect.position, this.master.rect.position);

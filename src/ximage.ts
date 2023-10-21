@@ -46,7 +46,7 @@ class XImage {
     this.width = ~~this.width;
     this.height = ~~this.height;
   }
-  toJson(): rectparams {
+  toJson(): RectParams {
     return {
       x: this.x,
       y: this.y,

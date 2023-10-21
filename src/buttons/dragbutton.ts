@@ -96,7 +96,7 @@ class DragButton extends Button {
     public get getOldAngle(): number {
         return this.oldAngle;
     }
-    public update(paint: Painter): void {
+    public render(paint: Painter): void {
         this.draw(paint);
     }
     onSelected(): void {

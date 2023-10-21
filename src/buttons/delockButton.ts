@@ -57,7 +57,7 @@ class UnLockButton extends Button {
             offsety: y - halfRadius + 2
         });
     }
-    update(paint: Painter): void {
+    render(paint: Painter): void {
         this.draw(paint);
     }
     onSelected(): void {

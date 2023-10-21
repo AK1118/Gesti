@@ -1,4 +1,3 @@
-import canvasConfig from "./config/canvasConfig";
 import GestiConfig, { gesticonfig } from "./config/gestiConfig";
 import GesteControllerImpl from "./controller";
 import { ViewObjectFamily } from "./enums";
@@ -15,18 +14,45 @@ class Gesti {
   constructor(config?: gesticonfig) {
     Gesti.config = new GestiConfig(config);
   }
-  private _controller:GestiController;
+  private _controller: GestiController;
   get controller(): GestiController {
-    return this._controller||(this._controller=new GesteControllerImpl(this.kit));
+    return (
+      this._controller || (this._controller = new GesteControllerImpl(this.kit))
+    );
   }
 
   set debug(value: boolean) {
-    this.kit.isDebug = true;
+    if (this.kit) this.kit.isDebug = value;
   }
-  /*
-   * @description 初始化 @Gesti 所代理的画布高宽，在h5端可直接传入 HTMLCanvasElement 自动解析高宽
-   * @param @CanvasRenderingContext2D paint
+
+  public initialization(option: InitializationOption): void {
+    if (!option) throw Error("The option is should not undefined.");
+    if (!(option.canvas && option.renderContext))
+      throw Error("Both the Canvas and renderContext must not be undefined.");
+    this._controller && this.dispose();
+    if (
+      typeof document != "undefined" &&
+      option.canvas &&
+      option.renderContext
+    ) {
+      let canvasRect: DOMRect = option.canvas.getBoundingClientRect();
+      if (option.rect) canvasRect = option.rect as DOMRect;
+      else option.rect = canvasRect;
+      option.renderContext.imageSmoothingEnabled = true;
+      option.renderContext.imageSmoothingQuality = "high";
+      this.kit = new ImageToolkit(option);
+      return;
+    }
+    if (option.rect) this.kit = new ImageToolkit(option);
+  }
+
+  /**
+   * @deprecated 次方法已废弃，请使用 initialization
+   * @description 初始化
+   * @param canvas
+   * @param paint
    * @param rect
+   * @returns
    */
   public init(
     canvas: HTMLCanvasElement | null,
@@ -37,40 +63,30 @@ class Gesti {
       width: number;
       height: number;
     }
-  ) {
-    if (!canvas && !rect) throw Error("未指定Canvas大小或Canvas节点");
-    if(this._controller)this.destroy();
-    if (typeof document != "undefined" && canvas) {
-      let canvasRect: DOMRect = canvas.getBoundingClientRect();
-      //优先使用自定义的rect
-      if (rect) canvasRect = rect as DOMRect;
-      if (canvasRect) {
-        const g = canvas.getContext("2d");
-        g.imageSmoothingEnabled = true;
-        g.imageSmoothingQuality = "high";
-        this.kit = new ImageToolkit(g, canvasRect);
-        canvasConfig.init(this.kit);
-        return;
-      }
-    }
-    if (rect) this.kit = new ImageToolkit(paint, rect);
-    canvasConfig.init(this.kit);
-  }
+  ) {}
   /**
    * @description 设置配置，跟构造函数一样
-   * @param config 
+   * @param config
    */
-  public setConfig(config?: gesticonfig):void{
+  public setConfig(config?: gesticonfig): void {
     Gesti.config.setParams(config);
     this.kit.update();
   }
-  public destroy():void{
+  /**
+   * @deprecated
+   * @description 建议使用 dispose
+   */
+  public destroy(): void {
     this.controller?.destroyGesti();
-    this._controller=null;
-    this.kit=null;
-
+    this._controller = null;
+    this.kit = null;
   }
-  static Family=ViewObjectFamily;
+  public dispose(): void {
+    this.controller?.destroyGesti();
+    this._controller = null;
+    this.kit = null;
+  }
+  static Family = ViewObjectFamily;
 }
 
 export default Gesti;

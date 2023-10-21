@@ -17,25 +17,8 @@ class CutterH5 implements CutterInterface {
    * @param offScreen
    * @param painter
    */
-  constructor(offScreen?: boolean, painter?: Painter) {
-    if (offScreen ?? true) {
-      if (typeof OffscreenCanvas !== "undefined")
-        //原生
-        this.offScreenPainter = new OffscreenCanvas(10000, 10000).getContext(
-          "2d"
-        );
-      else {
-        throw Error(
-          "This platform does not have off-screen rendering function, please select painter"
-        );
-      }
-    } else {
-      if (!painter)
-        throw Error(
-          "When you give up off-screen rendering, you must pass in a painter object"
-        );
-      this.painter = painter;
-    }
+  constructor(painter?: Painter) {
+    this.painter=painter;
   }
 
   /**
@@ -97,12 +80,12 @@ class CutterH5 implements CutterInterface {
     chunks: ImageChunk[]
   ): Promise<ImageData> {
     const g: any = this.offScreenPainter || this.painter;
-    const coverter: ImageChunkConverter = new ImageChunkConverter();
+    const converter: ImageChunkConverter = new ImageChunkConverter();
     const imageData: ImageData = new ImageData(width, height, {
       colorSpace: "srgb",
     });
     chunks.forEach((item) => {
-      const chunk = coverter.base64ToChunk(item);
+      const chunk = converter.base64ToChunk(item);
       const A = 4;
       //切片数组开始位置
       const sx = Math.max(0, chunk.x),

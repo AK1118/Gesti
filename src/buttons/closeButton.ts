@@ -53,7 +53,7 @@ class CloseButton extends Button {
             offsety: -height / 2 - 3
         });
     }
-    update(paint: Painter): void {
+    render(paint: Painter): void {
         this.draw(paint);
     }
     onSelected(): void {
