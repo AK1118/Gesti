@@ -167,8 +167,9 @@ class Widgets {
         } = offset;
         paint.beginPath();
         paint.fillStyle=GestiConfig.theme.buttonIconColor;
-        paint.arc(x,y,3,0,Math.PI*2);
-        paint.fill();
+        paint.fillRect(x-3,y-3,6,6);
+        // paint.arc(x,y,3,0,Math.PI*2);
+        // paint.fill();
         paint.closePath();
     }
 

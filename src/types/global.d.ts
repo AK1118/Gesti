@@ -165,10 +165,12 @@ declare interface TextOptions {
   color?: string;
   /**
    * 是否显示下划线
+   * @deprecated
    */
   line?: boolean;
   /**
    * 下划线粗细
+   * @deprecated
    */
   lineWidth?: number;
   /**
@@ -176,6 +178,7 @@ declare interface TextOptions {
    */
   lineColor?: string;
   /**
+   * @deprecated
    * 下划线与文字偏移量
    */
   lineOffsetY?: number;
@@ -194,6 +197,8 @@ declare interface TextOptions {
    * 传入一个整数类型，用于限制字体大小最大值，默认不会限制
    */
   maxFontSize?: number;
+
+  backgroundColor?:string,
 }
 
 declare type CenterAxis = "vertical" | "horizon";

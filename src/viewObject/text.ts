@@ -6,15 +6,14 @@ import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../image-toolkit";
 import Painter from "../painter";
 import Rect from "../rect";
+import { sp } from "../utils";
 import Vector from "../vector";
 
 type TextSingle = {
   text: string;
+  texts?: Array<TextSingle>;
   width: number;
   height: number;
-  color: string;
-  index: number;
-  backgroundColor: string;
 };
 
 abstract class TextBoxBase extends ViewObject {
@@ -26,31 +25,40 @@ abstract class TextBoxBase extends ViewObject {
   updateText(text: string, options?: TextOptions): Promise<void> {
     return Promise.resolve();
   }
+  private getTextSingle = (text: string): TextSingle => {
+    const measureText = this.paint.measureText(text);
+    //行高
+    const lineHeight: number = this.fixedOption.lineHeight || 1;
+    const textSingle: TextSingle = {
+      text,
+      width: measureText.width,
+      height: measureText.fontBoundingBoxAscent * lineHeight,
+    };
+
+    return textSingle;
+  };
   /**
    * @description 计算文字大小
    * @returns
    */
   computeTextSingle(): Array<TextSingle> {
     //设置字体大小
-    this.paint.font = 10 + "px " + this.fixedOption.fontFamily;
+    this.paint.font =
+      this.fixedOption.fontSize + "px " + this.fixedOption.fontFamily;
     //This viewObject rect size
     const size: Size = { width: 0, height: 0 };
-    const splitTexts: Array<string> = this.handleSplitText(this.fixedText); // this.fixedText.split(/([\s]|[A-Za-z]+|[\u4e00-\u9fa5]+)/).filter(Boolean);;
-    this.texts = splitTexts.map((text, index) => {
-      const measureText = this.paint.measureText(text);
-      const textSingle: TextSingle = {
-        text,
-        index,
-        width: measureText.width,
-        height: measureText.fontBoundingBoxAscent,
-        backgroundColor: "#ffffff",
-        color: "red",
-      };
-      size.height = Math.max(textSingle.height, size.height);
-      size.width += textSingle.width;
-      size.width = Math.min(this.maxWidth, size.width);
-      return textSingle;
-    }) as unknown as Array<TextSingle>;
+    const splitTexts: Array<string> = this.handleSplitText(this.fixedText);
+    const getTextSingles = (texts: Array<string>): Array<TextSingle> => {
+      return texts.map((text) => {
+        const textSingle = this.getTextSingle(text);
+        size.height = Math.max(textSingle.height, size.height);
+        size.width += textSingle.width;
+        size.width = Math.min(this.maxWidth, size.width);
+        if (text.length != 1) textSingle.texts = getTextSingles(text.split(""));
+        return textSingle;
+      }) as unknown as Array<TextSingle>;
+    };
+    this.texts = getTextSingles(splitTexts);
     this.updateRectSize(size);
     return this.texts;
   }
@@ -63,18 +71,54 @@ abstract class TextBoxBase extends ViewObject {
     }
     return result;
   }
-  private computeDrawPoint(texts: Array<TextSingle>): Array<Vector> {
-    const points: Array<Vector|null> = [];
+  /**
+   * 渲染坐标来自上次计算
+   * 计算由width+spacing得出，换行由x得出，但是x在换行之下
+   * 1.(如果是字符串多个)优先计算text+width宽度
+   * @param texts
+   * @returns
+   */
+  private computeDrawPoint(
+    texts: Array<TextSingle>
+  ): Array<Vector | null | Array<Vector>> {
+    const points: Array<Vector | null | Array<Vector>> = [];
     let startX: number = -this.size.width * 0.5;
     let x = startX; // 初始 x 位置
     let y = texts[0].height * 0.1; // 初始 y 位置
-    let maxX = 0;
+    /**
+     * maxWordWidth 最长单词宽度
+     */
+    let maxWordWidth: number = 0;
+    const spacing = this.fixedOption.spacing;
+    //Rect宽度，用户检测文字是否超出
+    const checkRectSizeWidth: number = this.size.width * 0.5;
     texts.forEach((textData, ndx) => {
+      //单个文字或者多个文字的宽度
+      const getTextWidth = (texts: Array<TextSingle> | TextSingle): number => {
+        let width: number = 0;
+        if (Array.isArray(texts)) {
+          texts.forEach((_) => {
+            width += _.width + spacing;
+          });
+          width -= spacing;
+        } else width = texts.width;
+        return width;
+      };
+      /**是否是换行符 */
+      const isEnter = (textData: Array<TextSingle> | TextSingle): boolean => {
+        if (Array.isArray(textData)) {
+          for (let i = 0; i < textData.length; i++) {
+            if (/\n/.test(textData[i].text)) return true;
+          }
+          return false;
+        }
+        return /\n/.test(textData.text);
+      };
+      /**预先获取宽度，判断是否超出rect宽度*/
+      let width: number = getTextWidth(textData.texts || textData);
+      maxWordWidth = Math.max(width, maxWordWidth);
       // 如果文本宽度超出矩形宽度，需要换行。换行符不需要另外换行，有特殊处理
-      if (
-        x + textData.width > this.size.width * 0.5 &&
-        !/\n/.test(textData.text)
-      ) {
+      if (x + width > checkRectSizeWidth && !isEnter(textData)) {
         x = startX; // 换行后 x 重置
         y += textData.height;
       } else if (/\n/.test(textData.text)) {
@@ -85,44 +129,63 @@ abstract class TextBoxBase extends ViewObject {
       }
       //空格不会出现在文本最前方
       if (x === startX && textData.text === " ") return points.push(null);
-      //渲染时Y轴偏移量
-      const offsetY = 0;
       const drawX = x; // 将文本绘制在字符中心
-      const drawY = y + offsetY; // y 位置根据行高设置
-      points.push(new Vector(drawX,drawY));
-      // paint.fillText(textData.text, drawX, drawY);
-      x += textData.width; // 更新 x 位置
-      maxX = Math.max(maxX, x);
-      
+      const drawY = y;
+      if (textData?.texts) {
+        const childPoint: Array<Vector> = [];
+        let _x = x;
+        textData.texts.forEach((_) => {
+          childPoint.push(new Vector(_x, drawY));
+          _x += _.width + spacing;
+        });
+        points.push(childPoint);
+        x = _x; // 更新 x 位置
+      } else {
+        points.push(new Vector(drawX, drawY));
+        x += textData.width + spacing; // 更新 x 位置
+      }
     });
     const size: Size = this.computeViewObjectSize(
-        this.size.width,
-        y + this.texts[0].height
-      );
+      Math.max(this.size.width, maxWordWidth),
+      y + this.texts[0].height
+    );
     this.updateRectSize(size);
     return points;
   }
   protected drawText(paint: Painter): void {
     if (this.texts.length === 0) return;
+    const color: string = this.fixedOption.color;
+    const backgroundColor: string = this.fixedOption.backgroundColor;
     const points = this.computeDrawPoint(this.texts);
-    paint.fillStyle = "#ccc";
-    paint.fillRect(
-      this.size.width * -0.5,
-      this.size.height * -0.5,
-      this.size.width,
-      this.size.height
-    );
-    paint.fillStyle = "red";
+    paint.beginPath();
+    if (backgroundColor) {
+      paint.fillStyle=backgroundColor;
+      paint.fillRect(
+        this.size.width * -0.5,
+        this.size.height * -0.5,
+        this.size.width,
+        this.size.height
+      );
+    }
+    paint.fillStyle = color;
     paint.textBaseLine = "middle";
     this.texts.forEach((textData, ndx) => {
-      const point=points[ndx];
-      if(!point)return;
-      const offsetY =this.size.height * -0.5 + textData.height * 0.5
-      const text = this.texts[ndx].text;
-      paint.fillText(text, point.x, point.y+offsetY);
+      const point = points[ndx];
+      if (!point) return;
+      const offsetY = this.size.height * -0.5 + textData.height * 0.5;
+      const text = textData.text;
+      if (!Array.isArray(point))
+        paint.fillText(text, point.x, point.y + offsetY);
+      else {
+        textData.texts.forEach((_, _ndx) => {
+          const p = point[_ndx];
+          paint.fillText(_.text, p.x, p.y + offsetY);
+        });
+      }
     });
+    paint.closePath();
   }
-  private updateRectSize(size:Size):void{
+  private updateRectSize(size: Size): void {
     this.setSize(size);
   }
   //根据文字计算矩形大小
@@ -152,7 +215,6 @@ class TextBox extends TextBoxBase {
     throw new Error("Method not implemented.");
   }
   drawImage(paint: Painter): void {
-    
     this.drawText(paint);
   }
 

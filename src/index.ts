@@ -198,14 +198,13 @@ canvas.width = 500;
 canvas.height = 500;
 offScreenCanvas.width = 10000;
 offScreenCanvas.height = 500;
-const g = canvas.getContext("2d");
+const g = canvas.getContext("2d"); 
 const offScreenPainter = offScreenCanvas.getContext("2d");
 const gesti = createGesti({
   dashedLine: false,
   auxiliary: false,
 });
 gesti.init(canvas);
-
 g.drawImage(img, 0, 0);
 const data = g.getImageData(0, 0, img.width, img.height);
 
@@ -221,18 +220,26 @@ const lockButton = new LockButton(imageBox);
 const unLockButton = new UnLockButton(imageBox);
 
 doUpdate();
-
+ 
 const textBox = createTextBox("新建文本", {
   resetFontSizeWithRect: true,
 });
-const textBox2 = createTextBox(`你好，这是一篇英语短文Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`, {
+const str=`你好，这是一篇英语短文 Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
+console.log("长度",str.length)
+const textBox2 = createTextBox(str, {
   resetFontSizeWithRect: true,
+  fontSize:20,
+  spacing:0,
+  fontFamily:"楷体",
+  lineHeight:1.5,
+  color:"black",
+  backgroundColor:"white"
 });
 const group: Group = new Group();
 textBox2.setPosition(300,30);
 // doCenter(group);
 // loadToGesti(group);
-loadToGesti(imageBox)
+loadToGesti(textBox2)
 // loadToGesti(textBox);
 // loadToGesti(textBox2);
 // doCenter(textBox2)
@@ -242,9 +249,10 @@ loadToGesti(imageBox)
 // group.add(textBox);
 //  group.add(textBox2);
 
-// imageBox.installButton(new RotateButton(imageBox));
-imageBox.installButton(new DragButton(imageBox));
-doCenter(imageBox)
+textBox2.installButton(new HorizonButton(textBox2));
+textBox2.installButton(new RotateButton(textBox2));
+// textBox2.installButton(new DragButton(textBox2));
+doCenter(textBox2)
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");
   const a = window.localStorage.getItem("aa");
