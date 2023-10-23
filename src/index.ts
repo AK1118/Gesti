@@ -249,6 +249,11 @@ loadToGesti(imageBox)
 // doCenter(textBox2)
 textBox2.installButton(new HorizonButton(textBox2));
 textBox2.installButton(new RotateButton(textBox2));
+
+let i=10;
+setInterval(()=>{
+  textBox2.setFontSize(i++);
+},1000)
 // group.add(imageBox);
 // group.add(textBox);
 //  group.add(textBox2);

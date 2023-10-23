@@ -130,10 +130,13 @@ export declare class Group{
   remove(id:string):void;
   removeById(viewObject:ViewObject):void;
 }
-
-export declare class TextBox extends ViewObject {
+export declare interface TextHandler{
+  setFontSize(fontSize:number):void;
+}
+export declare class TextBox extends ViewObject implements TextHandler{
   new(text: string, options?: TextOptions): TextBox;
   constructor(text: string, options?: TextOptions);
+  setFontSize(fontSize: number): void;
   setDecoration(options: TextOptions): void;
   get fontSize(): number;
   updateText(text: string, options?: TextOptions): Promise<void>;

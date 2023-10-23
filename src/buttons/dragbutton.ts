@@ -10,14 +10,11 @@ import GestiConfig from "../config/gestiConfig";
 
 class DragButton extends Button {
     public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
-    public rect: Rect;
-    public master: ViewObject
     private oldViewObjectRect: Rect = null;
     private oldRadius: number = 0;
     public oldAngle: number = 0;
     public radius: number = 10;
     private disable: boolean = false;
-    public relativeRect: Rect;
     private preScale:number;
     //拉伸变化方式  比例   水平  垂直   自由
     private axis:"ratio"|"horizontal"|"vertical"|"free"="ratio";

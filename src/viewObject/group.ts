@@ -7,7 +7,6 @@ import Vector from "../vector";
 
 abstract class GroupBase extends ViewObject {
   private beforeAngle: number = 0;
-  private kit: ImageToolkit;
   private views: Array<ViewObject> = [];
   protected updateChildren() {
     const [deltaX, deltaY] = this.delta.delta;
@@ -19,7 +18,6 @@ abstract class GroupBase extends ViewObject {
   public ready(kit: ImageToolkit): void {
     //将组合添加到最底层
     kit.layerBottom(this);
-    this.kit = kit;
   }
   add(obj: ViewObject): number {
     if (!obj)

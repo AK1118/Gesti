@@ -10,14 +10,11 @@ import GestiConfig from "../config/gestiConfig";
 
 class RotateButton extends Button {
     public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
-    public rect: Rect;
-    public master: ViewObject
     private oldViewObjectRect: Rect = null;
     private oldRadius: number = 0;
     public oldAngle: number = 0;
     public radius: number = 10;
     private disable: boolean = false;
-    public relativeRect: Rect;
     key: string | number = +new Date();
     constructor(master: ViewObject) {
         super(master);

@@ -66,6 +66,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   private layer: number = 0;
   //是否属于背景，如果是背景，就不能被选中，且永远置于最底层
   private background: boolean = false;
+  protected kit: ImageToolkit;
   public get position(): Vector {
     return this.rect.position;
   }
@@ -76,7 +77,6 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       height: 100,
     });
     this.init();
-   
   }
 
   //获取对象值
@@ -109,9 +109,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
    * 被加入gesti内时调用
    */
   public ready(kit: ImageToolkit): void {}
-  public initialization(kit:ImageToolkit):void{
+  public initialization(kit: ImageToolkit): void {
+    this.kit = kit;
     //根据配置判断是否设置参考线
-    GestiConfig.auxiliary && (this.auxiliary = new AuxiliaryLine(kit.getCanvasRect(),kit.getViewObjects()));
+    GestiConfig.auxiliary &&
+      (this.auxiliary = new AuxiliaryLine(
+        kit.getCanvasRect(),
+        kit.getViewObjects()
+      ));
     this.ready(kit);
   }
   public init() {
@@ -385,7 +390,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     // this.funcButton.forEach((button, ndx) => {
     //   //获取两点偏移量
     //   const offset: Vector = Vector.sub(this.position, button.position);
-    //   //偏移量乘以缩放因子 
+    //   //偏移量乘以缩放因子
     //   const offsetDel: Vector = Vector.mult(offset, scale);
     //   //圆心点加上缩放因子
     //   const newPosition: Vector = Vector.add(offsetDel, this.position);

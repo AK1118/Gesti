@@ -1,9 +1,9 @@
-
 import ViewObject, { toJSONInterface } from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../image-toolkit";
 import Painter from "../painter";
 import Rect from "../rect";
+import { TextHandler } from "../types/index";
 import { sp } from "../utils";
 import Vector from "../vector";
 
@@ -45,7 +45,9 @@ abstract class TextBoxBase extends ViewObject {
   computeTextSingle(): Array<TextSingle> {
     //设置字体大小
     this.paint.font =
-     (+this.fixedOption.fontSize.toFixed(2)) + "px " + this.fixedOption.fontFamily;
+      +this.fixedOption.fontSize.toFixed(2) +
+      "px " +
+      this.fixedOption.fontFamily;
     //This viewObject rect size
     const size: Size = { width: 0, height: 0 };
     const splitTexts: Array<string> = this.handleSplitText(this.fixedText);
@@ -159,7 +161,7 @@ abstract class TextBoxBase extends ViewObject {
     const points = this.computeDrawPoint(this.texts);
     paint.beginPath();
     if (backgroundColor) {
-      paint.fillStyle=backgroundColor;
+      paint.fillStyle = backgroundColor;
       paint.fillRect(
         this.size.width * -0.5,
         this.size.height * -0.5,
@@ -193,24 +195,22 @@ abstract class TextBoxBase extends ViewObject {
     return { width: x, height: y };
   }
   protected didChangeScale(scale: number): void {
-    console.log("缩放",scale);
-      
+    console.log("缩放", scale);
   }
 }
 
 /**
  * 文字
  */
-class TextBox extends TextBoxBase {
+class TextBox extends TextBoxBase implements TextHandler {
   constructor(text: string, option?: TextOptions) {
     super();
     this.fixedText = text;
     this.fixedOption = option;
-    console.log("初始化",this.fixedOption)
   }
   public ready(kit: ImageToolkit): void {
     this.paint = kit.getPainter();
-    this.computeTextSingle()
+    this.computeTextSingle();
   }
   family: ViewObjectFamily = ViewObjectFamily.text;
   get value(): any {
@@ -228,6 +228,11 @@ class TextBox extends TextBoxBase {
   }
   exportWeChat(painter?: Painter, canvas?: any): Promise<Object> {
     throw new Error("Method not implemented.");
+  }
+  setFontSize(fontSize: number): void {
+    this.fixedOption.fontSize = fontSize;
+    this.computeTextSingle();
+    this.kit.update();
   }
 }
 
