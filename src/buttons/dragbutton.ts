@@ -15,7 +15,7 @@ class DragButton extends Button {
     public oldAngle: number = 0;
     public radius: number = 10;
     private disable: boolean = false;
-    private preScale:number;
+    private preScale:number=1;
     //拉伸变化方式  比例   水平  垂直   自由
     private axis:"ratio"|"horizontal"|"vertical"|"free"="ratio";
     key: string | number = +new Date();
@@ -48,6 +48,7 @@ class DragButton extends Button {
     private initScale() {
         this.setRelativePositionRect(this.options.percentage);
         this.oldRadius = Vector.mag(this.relativeRect.position);
+        this.preScale=1;
     }
     effect(newRect: Rect): void {
         /**
@@ -59,7 +60,9 @@ class DragButton extends Button {
                offsetY = newRect.position.y - oldRect.position.y;
         /*等比例缩放*/
         const scale =Vector.mag(new Vector(offsetX, offsetY)) / this.oldRadius;
+
         let deltaScale=1+(scale-this.preScale);
+
         /*不适用于scale函数，需要基于原大小改变*/
         let newWidth = (oldRect.size.width * scale),
             newHeight =(oldRect.size.height * scale);
@@ -79,6 +82,7 @@ class DragButton extends Button {
         /*this.oldAngle为弧度，偏移量*/
         const angle = Math.atan2(offsetY, offsetX) - this.oldAngle;
         if(this.axis=="ratio") this.master.rect.setAngle(angle,true);
+       
        this.master.rect.setScale(deltaScale,false);
        this.preScale=scale;
     }

@@ -61,7 +61,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   protected delta: Delta = new Delta(0, 0);
   public name: string;
   public id: string;
-  abstract family: ViewObjectFamily;
+  abstract readonly family: ViewObjectFamily;
   public originFamily: ViewObjectFamily;
   private layer: number = 0;
   //是否属于背景，如果是背景，就不能被选中，且永远置于最底层
@@ -358,6 +358,10 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   private doScale() {
     if (this.isLock) return;
     this.onChanged();
+  }
+  protected setScale(scale:number){
+    this.scale=scale;
+    this.rect.setScale(scale);
   }
   /*每次改变大小后都需要刷新按钮的数据*/
   public onChanged() {

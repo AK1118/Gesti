@@ -86,6 +86,7 @@ class Rect extends ObserverObj {
     return this._angle;
   }
   public set position(position: Vector) {
+    if(position.equals(this.position))return;
     this.beforeReport(this._position, "position");
     this._position = position;
     this._position.x = ~~this._position.x;
@@ -93,6 +94,7 @@ class Rect extends ObserverObj {
     this.report(position, "position");
   }
   public setPosition(position: Vector): void {
+    if(position.equals(this.position))return;
     this.beforeReport(this._position, "position");
     this._position = position;
     this._position.x = this._position.x;
@@ -100,6 +102,7 @@ class Rect extends ObserverObj {
     this.report(position, "position");
   }
   public setScale(scale: number, change?: boolean): void {
+    if(scale===this.scale)return;
     this.beforeReport(scale, "scale");
     //是否真正改变大小，还是之通知倍数改变了，后续可以考虑移除监听scale
     if (change ?? true) {
@@ -114,6 +117,7 @@ class Rect extends ObserverObj {
    * @param height
    */
   public setSize(width: number, height: number, isDrag?: boolean): void {
+    if(width===this.size.width&&height===this.size.height)return;
     //之前
     if (isDrag)
       this.beforeReport(
@@ -132,6 +136,7 @@ class Rect extends ObserverObj {
     else this.report(new Size(width, height), "size");
   }
   public setAngle(angle: number, isDrag?: boolean): void {
+    if(angle===this._angle)return;
     //之前
     if (isDrag)
       this.beforeReport(

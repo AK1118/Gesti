@@ -23,6 +23,7 @@ abstract class TextBoxBase extends ViewObject {
   protected paint: Painter;
   protected texts: Array<TextSingle> = [];
   protected maxWidth: number = 300;
+  private test: number = 1;
   updateText(text: string, options?: TextOptions): Promise<void> {
     return Promise.resolve();
   }
@@ -33,7 +34,7 @@ abstract class TextBoxBase extends ViewObject {
     const textSingle: TextSingle = {
       text,
       width: measureText.width,
-      height: measureText.fontBoundingBoxAscent * lineHeight,
+      height: this.fixedOption.fontSize* lineHeight,
     };
 
     return textSingle;
@@ -54,6 +55,7 @@ abstract class TextBoxBase extends ViewObject {
     const getTextSingles = (texts: Array<string>): Array<TextSingle> => {
       return texts.map((text) => {
         const textSingle = this.getTextSingle(text);
+
         size.height = Math.max(textSingle.height, size.height);
         size.width += textSingle.width;
         size.width = Math.min(this.maxWidth, size.width);
@@ -66,7 +68,7 @@ abstract class TextBoxBase extends ViewObject {
   }
   private handleSplitText(text: string): Array<string> {
     const result = [];
-    const regex = /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+/g;
+    const regex = /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[.,\/#!$%\^&\*;:{}=\-_`~()]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
     let match: Array<string> = [];
     while ((match = regex.exec(text)) !== null) {
       result.push(match[0]);
@@ -86,7 +88,7 @@ abstract class TextBoxBase extends ViewObject {
     const points: Array<Vector | null | Array<Vector>> = [];
     let startX: number = -this.size.width * 0.5;
     let x = startX; // 初始 x 位置
-    let y = texts[0].height * 0.1; // 初始 y 位置
+    let y = 0;
     /**
      * maxWordWidth 最长单词宽度
      */
@@ -94,39 +96,44 @@ abstract class TextBoxBase extends ViewObject {
     const spacing = this.fixedOption.spacing;
     //Rect宽度，用户检测文字是否超出
     const checkRectSizeWidth: number = this.size.width * 0.5;
-    texts.forEach((textData, ndx) => {
-      //单个文字或者多个文字的宽度
-      const getTextWidth = (texts: Array<TextSingle> | TextSingle): number => {
-        let width: number = 0;
-        if (Array.isArray(texts)) {
-          texts.forEach((_) => {
-            width += _.width + spacing;
-          });
-          width -= spacing;
-        } else width = texts.width;
-        return width;
-      };
-      /**是否是换行符 */
-      const isEnter = (textData: Array<TextSingle> | TextSingle): boolean => {
-        if (Array.isArray(textData)) {
-          for (let i = 0; i < textData.length; i++) {
-            if (/\n/.test(textData[i].text)) return true;
-          }
-          return false;
+    //单个文字或者多个文字的宽度
+    const getTextWidth = (texts: Array<TextSingle> | TextSingle): number => {
+      let width: number = 0;
+      if (Array.isArray(texts)) {
+        texts.forEach((_) => {
+          width += _.width + spacing;
+        });
+        width -= spacing;
+      } else width = texts.width;
+      return width;
+    };
+    /**是否是换行符 */
+    const isEnter = (textData: Array<TextSingle> | TextSingle): boolean => {
+      if (Array.isArray(textData)) {
+        for (let i = 0; i < textData.length; i++) {
+          if (/\n/.test(textData[i].text)) return true;
         }
-        return /\n/.test(textData.text);
+        return false;
+      }
+      return /\n/.test(textData.text);
+    };
+
+    this.test = 1;
+    texts.forEach((textData, ndx) => {
+      const handleSorting = () => {
+        x = startX; // 换行后 x 重置
+        y += textData.height;
+        this.test += 1;
       };
       /**预先获取宽度，判断是否超出rect宽度*/
       let width: number = getTextWidth(textData.texts || textData);
       maxWordWidth = Math.max(width, maxWordWidth);
       // 如果文本宽度超出矩形宽度，需要换行。换行符不需要另外换行，有特殊处理
       if (x + width > checkRectSizeWidth && !isEnter(textData)) {
-        x = startX; // 换行后 x 重置
-        y += textData.height;
+        handleSorting();
       } else if (/\n/.test(textData.text)) {
         //换行符
-        x = startX; // 换行后 x 重置
-        y += textData.height;
+        handleSorting();
         return points.push(null);
       }
       //空格不会出现在文本最前方
@@ -147,13 +154,17 @@ abstract class TextBoxBase extends ViewObject {
         x += textData.width + spacing; // 更新 x 位置
       }
     });
-    const size: Size = this.computeViewObjectSize(
-      Math.max(this.size.width, maxWordWidth),
-      y + this.texts[0].height
-    );
-    this.updateRectSize(size);
+    if ((this.size.width === 100 && this.size.height === 100)) {
+      console.log("设置大小")
+      const size: Size = this.computeViewObjectSize(
+        Math.max(this.size.width, maxWordWidth),
+        y + this.texts[0].height
+      );
+      this.updateRectSize(size);
+    }
     return points;
   }
+
   protected drawText(paint: Painter): void {
     if (this.texts.length === 0) return;
     const color: string = this.fixedOption.color;
@@ -176,6 +187,7 @@ abstract class TextBoxBase extends ViewObject {
       if (!point) return;
       const offsetY = this.size.height * -0.5 + textData.height * 0.5;
       const text = textData.text;
+      
       if (!Array.isArray(point))
         paint.fillText(text, point.x, point.y + offsetY);
       else {
@@ -195,7 +207,27 @@ abstract class TextBoxBase extends ViewObject {
     return { width: x, height: y };
   }
   protected didChangeScale(scale: number): void {
-    console.log("缩放", scale);
+    return;
+    // console.log("层", this.test);
+    /**
+     * 高度减去字体大小高度，得到偏移高度，
+     */
+    const currentFontSize=this.fixedOption.fontSize;
+    const rectHeight:number=this.size.height;
+    const lineHeight=this.fixedOption.lineHeight;
+    //每一行高度
+    console.log("行数",this.test);
+    const columnHeight=rectHeight/this.test;
+  //文字大小 = 每一行高度/lineHeight
+  const newFontSize:number=columnHeight/lineHeight;
+  this.fixedOption.fontSize=newFontSize;
+    console.log(newFontSize);
+    
+    this.computeTextSingle();
+    // console.log(scale,this.size.width*scale,this.size.height*scale);
+    // this.setSize({
+    //   width:this.size.width*scale,height:this.size.height*scale
+    // });
   }
 }
 
@@ -208,13 +240,29 @@ class TextBox extends TextBoxBase implements TextHandler {
     this.fixedText = text;
     this.fixedOption = option;
   }
+  setText(text: string): void {
+    this.fixedText = text;
+    this.rebuild();
+  }
+  setFontFamily(family: string): void {
+    this.fixedOption.fontFamily = family;
+    this.rebuild();
+  }
+  setSpacing(value: number): void {
+    this.fixedOption.spacing = value;
+    this.rebuild();
+  }
+  setColor(color: string): void {
+    this.fixedOption.color = color;
+    this.rebuild();
+  }
   public ready(kit: ImageToolkit): void {
     this.paint = kit.getPainter();
     this.computeTextSingle();
   }
-  family: ViewObjectFamily = ViewObjectFamily.text;
+  readonly family: ViewObjectFamily = ViewObjectFamily.text;
   get value(): any {
-    throw new Error("Method not implemented.");
+    return this.fixedText;
   }
   setDecoration(args: any): void {
     throw new Error("Method not implemented.");
@@ -231,7 +279,10 @@ class TextBox extends TextBoxBase implements TextHandler {
   }
   setFontSize(fontSize: number): void {
     this.fixedOption.fontSize = fontSize;
-    this.computeTextSingle();
+    this.rebuild();
+  }
+  private rebuild() {
+    // this.computeTextSingle();
     this.kit.update();
   }
 }

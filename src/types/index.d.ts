@@ -132,10 +132,18 @@ export declare class Group{
 }
 export declare interface TextHandler{
   setFontSize(fontSize:number):void;
+  setFontFamily(family:string):void;
+  setSpacing(value:number):void;
+  setColor(color:string):void;
+  setText(text:string):void;
 }
 export declare class TextBox extends ViewObject implements TextHandler{
   new(text: string, options?: TextOptions): TextBox;
   constructor(text: string, options?: TextOptions);
+  setText(text: string): void;
+  setFontFamily(family: string): void;
+  setSpacing(value: number): void;
+  setColor(color: string): void;
   setFontSize(fontSize: number): void;
   setDecoration(options: TextOptions): void;
   get fontSize(): number;

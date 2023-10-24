@@ -1,8 +1,12 @@
 // const path=require("path");
 // const HtmlWebpackPlugin=require('html-webpack-plugin');
-import path from "path";
+import path,{dirname} from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
+import { fileURLToPath } from "url";
+
+const __filename=fileURLToPath(import.meta.url)
+const __dirname=dirname(__filename);
 
 export default {
   entry: "./src/index.ts",

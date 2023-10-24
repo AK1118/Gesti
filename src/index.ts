@@ -8,6 +8,7 @@ import {
   VerticalButton,
   HorizonButton,
 } from "./buttons";
+import Drag from "./drag";
 import { ViewObjectFamily } from "./enums";
 import Gesti from "./gesti";
 
@@ -227,9 +228,9 @@ doUpdate();
 const textBox = createTextBox("新建文本", {
   resetFontSizeWithRect: true,
 });
-const str=`你好，这是一篇英语短文 Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
+const str=`你好，这是一篇英语短文1234567890 👌⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
 console.log("长度",str.length)
-const textBox2 = createTextBox('你好，这是一篇英语短文', {
+const textBox2 = createTextBox(str, {
   resetFontSizeWithRect: true,
   fontSize:20,
   spacing:0,
@@ -243,16 +244,16 @@ textBox2.setPosition(300,30);
 // doCenter(group);
 //  loadToGesti(group);
 loadToGesti(textBox2)
-loadToGesti(imageBox)
+// loadToGesti(imageBox)
 // loadToGesti(textBox);
 // loadToGesti(textBox2);
 // doCenter(textBox2)
 textBox2.installButton(new HorizonButton(textBox2));
-textBox2.installButton(new RotateButton(textBox2));
+textBox2.installButton(new DragButton(textBox2));
 
 let i=10;
 setInterval(()=>{
-  textBox2.setFontSize(i++);
+  // textBox2.setText(textBox2.value+''+i);
 },1000)
 // group.add(imageBox);
 // group.add(textBox);
