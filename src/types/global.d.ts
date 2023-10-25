@@ -173,6 +173,8 @@ declare interface TextOptions {
    * 可以浏览器搜索   canvas自定义字体
    */
   fontFamily?: string;
+  bold?:boolean,
+  italic?:boolean,
   fontSize?: number;
   /**
    * 文字间距
@@ -194,6 +196,7 @@ declare interface TextOptions {
   lineWidth?: number;
   /**
    * 下划线颜色
+   * @deprecated
    */
   lineColor?: string;
   /**

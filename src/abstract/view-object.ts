@@ -343,15 +343,15 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     /*在抬起鼠标时，ViewObject还没有被Calcel，为再次聚焦万向按钮做刷新数据*/
     this.onChanged();
   }
+  private readonly enlargeScale:number=1.1;
+  private readonly narrowScale:number=1/1.1;
   public enlarge() {
-    this.scale = 1;
-    this.scale += 0.1;
+    this.scale = this.enlargeScale;
     this.rect.setScale(this.scale);
     this.doScale();
   }
   public narrow() {
-    this.scale = 1;
-    this.scale -= 0.1;
+    this.scale = this.narrowScale;
     this.rect.setScale(this.scale);
     this.doScale();
   }

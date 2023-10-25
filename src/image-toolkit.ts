@@ -704,13 +704,13 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   public getViewObjectCount(): number {
     return this.ViewObjectList.length;
   }
+  
   private addViewObject(obj: ViewObject): void {
     this.ViewObjectList.push(obj);
     obj.initialization(this);
     obj.setLayer(this.getViewObjectCount() - 1);
     this.callHook("onLoad", obj);
     this.update();
-    // this.tool.arrangeLayer(this.ViewObjectList,obj,obj.);
   }
 
   /**

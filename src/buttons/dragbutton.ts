@@ -13,8 +13,8 @@ class DragButton extends Button {
     private oldViewObjectRect: Rect = null;
     private oldRadius: number = 0;
     public oldAngle: number = 0;
-    public radius: number = 10;
     private disable: boolean = false;
+    radius: number=10;
     private preScale:number=1;
     //拉伸变化方式  比例   水平  垂直   自由
     private axis:"ratio"|"horizontal"|"vertical"|"free"="ratio";
