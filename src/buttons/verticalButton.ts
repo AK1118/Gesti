@@ -17,8 +17,8 @@ class VerticalButton extends DragButton {
     this.draw = function (paint) {
       const { x, y } = this.relativeRect.position;
       Widgets.drawChangeSizeAlone(paint, {
-        offsetx: x,
-        offsety: y,
+        offsetX: x,
+        offsetY: y,
       });
     };
   }

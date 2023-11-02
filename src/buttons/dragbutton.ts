@@ -1,127 +1,191 @@
 import { FuncButtonTrigger } from "../enums";
- 
+
 import Button from "../abstract/button";
 import Painter from "../painter";
-import Rect from "../rect";
+import Rect, { Size } from "../rect";
 import Vector from "../vector";
 import Widgets from "../widgets";
 import ViewObject from "../abstract/view-object";
 import GestiConfig from "../config/gestiConfig";
-
+import { Delta } from "../event";
 class DragButton extends Button {
-    public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
-    private oldViewObjectRect: Rect = null;
-    private oldRadius: number = 0;
-    public oldAngle: number = 0;
-    private disable: boolean = false;
-    radius: number=10;
-    private preScale:number=1;
-    //拉伸变化方式  比例   水平  垂直   自由
-    private axis:"ratio"|"horizontal"|"vertical"|"free"="ratio";
-    key: string | number = +new Date();
-    constructor(master: ViewObject,options?:{
-        axis?:"ratio"|"horizontal"|"vertical"|"free"
-    }) {
-        super(master);
-        this.init({percentage:[.5, .5]});
-        this.initScale();
-        this.rect.onDrag = (newRect: Rect) => {
-            /*拖拽缩放*/
-            this.rect = newRect;
-            this.effect(newRect);
-        }
-        if(options)this.axis=options.axis??"ratio";
-    }
-    updatePosition(vector: Vector): void {
-        this.updateRelativePosition();
-        this.setAbsolutePosition(vector);
-    }
-    public setAxis(axis:"ratio"|"horizontal"|"vertical"|"free"){
-        this.axis=axis;
-    }
-    setMaster(master: ViewObject): void {
-        this.master = master;
-    }
-    /**
-     * 为拖拽改变大小初始化
-     */
-    private initScale() {
-        this.setRelativePositionRect(this.options.percentage);
-        this.oldRadius = Vector.mag(this.relativeRect.position);
-        this.preScale=1;
-    }
-    effect(newRect: Rect): void {
-        /**
-         * @param {ImageRect} newRect 
-         * @description 万向点的坐标是基于 @ViewObject 内的Rect @ImageRect 的，所以得到的一直是相对坐标
-         */
-        const oldRect = this.oldViewObjectRect;
-        const offsetX = newRect.position.x - oldRect.position.x,
-               offsetY = newRect.position.y - oldRect.position.y;
-        /*等比例缩放*/
-        const scale =Vector.mag(new Vector(offsetX, offsetY)) / this.oldRadius;
+  public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
+  private preViewObjectRect: Rect = null;
+  private oldRadius: number = 0;
+  public oldAngle: number = 0;
+  private disable: boolean = false;
+  private delta: Delta;
+  radius: number = 10;
+  private preScale: number = 1;
+  private angleDisabled: boolean = false;
+  //拉伸变化方式  比例   水平  垂直   自由
+  private axis: "ratio" | "horizontal" | "vertical" | "free" = "ratio";
+  key: string | number = +new Date();
 
-        let deltaScale=1+(scale-this.preScale);
+  constructor(
+    master: ViewObject,
+    options?: {
+      axis?: "ratio" | "horizontal" | "vertical" | "free";
+      angleDisabled?: boolean;
+    }
+  ) {
+    super(master);
+    this.init({ percentage: [0.5, 0.5] });
+    this.initScale();
+    this.rect.onDrag = (currentButtonRect: Rect) => {
+      /*拖拽缩放*/
+      this.rect = currentButtonRect;
+      this.effect(currentButtonRect);
+    };
+    if (options) {
+      this.axis = options.axis ?? "ratio";
+      this.angleDisabled = options.angleDisabled;
+    }
+  }
+  updatePosition(vector: Vector): void {
+    this.updateRelativePosition();
+    this.setAbsolutePosition(vector);
+  }
+  public setAxis(axis: "ratio" | "horizontal" | "vertical" | "free") {
+    this.axis = axis;
+  }
+  setMaster(master: ViewObject): void {
+    this.master = master;
+  }
+  /**
+   * 为拖拽改变大小初始化
+   */
+  private initScale() {
+    this.setRelativePositionRect(this.options.percentage);
+    this.oldRadius = Vector.mag(this.relativeRect.position);
+    this.preScale = 1;
+    this.preMag = -1;
+  }
+  private preMag: number = -1;
+  /**
+   * 按钮拖拽，得到mag和倍数，缩小，缩放按钮还是在那个位置
+   * 左上角缩放，旋转后缩放有bug
+   * const mag=this.getButtonWidthMasterMag(currentButtonRect);
+    const preMasterSize:Size=this.master.size.copy();
+    if(this.preMag===-1)this.preMag=mag;
+    const deltaScale:number=mag/this.preMag;
+    const rScale:number=deltaScale+(1-deltaScale)/2;
+    this.master.setScale(rScale);
+    const currentMasterSize:Size=this.master.size.copy();
+    const delta=currentMasterSize.toVector().sub(preMasterSize.toVector()).half();
+    this.master.addPosition(delta.x,delta.y);
+    this.preMag=deltaScale<1?(mag+delta.mag()):(mag-delta.mag());
+   */
+  effect(currentButtonRect?: Rect): void {
+    const mag = this.getButtonWidthMasterMag(currentButtonRect);
+    if (this.preMag === -1) this.preMag = mag;
+    const deltaScale: number = mag / this.preMag;
+      const [offsetX,offsetY]=currentButtonRect.position.sub(this.master.position).toArray();
+    this.master.setScale(deltaScale);
+    if (!this.angleDisabled) {
+      const angle = Math.atan2(offsetY, offsetX) - this.oldAngle;
+      this.master.rect.setAngle(angle, true);
+    }
+    this.preMag = mag;
+  }
 
-        /*不适用于scale函数，需要基于原大小改变*/
-        let newWidth = (oldRect.size.width * scale),
-            newHeight =(oldRect.size.height * scale);
-        if(this.axis=="horizontal"){
-            newHeight = oldRect.size.height;
-        }
-        else if(this.axis=="vertical"){
-            newWidth =oldRect.size.width;
-        }
-        else if(this.axis=="ratio"){
+  private getButtonWidthMasterMag(currentButtonRect: Rect): number {
+    const currentButtonPosition: Vector = currentButtonRect.position;
+    const currentMasterPosition: Vector = this.master.rect.position;
+    const mag: number = Vector.mag(
+      Vector.sub(currentButtonPosition, currentMasterPosition)
+    );
+    return mag;
+  }
+  /**
+   * @param {ImageRect} currentButtonRect
+   * @description 万向点的坐标是基于 @ViewObject 内的Rect @ImageRect 的，所以得到的一直是相对坐标
+   */
+  // effect(currentButtonRect: Rect): void {
+  //   const preViewObject = this.preViewObjectRect;
+  //   // console.log([currentButtonRect.position,preViewObject.position])
+  //   const [offsetX,offsetY]=currentButtonRect.position.sub(preViewObject.position).toArray();
 
-        }else if(this.axis=="free"){
-           newWidth=oldRect.size.width*(offsetX*1.5/this.oldRadius);
-           newHeight=oldRect.size.height*(offsetY*1.5/this.oldRadius);
-        }
-        this.master.rect.setSize(newWidth, newHeight,true);
-        /*this.oldAngle为弧度，偏移量*/
-        const angle = Math.atan2(offsetY, offsetX) - this.oldAngle;
-        if(this.axis=="ratio") this.master.rect.setAngle(angle,true);
-       
-       this.master.rect.setScale(deltaScale,false);
-       this.preScale=scale;
-    }
-    public get getOldAngle(): number {
-        return this.oldAngle;
-    }
-    public render(paint: Painter): void {
-        this.draw(paint);
-    }
-    onSelected(): void {
-        this.oldViewObjectRect = this.master.rect.copy();
-        this.initScale();
-    }
-    hide() {
-        this.disable = true;
-    }
-    show() {
-        this.disable = false;
-    }
-    draw(paint: Painter): void {
-        this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
-    }
-    drawButton(position: Vector, size: Size,radius:number, paint: Painter): void {
-        const {
-            width,
-            height
-        } = size;
-        const halfRadius = this.radius * .75;
-        const x = position.x, y = position.y;
-        paint.beginPath();
-        paint.fillStyle = GestiConfig.theme.buttonsBgColor;
-        paint.arc(x, y, this.radius, 0, Math.PI * 2);
-        paint.closePath();
-        paint.fill();
-        Widgets.drawGrag(paint, {
-            offsetx: x - halfRadius + 2,
-            offsety: y - halfRadius + 2
-        });
-    }
+  //   console.log("之前",[offsetX,offsetY]);
+
+  //   /*等比例缩放*/
+  //   const scale = Vector.mag(new Vector(offsetX, offsetY)) / this.oldRadius;
+
+  //   console.log();
+
+  //   let deltaScale = 1 + (scale - this.preScale);
+
+  //   /*不适用于scale函数，需要基于原大小改变*/
+  //   let newWidth = preViewObject.size.width *scale,
+  //     newHeight = preViewObject.size.height*scale;
+
+  //   // if (this.axis == "horizontal") {
+  //   //   newHeight = preViewObject.size.height;
+  //   // } else if (this.axis == "vertical") {
+  //   //   newWidth = preViewObject.size.width;
+  //   // } else if (this.axis == "ratio") {
+  //   // } else if (this.axis == "free") {
+  //   //   newWidth = preViewObject.size.width * ((offsetX * 1.5) / this.oldRadius);
+  //   //   newHeight = preViewObject.size.height * ((offsetY * 1.5) / this.oldRadius);
+  //   // }
+  //   console.log("之后",newWidth===newHeight);
+  //   this.master.rect.setSize(newWidth, newHeight, true);
+
+  //   /*this.oldAngle为弧度，偏移量*/
+  //   if (!this.angleDisabled) {
+  //     const angle = Math.atan2(offsetY, offsetX) - this.oldAngle;
+  //     if (this.axis == "ratio") this.master.rect.setAngle(angle, true);
+  //   }
+  //   this.master.rect.setScale(deltaScale, false);
+  //   this.preScale = scale;
+
+  // }
+  public get getOldAngle(): number {
+    return this.oldAngle;
+  }
+  public render(paint: Painter): void {
+    if (!this.delta) this.delta = new Delta(this.position.x, this.position.y);
+    this.delta.update(this.position.copy());
+    this.draw(paint);
+  }
+  onSelected(): void {
+    this.preViewObjectRect = this.master.rect.copy();
+    this.initScale();
+  }
+  hide() {
+    this.disable = true;
+  }
+  show() {
+    this.disable = false;
+  }
+  draw(paint: Painter): void {
+    this.drawButton(
+      this.relativeRect.position,
+      this.master.rect.size,
+      this.radius,
+      paint
+    );
+  }
+  drawButton(
+    position: Vector,
+    size: Size,
+    radius: number,
+    paint: Painter
+  ): void {
+    const { width, height } = size;
+    const halfRadius = this.radius * 0.75;
+    const x = position.x,
+      y = position.y;
+    paint.beginPath();
+    paint.fillStyle = GestiConfig.theme.buttonsBgColor;
+    paint.arc(x, y, this.radius, 0, Math.PI * 2);
+    paint.closePath();
+    paint.fill();
+    Widgets.drawGrag(paint, {
+      offsetX: x - halfRadius + 2,
+      offsetY: y - halfRadius + 2,
+    });
+  }
 }
 
 export default DragButton;

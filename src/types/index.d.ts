@@ -110,6 +110,9 @@ export declare abstract class ViewObject {
    * 取消对象为背景
    */
   public unBackground():void;
+  get position():Vector;
+  get size():Size;
+  get mounted():boolean;
 }
 export declare class XImage {
   new(params: createImageOptions): XImage;

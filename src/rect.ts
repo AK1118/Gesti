@@ -11,12 +11,15 @@ declare interface onDragFunction {
   (rect: Rect): void;
 }
 
-class Size {
+export class Size {
   width: number;
   height: number;
   constructor(width: number, height: number) {
     this.width = width;
     this.height = height;
+  }
+  static get zero():Size{
+    return new Size(0,0);
   }
   toVector() {
     return new Vector(this.width, this.height);
@@ -89,8 +92,8 @@ class Rect extends ObserverObj {
     if(position.equals(this.position))return;
     this.beforeReport(this._position, "position");
     this._position = position;
-    this._position.x = ~~this._position.x;
-    this._position.y = ~~this._position.y;
+    this._position.x = this._position.x;
+    this._position.y = this._position.y;
     this.report(position, "position");
   }
   public setPosition(position: Vector): void {
@@ -188,6 +191,12 @@ class Rect extends ObserverObj {
     this.setAngle(newRect.getAngle);
     this.setScale(newRect.scale);
     this.setSize(newRect.size.width, newRect.size.height);
+  }
+  public setPositionXY(x:number,y:number){
+    if(this.position.x===x&&this.position.y===y)return;
+    this.beforeReport(this._position, "position");
+    this._position.setXY(x,y);
+    this.report(this._position, "position");
   }
 }
 

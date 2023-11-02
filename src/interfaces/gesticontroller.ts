@@ -1,7 +1,6 @@
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import XImage from "../ximage";
-type View = ViewObject;
 //图层控制器
 interface LayerController {
   /**
@@ -96,6 +95,18 @@ interface LayerController {
   cleanAll(): Promise<void>;
 
   position(x:number,y:number,view?:ViewObject):void;
+  /**
+   * @description 关闭某个图层
+   * @param view 
+   */
+  close(view?:ViewObject):void;
+  /**
+   * @description 镜像
+   * @param view 
+   * @returns {boolean} 返回是否处于镜像
+   */
+  mirror(view?:ViewObject):boolean;
+
 }
 
 type ListenerCallback = (object: any) => void;

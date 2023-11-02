@@ -66,9 +66,9 @@ export abstract class Button implements RenderObject {
 
     if (!this.originPositionWithSize)
       this.originPositionWithSize = {
-        offsetx:
+        offsetX:
          ~~ (this.relativeRect.position.x),
-        offsety:
+        offsetY:
          ~~ (this.relativeRect.position.y),
       };
 
@@ -97,7 +97,7 @@ export abstract class Button implements RenderObject {
   }
   abstract trigger: FuncButtonTrigger;
   abstract setMaster(master: RenderObject): void;
-  abstract effect(rect?: Rect): void;
+  abstract effect(currentButtonRect?: Rect): void;
   abstract updatePosition(vector: Vector): void;
   abstract draw(paint: Painter): void;
   abstract render(paint: Painter): void;

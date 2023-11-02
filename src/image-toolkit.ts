@@ -184,6 +184,23 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  close(view?: ViewObject): void {
+    if (!view) this.selectedViewObject?.hide?.();
+    view?.hide?.();
+    this.update();
+  }
+  mirror(view?: ViewObject): boolean {
+    if (!view) {
+      const isMirror: boolean = this.selectedViewObject?.mirror?.();
+      this.update();
+      this.callHook("onMirror", isMirror);
+      return isMirror;
+    }
+    const isMirror: boolean = view.mirror();
+    this.update();
+    this.callHook("onMirror", isMirror);
+    return isMirror;
+  }
   setBoundary(boundaryRect: Boundary): void {
     throw new Error("Method not implemented.");
   }
@@ -619,7 +636,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       //鼠标|手指抬起时提交一次操作
       this.recorder.commit();
     }
-    setTimeout(() => this.update(), 100);
+    this.update();
     this._inObjectArea = false;
   }
 
@@ -704,12 +721,13 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   public getViewObjectCount(): number {
     return this.ViewObjectList.length;
   }
-  
+
   private addViewObject(obj: ViewObject): void {
     this.ViewObjectList.push(obj);
     obj.initialization(this);
     obj.setLayer(this.getViewObjectCount() - 1);
     this.callHook("onLoad", obj);
+
     this.update();
   }
 

@@ -6,7 +6,7 @@ import WriteViewObj from "../viewObject/write";
 
 class WriteRect extends WriteBase{
     points:Array<Vector>=[];
-    currentPosition:Vector=new Vector(0,0);
+    currentPosition:Vector=Vector.zero;
     draw(position: Vector) {
       
         this.paint.beginPath();

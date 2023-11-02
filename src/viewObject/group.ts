@@ -111,7 +111,8 @@ abstract class GroupBase extends ViewObject {
     this.beforeAngle = this.rect.getAngle;
   }
   public didChangeScale(scale: number): void {
-    this.views.forEach(_=>{
+    console.log(scale)
+    this.views.forEach((_:ViewObject)=>{
       //获取两点偏移量
       const offset:Vector=Vector.sub(_.position,this.position);
       //偏移量乘以缩放因子
@@ -120,7 +121,7 @@ abstract class GroupBase extends ViewObject {
       const newPosition:Vector=Vector.add(offsetDel,this.position);
       // console.log("缩放",scale)
       _.setPosition(newPosition.x,newPosition.y);
-      _.rect.setScale(scale);
+      
     });
     this.updateChildrenAngle();
   }

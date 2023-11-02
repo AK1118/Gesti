@@ -6,16 +6,20 @@ declare const wx: any;
 declare const tt: any;
 declare var document: Document;
 declare interface EventHandle {}
-declare interface Size {
+declare class Size {
   width: number;
   height: number;
+  constructor(width: number, height: number);
+  toVector(): Vector;
+  copy(): Size;
+  static get zero(): Size;
 }
 declare interface CanvasRenderingContext2D {
   draw(): void;
 }
 declare interface Offset {
-  offsetx: number;
-  offsety: number;
+  offsetX: number;
+  offsetY: number;
 }
 declare interface RectParams {
   x?: number;
@@ -67,6 +71,8 @@ declare class Vector {
   static sub(v1: Vector, v2: Vector): Vector;
   static add(v1: Vector, v2: Vector): Vector;
   static troweling(v: Vector): Vector;
+  static get zero():Vector;
+  half():Vector;
 }
 
 declare interface GestiEventParams {
@@ -169,58 +175,82 @@ declare interface XImageOptions {
 
 declare interface TextOptions {
   /**
-   * 字体风格
-   * 可以浏览器搜索   canvas自定义字体
+   * @description 字体风格，可以浏览器搜索 canvas自定义字体
    */
   fontFamily?: string;
-  bold?:boolean,
-  italic?:boolean,
+  bold?: boolean;
+  italic?: boolean;
   fontSize?: number;
   /**
-   * 文字间距
+   * @description 文字间距
    */
   spacing?: number;
   /**
-   * 文字颜色
+   * @description 文字颜色
    */
   color?: string;
   /**
-   * 是否显示下划线
+   * @description 是否显示下划线,建议使用underLine
    * @deprecated
    */
   line?: boolean;
   /**
-   * 下划线粗细
-   * @deprecated
+   * @description 下划线
+   */
+  underLine?: boolean;
+  /**
+   * @description 删除线
+   */
+  lineThrough?: boolean;
+  /**
+   * @description 上划线
+   */
+  overLine?: boolean;
+  /**
+   * @description 划线宽度
    */
   lineWidth?: number;
   /**
-   * 下划线颜色
-   * @deprecated
+   * @description 下划线颜色
+   *
    */
   lineColor?: string;
   /**
    * @deprecated
-   * 下划线与文字偏移量
+   * @description 已废弃，设置无效
    */
   lineOffsetY?: number;
   /**
-   * 文字间距高度
+   * @description 文字间距高度
    */
   lineHeight?: number;
+  /**
+   * @deprecated
+   * @description 已废弃，设置无效
+   */
 
   width?: number;
+  /**
+   * @deprecated
+   * @description 已废弃，设置无效
+   */
   height?: number;
   /**
-   * 如果为true,文字大小会随着选框的高而变化
+   * @description 如果为true,文字大小会随着选框的高而变化
    */
   resetFontSizeWithRect?: boolean;
   /**
-   * 传入一个整数类型，用于限制字体大小最大值，默认不会限制
+   * @description 传入一个整数类型，用于限制字体大小最大值，默认不会限制
    */
   maxFontSize?: number;
-
+  /**
+   * @description 文字背景颜色
+   */
   backgroundColor?: string;
+  /**
+   * @description 最大宽度
+   */
+  maxWidth?: number;
 }
 
 declare type CenterAxis = "vertical" | "horizon";
@@ -233,6 +263,7 @@ declare type GestiControllerListenerTypes =
   | "onUpdate"
   | "onLoad"
   | "onDestroy"
+  | "onMirror"
   | "onBeforeDestroy";
 
 declare function textHandler(options?: TextOptions): any;

@@ -67,6 +67,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   //是否属于背景，如果是背景，就不能被选中，且永远置于最底层
   private background: boolean = false;
   protected kit: ImageToolkit;
+  private _mounted:boolean=false;
   public get position(): Vector {
     return this.rect.position;
   }
@@ -78,7 +79,15 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     });
     this.init();
   }
-
+  get mounted():boolean{
+    return this.mounted;
+  }
+  public mount():void{
+    this._mounted=true;
+  }
+  public unMount():void{
+    this._mounted=false;
+  }
   //获取对象值
   abstract get value(): any;
   /**
@@ -118,6 +127,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
         kit.getViewObjects()
       ));
     this.ready(kit);
+    this.mount();
   }
   public init() {
     this.relativeRect = new Rect({
@@ -182,8 +192,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public getLayer(): number {
     return this.layer;
   }
-  public mirror() {
+  public mirror():boolean {
     this.isMirror = !this.isMirror;
+    return this.isMirror;
   }
   public render(paint: Painter) {
     if (!this.initialed) return;
@@ -359,9 +370,10 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     if (this.isLock) return;
     this.onChanged();
   }
-  protected setScale(scale:number){
+  public setScale(scale:number){
     this.scale=scale;
     this.rect.setScale(scale);
+    this.doScale();
   }
   /*每次改变大小后都需要刷新按钮的数据*/
   public onChanged() {
@@ -405,7 +417,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   }
   protected _didChangePosition(position: Vector): void {
     if (!this.delta) this.delta = new Delta(position.x, position.y);
-    this.delta.update(position);
+    this.delta.update(position.copy());
   }
   /**
    * 撤销 | 取消撤销回调
@@ -460,6 +472,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public setAngle(angle: number) {
     this.rect.setAngle(angle);
   }
+
 }
 
 export default ViewObject;

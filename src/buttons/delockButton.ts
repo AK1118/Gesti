@@ -47,8 +47,8 @@ class UnLockButton extends Button {
         paint.closePath();
         paint.fill();
         Widgets.drawDeLock(paint, {
-            offsetx: x - halfRadius + 2,
-            offsety: y - halfRadius + 2
+            offsetX: x - halfRadius + 2,
+            offsetY: y - halfRadius + 2
         });
     }
     render(paint: Painter): void {

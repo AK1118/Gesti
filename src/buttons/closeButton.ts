@@ -41,8 +41,8 @@ class CloseButton extends Button {
         paint.closePath();
         paint.fill();
         Widgets.drawClose(paint, {
-            offsetx: x - halfRadius + 4,
-            offsety: -height / 2 - 3
+            offsetX: x - halfRadius + 4,
+            offsetY: -height / 2 - 3
         });
     }
     render(paint: Painter): void {

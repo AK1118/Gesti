@@ -215,57 +215,45 @@ const ximage = createXImage({
   height: img.height,
   scale: .5,
 });
+
 const imageBox = createImageBox(ximage);
-const drawButton = new DragButton(imageBox);
+console.log(imageBox.size);
+const drawButton = new DragButton(imageBox,{
+  angleDisabled:false,
+});
 // const unLockButton = new UnLockButton(imageBox);
 imageBox.installButton(drawButton);
+imageBox.installButton(new RotateButton(imageBox));
 // loadToGesti(imageBox)
 // doUpdate();
  
 const textBox = createTextBox("新建文本", {
   resetFontSizeWithRect: true,
 });
-const str=`你好，这是一篇英语短文1234567890 👌⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
-const str1=`你好，这是一篇英语短文1234567890 Redux \n maintainer Mark Erikson`;
-// console.log("长度",str.length)
+const str=`你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
+const str1=`你好，这是一篇英语短文1234567890 Redux  maintainer Mark Erikson`;
 const textBox2 = createTextBox(str1, {
-  resetFontSizeWithRect: true,
-  fontSize:20,
-  spacing:10,
-  fontFamily:"楷体",
-  lineHeight:1,
+  resetFontSizeWithRect: false,
+  fontSize:10,
+  spacing:0,
+  lineHeight:1.5,
   color:"black",
-  bold:true,
-  italic:true,
-  backgroundColor:"white"
+  backgroundColor:"white",
 });
 
 
 const group: Group = new Group();
 textBox2.setPosition(300,30);
-// doCenter(group);
-//  loadToGesti(group);
-loadToGesti(textBox2)
-// loadToGesti(imageBox)
-// loadToGesti(textBox);
-// loadToGesti(textBox2);
-// doCenter(textBox2)
-// textBox2.installButton(new HorizonButton(textBox2));
+// loadToGesti(group);
+// loadToGesti(textBox2)
+loadToGesti(imageBox)
+// group.add(imageBox);
+// group.add(textBox2);
 const dragButton=new DragButton(textBox2);
 textBox2.installButton(dragButton);
-
-let i=10;
-setInterval(()=>{
-  // textBox2.setText(textBox2.value+''+i);
-},1000)
-// group.add(imageBox);
-// group.add(textBox);
-//  group.add(textBox2);
-
-// textBox2.installButton(new HorizonButton(textBox2));
-// textBox2.installButton(new RotateButton(textBox2));
-// textBox2.installButton(new DragButton(textBox2));
-doCenter(textBox2)
+group.installButton(new DragButton(group,{
+  angleDisabled:true,
+}));
 doUpdate()
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");

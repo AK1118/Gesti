@@ -13,7 +13,9 @@ class Delta implements Delta {
   }
   update(vector: Vector) {
     //初始化时before 和 vector 坐标相等
-    if(this.beforeVector.x===0&&this.beforeVector.y===0)this.beforeVector = vector;
+    if(this.beforeVector.x===0&&this.beforeVector.y===0){
+      this.beforeVector = vector;
+    }
     [this._deltaX, this._deltaY] = Vector.sub(
       vector,
       this.beforeVector
@@ -28,6 +30,9 @@ class Delta implements Delta {
   }
   get delta():[deltaX:number,deltaY:number]{
     return [this._deltaX,this._deltaY];
+  }
+  get deltaVector():Vector{
+    return new Vector(this._deltaX,this._deltaY);
   }
   public clean(){
     this._deltaX=this._deltaY=0;

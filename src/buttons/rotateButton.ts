@@ -20,7 +20,7 @@ class RotateButton extends Button {
         super(master);
         this.name="rotate";
         this.init({
-            position:new Vector(0,(master.rect.size.height>>1)+10),
+            position:new Vector(0,(master.rect.size.height*.5)+10),
         });
         this.initScale();
         this.rect.onDrag = (newRect: Rect) => {
@@ -49,9 +49,9 @@ class RotateButton extends Button {
          * @description 万向点的坐标是基于 @ViewObject 内的Rect @ImageRect 的，所以得到的一直是相对坐标
          */
         const oldRect = this.oldViewObjectRect;
-        const offsetx = newRect.position.x - oldRect.position.x,
-            offsety = newRect.position.y - oldRect.position.y;
-        let angle = Math.atan2(offsety, offsetx) - this.oldAngle;
+        const offsetX = newRect.position.x - oldRect.position.x,
+            offsetY = newRect.position.y - oldRect.position.y;
+        let angle = Math.atan2(offsetY, offsetX) - this.oldAngle;
         //辅助旋转
         {
             let _angle = +angle.toFixed(2);
@@ -95,8 +95,8 @@ class RotateButton extends Button {
         paint.closePath();
         paint.fill();
         Widgets.drawRotate(paint, {
-            offsetx: x,
-            offsety: y,
+            offsetX: x,
+            offsetY: y,
         });
     }
 }

@@ -2,10 +2,11 @@ import ViewObject, { toJSONInterface } from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../image-toolkit";
 import Painter from "../painter";
-import Rect from "../rect";
+import Rect, { Size } from "../rect";
 import { TextHandler } from "../types/index";
 import { sp } from "../utils";
 import Vector from "../vector";
+import { Point } from "../vertex";
 
 interface TextSingle {
   text: string;
@@ -15,6 +16,7 @@ interface TextSingle {
 }
 interface FixedOption {
   fontSize: number;
+  maxWidth: number;
 }
 /**
  * 普通模式，矩形根据文字而定
@@ -22,20 +24,25 @@ interface FixedOption {
  */
 abstract class TextBoxBase extends ViewObject {
   protected fixedText: string;
+  private readonly defaultLineColor: string = "black";
+  private readonly defaultLineWidth: number = 2;
   protected textOptions: TextOptions = {
     fontSize: 20,
     color: "black",
-    spacing: 0,
-    lineHeight: 1,
+    spacing: 10,
+    lineHeight: 1.5,
     bold: false,
+    italic: false,
+    maxWidth: 300,
   };
   protected paint: Painter;
   protected texts: Array<TextSingle> = [];
-  protected maxWidth: number = 300;
   private rowsCount: number = 1;
   private readonly fixedOption: FixedOption = {
     fontSize: 20,
+    maxWidth: 300,
   };
+  private start: number;
   updateText(text: string, options?: TextOptions): Promise<void> {
     return Promise.resolve();
   }
@@ -52,7 +59,7 @@ abstract class TextBoxBase extends ViewObject {
   };
   private getFont(): string {
     const bold = this.textOptions.bold ? "bold" : "";
-    const italic =this.textOptions.italic?"italic":"";
+    const italic = this.textOptions.italic ? "italic" : "";
     return `${bold} ${italic} ${this.textOptions.fontSize}px ${this.textOptions.fontFamily}`;
   }
   /**
@@ -62,17 +69,19 @@ abstract class TextBoxBase extends ViewObject {
   protected computeTextSingle(
     isInitialization: boolean = false
   ): Array<TextSingle> {
+    if (isInitialization) this.setFixedOption();
+    this.start = performance.now();
     //设置字体大小
     this.paint.font = this.getFont();
     //This viewObject rect size
-    const size: Size = { width: 0, height: 0 };
+    const size: Size = Size.zero;
     const splitTexts: Array<string> = this.handleSplitText(this.fixedText);
     const getTextSingles = (texts: Array<string>): Array<TextSingle> => {
       return texts.map((text) => {
         const textSingle = this.getTextSingle(text);
         size.height = Math.max(textSingle.height, size.height);
         size.width += textSingle.width;
-        size.width = Math.min(this.maxWidth, size.width);
+        size.width = Math.min(this.fixedOption.maxWidth, size.width);
         if (text.length != 1) textSingle.texts = getTextSingles(text.split(""));
         return textSingle;
       }) as unknown as Array<TextSingle>;
@@ -80,11 +89,16 @@ abstract class TextBoxBase extends ViewObject {
     this.texts = getTextSingles(splitTexts);
     if (isInitialization) {
       this.updateRectSize(size);
-      this.setFixedOption();
     }
     this.computeDrawPoint(this.texts, true);
+
     return this.texts;
   }
+  /**
+   * @description 切割文本
+   * @param text
+   * @returns
+   */
   private handleSplitText(text: string): Array<string> {
     const result = [];
     const regex =
@@ -93,6 +107,7 @@ abstract class TextBoxBase extends ViewObject {
     while ((match = regex.exec(text)) !== null) {
       result.push(match[0]);
     }
+
     return result;
   }
   /**
@@ -142,21 +157,21 @@ abstract class TextBoxBase extends ViewObject {
     };
 
     this.rowsCount = 1;
+    const handleSorting = (textData: TextSingle) => {
+      x = startX; // 换行后 x 重置
+      y += textData.height;
+      this.rowsCount += 1;
+    };
     texts.forEach((textData, ndx) => {
-      const handleSorting = () => {
-        x = startX; // 换行后 x 重置
-        y += textData.height;
-        this.rowsCount += 1;
-      };
       /**预先获取宽度，判断是否超出rect宽度*/
       let width: number = getTextWidth(textData.texts || textData);
       maxWordWidth = Math.max(width, maxWordWidth);
       // 如果文本宽度超出矩形宽度，需要换行。换行符不需要另外换行，有特殊处理
       if (x + width > checkRectSizeWidth && !isEnter(textData)) {
-        handleSorting();
+        handleSorting(textData);
       } else if (/\n/.test(textData.text)) {
         //换行符
-        handleSorting();
+        handleSorting(textData);
         return points.push(null);
       }
       //空格不会出现在文本最前方
@@ -179,10 +194,9 @@ abstract class TextBoxBase extends ViewObject {
     });
     y += this.textOptions.fontSize * this.textOptions.lineHeight;
     if (isInitialization) {
-      this.updateRectSize({
-        width: Math.max(this.size.width, maxWordWidth),
-        height: y,
-      });
+      this.updateRectSize(
+        new Size(Math.max(this.size.width, maxWordWidth), y) //maxWordWidth 是某个文字最大宽度，比如一个单词最大宽度，防止矩形宽度小于单词宽度
+      );
     }
     return points;
   }
@@ -204,22 +218,58 @@ abstract class TextBoxBase extends ViewObject {
     }
     paint.fillStyle = color;
     paint.textBaseLine = "middle";
+    const spacing =
+      this.textOptions.spacing *
+      (this.textOptions.fontSize / this.fixedOption.fontSize);
+
+    const render = (point, textData: TextSingle) => {
+      const offsetY =
+        this.size.height * -0.5 +
+        textData.height * 0.5 +
+        this.textOptions.fontSize * 0.1;
+
+      renderTexts(point, textData.text, offsetY);
+      if (this.textOptions?.lineThrough) {
+        renderLine(point, textData.width, offsetY);
+      }
+      if (this.textOptions?.underLine) {
+        renderLine(point, textData.width, 0);
+      }
+      if (this.textOptions?.overLine) {
+        const textHeight = textData.height;
+        renderLine(point, textData.width, -textHeight);
+      }
+    };
+    const renderLine = (point: Point, width: number, offsetY: number) => {
+      this.paint.moveTo(point.x, point.y + offsetY);
+      let lineX = point.x + width + spacing;
+      if (lineX > this.size.width * 0.5) lineX -= spacing;
+      this.paint.lineTo(lineX, point.y + offsetY);
+    };
+    const renderTexts = (point: Point, text: string, offsetY: number) => {
+      paint.fillText(text, point.x, point.y + offsetY);
+    };
+
     this.texts.forEach((textData, ndx) => {
       const point = points[ndx];
       if (!point) return;
-      const offsetY = this.size.height * -0.5 + textData.height * 0.5;
-      const text = textData.text;
 
-      if (!Array.isArray(point))
-        paint.fillText(text, point.x, point.y + offsetY);
-      else {
+      if (!Array.isArray(point)) {
+        render(point, textData);
+      } else {
         textData.texts.forEach((_, _ndx) => {
           const p = point[_ndx];
-          paint.fillText(_.text, p.x, p.y + offsetY);
+          render(p, _);
         });
       }
     });
+    paint.strokeStyle = this.textOptions?.lineColor ?? this.defaultLineColor;
+    if (paint.lineWidth !== this.textOptions?.lineWidth)
+      paint.lineWidth = this.textOptions?.lineWidth ?? this.defaultLineWidth;
+    paint.stroke();
     paint.closePath();
+    const end = performance.now();
+    // console.log(end-this.start);
   }
   private updateRectSize(size: Size): void {
     this.setSize(size);
@@ -237,6 +287,7 @@ abstract class TextBoxBase extends ViewObject {
   }
   protected setFixedOption() {
     this.fixedOption.fontSize = this.textOptions.fontSize;
+    this.fixedOption.maxWidth = this.textOptions.maxWidth;
   }
 }
 

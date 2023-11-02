@@ -44,8 +44,8 @@ class LockButton extends Button {
         paint.closePath();
         paint.fill();
         Widgets.drawLock(paint, {
-            offsetx: x - halfRadius + 1,
-            offsety: -height / 2 - halfRadius + 3
+            offsetX: x - halfRadius + 1,
+            offsetY: -height / 2 - halfRadius + 3
         });
     }
     render(paint: Painter): void {

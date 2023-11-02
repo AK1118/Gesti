@@ -4,18 +4,8 @@ import ImageToolkit from "./image-toolkit";
 import GestiController from "./interfaces/gesticontroller";
 import Vector from "./vector";
 import XImage from "./ximage";
-declare interface TextOptions {
-  fontFamily?: string;
-  fontSize?: number;
-  spacing?: number;
-  color?: string;
-  linesMarks?: Array<number>;
-  lineWidth?: number;
-  lineColor?: string;
-  lineOffsetY?: number;
-}
 
-declare type CenterAxis="vertical"|"horizon";
+declare type CenterAxis = "vertical" | "horizon";
 
 class GesteControllerImpl implements GestiController {
   /**
@@ -27,40 +17,50 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  close(view?: ViewObject): void {
+    this.kit.close(view);
+  }
+  mirror(view?: ViewObject): boolean {
+    return this.kit.mirror(view);
+  }
   setBoundary(boundaryRect: Boundary): void {
     throw new Error("Method not implemented.");
   }
-  querySelector(select: string | ViewObjectFamily): Promise<ViewObject | ViewObject[]> {
+  querySelector(
+    select: string | ViewObjectFamily
+  ): Promise<ViewObject | ViewObject[]> {
     throw new Error("Method not implemented.");
   }
-  getViewObjectById<T extends ViewObject>(id:string): Promise<T> {
-      if(!id)throw Error("Invalid id");
-      return this.kit.getViewObjectById<T>(id);
+  getViewObjectById<T extends ViewObject>(id: string): Promise<T> {
+    if (!id) throw Error("Invalid id");
+    return this.kit.getViewObjectById<T>(id);
   }
   /**
    * @description 设置某个对象的位置
-   * @param x 
-   * @param y 
-   * @param view 
+   * @param x
+   * @param y
+   * @param view
    */
   position(x: number, y: number, view?: ViewObject): void {
-      this.kit.position(x,y,view);
+    this.kit.position(x, y, view);
   }
   /**
    * @description 微信小程序导出
    * @param offScreenPainter 离屏画笔
-   * @returns 
+   * @returns
    */
-  exportAllWithWeChat(offScreenPainter: CanvasRenderingContext2D): Promise<string> {
+  exportAllWithWeChat(
+    offScreenPainter: CanvasRenderingContext2D
+  ): Promise<string> {
     return this.kit.exportAllWithWeChat(offScreenPainter);
   }
-/**
+  /**
    * @description 微信小程序导入
    * @param offScreenPainter 离屏画布
-   * @returns 
+   * @returns
    */
   importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
-    return this.kit.importAllWithWeChat(json,weChatCanvas);
+    return this.kit.importAllWithWeChat(json, weChatCanvas);
   }
   cleanAll(): Promise<void> {
     return this.kit.cleanAll();
@@ -68,8 +68,11 @@ class GesteControllerImpl implements GestiController {
   destroyGesti(): void {
     this.kit.destroyGesti();
   }
-  removeListener(listenType:GestiControllerListenerTypes,hook: (object: any) => void): void {
-      this.kit.removeListener(listenType,hook);
+  removeListener(
+    listenType: GestiControllerListenerTypes,
+    hook: (object: any) => void
+  ): void {
+    this.kit.removeListener(listenType, hook);
   }
   load(view: ViewObject): void {
     return this.kit.load(view);
@@ -80,8 +83,8 @@ class GesteControllerImpl implements GestiController {
   get currentViewObject(): ViewObject {
     return this.kit.currentViewObject;
   }
-  rotate(angle:number,existing?:boolean,view?:ViewObject): Promise<void> {
-    return this.kit.rotate(angle,existing,view);
+  rotate(angle: number, existing?: boolean, view?: ViewObject): Promise<void> {
+    return this.kit.rotate(angle, existing, view);
   }
   upward(viewObject?: ViewObject): number {
     return this.kit.upward(viewObject);
@@ -98,9 +101,8 @@ class GesteControllerImpl implements GestiController {
   importAll(json: string): Promise<void> {
     return this.kit.importAll(json);
   }
- 
 
-  exportAll(offScreenPainter:CanvasRenderingContext2D): Promise<string> {
+  exportAll(offScreenPainter: CanvasRenderingContext2D): Promise<string> {
     return this.kit.exportAll(offScreenPainter);
   }
   addWrite(options: {
@@ -108,46 +110,43 @@ class GesteControllerImpl implements GestiController {
     lineWidth?: number;
     color?: string;
     isFill?: boolean;
-  }) :void{
-   return this.kit.addWrite(options);
+  }): void {
+    return this.kit.addWrite(options);
   }
   addListener(
     listenType: GestiControllerListenerTypes,
     callback: (obj: any) => void,
-    prepend?:boolean
+    prepend?: boolean
   ): any {
-    return this.kit.addListener(listenType, callback,prepend);
+    return this.kit.addListener(listenType, callback, prepend);
   }
 
   updateText(text: string, options?: TextOptions): void {
     this.kit.updateText(text, options);
   }
-  center(axis?: CenterAxis,view?:ViewObject): void {
-    this.kit.center(axis,view);
+  center(axis?: CenterAxis, view?: ViewObject): void {
+    this.kit.center(axis, view);
   }
-  addText(
-    text: string,
-    options?:TextOptions,
-  ): Promise<ViewObject> {
+  addText(text: string, options?: TextOptions): Promise<ViewObject> {
     return this.kit.addText(text, options);
   }
-  cancel(view?:ViewObject): void {
+  cancel(view?: ViewObject): void {
     this.kit.cancel(view);
   }
   cancelAll(): void {
     this.kit.cancelAll();
   }
 
-  layerLower(view?:ViewObject): void {
+  layerLower(view?: ViewObject): void {
     this.kit.layerLower(view);
   }
-  layerRise(view?:ViewObject): void {
+  layerRise(view?: ViewObject): void {
     this.kit.layerRise(view);
   }
-  layerTop(view?:ViewObject): void {
+  layerTop(view?: ViewObject): void {
     this.kit.layerTop(view);
   }
-  layerBottom(view?:ViewObject): void {
+  layerBottom(view?: ViewObject): void {
     this.kit.layerBottom(view);
   }
   update(): void {
@@ -156,10 +155,10 @@ class GesteControllerImpl implements GestiController {
   cancelEvent(): void {
     this.kit.cancelEvent();
   }
-  unLock(view?:ViewObject): void {
+  unLock(view?: ViewObject): void {
     this.kit.unLock(view);
   }
-  lock(view?:ViewObject): void {
+  lock(view?: ViewObject): void {
     this.kit.lock(view);
   }
   fallback(): void {

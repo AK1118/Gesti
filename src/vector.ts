@@ -60,6 +60,11 @@ class Vector{
 			y:this.y,
 		}
 	}
+	half():Vector{
+		this.x*=.5;
+		this.y*=.5;
+		return this;
+	}
 	troweling():Vector{
 		this.x=this.x>>0;
 		this.y=this.y>>0;
@@ -91,6 +96,9 @@ class Vector{
 		v.x=v.x>>0;
 		v.y=v.y>>0;
 		return v;
+	}
+	static get zero():Vector{
+		return new Vector(0,0);
 	}
 	
 }

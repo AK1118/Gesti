@@ -11,20 +11,20 @@ class Widgets {
     public static drawGrag(paint: Painter, offset: Offset): void {
         const scale = .08;
         const {
-            offsetx,
-            offsety
+            offsetX,
+            offsetY
         } = offset;
         // 填充三角形
         paint.beginPath();
         paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.fillStyle = GestiConfig.theme.buttonIconColor;
-        paint.moveTo(25 * scale + offsetx, 25 * scale + offsety);
-        paint.lineTo(105 * scale + offsetx, 25 * scale + offsety);
-        paint.lineTo(25 * scale + offsetx, 105 * scale + offsety);
+        paint.moveTo(25 * scale + offsetX, 25 * scale + offsetY);
+        paint.lineTo(105 * scale + offsetX, 25 * scale + offsetY);
+        paint.lineTo(25 * scale + offsetX, 105 * scale + offsetY);
         paint.fill();
-        paint.moveTo(125 * scale + offsetx, 125 * scale + offsety);
-        paint.lineTo(125 * scale + offsetx, 45 * scale + offsety);
-        paint.lineTo(45 * scale + offsetx, 125 * scale + offsety);
+        paint.moveTo(125 * scale + offsetX, 125 * scale + offsetY);
+        paint.lineTo(125 * scale + offsetX, 45 * scale + offsetY);
+        paint.lineTo(45 * scale + offsetX, 125 * scale + offsetY);
         paint.closePath();
         paint.fill();
     }
@@ -37,20 +37,20 @@ class Widgets {
         const scale = .08;
         paint.lineWidth=1;
         const {
-            offsetx,
-            offsety
+            offsetX,
+            offsetY
         } = offset;
         // 填充三角形
         paint.beginPath();
         paint.fillStyle = GestiConfig.theme.buttonIconColor;
         paint.strokeStyle = GestiConfig.theme.buttonIconColor;
-        paint.arc(offsetx,offsety,4,0,Math.PI*.6);
+        paint.arc(offsetX,offsetY,4,0,Math.PI*.6);
         paint.stroke();
         paint.closePath();
         paint.beginPath();
         paint.fillStyle = GestiConfig.theme.buttonIconColor;
         paint.strokeStyle = GestiConfig.theme.buttonIconColor;
-        paint.arc(offsetx,offsety,4,Math.PI,Math.PI*1.6);
+        paint.arc(offsetX,offsetY,4,Math.PI,Math.PI*1.6);
         paint.stroke();
         paint.closePath();
     }
@@ -62,26 +62,26 @@ class Widgets {
     public static drawMirror(paint: Painter, offset: Offset): void {
         const scale = .3;
         const {
-            offsetx,
-            offsety
+            offsetX,
+            offsetY
         } = offset;
 
         paint.beginPath();
         paint.fillStyle = GestiConfig.theme.buttonIconColor;
         paint.strokeStyle = GestiConfig.theme.buttonIconColor;
-        paint.moveTo(10 * scale + offsetx, 5 * scale + offsety);
-        paint.lineTo(0 * scale + offsetx, 15 * scale + offsety);
-        paint.lineTo(10 * scale + offsetx, 25 * scale + offsety);
+        paint.moveTo(10 * scale + offsetX, 5 * scale + offsetY);
+        paint.lineTo(0 * scale + offsetX, 15 * scale + offsetY);
+        paint.lineTo(10 * scale + offsetX, 25 * scale + offsetY);
 
-        paint.moveTo(30 * scale + offsetx, 5 * scale + offsety);
-        paint.lineTo(40 * scale + offsetx, 15 * scale + offsety);
-        paint.lineTo(30 * scale + offsetx, 25 * scale + offsety);
+        paint.moveTo(30 * scale + offsetX, 5 * scale + offsetY);
+        paint.lineTo(40 * scale + offsetX, 15 * scale + offsetY);
+        paint.lineTo(30 * scale + offsetX, 25 * scale + offsetY);
 
 
-        paint.moveTo(17 * scale + offsetx, 0 * scale + offsety);
-        paint.lineTo(23 * scale + offsetx, 0 * scale + offsety);
-        paint.lineTo(23 * scale + offsetx, 30 * scale + offsety);
-        paint.lineTo(17 * scale + offsetx, 30 * scale + offsety);
+        paint.moveTo(17 * scale + offsetX, 0 * scale + offsetY);
+        paint.lineTo(23 * scale + offsetX, 0 * scale + offsetY);
+        paint.lineTo(23 * scale + offsetX, 30 * scale + offsetY);
+        paint.lineTo(17 * scale + offsetX, 30 * scale + offsetY);
         paint.closePath();
         paint.fill();
     }
@@ -95,17 +95,17 @@ class Widgets {
     public static drawClose(paint: Painter, offset: Offset): void {
         const scale = .7;
         const {
-            offsetx,
-            offsety
+            offsetX,
+            offsetY
         } = offset;
 
         paint.beginPath();
         paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.lineWidth = 1;
-        paint.moveTo(0 * scale + offsetx, 0 * scale + offsety);
-        paint.lineTo(10 * scale + offsetx, 10 * scale + offsety);
-        paint.moveTo(10 * scale + offsetx, 0 * scale + offsety);
-        paint.lineTo(0 * scale + offsetx, 10 * scale + offsety);
+        paint.moveTo(0 * scale + offsetX, 0 * scale + offsetY);
+        paint.lineTo(10 * scale + offsetX, 10 * scale + offsetY);
+        paint.moveTo(10 * scale + offsetX, 0 * scale + offsetY);
+        paint.lineTo(0 * scale + offsetX, 10 * scale + offsetY);
         paint.stroke();
         paint.closePath();
     }
@@ -119,16 +119,16 @@ class Widgets {
     public static drawLock(paint: Painter, offset: Offset) {
         const scale = .7;
         const {
-            offsetx,
-            offsety
+            offsetX,
+            offsetY
         } = offset;
 
         paint.beginPath();
         paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.lineWidth = 1;
-        paint.arc(5 + offsetx, offsety + 3, 3, Math.PI, 0);
-        paint.strokeRect(offsetx, offsety + 4, 10, 6);
-        paint.strokeRect(offsetx + 4, offsety + 6, 2, 2);
+        paint.arc(5 + offsetX, offsetY + 3, 3, Math.PI, 0);
+        paint.strokeRect(offsetX, offsetY + 4, 10, 6);
+        paint.strokeRect(offsetX + 4, offsetY + 6, 2, 2);
         paint.stroke();
         paint.closePath();
     }
@@ -142,15 +142,15 @@ class Widgets {
     public static drawDeLock(paint: Painter, offset: Offset) {
         const scale = .7;
         const {
-            offsetx,
-            offsety
+            offsetX,
+            offsetY
         } = offset;
         paint.beginPath();
         paint.strokeStyle = GestiConfig.theme.buttonIconColor;
         paint.lineWidth = 1;
-        paint.arc(5 + offsetx, offsety + 2, 3, Math.PI, 0);
-        paint.strokeRect(offsetx, offsety + 6, 10, 6);
-        paint.strokeRect(offsetx + 4, offsety + 7, 2, 2);
+        paint.arc(5 + offsetX, offsetY + 2, 3, Math.PI, 0);
+        paint.strokeRect(offsetX, offsetY + 6, 10, 6);
+        paint.strokeRect(offsetX + 4, offsetY + 7, 2, 2);
         paint.stroke();
         paint.closePath();
     }
@@ -162,8 +162,8 @@ class Widgets {
      */
     public static drawChangeSizeAlone(paint: Painter, offset: Offset){
         const {
-            offsetx:x,
-            offsety:y
+            offsetX:x,
+            offsetY:y
         } = offset;
         paint.beginPath();
         paint.fillStyle=GestiConfig.theme.buttonIconColor;
