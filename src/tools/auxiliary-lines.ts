@@ -1,9 +1,9 @@
 import GestiConfig from "../config/gestiConfig";
 import Painter from "../painter";
-import Rect from "../rect";
-import Vector from "../vector";
-import { Point } from "../vertex";
-import ViewObject from "../abstract/view-object";
+import Rect from "../core/lib/rect";
+import Vector from "../core/lib/vector";
+import { Point } from "../core/lib/vertex";
+import ViewObject from "../core/abstract/view-object";
 
 export interface ViewLines {
   view: ViewObject;

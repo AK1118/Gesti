@@ -1,5 +1,5 @@
-import { RecordNode } from "./abstract/operation-observer";
-import RecorderInterface from "./interfaces/recorder";
+import { RecordNode } from "./core/abstract/operation-observer";
+import RecorderInterface from "./core/interfaces/recorder";
 
 //操作记录
 class Recorder implements RecorderInterface {

@@ -1,6 +1,6 @@
-import ImageBox from "../viewObject/image";
-import TextBox from "../viewObject/text";
-import XImage from "../ximage";
+import ImageBox from "../core/viewObject/image";
+import TextBox from "../core/viewObject/text";
+import XImage from "../core/lib/ximage";
 
 function createTextBoxView(text: string, options?: TextOptions): TextBox {
   const textBox = new TextBox(text, options);

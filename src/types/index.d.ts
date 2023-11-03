@@ -390,7 +390,7 @@ export declare const removeListener: (
 ) => void;
 export declare const useController: (
   target?: Gesti
-) => import("../interfaces/gesticontroller").default;
+) => import("../core/interfaces/gesticontroller").default;
 /**
  * 添加预设图形
  */
@@ -407,7 +407,7 @@ export declare const createTextBox: (
 ) => TextBox;
 export declare const createImageBox: (
   xImage: XImage
-) => import("../viewObject/image").default;
+) => import("../core/viewObject/image").default;
 /**
  * @description 踩踩踩
  * @param option

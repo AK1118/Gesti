@@ -6,6 +6,9 @@
         "strict": false,
         "outDir": "./dist",
         "declarationMap": false,
+        "paths": {
+            "@/*":["./src/*"],
+        }
     },
     "include": [
         "src/**/*"

@@ -1,27 +1,27 @@
-import Button, { BaseButton } from "./abstract/baseButton";
-import { RecordNode } from "./abstract/operation-observer";
-import ViewObject from "./abstract/view-object";
-import WriteBase from "./abstract/write-category";
-import CatchPointUtil from "./catchPointUtil";
-import Drag from "./drag";
+import Button, { BaseButton } from "./core/abstract/baseButton";
+import { RecordNode } from "./core/abstract/operation-observer";
+import ViewObject from "./core/abstract/view-object";
+import WriteBase from "./core/abstract/write-category";
+import CatchPointUtil from "./utils/event/catchPointUtil";
+import Drag from "./utils/event/drag";
 import { FuncButtonTrigger, ViewObjectFamily } from "./enums";
-import GestiEventManager, { GestiEvent } from "./event";
-import Gesture from "./gesture";
-import GestiController from "./interfaces/gesticontroller";
-import RecorderInterface from "./interfaces/recorder";
-import RenderObject from "./interfaces/render-object";
+import GestiEventManager, { GestiEvent } from "./utils/event/event";
+import Gesture from "./utils/event/gesture";
+import GestiController from "./core/interfaces/gesticontroller";
+import RecorderInterface from "./core/interfaces/recorder";
+import RenderObject from "./core/interfaces/render-object";
 import Painter from "./painter";
-import GestiReader from "./abstract/reader";
-import GestiReaderH5 from "./reader/reader-H5";
+import GestiReader from "./core/abstract/reader";
+import GestiReaderH5 from "./utils/reader/reader-H5";
 import Recorder from "./recorder";
-import Rect from "./rect";
+import Rect from "./core/lib/rect";
 import { classTypeIs } from "./utils";
-import Vector from "./vector";
-import ImageBox from "./viewObject/image";
-import TextBox from "./viewObject/text";
-import WriteFactory, { WriteType } from "./write/write-factory";
-import XImage from "./ximage";
-import GestiReaderWechat from "./reader/reader-WeChat";
+import Vector from "./core/lib/vector";
+import ImageBox from "./core/viewObject/image";
+import TextBox from "./core/viewObject/text";
+import WriteFactory, { WriteType } from "./core/viewObject/write/write-factory";
+import XImage from "./core/lib/ximage";
+import GestiReaderWechat from "./utils/reader/reader-WeChat";
 
 enum EventHandlerState {
   down,

@@ -7,9 +7,10 @@ import {
   UnLockButton,
   VerticalButton,
   HorizonButton,
-} from "./buttons";
-import SizeButton from "./buttons/sizeButton";
-import Drag from "./drag";
+} from "./composite/buttons";
+
+import SizeButton from "./core/viewObject/buttons/sizeButton";
+import Drag from "./utils/event/drag";
 import { ViewObjectFamily } from "./enums";
 import Gesti from "./gesti";
 
@@ -91,11 +92,11 @@ import {
   uint8ArrayConvert,
   uint8ArrayToChunks,
 } from "./utils/utils";
-import Group from "./viewObject/group";
-import ImageBox from "./viewObject/image";
-import TextBox from "./viewObject/text";
-import WriteViewObj from "./viewObject/write";
-import XImage from "./ximage";
+import Group from "./core/viewObject/group";
+import ImageBox from "./core/viewObject/image";
+import TextBox from "./core/viewObject/text";
+import WriteViewObj from "./core/viewObject/write";
+import XImage from "./core/lib/ximage";
 
 //按钮
 export {

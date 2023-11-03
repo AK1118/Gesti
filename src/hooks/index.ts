@@ -1,29 +1,29 @@
-import BaseButton from "../abstract/baseButton";
-import ViewObject from "../abstract/view-object";
+import BaseButton from "../core/abstract/baseButton";
+import ViewObject from "../core/abstract/view-object";
 import {
   CloseButton,
   DragButton,
   MirrorButton,
   RotateButton,
-} from "../buttons";
-import UnLockButton from "../buttons/delockButton";
-import HorizonButton from "../buttons/horizonButton";
-import LockButton from "../buttons/lockbutton";
-import VerticalButton from "../buttons/verticalButton";
+} from "../composite/buttons";
+import UnLockButton from "../core/viewObject/buttons/delockButton";
+import HorizonButton from "../core/viewObject/buttons/horizonButton";
+import LockButton from "../core/viewObject/buttons/lockbutton";
+import VerticalButton from "../core/viewObject/buttons/verticalButton";
 import { gesticonfig } from "../config/gestiConfig";
 import Gesti from "../gesti";
-import GestiReader from "../abstract/reader";
-import Vertex from "../vertex";
-import TextBox from "../viewObject/text";
-import Widgets from "../widgets";
-import XImage from "../ximage";
+import GestiReader from "../core/abstract/reader";
+import Vertex from "../core/lib/vertex";
+import TextBox from "../core/viewObject/text";
+import Widgets from "../static/widgets";
+import XImage from "../core/lib/ximage";
 import {
   createImageBoxView,
   createTextBoxView,
   createXImageFun,
 } from "./create";
-import GestiReaderH5 from "../reader/reader-H5";
-import GestiReaderWechat from "../reader/reader-WeChat";
+import GestiReaderH5 from "../utils/reader/reader-H5";
+import GestiReaderWechat from "../utils/reader/reader-WeChat";
 import Painter from "../painter";
 
 let currentInstance: Gesti = null;
