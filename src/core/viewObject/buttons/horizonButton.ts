@@ -1,7 +1,12 @@
-import ViewObject from "../../abstract/view-object";
-import Painter from "../../../painter";
+import { FuncButtonTrigger } from "../../enums";
+
+import BaseButton from "../../abstract/baseButton";
+import Painter from "../../lib/painter";
+import Rect from "../../lib/rect";
 import Vector from "../../lib/vector";
 import Widgets from "../../../static/widgets";
+import ViewObject from "../../abstract/view-object";
+import GestiConfig from "../../../config/gestiConfig";
 import DragButton from "./dragbutton";
 
 class HorizonButton extends DragButton {

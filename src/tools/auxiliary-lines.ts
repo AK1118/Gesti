@@ -1,5 +1,5 @@
 import GestiConfig from "../config/gestiConfig";
-import Painter from "../painter";
+import Painter from "../core/lib/painter";
 import Rect from "../core/lib/rect";
 import Vector from "../core/lib/vector";
 import { Point } from "../core/lib/vertex";

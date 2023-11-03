@@ -1,7 +1,7 @@
 import ViewObject from "../abstract/view-object";
-import { ViewObjectFamily } from "../../enums";
-import ImageToolkit from "../../image-toolkit";
-import Painter from "../../painter";
+import { ViewObjectFamily } from "../enums";
+import ImageToolkit from "../lib/image-toolkit";
+import Painter from "../lib/painter";
 import Rect from "../lib/rect";
 import Vector from "../lib/vector";
 

@@ -1,12 +1,10 @@
-import CatchPointUtil from "../../utils/event/catchPointUtil";
-import { FuncButtonTrigger } from "../../enums";
-
+import { FuncButtonTrigger } from "@/core/enums";
 import RenderObject from "../interfaces/render-object";
-import Painter from "../../painter";
+import Painter from "@/core/lib/painter";
+import CatchPointUtil from "../../utils/event/catchPointUtil";
+import ViewObject from "./view-object";
 import Rect from "../lib/rect";
 import Vector from "../lib/vector";
-import ViewObject from "./view-object";
-
 //按钮抽象类
 export abstract class BaseButton implements RenderObject {
   constructor(master: ViewObject) {

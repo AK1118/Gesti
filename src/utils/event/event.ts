@@ -1,4 +1,4 @@
-import ImageToolkit from "../../image-toolkit";
+import ImageToolkit from "../../core/lib/image-toolkit";
 import Vector from "../../core/lib/vector";
 
 type wheelParams = (e: WheelEvent) => void;

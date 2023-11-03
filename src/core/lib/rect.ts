@@ -1,6 +1,5 @@
 import { ObserverObj, OperationType } from "../abstract/operation-observer";
 import RecorderInterface from "../interfaces/recorder";
-import Recorder from "../../recorder";
 import Vector from "./vector";
 import Vertex from "./vertex";
 

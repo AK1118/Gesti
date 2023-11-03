@@ -1,8 +1,5 @@
-import Painter from "../../painter";
-import Rect from "../lib/rect";
-import ImageBox from "../viewObject/image";
-import WriteViewObj from "../viewObject/write";
-import XImage from "../lib/ximage";
+import Painter from "../../core/lib/painter";
+import Rect from "../../core/lib/rect";
 import ViewObject from "./view-object";
 
 /**

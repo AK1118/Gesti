@@ -1,7 +1,5 @@
-import RecorderInterface from "../interfaces/recorder";
 import RenderObject from "../interfaces/render-object";
-import Recorder from "../../recorder";
-import { Debounce, Throttle } from "../../utils";
+import { Debounce, Throttle } from "../../utils/utils";
 
 //操作监听类型
 /**
@@ -75,12 +73,10 @@ class RecordNode {
  * 存历史记录节点
  */
 class Record {
-  private recorder: RecorderInterface = Recorder.getInstance();
   private debounceNow: Function = Debounce(
     (args: { value: any; type: keyof OperationType; master: RenderObject }) => {
       const { value, type, master } = args;
       const now = this.getNode(value, type, master);
-      this.recorder.setNow(now);
     },
     0
   );
@@ -88,7 +84,6 @@ class Record {
     (args: { value: any; type: keyof OperationType; master: RenderObject }) => {
       const { value, type, master } = args;
       const before = this.getNode(value, type, master);
-      this.recorder.setCache(before);
     },
     100
   );

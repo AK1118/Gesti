@@ -1,5 +1,5 @@
 import GestiConfig from "../config/gestiConfig";
-import Painter from "../painter";
+import Painter from "../core/lib/painter";
 
 /*使用Canvas渲染一些小部件*/
 class Widgets {

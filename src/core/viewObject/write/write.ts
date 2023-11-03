@@ -1,8 +1,8 @@
-import ViewObject from "../../abstract/view-object";
-import WriteBase from "../../abstract/write-category";
+import ViewObject from "@/core/abstract/view-object";
 import Rect from "../../lib/rect";
 import Vector from "../../lib/vector";
 import WriteViewObj from "../write";
+import WriteBase from "../../abstract/write-category";
 /**
  * 写的时候的类，并不是ViewObject图册
  * https://www.cnblogs.com/fangsmile/p/14324460.html

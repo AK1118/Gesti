@@ -1,6 +1,6 @@
 import ViewObject, { toJSONInterface } from "../abstract/view-object";
-import { ViewObjectFamily } from "../../enums";
-import Painter from "../../painter";
+import { ViewObjectFamily } from "../enums";
+import Painter from "../lib/painter";
 import Rect from "../lib/rect";
 import { ImageChunk } from "../../types/index";
 import Cutter from "../../utils/cutters/cutter-H5";
@@ -8,8 +8,7 @@ import ImageChunkConverterH5 from "../../utils/converters/image-chunk-converter-
 import ImageChunkConverter from "../../utils/converters/image-chunk-converter-H5";
 import ImageChunkConverterWeChat from "../../utils/converters/image-chunk-converter-WeChat";
 import XImage from "../lib/ximage";
-import CutterWeChat from "../../utils/cutters/cutter-WeChat";
-import { OperationType } from "../abstract/operation-observer";
+import CutterWeChat from "../..//utils/cutters/cutter-WeChat";
 class ImageBox extends ViewObject {
   family: ViewObjectFamily = ViewObjectFamily.image;
   get value(): any {

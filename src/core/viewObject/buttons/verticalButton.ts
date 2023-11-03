@@ -1,5 +1,5 @@
 import ViewObject from "../../abstract/view-object";
-import Painter from "../../../painter";
+import Painter from "../../lib/painter";
 import Widgets from "../../../static/widgets";
 import DragButton from "./dragbutton";
 

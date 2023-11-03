@@ -1,5 +1,5 @@
 import Rect from "../../core/lib/rect";
-import Vector from "./core/lib/vector";
+import Vector from "../../core/lib/vector";
 
 class Drag {
   private rect: Rect = null;

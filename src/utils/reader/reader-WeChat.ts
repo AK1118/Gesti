@@ -1,6 +1,6 @@
 import ViewObject from "../../core/abstract/view-object";
 import GestiReader from "../../core/abstract/reader";
-import Painter from "../../painter";
+import Painter from "../../core/lib/painter";
 import Rect from "../../core/lib/rect";
 import CutterH5 from "../cutters/cutter-H5";
 import ImageBox from "../../core/viewObject/image";

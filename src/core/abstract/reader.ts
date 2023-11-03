@@ -1,22 +1,30 @@
 import ViewObject from "./view-object";
-import GesteControllerImpl from "../../controller";
+import GesteControllerImpl from "../lib/controller";
 import Rect from "../lib/rect";
 import ImageBox from "../viewObject/image";
 import TextBox from "../viewObject/text";
 import WriteViewObj from "../viewObject/write";
 import XImage from "../lib/ximage";
-import {
-  CloseButton,
-  DragButton,
-  MirrorButton,
-  RotateButton,
-  LockButton,
-  UnLockButton,
-  VerticalButton,
-  HorizonButton,
-} from "../../composite/buttons";
+// import {
+//   CloseButton,
+//   DragButton,
+//   MirrorButton,
+//   RotateButton,
+//   LockButton,
+//   UnLockButton,
+//   VerticalButton,
+//   HorizonButton,
+// } from "@/composite/buttons";
 import Button from "./baseButton";
 import CutterH5 from "../../utils/cutters/cutter-H5";
+import DragButton from "../viewObject/buttons/dragbutton";
+import MirrorButton from "../viewObject/buttons/mirrorbutton";
+import CloseButton from "../viewObject/buttons/closeButton";
+import RotateButton from "../viewObject/buttons/rotateButton";
+import UnLockButton from "../viewObject/buttons/delockButton";
+import HorizonButton from "../viewObject/buttons/horizonButton";
+import LockButton from "../viewObject/buttons/lockbutton";
+import VerticalButton from "../viewObject/buttons/verticalButton";
 abstract class GestiReader {
   constructor() {}
   private buttonClazzList = {

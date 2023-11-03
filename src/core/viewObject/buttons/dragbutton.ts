@@ -1,8 +1,8 @@
-import { FuncButtonTrigger } from "../../../enums";
+import { FuncButtonTrigger } from "../../enums";
 
 import BaseButton from "../../abstract/baseButton";
-import Painter from "../../../painter";
-import Rect, { Size } from "../../lib/rect";
+import Painter from "../../lib/painter";
+import Rect from "../../lib/rect";
 import Vector from "../../lib/vector";
 import Widgets from "../../../static/widgets";
 import ViewObject from "../../abstract/view-object";

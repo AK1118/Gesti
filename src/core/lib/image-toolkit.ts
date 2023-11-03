@@ -1,27 +1,23 @@
-import Button, { BaseButton } from "./core/abstract/baseButton";
-import { RecordNode } from "./core/abstract/operation-observer";
-import ViewObject from "./core/abstract/view-object";
-import WriteBase from "./core/abstract/write-category";
-import CatchPointUtil from "./utils/event/catchPointUtil";
-import Drag from "./utils/event/drag";
-import { FuncButtonTrigger, ViewObjectFamily } from "./enums";
-import GestiEventManager, { GestiEvent } from "./utils/event/event";
-import Gesture from "./utils/event/gesture";
-import GestiController from "./core/interfaces/gesticontroller";
-import RecorderInterface from "./core/interfaces/recorder";
-import RenderObject from "./core/interfaces/render-object";
+import Button, { BaseButton } from "../abstract/baseButton";
+import { RecordNode } from "../abstract/operation-observer";
+import ViewObject from "../abstract/view-object";
+import CatchPointUtil from "../../utils/event/catchPointUtil";
+import Drag from "../../utils/event/drag";
+import { FuncButtonTrigger, ViewObjectFamily } from "../enums";
+import GestiEventManager, { GestiEvent } from "../../utils/event/event";
+import Gesture from "../../utils/event/gesture";
+import GestiController from "../interfaces/gesticontroller";
+import RecorderInterface from "../interfaces/recorder";
 import Painter from "./painter";
-import GestiReader from "./core/abstract/reader";
-import GestiReaderH5 from "./utils/reader/reader-H5";
-import Recorder from "./recorder";
-import Rect from "./core/lib/rect";
-import { classTypeIs } from "./utils";
-import Vector from "./core/lib/vector";
-import ImageBox from "./core/viewObject/image";
-import TextBox from "./core/viewObject/text";
-import WriteFactory, { WriteType } from "./core/viewObject/write/write-factory";
-import XImage from "./core/lib/ximage";
-import GestiReaderWechat from "./utils/reader/reader-WeChat";
+import GestiReaderH5 from "../../utils/reader/reader-H5";
+import Rect from "./rect";
+import Vector from "./vector";
+import ImageBox from "../viewObject/image";
+import TextBox from "../viewObject/text";
+import WriteFactory from "../viewObject/write/write-factory";
+import XImage from "./ximage";
+import GestiReaderWechat from "../../utils/reader/reader-WeChat";
+import { classTypeIs } from "../../utils/utils";
 
 enum EventHandlerState {
   down,
@@ -94,8 +90,6 @@ abstract class ImageToolkitBase {
   protected paint: Painter;
   //是否debug模式
   public isDebug: boolean = false;
-  //记录操作
-  protected recorder: RecorderInterface = Recorder.getInstance();
   /**
    * 本次点击是否有选中到对象，谈起时需要置于false
    */
@@ -473,12 +467,12 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     else this.selectedViewObject?.lock();
   }
   async fallback() {
-    const node: RecordNode = await this.recorder.fallback();
-    this.tool.fallbackViewObject(this.ViewObjectList, node, this);
+    // const node: RecordNode = await this.recorder.fallback();
+    // this.tool.fallbackViewObject(this.ViewObjectList, node, this);
   }
   async cancelFallback() {
-    const node: RecordNode = await this.recorder.cancelFallback();
-    this.tool.fallbackViewObject(this.ViewObjectList, node, this);
+    // const node: RecordNode = await this.recorder.cancelFallback();
+    // this.tool.fallbackViewObject(this.ViewObjectList, node, this);
   }
 
   //无须实现
@@ -638,7 +632,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     if ((this.selectedViewObject ?? false) && this._inObjectArea) {
       this.selectedViewObject.onUp(this.paint);
       //鼠标|手指抬起时提交一次操作
-      this.recorder.commit();
+      // this.recorder.commit();
     }
     this.update();
     this._inObjectArea = false;

@@ -1,10 +1,9 @@
 import ViewObject, { toJSONInterface } from "../abstract/view-object";
-import { ViewObjectFamily } from "../../enums";
-import ImageToolkit from "../../image-toolkit";
-import Painter from "../../painter";
+import { ViewObjectFamily } from "../enums";
+import ImageToolkit from "../lib/image-toolkit";
+import Painter from "../lib/painter";
 import Rect, { Size } from "../lib/rect";
 import { TextHandler } from "../../types/index";
-import { sp } from "../../utils";
 import Vector from "../lib/vector";
 import { Point } from "../lib/vertex";
 

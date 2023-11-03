@@ -1,5 +1,5 @@
 import ViewObject from "../abstract/view-object";
-import { ViewObjectFamily } from "../../enums";
+import { ViewObjectFamily } from "../enums";
 import XImage from "../lib/ximage";
 //图层控制器
 interface LayerController {
@@ -120,10 +120,12 @@ interface ImageToolKitController {
   load(view: ViewObject): void;
   /**
    * 回退操作
+   * @deprecated 功能废弃
    */
   fallback(): void;
   /**
    * 取消刚刚的回退
+   * @deprecated 功能废弃
    */
   cancelFallback(): void;
   /**

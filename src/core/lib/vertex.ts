@@ -1,6 +1,6 @@
-import Painter from "../../painter";
+import Painter from "./painter";
 import Rect from "./rect";
-import Vector from "./core/lib/vector";
+import Vector from "../../core/lib/vector";
 
 class Point extends Vector {
     constructor(x: number, y: number) {

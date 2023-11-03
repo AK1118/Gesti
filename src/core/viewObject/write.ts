@@ -1,7 +1,7 @@
 import OperationObserver from "../abstract/operation-observer";
 import ViewObject, { toJSONInterface } from "../abstract/view-object";
-import Painter from "../../painter";
-import { ViewObjectFamily } from "../../enums";
+import Painter from "../lib/painter";
+import { ViewObjectFamily } from "../enums";
 import GestiConfig from "../../config/gestiConfig";
 /**
  * 实现逻辑

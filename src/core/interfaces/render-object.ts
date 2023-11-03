@@ -1,4 +1,4 @@
-import Painter from "../../painter";
+import Painter from "../lib/painter";
 import Rect from "../lib/rect";
 
 /**

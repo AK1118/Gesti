@@ -1,9 +1,9 @@
-import ViewObject from "./core/abstract/view-object";
-import { ViewObjectFamily } from "./enums";
+import ViewObject from "../abstract/view-object";
+import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "./image-toolkit";
-import GestiController from "./core/interfaces/gesticontroller";
-import Vector from "./core/lib/vector";
-import XImage from "./core/lib/ximage";
+import GestiController from "../interfaces/gesticontroller";
+import Vector from "./vector";
+import XImage from "./ximage";
 
 declare type CenterAxis = "vertical" | "horizon";
 

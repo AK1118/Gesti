@@ -1,18 +1,12 @@
-import {
-  CloseButton,
-  DragButton,
-  MirrorButton,
-  RotateButton,
-  LockButton,
-  UnLockButton,
-  VerticalButton,
-  HorizonButton,
-} from "./composite/buttons";
-
+/*
+ * @Author: AK1118 
+ * @Date: 2023-11-03 18:14:02 
+ * @Last Modified by:   AK1118 
+ * @Last Modified time: 2023-11-03 18:14:02 
+ */
 import SizeButton from "./core/viewObject/buttons/sizeButton";
-import Drag from "./utils/event/drag";
-import { ViewObjectFamily } from "./enums";
-import Gesti from "./gesti";
+import { ViewObjectFamily } from "./core/enums";
+import Gesti from "./core/lib/gesti";
 
 import {
   createGesti /**创建Gesti实例 */,
@@ -85,18 +79,25 @@ import {
   useReaderWeChat,
   useGetViewObjectById,
 } from "./hooks/index";
-import Painter from "./painter";
-import { inToPx, mmToIn, ptToPx } from "./utils";
 import {
   parseUint8Array,
   uint8ArrayConvert,
   uint8ArrayToChunks,
-} from "./utils/utils";
+  inToPx, mmToIn, ptToPx
+} from "./utils/utils"
 import Group from "./core/viewObject/group";
 import ImageBox from "./core/viewObject/image";
 import TextBox from "./core/viewObject/text";
 import WriteViewObj from "./core/viewObject/write";
 import XImage from "./core/lib/ximage";
+import CloseButton from "./core/viewObject/buttons/closeButton";
+import DragButton from "./core/viewObject/buttons/dragbutton";
+import MirrorButton from "./core/viewObject/buttons/mirrorbutton";
+import RotateButton from "./core/viewObject/buttons/rotateButton";
+import LockButton from "./core/viewObject/buttons/lockbutton";
+import UnLockButton from "./core/viewObject/buttons/delockButton";
+import VerticalButton from "./core/viewObject/buttons/verticalButton";
+import HorizonButton from "./core/viewObject/buttons/horizonButton";
 
 //按钮
 export {

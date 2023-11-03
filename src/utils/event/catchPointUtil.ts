@@ -1,6 +1,6 @@
-import ViewObject from "../../core/abstract/view-object";
+import ViewObject from "@/core/abstract/view-object";
 import CheckInside from "./checkInside";
-import Rect from "../../core/lib/rect";
+import Rect from "@/core/lib/rect";
 import Vector from "../../core/lib/vector";
 import { Point } from "../../core/lib/vertex";
 

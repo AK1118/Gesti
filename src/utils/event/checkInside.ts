@@ -1,5 +1,5 @@
-import Vector from "../../core/lib/vector";
 import { Point } from "../../core/lib/vertex";
+
 class Line {
 	//Point p1, p2;
     p1:Point;

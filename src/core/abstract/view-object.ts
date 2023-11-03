@@ -1,10 +1,9 @@
-import { CloseButton, MirrorButton, RotateButton } from "../../composite/buttons";
 import UnLockButton from "../viewObject/buttons/delockButton";
 import DragButton from "../viewObject/buttons/dragbutton";
 import LockButton from "../viewObject/buttons/lockbutton";
 
 import RenderObject from "../interfaces/render-object";
-import Painter from "../../painter";
+import Painter from "../lib/painter";
 import Rect from "../lib/rect";
 import Vector from "../lib/vector";
 import { Point } from "../lib/vertex";
@@ -14,9 +13,12 @@ import AuxiliaryLine from "../../tools/auxiliary-lines";
 import GestiConfig from "../../config/gestiConfig";
 import VerticalButton from "../viewObject/buttons/verticalButton";
 import HorizonButton from "../viewObject/buttons/horizonButton";
-import { ViewObjectFamily } from "../../enums";
+import { ViewObjectFamily } from "../enums";
+import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
-import ImageToolkit from "../../image-toolkit";
+import MirrorButton from "../viewObject/buttons/mirrorbutton";
+import RotateButton from "../viewObject/buttons/rotateButton";
+import CloseButton from "../viewObject/buttons/closeButton";
 //转换为json的类型
 export type toJsonType = "image" | "text" | "write";
 

@@ -1,8 +1,8 @@
 import ViewObject from "../../abstract/view-object";
 import WriteBase from "../../abstract/write-category";
-import Rect from "../../lib/rect";
-import Vector from "../../lib/vector";
 import WriteViewObj from "../write";
+import Rect from "../../lib/rect";
+
 
 class WriteLine extends WriteBase {
     currentPosition: Vector = new Vector(0, 0);
