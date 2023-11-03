@@ -1,4 +1,4 @@
-import Button from "./abstract/button";
+import Button, { BaseButton } from "./abstract/baseButton";
 import { RecordNode } from "./abstract/operation-observer";
 import ViewObject from "./abstract/view-object";
 import WriteBase from "./abstract/write-category";
@@ -559,7 +559,9 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       !this.selectedViewObject.isLock &&
       !selectedViewObject.isBackground
     )
-      this.drag.catchViewObject(selectedViewObject.rect, event);
+      {
+        this.drag.catchViewObject(selectedViewObject.rect, event);
+      }
 
     /**
      * 画笔代码块 可以有被选中的图层，前提是当前下落的位置必定不能在上一个被选中的图册内
@@ -569,7 +571,9 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       this.selectedViewObject != selectedViewObject ||
       selectedViewObject == null
     )
-      this.writeFactory.onDraw();
+      {
+        this.writeFactory.onDraw();
+      }
 
     this.update();
   }
@@ -618,7 +622,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.debug(["Event Up,", v]);
     const event: Vector | Vector[] = this.correctEventPosition(v);
     //判断是否选中对象
-    this.clickViewObject(event);
+    const selectedObj=this.clickViewObject(event);
     this.eventHandlerState = EventHandlerState.up;
     //手势解析处理
     this.gesture.onUp(this.selectedViewObject, event);
@@ -693,13 +697,13 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     return vector.sub(this.offset);
   }
   private checkFuncButton(eventPosition: Vector): boolean {
-    const _button: Button | boolean =
+    const _button: BaseButton | boolean =
       this.selectedViewObject.checkFuncButton(eventPosition);
     const result: any = _button;
     //确保是按钮
     if (result instanceof Button) {
       this._inObjectArea = true;
-      const button: Button = result;
+      const button: BaseButton = result;
       if (button.trigger == FuncButtonTrigger.drag) {
         button.onSelected();
         this.drag.catchViewObject(button.rect, eventPosition);

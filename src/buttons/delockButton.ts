@@ -1,6 +1,6 @@
 import { FuncButtonTrigger } from "../enums";
  
-import Button from "../abstract/button";
+import BaseButton from "../abstract/baseButton";
 import Painter from "../painter";
 import Rect from "../rect";
 import Vector from "../vector";
@@ -10,7 +10,7 @@ import GestiConfig from "../config/gestiConfig";
 
 
 
-class UnLockButton extends Button {
+class UnLockButton extends BaseButton {
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
     constructor(master: ViewObject) {

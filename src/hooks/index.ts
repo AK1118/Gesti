@@ -1,4 +1,4 @@
-import Button from "../abstract/button";
+import BaseButton from "../abstract/baseButton";
 import ViewObject from "../abstract/view-object";
 import {
   CloseButton,
@@ -338,22 +338,22 @@ const exportAllWithWeChat = (
   return controller.exportAllWithWeChat(offscreenPainter);
 };
 
-const createDragButton = (view: ViewObject): Button => new DragButton(view);
-const createHorizonButton = (view: ViewObject): Button =>
+const createDragButton = (view: ViewObject): BaseButton => new DragButton(view);
+const createHorizonButton = (view: ViewObject): BaseButton =>
   new HorizonButton(view);
-const createRotateButton = (view: ViewObject): Button => new RotateButton(view);
-const createLockButton = (view: ViewObject): Button => new LockButton(view);
-const createUnlockButton = (view: ViewObject): Button => new UnLockButton(view);
-const createCloseButton = (view: ViewObject): Button => new CloseButton(view);
-const createVerticalButton = (view: ViewObject): Button =>
+const createRotateButton = (view: ViewObject): BaseButton => new RotateButton(view);
+const createLockButton = (view: ViewObject): BaseButton => new LockButton(view);
+const createUnlockButton = (view: ViewObject): BaseButton => new UnLockButton(view);
+const createCloseButton = (view: ViewObject): BaseButton => new CloseButton(view);
+const createVerticalButton = (view: ViewObject): BaseButton =>
   new VerticalButton(view);
-const createMirrorButton = (view: ViewObject): Button => new MirrorButton(view);
+const createMirrorButton = (view: ViewObject): BaseButton => new MirrorButton(view);
 /**
  * @description 给某个可操作对象安装按钮
  * @param view
  * @param button
  */
-const installButton = (view: ViewObject, button: Button | Array<Button>) => {
+const installButton = (view: ViewObject, button: BaseButton | Array<BaseButton>) => {
   if (Array.isArray(button)) {
     button.forEach((item) => view.installButton(item));
   } else {
@@ -361,7 +361,7 @@ const installButton = (view: ViewObject, button: Button | Array<Button>) => {
   }
 };
 
-const unInstallButton = (view: ViewObject, button: Button | Array<Button>) => {
+const unInstallButton = (view: ViewObject, button: BaseButton | Array<BaseButton>) => {
   if (Array.isArray(button)) {
     view.unInstallButton(button);
   } else {

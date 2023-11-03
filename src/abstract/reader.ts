@@ -15,7 +15,7 @@ import {
   VerticalButton,
   HorizonButton,
 } from "../buttons";
-import Button from "./button";
+import Button from "./baseButton";
 import CutterH5 from "../cutters/cutter-H5";
 abstract class GestiReader {
   constructor() {}

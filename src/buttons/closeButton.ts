@@ -1,5 +1,5 @@
 import { FuncButtonTrigger } from "../enums";
-import Button from "../abstract/button";
+import BaseButton from "../abstract/baseButton";
 import Painter from "../painter";
 import Rect from "../rect";
 import Vector from "../vector";
@@ -7,7 +7,7 @@ import Widgets from "../widgets";
 import ViewObject from "../abstract/view-object";
 import GestiConfig from "../config/gestiConfig";
 
-class CloseButton extends Button {
+class CloseButton extends BaseButton {
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     constructor(master: ViewObject) {
         super(master);

@@ -1,6 +1,6 @@
 import { FuncButtonTrigger } from "../enums";
 
-import Button from "../abstract/button";
+import BaseButton from "../abstract/baseButton";
 import Painter from "../painter";
 import Rect, { Size } from "../rect";
 import Vector from "../vector";
@@ -8,15 +8,14 @@ import Widgets from "../widgets";
 import ViewObject from "../abstract/view-object";
 import GestiConfig from "../config/gestiConfig";
 import { Delta } from "../event";
-class DragButton extends Button {
+class DragButton extends BaseButton {
   public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
   private preViewObjectRect: Rect = null;
-  private oldRadius: number = 0;
   public oldAngle: number = 0;
   private disable: boolean = false;
   private delta: Delta;
-  radius: number = 10;
-  private preScale: number = 1;
+  public radius: number = 10;
+  protected preMag: number = -1;
   private angleDisabled: boolean = false;
   //拉伸变化方式  比例   水平  垂直   自由
   private axis: "ratio" | "horizontal" | "vertical" | "free" = "ratio";
@@ -57,25 +56,8 @@ class DragButton extends Button {
    */
   private initScale() {
     this.setRelativePositionRect(this.options.percentage);
-    this.oldRadius = Vector.mag(this.relativeRect.position);
-    this.preScale = 1;
     this.preMag = -1;
   }
-  private preMag: number = -1;
-  /**
-   * 按钮拖拽，得到mag和倍数，缩小，缩放按钮还是在那个位置
-   * 左上角缩放，旋转后缩放有bug
-   * const mag=this.getButtonWidthMasterMag(currentButtonRect);
-    const preMasterSize:Size=this.master.size.copy();
-    if(this.preMag===-1)this.preMag=mag;
-    const deltaScale:number=mag/this.preMag;
-    const rScale:number=deltaScale+(1-deltaScale)/2;
-    this.master.setScale(rScale);
-    const currentMasterSize:Size=this.master.size.copy();
-    const delta=currentMasterSize.toVector().sub(preMasterSize.toVector()).half();
-    this.master.addPosition(delta.x,delta.y);
-    this.preMag=deltaScale<1?(mag+delta.mag()):(mag-delta.mag());
-   */
   effect(currentButtonRect?: Rect): void {
     const mag = this.getButtonWidthMasterMag(currentButtonRect);
     if (this.preMag === -1) this.preMag = mag;
@@ -84,12 +66,12 @@ class DragButton extends Button {
     this.master.setScale(deltaScale);
     if (!this.angleDisabled) {
       const angle = Math.atan2(offsetY, offsetX) - this.oldAngle;
-      this.master.rect.setAngle(angle, true);
+      this.master.rect.setAngle(angle);
     }
     this.preMag = mag;
   }
 
-  private getButtonWidthMasterMag(currentButtonRect: Rect): number {
+  protected getButtonWidthMasterMag(currentButtonRect: Rect): number {
     const currentButtonPosition: Vector = currentButtonRect.position;
     const currentMasterPosition: Vector = this.master.rect.position;
     const mag: number = Vector.mag(

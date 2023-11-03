@@ -8,9 +8,9 @@ import Painter from "../painter";
 import Rect from "../rect";
 import Vector from "../vector";
 import { Point } from "../vertex";
-import Button from "./button";
+import Button from "./baseButton";
 import OperationObserver from "./operation-observer";
-import AuxiliaryLine from "./tools/auxiliary-lines";
+import AuxiliaryLine from "../tools/auxiliary-lines";
 import GestiConfig from "../config/gestiConfig";
 import VerticalButton from "../buttons/verticalButton";
 import HorizonButton from "../buttons/horizonButton";
@@ -373,7 +373,6 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public setScale(scale:number){
     this.scale=scale;
     this.rect.setScale(scale);
-    this.doScale();
   }
   /*每次改变大小后都需要刷新按钮的数据*/
   public onChanged() {

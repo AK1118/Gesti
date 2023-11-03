@@ -8,7 +8,7 @@ import Vector from "../vector";
 import ViewObject from "./view-object";
 
 //按钮抽象类
-export abstract class Button implements RenderObject {
+export abstract class BaseButton implements RenderObject {
   constructor(master: ViewObject) {
     this.master = master;
   }
@@ -157,4 +157,4 @@ export abstract class Button implements RenderObject {
   abstract drawButton(position:Vector,size:Size,radius:number,paint:Painter):void;
 }
 
-export default Button;
+export default BaseButton;
