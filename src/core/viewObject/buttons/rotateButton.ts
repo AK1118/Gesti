@@ -16,12 +16,13 @@ class RotateButton extends BaseButton {
   public radius: number = 10;
   private disable: boolean = false;
   key: string | number = +new Date();
-  constructor(master: ViewObject) {
-    super(master);
+  protected percentage: [x: number, y: number]=[0,.7];
+  constructor() {
+    super();
     this.name = "rotate";
-    this.init({
-      position: new Vector(0, master.rect.size.height * 0.5 + 10),
-    });
+    // this.init({
+    //   position: new Vector(0, master.rect.size.height * 0.5 + 10),
+    // });
     this.initScale();
     this.rect.onDrag = (newRect: Rect) => {
       /*拖拽缩放*/
@@ -54,7 +55,7 @@ class RotateButton extends BaseButton {
       const scale = (angle / 0.78) >> 0;
       angle = Math.abs(_angle - scale * _45) < limit ? scale * _45 : _angle;
     }
-    this.master.rect.setAngle(angle, true);
+    this.master.rect.setAngle(angle);
   }
   public get getOldAngle(): number {
     return this.oldAngle;

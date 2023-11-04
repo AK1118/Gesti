@@ -103,6 +103,12 @@ class Rect extends ObserverObj {
     this._position.y = this._position.y;
     this.report(position, "position");
   }
+  public addPosition(delta:Vector){
+    if(delta.equals(Vector.zero))return;
+    this.beforeReport(delta, "addPosition");
+    this._position.add(delta);
+    this.report(delta, "addPosition");
+  }
   public setScale(scale: number, change?: boolean): void {
     if(scale===this.scale)return;
     this.beforeReport(scale, "scale");

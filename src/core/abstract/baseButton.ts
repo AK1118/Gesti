@@ -7,9 +7,6 @@ import Rect from "../lib/rect";
 import Vector from "../lib/vector";
 //按钮抽象类
 export abstract class BaseButton implements RenderObject {
-  constructor(master: ViewObject) {
-    this.master = master;
-  }
   name: string = "";
   //隐藏
   disabled: boolean = false;
@@ -45,22 +42,15 @@ export abstract class BaseButton implements RenderObject {
    * 重置按钮坐标
    */
   public reset() {
-    this.init(this.options);
+    this.computeSelfLocation();
   }
   /**
    * @description 设置相对定位
    * @param options
    */
-  public init(options: {
-    percentage?: [x: number, y: number];
-    position?: Vector;
-  }) {
+  public computeSelfLocation() {
     if(this.disabled)return;
-    this.options = options;
-    const { percentage, position } = options;
-
-    if (percentage) this.setRelativePositionRect(percentage);
-    else if (position) this.setRelativePosition(position);
+    if (this.percentage) this.setRelativePositionRect(this.percentage);
 
     if (!this.originPositionWithSize)
       this.originPositionWithSize = {
@@ -93,6 +83,7 @@ export abstract class BaseButton implements RenderObject {
     // this.scaleWithMaster = new Vector(scaleWidth == 1 ? 0 : scaleWidth, scaleHeight == 1 ? 0 : scaleHeight);
     this.scaleWithMaster = new Vector(scaleWidth, scaleHeight);
   }
+  
   abstract trigger: FuncButtonTrigger;
   abstract setMaster(master: RenderObject): void;
   abstract effect(currentButtonRect?: Rect): void;
@@ -100,6 +91,19 @@ export abstract class BaseButton implements RenderObject {
   abstract draw(paint: Painter): void;
   abstract render(paint: Painter): void;
   abstract onSelected(): void;
+  protected abstract percentage:[x: number, y: number];
+   public  initialization(master:ViewObject){
+    this.master=master;
+    this.beforeMounted();
+    this.computeSelfLocation();
+    this.afterMounted();
+  }
+  protected beforeMounted(...args):void{
+
+  }
+  protected afterMounted(...args):void{
+
+  }
   get getAbsolutePosition(): Vector {
     return Vector.add(this.relativeRect.position, this.master.rect.position);
   }
@@ -118,6 +122,7 @@ export abstract class BaseButton implements RenderObject {
    * @param percentage ,占比值，四个点坐标
    */
   public setRelativePositionRect(percentage: [x: number, y: number]) {
+
     const { width, height } = this.master.rect.size;
     const [percent_x, percent_y] = percentage;
   

@@ -2,16 +2,53 @@
  * 改变大小按钮
  */
 
-import ViewObject from "../../abstract/view-object";
 import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
 import Widgets from "../../../static/widgets";
 import DragButton from "./dragbutton";
+import { SizeButtonLocation } from "../../enums";
+import Vector from "@/core/lib/vector";
 
 class SizeButton extends DragButton {
-  constructor(master: ViewObject) {
-    super(master);
+
+  protected percentage: [x: number, y: number]=[-0.5, 0.5];
+  private selfLocation:SizeButtonLocation;
+  constructor(location:SizeButtonLocation){
+    super();
+    this.selfLocation=location;
+    this.beforeMounted(location);
   }
+  /**
+   * @description 在按钮挂载前设置位置
+   * @param location 
+   */
+  protected beforeMounted(location:SizeButtonLocation): void {
+    switch(location){
+      case SizeButtonLocation.LT:this.percentage=[-.5,-.5];break;
+      case SizeButtonLocation.LB:this.percentage=[-.5,.5];break;
+      case SizeButtonLocation.RT:this.percentage=[.5,-.5];break;
+      case SizeButtonLocation.RB:this.percentage=[.5,.5];break;
+    }   
+  }
+  
+  private manipulateDelta(delta:Vector):void{
+    switch(this.selfLocation){
+      case SizeButtonLocation.LT:{
+        delta.y*=-1;
+        delta.x*=-1;
+      };break;
+      case SizeButtonLocation.LB:{
+        delta.x*=-1;
+      };break;
+      case SizeButtonLocation.RT:{
+        delta.y*=-1;
+      };break;
+      case SizeButtonLocation.RB:{
+       
+      };break;
+    }
+  }
+
   effect(currentButtonRect?: Rect): void {
     const mag = this.getButtonWidthMasterMag(currentButtonRect);
     const preMasterSize: Size = this.master.size.copy();
@@ -29,10 +66,11 @@ class SizeButton extends DragButton {
       .sub(preMasterSize.toVector())
       .half();
 
-      
+    this.manipulateDelta(delta);
+    
     //获取Widget对象的弧度制的角度
     const angleInRadians = this.master.rect.getAngle;
-    delta.x*=-1;
+    
     // 假设 delta 是旧的 delta 向量
     const [x, y] = delta.toArray();
     
@@ -57,7 +95,6 @@ class SizeButton extends DragButton {
   }
   drawButton(position: Vector, size: Size, radius: number, paint: Painter): void {
     this.setAxis("horizontal");
-    this.init({ percentage: [-0.5, 0.5] });
     //按钮渲染样式
     this.draw = function (paint) {
       const { x, y } = this.relativeRect.position;

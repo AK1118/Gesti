@@ -73,6 +73,8 @@ declare class Vector {
   static troweling(v: Vector): Vector;
   static get zero():Vector;
   half():Vector;
+  toZero():void;
+  double():Vector;
 }
 
 declare interface GestiEventParams {

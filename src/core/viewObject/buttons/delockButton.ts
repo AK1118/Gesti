@@ -10,16 +10,9 @@ import GestiConfig from "../../../config/gestiConfig";
 
 
 class UnLockButton extends BaseButton {
+    protected percentage: [x: number, y: number]=[.5, .5];
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
-    constructor(master: ViewObject) {
-        super(master);
-        this.init({
-            percentage:[.5, .5],
-        });
-        this.free = true;
-        this.disabled=true;
-    }
     updatePosition(vector: Vector): void {
         this.updateRelativePosition();
         this.setAbsolutePosition(vector);

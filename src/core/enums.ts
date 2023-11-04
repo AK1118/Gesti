@@ -31,8 +31,15 @@ enum ViewObjectFamily{
     text,
     group,
   }
+enum SizeButtonLocation{
+    LT,
+    LB,
+    RT,
+    RB,
+  }
 export {
     FuncButtonTrigger,
     OperationTypeEmum,
-    ViewObjectFamily
+    ViewObjectFamily,
+    SizeButtonLocation
 }

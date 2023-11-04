@@ -157,6 +157,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   }
   //安装按钮
   public installButton(button: Button) {
+    button.initialization(this);
     this.funcButton.push(button);
   }
   /**
@@ -403,18 +404,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.rect.position = new Vector(x, y);
   }
   protected _didChangeScale(scale: number): void {
-    // console.log("改变", scale);
-    // this.funcButton.forEach((button, ndx) => {
-    //   //获取两点偏移量
-    //   const offset: Vector = Vector.sub(this.position, button.position);
-    //   //偏移量乘以缩放因子
-    //   const offsetDel: Vector = Vector.mult(offset, scale);
-    //   //圆心点加上缩放因子
-    //   const newPosition: Vector = Vector.add(offsetDel, this.position);
-    //   // console.log("缩放",scale)
-    //   console.log(newPosition);
-    //   button.updatePosition(newPosition);
-    // });
+  
   }
   protected _didChangePosition(position: Vector): void {
     if (!this.delta) this.delta = new Delta(position.x, position.y);
@@ -465,7 +455,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     this.rect.setPosition(new Vector(x, y));
   }
   public addPosition(deltaX: number, deltaY: number) {
-    this.rect.position.add(new Vector(deltaX, deltaY));
+    this.rect.addPosition(new Vector(deltaX, deltaY));
   }
   public setOpacity(opacity: number): void {
     this.opacity = opacity;

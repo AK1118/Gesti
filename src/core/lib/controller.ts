@@ -17,6 +17,7 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  
   close(view?: ViewObject): void {
     this.kit.close(view);
   }
@@ -149,8 +150,14 @@ class GesteControllerImpl implements GestiController {
   layerBottom(view?: ViewObject): void {
     this.kit.layerBottom(view);
   }
+  render(): void {
+    this.kit.render();
+  }
+  /**
+   * @deprecated 即将废弃，请使用 render()
+   */
   update(): void {
-    this.kit.update();
+    this.render();
   }
   cancelEvent(): void {
     this.kit.cancelEvent();

@@ -70,7 +70,7 @@ class Gesti {
    */
   public setConfig(config?: gesticonfig): void {
     Gesti.config.setParams(config);
-    this.kit.update();
+    this.kit.render();
   }
   /**
    * @deprecated

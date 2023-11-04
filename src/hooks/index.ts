@@ -191,7 +191,7 @@ function textHandler(
   }
   setCurrentInstance(target);
   const controller = getCurrentController();
-  controller.update();
+  controller.render();
 }
 
 /**
@@ -336,16 +336,16 @@ const exportAllWithWeChat = (
   return controller.exportAllWithWeChat(offscreenPainter);
 };
 
-const createDragButton = (view: ViewObject): BaseButton => new DragButton(view);
+const createDragButton = (view: ViewObject): BaseButton => new DragButton();
 const createHorizonButton = (view: ViewObject): BaseButton =>
-  new HorizonButton(view);
-const createRotateButton = (view: ViewObject): BaseButton => new RotateButton(view);
-const createLockButton = (view: ViewObject): BaseButton => new LockButton(view);
-const createUnlockButton = (view: ViewObject): BaseButton => new UnLockButton(view);
-const createCloseButton = (view: ViewObject): BaseButton => new CloseButton(view);
+  new HorizonButton();
+const createRotateButton = (view: ViewObject): BaseButton => new RotateButton();
+const createLockButton = (view: ViewObject): BaseButton => new LockButton();
+const createUnlockButton = (view: ViewObject): BaseButton => new UnLockButton();
+const createCloseButton = (view: ViewObject): BaseButton => new CloseButton();
 const createVerticalButton = (view: ViewObject): BaseButton =>
-  new VerticalButton(view);
-const createMirrorButton = (view: ViewObject): BaseButton => new MirrorButton(view);
+  new VerticalButton();
+const createMirrorButton = (view: ViewObject): BaseButton => new MirrorButton();
 /**
  * @description 给某个可操作对象安装按钮
  * @param view
@@ -444,7 +444,7 @@ const doSomething =
         controller.cancelAll();
         break;
       case "destroyGesti": {
-        currentInstance.destroy();
+        currentInstance.dispose();
         setCurrentInstance(null);
         break;
       };
@@ -453,7 +453,7 @@ const doSomething =
         break;
       default:
     }
-    setTimeout(() => controller.update(), 10);
+    setTimeout(() => controller.render(), 10);
   };
 
 //选中某个元素

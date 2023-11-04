@@ -341,7 +341,7 @@ class TextBox extends TextBoxBase implements TextHandler {
     this.rebuild();
   }
   private rebuild() {
-    this.kit.update();
+    this.kit.render();
   }
 }
 

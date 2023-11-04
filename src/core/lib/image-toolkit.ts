@@ -123,7 +123,7 @@ abstract class ImageToolkitBase {
   private cleaning(item: ViewObject) {
     if (item && item.rect) {
       const { width, height } = item.rect.size;
-      if (width <= 3 && height <= 3) item.hide();
+      if (width <= 3 && height <= 3) item.unMount();
     }
   }
   public getCanvasRect(): Rect {
@@ -132,7 +132,7 @@ abstract class ImageToolkitBase {
   public getViewObjects() {
     return this.ViewObjectList;
   }
-  public update() {
+  public render() {
     /**
      * 在使用绘制对象时，根据值来判断是否禁止重绘
      */
@@ -148,6 +148,11 @@ abstract class ImageToolkitBase {
     if (this.currentViewObjectState.length != this.ViewObjectList.length) {
       this.currentViewObjectState.push(1);
     }
+    /**
+     * 元素显示条件   mounted&&!disabled
+     * 当为disabled时不会被清除，只是被隐藏，可以再次显示
+     * 当mounted为false时，从kit中删除该对象。
+     */
     this.ViewObjectList.forEach((item: ViewObject, ndx: number) => {
       if (!item.disabled) {
         //扫除
@@ -178,20 +183,23 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  update(): void {
+    this.render();
+  }
   close(view?: ViewObject): void {
     if (!view) this.selectedViewObject?.hide?.();
     view?.hide?.();
-    this.update();
+    this.render();
   }
   mirror(view?: ViewObject): boolean {
     if (!view) {
       const isMirror: boolean = this.selectedViewObject?.mirror?.();
-      this.update();
+      this.render();
       this.callHook("onMirror", isMirror);
       return isMirror;
     }
     const isMirror: boolean = view.mirror();
-    this.update();
+    this.render();
     this.callHook("onMirror", isMirror);
     return isMirror;
   }
@@ -216,7 +224,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       view.setPosition(x, y);
     }
     this.selectedViewObject?.setPosition(x, y);
-    this.update();
+    this.render();
   }
   /**
    * @description 清空所有元素
@@ -225,7 +233,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   cleanAll(): Promise<void> {
     return new Promise((r, v) => {
       this.ViewObjectList = [];
-      this.update();
+      this.render();
       r();
     });
   }
@@ -250,7 +258,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       select.onSelected();
       this.selectedViewObject = select;
       this.callHook("onSelect", select);
-      this.update();
+      this.render();
       return Promise.resolve();
     }
     return Promise.resolve();
@@ -267,7 +275,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     if (!obj) return Promise.resolve(null);
     let _angle = existing ? angle + obj.rect.getAngle : angle;
     obj.rect.setAngle(_angle);
-    this.update();
+    this.render();
     return Promise.resolve(null);
   }
   upward(viewObject?: ViewObject): number {
@@ -323,7 +331,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
           );
           if (obj) this.addViewObject(obj);
         }
-        this.update();
+        this.render();
         r();
       } catch (error) {
         j(error);
@@ -351,7 +359,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
           );
           if (obj) this.addViewObject(obj);
         }
-        this.update();
+        this.render();
         r();
       } catch (error) {
         j(error);
@@ -408,7 +416,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       (this.selectedViewObject as TextBox)
         .updateText(text, options)
         .then(() => {
-          this.update();
+          this.render();
         });
     }
   }
@@ -424,11 +432,11 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       _view?.cancel();
       this.callHook("onCancel", _view);
     }
-    this.update();
+    this.render();
   }
   cancelAll(): void {
     this.ViewObjectList.forEach((item: ViewObject) => item.cancel());
-    this.update();
+    this.render();
   }
   layerLower(view?: ViewObject): void {
     let _view = view || this.selectedViewObject;
@@ -437,17 +445,17 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       _view,
       LayerOperationType.lower
     );
-    this.update();
+    this.render();
   }
   layerRise(view?: ViewObject): void {
     let _view = view || this.selectedViewObject;
     this.tool.arrangeLayer(this.ViewObjectList, _view, LayerOperationType.rise);
-    this.update();
+    this.render();
   }
   layerTop(view?: ViewObject): void {
     let _view = view || this.selectedViewObject;
     this.tool.arrangeLayer(this.ViewObjectList, _view, LayerOperationType.top);
-    this.update();
+    this.render();
   }
   layerBottom(view?: ViewObject): void {
     let _view = view || this.selectedViewObject;
@@ -456,7 +464,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       _view,
       LayerOperationType.bottom
     );
-    this.update();
+    this.render();
   }
   unLock(view?: ViewObject): void {
     if (view) view?.unLock();
@@ -552,10 +560,9 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       this.selectedViewObject === selectedViewObject &&
       !this.selectedViewObject.isLock &&
       !selectedViewObject.isBackground
-    )
-      {
-        this.drag.catchViewObject(selectedViewObject.rect, event);
-      }
+    ) {
+      this.drag.catchViewObject(selectedViewObject.rect, event);
+    }
 
     /**
      * 画笔代码块 可以有被选中的图层，前提是当前下落的位置必定不能在上一个被选中的图册内
@@ -564,12 +571,11 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     if (
       this.selectedViewObject != selectedViewObject ||
       selectedViewObject == null
-    )
-      {
-        this.writeFactory.onDraw();
-      }
+    ) {
+      this.writeFactory.onDraw();
+    }
 
-    this.update();
+    this.render();
   }
   public onMove(v: GestiEventParams): void {
     this.debug(["Event Move,", v]);
@@ -578,7 +584,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
 
       //绘制处理,当down在已被选中的图册上时不能绘制
       if (this.writeFactory.current) {
-        this.update();
+        this.render();
         return this.writeFactory.current?.onMove(event);
       }
 
@@ -587,12 +593,12 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       //手势
       if (Array.isArray(event)) {
         this.gesture.update(event);
-        return this.update();
+        return this.render();
       }
       //拖拽
       this.drag.update(event);
       //有被选中对象才刷新
-      if (this.selectedViewObject != null) this.update();
+      if (this.selectedViewObject != null) this.render();
     } else {
       const event: Vector | Vector[] = this.correctEventPosition(v);
       //Hover检测
@@ -616,7 +622,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.debug(["Event Up,", v]);
     const event: Vector | Vector[] = this.correctEventPosition(v);
     //判断是否选中对象
-    const selectedObj=this.clickViewObject(event);
+    const selectedObj = this.clickViewObject(event);
     this.eventHandlerState = EventHandlerState.up;
     //手势解析处理
     this.gesture.onUp(this.selectedViewObject, event);
@@ -634,7 +640,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       //鼠标|手指抬起时提交一次操作
       // this.recorder.commit();
     }
-    this.update();
+    this.render();
     this._inObjectArea = false;
   }
 
@@ -644,7 +650,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       if (deltaY < 0) this.selectedViewObject.enlarge();
       else this.selectedViewObject.narrow();
     }
-    this.update();
+    this.render();
   }
 
   /**
@@ -725,8 +731,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     obj.initialization(this);
     obj.setLayer(this.getViewObjectCount() - 1);
     this.callHook("onLoad", obj);
-
-    this.update();
+    this.render();
   }
 
   /**
@@ -742,7 +747,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     imageBox.center(this.canvasRect.size);
     this.addViewObject(imageBox);
     setTimeout(() => {
-      this.update();
+      this.render();
     }, 100);
     return Promise.resolve(imageBox);
   }
@@ -760,7 +765,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     // this.selectedViewObject=textBox;
     // this.selectedViewObject.onSelected()
     setTimeout(() => {
-      this.update();
+      this.render();
     }, 100);
     return Promise.resolve(textBox);
   }
@@ -869,7 +874,7 @@ class _Tools {
       }
       obj.didFallback();
     }
-    kit.update();
+    kit.render();
   }
 }
 export default ImageToolkit;

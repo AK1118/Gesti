@@ -131,7 +131,11 @@ interface ImageToolKitController {
   /**
    * 刷新画布
    */
-  update(): void;
+  render(): void;
+    /**
+   * @deprecated 即将废弃，请使用 render()
+   */
+  update():void;
   /**
    * 新增图片
    * @param @XImage

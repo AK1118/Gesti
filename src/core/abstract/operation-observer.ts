@@ -12,6 +12,7 @@ interface OperationType {
   angle: number;
   scale: number;
   position: Vector;
+  addPosition:Vector;
   drag: { angle: number; size: Size };
 }
 
@@ -158,6 +159,7 @@ abstract class OperationObserver {
       case "size":
         this.beforeChangeSize(value);
         break;
+        case "addPosition":this.beforeAddPosition(value);break;
       default: {
       }
     }
@@ -179,19 +181,26 @@ abstract class OperationObserver {
 
       case "scale":
        {
-        this.didChangeScale(value);
         this._didChangeScale(value);
+        this.didChangeScale(value);
        }
         break;
 
       case "position":
         {
-          this.didChangePosition(value);
           this._didChangePosition(value);
+          this.didChangePosition(value);
         }
         break;
       case "drag":
         this.didDrag(value);
+        {
+          this._didChangePosition(value);
+          this.didChangePosition(value);
+        }
+        break;
+      case "addPosition":
+        this.didAddPosition(value);
         break;
       default: {
       }
@@ -212,6 +221,8 @@ abstract class OperationObserver {
   protected didChangeScale(scale: number): void {}
   protected _didChangeScale(scale:number):void{}
   protected didDrag(value: { size: Size; angle: number }): void {}
+  protected didAddPosition(delta:Vector):void{}
+  protected beforeAddPosition(delta:Vector):void{};
   
 }
 

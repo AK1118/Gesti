@@ -76,6 +76,15 @@ class Vector{
 	toArray():number[]{
 		return [this.x,this.y];
 	}
+	toZero():void{
+		this.x=0;
+		this.y=0;
+	}
+	double():Vector{
+		this.x*=2;
+		this.y*=2;
+		return this;
+	}
 	static dist(v1:Vector, v2:Vector) {
 		let sub = Vector.sub(v1, v2);
 		return Vector.mag(sub);

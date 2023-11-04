@@ -8,13 +8,6 @@ import Vector from "../lib/vector";
 abstract class GroupBase extends ViewObject {
   private beforeAngle: number = 0;
   private views: Array<ViewObject> = [];
-  protected updateChildren() {
-    const [deltaX, deltaY] = this.delta.delta;
-    this.views.forEach((_) => {
-      _.addPosition(deltaX, deltaY);
-    });
-    this.delta.clean();
-  }
   public ready(kit: ImageToolkit): void {
     //将组合添加到最底层
     kit.layerBottom(this);
@@ -104,29 +97,55 @@ abstract class GroupBase extends ViewObject {
       const ap = view.rect.position;
       const dv = Vector.sub(ap, sp);
       const newX = dv.x * Math.cos(_angle) - dv.y * Math.sin(_angle) + sp.x;
-      const newY = dv.x * Math.sin(_angle) + dv.y * Math.cos(_angle) + sp.y; 
+      const newY = dv.x * Math.sin(_angle) + dv.y * Math.cos(_angle) + sp.y;
       view.setPosition(newX, newY);
       view.setAngle(this.rect.getAngle);
-    }); 
+    });
     this.beforeAngle = this.rect.getAngle;
   }
   public didChangeScale(scale: number): void {
-    this.views.forEach((_:ViewObject)=>{
+    this.views.forEach((_: ViewObject) => {
       //获取两点偏移量
-      const offset:Vector=Vector.sub(_.position,this.position);
+      const offset: Vector = Vector.sub(_.position, this.position);
       //偏移量乘以缩放因子
-      const offsetDel:Vector=Vector.mult(offset,scale);
+      const offsetDel: Vector = Vector.mult(offset, scale);
       //圆心点加上缩放因子
-      const newPosition:Vector=Vector.add(offsetDel,this.position);
+      const newPosition: Vector = Vector.add(offsetDel, this.position);
       // console.log("缩放",scale)
-      _.setPosition(newPosition.x,newPosition.y);
+      _.setPosition(newPosition.x, newPosition.y);
       _.setScale(scale);
     });
   }
-
+  /**
+   * @description 更新子组件位置
+   */
+  protected updateChildrenLocation() {
+    const [deltaX, deltaY] = this.delta.delta;
+    this.views.forEach((_) => {
+      _.addPosition(deltaX, deltaY);
+    });
+    this.delta.clean();
+  }
+  protected didChangePosition(position: Vector): void {
+      this.updateChildrenLocation();
+  }
+  /**
+   * @description 位置通过加法被改变
+   * @param delta 
+   */
+  protected didAddPosition(delta: Vector): void {
+    this.views.forEach((_) => {
+      _.addPosition(delta.x, delta.y);
+    });
+    this.delta.update(this.position.copy())
+  }
+  public freeAll():void{
+    this.views.forEach((_) => {
+      _.unBackground();
+    });
+    this.hide();
+  }
 }
-
-
 
 class Group extends GroupBase {
   constructor() {
@@ -139,18 +158,17 @@ class Group extends GroupBase {
     });
     this.init();
   }
-  family: ViewObjectFamily=ViewObjectFamily.group;
+  family: ViewObjectFamily = ViewObjectFamily.group;
   get value(): any {
     return this.value;
   }
   setDecoration(args: any): void {
     throw new Error("Method not implemented.");
   }
-  public drawSelected(paint: Painter): void {
-      
-  }
+  public drawSelected(paint: Painter): void {}
+
   drawImage(paint: Painter): void {
-    paint.fillStyle = "#cccccc";
+    paint.fillStyle = "skyblue";
     paint.fillRect(
       this.rect.size.width * -0.5,
       this.rect.size.height * -0.5,
@@ -158,7 +176,7 @@ class Group extends GroupBase {
       this.rect.size.height
     );
     paint.stroke();
-    this.updateChildren();
+    // this.updateChildrenLocation();
   }
   export(painter?: Painter): Promise<Object> {
     throw new Error("Method not implemented.");

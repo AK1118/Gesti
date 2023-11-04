@@ -11,14 +11,10 @@ import GestiConfig from "../../../config/gestiConfig";
 
 
 class MirrorButton extends BaseButton {
+    protected percentage: [x: number, y: number]= [-.5, .5];
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
-    constructor(master: ViewObject) {
-        super(master);
-        this.init({
-            percentage: [-.5, .5]
-        });
-    }
+
     /**
      * @description 相对坐标为以父对象为原点的定位
      * 绝对坐标是以canvas为原点的定位

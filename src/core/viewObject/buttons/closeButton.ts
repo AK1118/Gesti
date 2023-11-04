@@ -8,13 +8,8 @@ import Widgets from "../../../static/widgets";
 import ViewObject from "../../abstract/view-object";
 import GestiConfig from "../../../config/gestiConfig";
 class CloseButton extends BaseButton {
+    protected percentage: [x: number, y: number]=[.5, -.5];
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
-    constructor(master: ViewObject) {
-        super(master);
-        this.init({
-            percentage:[.5, -.5]
-        });
-    }
     updatePosition(vector: Vector): void {
         this.updateRelativePosition();
         this.setAbsolutePosition(vector);

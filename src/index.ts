@@ -1,11 +1,11 @@
 /*
  * @Author: AK1118 
  * @Date: 2023-11-03 18:14:02 
- * @Last Modified by:   AK1118 
- * @Last Modified time: 2023-11-03 18:14:02 
+ * @Last Modified by: AK1118
+ * @Last Modified time: 2023-11-04 18:07:13
  */
 import SizeButton from "./core/viewObject/buttons/sizeButton";
-import { ViewObjectFamily } from "./core/enums";
+import { SizeButtonLocation, ViewObjectFamily } from "./core/enums";
 import Gesti from "./core/lib/gesti";
 
 import {
@@ -98,6 +98,7 @@ import LockButton from "./core/viewObject/buttons/lockbutton";
 import UnLockButton from "./core/viewObject/buttons/delockButton";
 import VerticalButton from "./core/viewObject/buttons/verticalButton";
 import HorizonButton from "./core/viewObject/buttons/horizonButton";
+import Manipulator from "./core/viewObject/tools/manipulator";
 
 //按钮
 export {
@@ -109,6 +110,8 @@ export {
   UnLockButton,
   VerticalButton,
   HorizonButton,
+  SizeButton,
+  SizeButtonLocation,
 };
 export { ImageBox, XImage, TextBox, WriteViewObj };
 //枚举
@@ -192,86 +195,3 @@ export {
   uint8ArrayToChunks,
 };
 export default Gesti;
-
-const canvas: HTMLCanvasElement = document.querySelector("#canvas");
-const offScreenCanvas: HTMLCanvasElement =
-  document.querySelector("#offScreenCanvas");
-const img2: HTMLImageElement = document.querySelector("#bg");
-canvas.width = 500;
-canvas.height = 500;
-offScreenCanvas.width = 10000;
-offScreenCanvas.height = 500;
-const g = canvas.getContext("2d"); 
-const offScreenPainter = offScreenCanvas.getContext("2d");
-const gesti = createGesti({
-  dashedLine: false,
-  auxiliary: false,
-});
-gesti.initialization({
-  canvas,
-  renderContext:g,
-});
-const img: HTMLImageElement = document.querySelector("#dog");
-const ximage = createXImage({
-  data: img2,
-  width: img2.width,
-  height: img2.height,
-  scale: .5,
-});
-
-const imageBox = createImageBox(ximage);
-console.log(imageBox.size);
-const drawButton = new DragButton(imageBox,{
-  angleDisabled:false,
-});
-doCenter(imageBox)
-// const unLockButton = new UnLockButton(imageBox);
-imageBox.installButton(drawButton);
-imageBox.installButton(new SizeButton(imageBox));
-imageBox.installButton(new RotateButton(imageBox));
-// loadToGesti(imageBox)
-// doUpdate();
- //Manipulator
-const textBox = createTextBox("新建文本", {
-  resetFontSizeWithRect: true,
-});
-const str=`你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
-const str1=`你好，这是一篇英语短文1234567890 Redux  maintainer Mark Erikson`;
-const textBox2 = createTextBox(str, {
-  resetFontSizeWithRect: false,
-  fontSize:10,
-  spacing:0,
-  lineHeight:1.5,
-  color:"black",
-  backgroundColor:"white",
-});
-
-
-const group: Group = new Group();
-textBox2.setPosition(300,30);
-loadToGesti(group);
-loadToGesti(textBox2)
-loadToGesti(imageBox)
-group.add(imageBox);
-group.add(textBox2);
-const dragButton=new DragButton(textBox2);
-textBox2.installButton(dragButton);
-group.installButton(new DragButton(group,{
-  angleDisabled:false,
-}));
-doUpdate()
-document.getElementById("import").addEventListener("click", () => {
-  console.log("导入");
-  const a = window.localStorage.getItem("aa");
-  importAll(a).then((e) => {
-    console.log("导入成功");
-  });
-});
-
-document.getElementById("export").addEventListener("click", () => {
-  console.log("导出");
-  exportAll(offScreenPainter).then((json) => {
-    window.localStorage.setItem("aa", json);
-    console.log("导出成功");
-  });
-});

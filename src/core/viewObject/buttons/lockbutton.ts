@@ -11,12 +11,9 @@ import GestiConfig from "../../../config/gestiConfig";
 
 
 class LockButton extends BaseButton {
+    protected percentage: [x: number, y: number]=[-.5, -.5];
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
-    constructor(master: ViewObject) {
-        super(master);
-        this.init({percentage:[-.5, -.5]});
-    }
 
     updatePosition(vector: Vector): void {
         this.updateRelativePosition();

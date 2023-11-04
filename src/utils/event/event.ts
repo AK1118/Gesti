@@ -6,7 +6,7 @@ type wheelParams = (e: WheelEvent) => void;
 class Delta implements Delta {
   private _deltaX: number;
   private _deltaY: number;
-  private beforeVector: Vector = new Vector(0, 0);
+  private beforeVector: Vector = Vector.zero;
   constructor(deltaX: number, deltaY: number) {
     this._deltaX = deltaX;
     this._deltaY = deltaY;
@@ -36,6 +36,10 @@ class Delta implements Delta {
   }
   public clean(){
     this._deltaX=this._deltaY=0;
+  }
+  public cleanCurrentAndBefore(){
+    this.clean();
+    this.beforeVector.toZero();
   }
 }
 

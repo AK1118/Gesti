@@ -2,6 +2,7 @@ export declare interface gesticonfig {
   auxiliary?: boolean;
   dashedLine?: boolean;
 }
+
 declare interface RectParams {
   x?: number;
   y?: number;
