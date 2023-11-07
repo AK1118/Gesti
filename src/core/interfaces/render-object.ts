@@ -16,7 +16,6 @@ export interface RenderObject {
     onSelected(): void;
     //相对坐标，相对于画布在translate
     relativeRect: Rect;
-    disabled: boolean;
 }
 
 export default RenderObject;

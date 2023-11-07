@@ -60,10 +60,9 @@ const textBox2 = createTextBox(str1, {
 
 
 const group: Group = new Group();
-loadToGesti(group);
+// loadToGesti(group);
 
 // man.installButton(new DragButton());
-
 loadToGesti(textBox2)
 loadToGesti(imageBox)
 group.add(imageBox);
@@ -73,12 +72,12 @@ group.installButton(new SizeButton(SizeButtonLocation.LB));
 group.installButton(new SizeButton(SizeButtonLocation.RT));
 group.installButton(new DragButton());
 
-group.setScale(.5);
+loadToGesti(group)
 
 
-setTimeout(()=>{
-  group.freeAll();
-},4000)
+// setTimeout(()=>{
+//   group.freeAll();
+// },4000)
 // const man=new Manipulator<Group>(group);
 // loadToGesti(man)
 

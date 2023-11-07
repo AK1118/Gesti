@@ -2,7 +2,7 @@
  * @Author: AK1118 
  * @Date: 2023-11-03 18:14:02 
  * @Last Modified by: AK1118
- * @Last Modified time: 2023-11-04 18:07:13
+ * @Last Modified time: 2023-11-06 09:16:00
  */
 import SizeButton from "./core/viewObject/buttons/sizeButton";
 import { SizeButtonLocation, ViewObjectFamily } from "./core/enums";
@@ -112,6 +112,7 @@ export {
   HorizonButton,
   SizeButton,
   SizeButtonLocation,
+  Manipulator
 };
 export { ImageBox, XImage, TextBox, WriteViewObj };
 //枚举

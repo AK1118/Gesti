@@ -1,7 +1,3 @@
-import UnLockButton from "../viewObject/buttons/delockButton";
-import DragButton from "../viewObject/buttons/dragbutton";
-import LockButton from "../viewObject/buttons/lockbutton";
-
 import RenderObject from "../interfaces/render-object";
 import Painter from "../lib/painter";
 import Rect from "../lib/rect";
@@ -11,14 +7,9 @@ import Button from "./baseButton";
 import OperationObserver from "./operation-observer";
 import AuxiliaryLine from "../../tools/auxiliary-lines";
 import GestiConfig from "../../config/gestiConfig";
-import VerticalButton from "../viewObject/buttons/verticalButton";
-import HorizonButton from "../viewObject/buttons/horizonButton";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
-import MirrorButton from "../viewObject/buttons/mirrorbutton";
-import RotateButton from "../viewObject/buttons/rotateButton";
-import CloseButton from "../viewObject/buttons/closeButton";
 //转换为json的类型
 export type toJsonType = "image" | "text" | "write";
 
@@ -28,67 +19,153 @@ export interface toJSONInterface {
 }
 
 /**
- * 凡是带有操作点的对象都是它，
- * 例如 图片、文字 等
+ * 图层基类
  */
-abstract class ViewObject extends OperationObserver implements RenderObject {
-  public selected: boolean = false;
-  //矩形缩放时用到
-  private scale: number = 1;
-  public key: string | number = +new Date();
-  private isMirror: boolean = false;
+abstract class BaseViewObject extends OperationObserver {
+  //是否挂载到Gesti
+  private _mounted: boolean = false;
+  //缩放倍数
+  protected scale: number = 1;
+  //是否被选中
+  protected selected: boolean = false;
+  //图层唯一身份码
+  public readonly key: string | number = +new Date();
+  //是否处于镜像
+  protected isMirror: boolean = false;
+  //是否隐藏
   public disabled: boolean = false;
-  public rect: Rect;
+  //描述对象在二维坐标中的平面信息数据
+  private _rect: Rect;
+  //相对于自身描述对象在二维坐标中的平面信息数据
+  private _relativeRect: Rect;
   //不透明度
-  private opacity: number = 1;
-  public beforeRect: Rect;
-  private funcButton: Array<Button> = new Array<Button>();
-  public relativeRect: Rect;
-  //辅助线
-  private auxiliary: AuxiliaryLine;
+  public opacity: number = 1;
+  //按钮数组，所安装的按钮都在里面
+  protected funcButton: Array<Button> = new Array<Button>();
+  //瞬时移动delta
+  protected delta: Delta = Delta.zero;
+  //实现类属于什么家族
+  abstract readonly family: ViewObjectFamily;
+  //是否属于背景，如果是背景，就不能被选中，且永远置于最底层
+  private _background: boolean = false;
   /**
    * @description 是否冻结锁住，
    * 锁住过后可被选取，但是不能位移和改变大小
    */
   private _lock: boolean = false;
-  public initialed: boolean = false;
-  public dragButton: DragButton;
-  public verticalButton: VerticalButton;
-  public horizonButton: HorizonButton;
-  public mirrorButton: MirrorButton;
-  public closeButton: CloseButton;
-  public lockButton: LockButton;
-  public unlockButton: UnLockButton;
-  public rotateButton: RotateButton;
-  protected delta: Delta = new Delta(0, 0);
-  public name: string;
-  public id: string;
-  abstract readonly family: ViewObjectFamily;
-  public originFamily: ViewObjectFamily;
-  private layer: number = 0;
-  //是否属于背景，如果是背景，就不能被选中，且永远置于最底层
-  private background: boolean = false;
+  //元素名字，可以可以被重复
+  public _name: string;
+  //元素唯一id
+  public _id: string;
+  //image kit 对象
   protected kit: ImageToolkit;
-  private _mounted:boolean=false;
+  //对象层级 => 对象在数组中的位置
+  private layer: number = 0;
+
+  public setLayer(layer: number) {
+    this.layer = layer;
+  }
+
+  public getLayer(): number {
+    return this.layer;
+  }
+
+  public setId(id: string): void {
+    this._id = id;
+  }
+
+  get id(): string {
+    return this._id;
+  }
+
+  public setName(name: string): void {
+    this._name = name;
+  }
+  get name(): string {
+    return this._name;
+  }
+
+  public mount(): void {
+    this._mounted = true;
+    this.onMount();
+  }
+  public unMount(): void {
+    this._mounted = false;
+    this.onUnMount();
+  }
+
+  get mounted(): boolean {
+    return this._mounted;
+  }
+
+  set relativeRect(value: Rect) {
+    this._relativeRect = value;
+  }
+  get relativeRect(): Rect {
+    return this._relativeRect;
+  }
+  set rect(value: Rect) {
+    this._rect = value;
+    this.relativeRect = value;
+  }
+  get rect(): Rect {
+    return this._rect;
+  }
+  public toBackground(): void {
+    this._background = true;
+  }
+  get isBackground(): boolean {
+    return this._background;
+  }
+  public unBackground(): void {
+    this._background = false;
+  }
+  get isLock(): boolean {
+    return this._lock;
+  }
+  /**
+   * @description 锁住
+   */
+  public lock(): void {
+    this._lock = true;
+    this.onLock();
+  }
+  /**
+   * @description 解锁
+   */
+  public unLock(): void {
+    this._lock = false;
+    this.onUnLock();
+  }
+  //当被锁定时触发
+  private onLock() {
+    //锁定时，自由的按钮不会消失,反之会显示
+    this.funcButton.forEach((button: Button) => {
+      button.disabled = !button.isFree;
+    });
+  }
+  //解锁时触发
+  private onUnLock() {
+    //解锁时，自由的按钮消失,反之会显示
+    this.funcButton.forEach((button: Button) => {
+      button.disabled = button.isFree;
+    });
+  }
+  protected onMount():void{}
+  protected onUnMount():void{}
+}
+
+abstract class ViewObject extends BaseViewObject implements RenderObject {
+  //辅助线
+  private auxiliary: AuxiliaryLine;
+  public originFamily: ViewObjectFamily;
   public get position(): Vector {
     return this.rect.position;
   }
   constructor() {
     super();
-    this.rect = new Rect({
-      width: 100,
-      height: 100,
-    });
-    this.init();
-  }
-  get mounted():boolean{
-    return this.mounted;
-  }
-  public mount():void{
-    this._mounted=true;
-  }
-  public unMount():void{
-    this._mounted=false;
+    this.rect = Rect.zero;
+    this.relativeRect = Rect.zero;
   }
   //获取对象值
   abstract get value(): any;
@@ -96,25 +173,10 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
    * @description 设置名字
    */
   public setName(name: string) {
-    this.name = name;
-  }
-  get isBackground(): boolean {
-    return this.background;
+    this._name = name;
   }
   get size(): Size {
     return this.rect.size;
-  }
-  /**
-   * 将对象设置为背景
-   */
-  public toBackground(): void {
-    this.background = true;
-  }
-  /**
-   * 取消图片背景图片
-   */
-  public unBackground(): void {
-    this.background = false;
   }
   /**
    * 被加入gesti内时调用
@@ -122,26 +184,14 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public ready(kit: ImageToolkit): void {}
   public initialization(kit: ImageToolkit): void {
     this.kit = kit;
-    //根据配置判断是否设置参考线
-    GestiConfig.auxiliary &&
-      (this.auxiliary = new AuxiliaryLine(
-        kit.getCanvasRect(),
-        kit.getViewObjects()
-      ));
+    //初始化一些数据，准备挂载
     this.ready(kit);
-    this.mount();
-  }
-  public init() {
-    this.relativeRect = new Rect({
-      x: 0,
-      y: 0,
-      width: this.rect.size.width,
-      height: this.rect.size.height,
-    });
+    //添加监听
+    this.addObserver(this);
     //初始化矩阵点
     this.rect.updateVertex();
-    this.addObserver(this);
-    this.initialed = true;
+    //挂载
+    this.mount();
   }
   //设置大小
   public setSize(size: { width?: number; height?: number }) {
@@ -169,38 +219,13 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       if (!arr.includes(button.name) && !button.disabled) button.reset();
     });
   }
-  /**
-   * @description 锁住
-   */
-  public lock(): void {
-    this._lock = true;
-    this.onLock();
-  }
-  /**
-   * @description 解锁
-   */
-  public unLock(): void {
-    this._lock = false;
-    this.onUnLock();
-  }
-  /**
-   * @description 查看是否锁住
-   */
-  get isLock(): boolean {
-    return this._lock;
-  }
-  public setLayer(layer: number) {
-    this.layer = layer;
-  }
-  public getLayer(): number {
-    return this.layer;
-  }
-  public mirror():boolean {
+
+  public mirror(): boolean {
     this.isMirror = !this.isMirror;
     return this.isMirror;
   }
   public render(paint: Painter) {
-    if (!this.initialed) return;
+    if (!this.mounted) return;
     this.draw(paint);
   }
 
@@ -236,20 +261,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       this.auxiliary?.draw(paint, this);
     }
   }
-  //当被锁定时触发
-  private onLock() {
-    //锁定时，自由的按钮不会消失,反之会显示
-    this.funcButton.forEach((button: Button) => {
-      button.disabled = !button.isFree;
-    });
-  }
-  //解锁时触发
-  private onUnLock() {
-    //解锁时，自由的按钮消失,反之会显示
-    this.funcButton.forEach((button: Button) => {
-      button.disabled = button.isFree;
-    });
-  }
+
   /**
    * 该方法需要子类实现
    * @param paint
@@ -357,8 +369,9 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     /*在抬起鼠标时，ViewObject还没有被Calcel，为再次聚焦万向按钮做刷新数据*/
     this.onChanged();
   }
-  private readonly enlargeScale:number=1.1;
-  private readonly narrowScale:number=1/1.1;
+
+  private readonly enlargeScale: number = 1.1;
+  private readonly narrowScale: number = 1 / 1.1;
   public enlarge() {
     this.scale = this.enlargeScale;
     this.rect.setScale(this.scale);
@@ -373,8 +386,8 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
     if (this.isLock) return;
     this.onChanged();
   }
-  public setScale(scale:number){
-    this.scale=scale;
+  public setScale(scale: number) {
+    this.scale = scale;
     this.rect.setScale(scale);
   }
   /*每次改变大小后都需要刷新按钮的数据*/
@@ -403,9 +416,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       y = canvasSize.height >> 1;
     this.rect.position = new Vector(x, y);
   }
-  protected _didChangeScale(scale: number): void {
-  
-  }
+  protected _didChangeScale(scale: number): void {}
   protected _didChangePosition(position: Vector): void {
     if (!this.delta) this.delta = new Delta(position.x, position.y);
     this.delta.update(position.copy());
@@ -442,7 +453,7 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
       locked: this.isLock,
       buttons: this.funcButton.map((button: Button) => button.constructor.name),
       id: this.id,
-      layer: this.layer,
+      layer: this.getLayer(),
       isBackground: this.isBackground,
     };
   }
@@ -463,7 +474,6 @@ abstract class ViewObject extends OperationObserver implements RenderObject {
   public setAngle(angle: number) {
     this.rect.setAngle(angle);
   }
-
 }
 
 export default ViewObject;

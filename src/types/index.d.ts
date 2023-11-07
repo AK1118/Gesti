@@ -1,3 +1,42 @@
+declare class Vector {
+  x: number;
+  y: number;
+  constructor(x: number, y: number);
+  add(v: Vector): void;
+  sub(v: Vector): this;
+  mult(v: Vector): this;
+  div(v: Vector): this;
+  mag(): number;
+  dist(v: Vector): number;
+  normalize(): this;
+  clamp(c: [max: number, min: number]): void;
+  copy(): Vector;
+  set(v: Vector): void;
+  setXY(x: number, y: number): void;
+  toJson(): { x: number; y: number };
+  toArray(): number[];
+  equals(v: Vector): boolean;
+  troweling(): Vector;
+  static dist(v1: Vector, v2: Vector): number;
+  static mag(v: Vector): number;
+  static sub(v1: Vector, v2: Vector): Vector;
+  static add(v1: Vector, v2: Vector): Vector;
+  static troweling(v: Vector): Vector;
+  static get zero(): Vector;
+  half(): Vector;
+  toZero(): void;
+  double(): Vector;
+}
+
+declare class Size {
+  width: number;
+  height: number;
+  constructor(width: number, height: number);
+  toVector(): Vector;
+  copy(): Size;
+  static get zero(): Size;
+}
+
 export declare interface gesticonfig {
   auxiliary?: boolean;
   dashedLine?: boolean;
@@ -9,6 +48,7 @@ declare interface RectParams {
   width: number;
   height: number;
 }
+
 export declare interface TextOptions {
   fontFamily?: string;
   fontSize?: number;
@@ -48,6 +88,7 @@ export declare enum ViewObjectFamily {
   rect,
   text,
 }
+
 export declare interface Rect {
   readonly key: string;
   get position(): Vector;
@@ -68,7 +109,7 @@ export declare interface ImageChunk {
   width: number;
   height: number;
   imageData: ImageData;
-  base64:string,
+  base64: string;
 }
 export declare abstract class ViewObject {
   getBaseInfo(): Object;
@@ -95,25 +136,25 @@ export declare abstract class ViewObject {
   //设置矩形大小
   setSize(size: { width?: number; height?: number }): void;
   //设置位置
-  setPosition(x:number,y:number):void;
+  setPosition(x: number, y: number): void;
   /**
    * @description 设置不透明度
    * @param opacity  0.0~1.0
    */
-  setOpacity(opacity:number):void;
+  setOpacity(opacity: number): void;
   //是否已被选中
   readonly selected: boolean;
   /**
    * 将对象设置为背景
    */
-  public toBackground():void;
+  public toBackground(): void;
   /**
    * 取消对象为背景
    */
-  public unBackground():void;
-  get position():Vector;
-  get size():Size;
-  get mounted():boolean;
+  public unBackground(): void;
+  get position(): Vector;
+  get size(): Size;
+  get mounted(): boolean;
 }
 export declare class XImage {
   new(params: createImageOptions): XImage;
@@ -130,18 +171,18 @@ export declare class XImage {
   toJson(): RectParams;
 }
 
-export declare class Group{
-  remove(id:string):void;
-  removeById(viewObject:ViewObject):void;
+export declare class Group {
+  remove(id: string): void;
+  removeById(viewObject: ViewObject): void;
 }
-export declare interface TextHandler{
-  setFontSize(fontSize:number):void;
-  setFontFamily(family:string):void;
-  setSpacing(value:number):void;
-  setColor(color:string):void;
-  setText(text:string):void;
+export declare interface TextHandler {
+  setFontSize(fontSize: number): void;
+  setFontFamily(family: string): void;
+  setSpacing(value: number): void;
+  setColor(color: string): void;
+  setText(text: string): void;
 }
-export declare class TextBox extends ViewObject implements TextHandler{
+export declare class TextBox extends ViewObject implements TextHandler {
   new(text: string, options?: TextOptions): TextBox;
   constructor(text: string, options?: TextOptions);
   setText(text: string): void;
@@ -389,9 +430,7 @@ export declare const removeListener: (
   hook: (_args: any) => any,
   target?: Gesti
 ) => void;
-export declare const useController: (
-  target?: Gesti
-) => import("../core/interfaces/gesticontroller").default;
+export declare const useController: (target?: Gesti) => GestiController;
 /**
  * 添加预设图形
  */
@@ -406,9 +445,7 @@ export declare const createTextBox: (
   text: string,
   options?: TextOptions
 ) => TextBox;
-export declare const createImageBox: (
-  xImage: XImage
-) => import("../core/viewObject/image").default;
+export declare const createImageBox: (xImage: XImage) => XImage;
 /**
  * @description 踩踩踩
  * @param option
@@ -583,13 +620,12 @@ export declare const inToPx: (inch: number) => number;
  */
 export declare const ptToPx: (pt: number) => number;
 
-
 /**
  * @description 将Uint8Array数组分割成小切片(压缩后的)
  */
-export declare const uint8ArrayToChunks:(
+export declare const uint8ArrayToChunks: (
   uint8Array: Uint8Array,
   width: number,
   height: number,
   chunkSize: number
-)=>ImageChunk[];
+) => ImageChunk[];

@@ -72,6 +72,9 @@ class Rect extends ObserverObj {
     ]);
     this._vertex.rotate(this.getAngle, this);
   }
+  static get zero():Rect{
+    return new Rect();
+  }
   public get position(): Vector {
     return this._position;
   }
@@ -191,6 +194,7 @@ class Rect extends ObserverObj {
       }
     );
   }
+  
   public set(newRect: Rect) {
     this.position.set(newRect.position);
     this.setAngle(newRect.getAngle);

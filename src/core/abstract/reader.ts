@@ -101,11 +101,9 @@ abstract class GestiReader {
       relativeRect.size.width,
       relativeRect.size.height
     );
-    viewObject.id=options.id;
+    viewObject.setId(options.id);
     viewObject.setLayer(options?.layer||0);
     viewObject.relativeRect.setAngle(options.relativeRect.angle);
-     //init包括生成按钮
-    viewObject.init();
     viewObject.custom();
     viewObject.rect.setPosition(rect.position);
     //安装按钮

@@ -11,6 +11,9 @@ class Delta implements Delta {
     this._deltaX = deltaX;
     this._deltaY = deltaY;
   }
+  static get zero():Delta{
+    return new Delta(0,0);
+  }
   update(vector: Vector) {
     //初始化时before 和 vector 坐标相等
     if(this.beforeVector.x===0&&this.beforeVector.y===0){

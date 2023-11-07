@@ -25,11 +25,11 @@ abstract class GroupBase extends ViewObject {
    */
   onAddObj(obj: ViewObject) {
     //设置对象为背景对象，不给选中
-    obj.toBackground();
+    if(this.mounted)obj.toBackground();
     //计算设置大小
     this.computeSize();
     //设置层级为最底层
-    this.ready(this.kit);
+    this.kit?.layerBottom?.(this);
   }
   public addAll(objs: Array<ViewObject>): number {
     if (!Array.isArray(objs))
@@ -139,24 +139,27 @@ abstract class GroupBase extends ViewObject {
     });
     this.delta.update(this.position.copy())
   }
+  /**
+   * @description 释放子元素
+   * 释放子元素后，自会对自己就行隐藏，不会被Unmount
+   * 
+   * 
+   */
   public freeAll():void{
     this.views.forEach((_) => {
       _.unBackground();
     });
     this.hide();
   }
+  protected onMount(): void {
+    console.log("挂载")
+      this.kit?.layerBottom?.(this);
+  }
 }
 
 class Group extends GroupBase {
   constructor() {
     super();
-    this.rect = new Rect({
-      width: 100,
-      height: 100,
-      x: 0,
-      y: 0,
-    });
-    this.init();
   }
   family: ViewObjectFamily = ViewObjectFamily.group;
   get value(): any {

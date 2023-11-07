@@ -27,7 +27,6 @@ class ImageBox extends ViewObject {
     this.ximage = ximage;
     this.image = ximage.data;
     this.rect = new Rect(ximage.toJson());
-    this.init();
   }
   setDecoration(xImage: XImage): void {
     this.ximage = xImage;
@@ -36,8 +35,6 @@ class ImageBox extends ViewObject {
     const oldPosition: Vector = this.rect.position.copy();
     this.rect.setPosition(oldPosition);
     this.rect.setSize(width, height);
-
-    this.init();
   }
   //@Override
   public drawImage(paint: Painter): void {

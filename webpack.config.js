@@ -1,5 +1,3 @@
-// const path=require("path");
-// const HtmlWebpackPlugin=require('html-webpack-plugin');
 import path,{dirname} from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
@@ -10,10 +8,8 @@ const __dirname=dirname(__filename);
 
 
 export default (env,{mode})=>{
-
+  //If this mode is "development",you must be set entry to test path,and mode "production" never won't use.
   const entry=mode==='development'?"./src/test/index.ts":"./src/index.ts";
-  console.log(env,mode);
-  console.log(entry);
   return {
     entry,
     output: {
