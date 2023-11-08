@@ -71,7 +71,7 @@ class Listeners {
 }
 abstract class ImageToolkitBase {
   //所有图层集合
-  protected ViewObjectList: Array<ViewObject> = new Array<ViewObject>();
+  protected _viewObjectList: Array<ViewObject> = new Array<ViewObject>();
   //手势监听器
   protected eventHandler: GestiEvent;
   //手势状态
@@ -106,6 +106,15 @@ abstract class ImageToolkitBase {
   //绘制对象工厂  //绘制对象，比如签字、矩形、圆形等
   protected writeFactory: WriteFactory;
   protected hoverViewObject: ViewObject = null;
+  protected setViewObjectList(viewObjectArray: Array<ViewObject>) {
+    this._viewObjectList = viewObjectArray;
+  }
+  protected cleanViewObjectList(): void {
+    this._viewObjectList = [];
+  }
+  get ViewObjectList(): Array<ViewObject> {
+    return this._viewObjectList;
+  }
   protected debug(message: any): void {
     if (!this.isDebug) return;
     if (Array.isArray(message)) console.warn("Gesti debug: ", ...message);
@@ -183,14 +192,36 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  mount(view: ViewObject): void {
+    this.load(view);
+  }
+  unMount(view: ViewObject): void {
+    const result: boolean = this.deleteViewObject(
+      view || this.selectedViewObject
+    );
+    if (result) this.render();
+  }
+  //返回删除结果
+  private deleteViewObject(view: ViewObject): boolean {
+    if (!view) return false;
+    const key: string | number = view.key;
+    const newList: Array<ViewObject> = this.ViewObjectList.filter(
+      (_) => _.key !== key
+    );
+    this.setViewObjectList(newList);
+    return false;
+  }
+
   update(): void {
     this.render();
   }
+  //隐藏某个对象
   close(view?: ViewObject): void {
     if (!view) this.selectedViewObject?.hide?.();
     view?.hide?.();
     this.render();
   }
+  //镜像某个对象
   mirror(view?: ViewObject): boolean {
     if (!view) {
       const isMirror: boolean = this.selectedViewObject?.mirror?.();
@@ -232,14 +263,14 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
    */
   cleanAll(): Promise<void> {
     return new Promise((r, v) => {
-      this.ViewObjectList = [];
+      this.cleanViewObjectList();
       this.render();
       r();
     });
   }
   destroyGesti(): void {
     this.callHook("onBeforeDestroy");
-    this.ViewObjectList = [];
+    this.cleanAll();
     this.eventHandler = null;
     this.tool = null;
     new Promise((v, r) => {
@@ -423,6 +454,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   center(axis?: CenterAxis, view?: ViewObject): void {
     if (view) view.center(this.canvasRect.size, axis);
     else this.selectedViewObject?.center(this.canvasRect.size, axis);
+    this.render();
   }
   cancel(view?: ViewObject): void {
     const _view = view || this.selectedViewObject;
@@ -635,10 +667,13 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       }
     });
 
-    if ((this.selectedViewObject ?? false) && this._inObjectArea) {
-      this.selectedViewObject.onUp(this.paint);
-      //鼠标|手指抬起时提交一次操作
-      // this.recorder.commit();
+    /**
+     * 抬起时，有选中对象
+     */
+    if (this.selectedViewObject ?? false) {
+      //判断抬起时手指是在对象范围内还是外
+      if (this._inObjectArea) this.selectedViewObject.onUpWithInner(this.paint);
+      else this.selectedViewObject.onUpWithOuter(this.paint);
     }
     this.render();
     this._inObjectArea = false;
@@ -746,9 +781,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     const imageBox: ImageBox = new ImageBox(image);
     imageBox.center(this.canvasRect.size);
     this.addViewObject(imageBox);
-    setTimeout(() => {
-      this.render();
-    }, 100);
+    this.render();
     return Promise.resolve(imageBox);
   }
   /**

@@ -39,16 +39,15 @@ class TwoFingerOperate implements Operate{
 		this.oldRect = null;
     }
     update(positions:Vector[]) {
-		if (this.ViewObject == null) return;
+		if (this.ViewObject == null||!Array.isArray(positions)) return;
 		const [a, b] = positions;
 		const dist = Vector.dist(a, b);
 		const scale = dist / this.oldDist;
-		const newWidth = this.oldRect.size.width * scale,
-			newHeight = this.oldRect.size.height * scale;
-		this.ViewObject.rect.setSize(newWidth, newHeight);
+		this.ViewObject.setScale(scale);
 		const v = Vector.sub(a, b);
 		const angle = Math.atan2(v.y, v.x) - this.oldAngle;
-		this.ViewObject.rect.setAngle(angle);
+		this.ViewObject.setAngle(angle);
+		this.oldDist = dist;
 	}
 }
 

@@ -9,7 +9,7 @@ const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const offScreenCanvas: HTMLCanvasElement =
   document.querySelector("#offScreenCanvas");
 const img2: HTMLImageElement = document.querySelector("#bg");
-canvas.width = 500;
+canvas.width = window.innerWidth;
 canvas.height = 500;
 offScreenCanvas.width = 10000;
 offScreenCanvas.height = 500;
@@ -23,6 +23,7 @@ gesti.initialization({
   canvas,
   renderContext:g,
 });
+const controller=gesti.controller;
 const img: HTMLImageElement = document.querySelector("#dog");
 const ximage = createXImage({
   data: img2,
@@ -47,15 +48,17 @@ imageBox.installButton(new RotateButton());
 const textBox = createTextBox("新建文本", {
   resetFontSizeWithRect: true,
 });
-const str=`你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
+const str=`你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
 const str1=`你好，这是一篇英语短文1234567890 Redux  maintainer Mark Erikson`;
-const textBox2 = createTextBox(str1, {
+const textBox2 = createTextBox(str, {
   resetFontSizeWithRect: false,
   fontSize:10,
   spacing:0,
   lineHeight:1.5,
+  width:100,
   color:"black",
   backgroundColor:"white",
+  
 });
 
 
@@ -64,20 +67,21 @@ const group: Group = new Group();
 
 // man.installButton(new DragButton());
 loadToGesti(textBox2)
-loadToGesti(imageBox)
-group.add(imageBox);
-group.add(textBox2);
-group.installButton(new SizeButton(SizeButtonLocation.LT));
-group.installButton(new SizeButton(SizeButtonLocation.LB));
-group.installButton(new SizeButton(SizeButtonLocation.RT));
-group.installButton(new DragButton());
+doCenter(textBox2)
+//loadToGesti(imageBox)
+// group.add(imageBox);
+// group.add(textBox2);
+textBox2.installButton(new SizeButton(SizeButtonLocation.LT));
+textBox2.installButton(new SizeButton(SizeButtonLocation.LB));
+textBox2.installButton(new SizeButton(SizeButtonLocation.RT));
+textBox2.installButton(new DragButton());
 
-loadToGesti(group)
+//loadToGesti(group)
 
 
-// setTimeout(()=>{
-//   group.freeAll();
-// },4000)
+setTimeout(()=>{
+  // controller.unMount(textBox2);
+},4000)
 // const man=new Manipulator<Group>(group);
 // loadToGesti(man)
 

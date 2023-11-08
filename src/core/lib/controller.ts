@@ -17,6 +17,12 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  mount(view: ViewObject): void {
+    this.kit.mount(view);
+  }
+  unMount(view: ViewObject): void {
+    this.kit.unMount(view);
+  }
   
   close(view?: ViewObject): void {
     this.kit.close(view);

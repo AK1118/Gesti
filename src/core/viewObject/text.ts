@@ -41,7 +41,6 @@ abstract class TextBoxBase extends ViewObject {
     fontSize: 20,
     maxWidth: 300,
   };
-  private start: number;
   updateText(text: string, options?: TextOptions): Promise<void> {
     return Promise.resolve();
   }
@@ -65,13 +64,15 @@ abstract class TextBoxBase extends ViewObject {
    * @description 计算文字大小
    * @returns
    */
+  private setFontDecorations(paint: Painter) {
+    //设置字体大小
+    paint.font = this.getFont();
+  }
   protected computeTextSingle(
     isInitialization: boolean = false
   ): Array<TextSingle> {
     if (isInitialization) this.setFixedOption();
-    this.start = performance.now();
-    //设置字体大小
-    this.paint.font = this.getFont();
+    this.setFontDecorations(this.paint);
     //This viewObject rect size
     const size: Size = Size.zero;
     const splitTexts: Array<string> = this.handleSplitText(this.fixedText);
@@ -246,7 +247,7 @@ abstract class TextBoxBase extends ViewObject {
       this.paint.lineTo(lineX, point.y + offsetY);
     };
     const renderTexts = (point: Point, text: string, offsetY: number) => {
-      paint.fillText(text, point.x, point.y + offsetY);
+      paint.fillText(text, ~~point.x, ~~(point.y + offsetY));
     };
 
     this.texts.forEach((textData, ndx) => {
@@ -268,13 +269,13 @@ abstract class TextBoxBase extends ViewObject {
     paint.stroke();
     paint.closePath();
     const end = performance.now();
-    // console.log(end-this.start);
   }
   private updateRectSize(size: Size): void {
     this.setSize(size);
   }
   protected didChangeScale(scale: number): void {
-    this.updateFontSizeByRectSizeHeight();
+    this.isRectDirty = true;
+
   }
   private updateFontSizeByRectSizeHeight(): void {
     const rectHeight: number = this.size.height;
@@ -284,9 +285,65 @@ abstract class TextBoxBase extends ViewObject {
     this.textOptions.fontSize = newFontSize;
     this.computeTextSingle();
   }
+
   protected setFixedOption() {
     this.fixedOption.fontSize = this.textOptions.fontSize;
     this.fixedOption.maxWidth = this.textOptions.maxWidth;
+  }
+  /**
+   * 缓存画布
+   */
+  private _renderCache: boolean = false;
+  protected flushCache(): void {
+    this._renderCache = false;
+  }
+  protected updateCache(): void {
+    this._renderCache = true;
+  }
+  get isRenderCache(): boolean {
+    return this._renderCache;
+  }
+  protected cacheCanvas: HTMLCanvasElement;
+  protected isRectDirty: boolean = true;
+  public didEventUpWithInner(): void {
+    this.doCache();
+  }
+  public didEventUpWithOuter(): void {
+    this.doCache();
+  }
+  protected doCache(): void {
+    //没变过大小就不缓存
+    if (!this.isRectDirty) return;
+    this.updateFontSizeByRectSizeHeight();
+    this.flushCache();
+    this.cache();
+    this.updateCache();
+    //重置没改过大小
+    this.isRectDirty = false;
+  }
+  private cache(): void {
+    const painter: Painter = this.getCacheCanvasPainter();
+    this.setFontDecorations(painter);
+    painter.clearRect(0, 0, this.width, this.height);
+    painter.translate(this.width * 0.5, this.height * 0.5);
+    this.render(painter, true);
+    painter.translate(-this.width * 0.5, -this.height * 0.5);
+  }
+  //创建时,刷新缓存时调用
+  private createCacheCanvas(): HTMLCanvasElement {
+    this.cacheCanvas = this.cacheCanvas || document.createElement("canvas");
+    this.cacheCanvas.width = this.width;
+    this.cacheCanvas.height = this.height;
+    return this.cacheCanvas;
+  }
+  //渲染时调用
+  private getCacheCanvas() {
+    return this.createCacheCanvas();
+  }
+  //获取画笔
+  private getCacheCanvasPainter(): Painter {
+    const cacheCanvas = this.getCacheCanvas();
+    return new Painter(cacheCanvas.getContext("2d"));
   }
 }
 
@@ -327,7 +384,19 @@ class TextBox extends TextBoxBase implements TextHandler {
     throw new Error("Method not implemented.");
   }
   drawImage(paint: Painter): void {
-    this.renderText(paint);
+    //改过大小，且有缓存，渲染缓存
+    if (this.isRectDirty && this.isRenderCache) {
+      paint.drawImage(
+        this.cacheCanvas,
+        -this.width * 0.5,
+        -this.height * 0.5,
+        this.width,
+        this.height
+      );
+    } else{
+      this.isRectDirty=true;
+      this.renderText(paint);
+    }
   }
 
   export(painter?: Painter): Promise<Object> {

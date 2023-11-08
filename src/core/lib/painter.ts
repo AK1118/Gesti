@@ -4,7 +4,16 @@
 class Painter implements Painter {
   paint: CanvasRenderingContext2D = null;
   constructor(paint: CanvasRenderingContext2D) {
+    this.setPaintQuality(paint);
     this.paint = paint;
+  }
+  private setPaintQuality(paint: CanvasRenderingContext2D): void {
+    try {
+      if (paint?.imageSmoothingEnabled) paint.imageSmoothingEnabled = true;
+      if (paint?.imageSmoothingQuality) paint.imageSmoothingQuality = "high";
+    } catch (error) {
+      console?.error("Get error while set paint quality.");
+    }
   }
   //仅限window
   get canvas() {
@@ -142,19 +151,9 @@ class Painter implements Painter {
     dh?: number
   ) {
     if (dx && dy) {
-      this.paint.drawImage(
-        image,
-        x,
-       y,
-        width,
-        height,
-        dx,
-        dy,
-        dw,
-        dh
-      );
+      this.paint.drawImage(image, x, y, width, height, dx, dy, dw, dh);
     } else {
-      this.paint.drawImage(image,x,y, width, height);
+      this.paint.drawImage(image, x, y, width, height);
     }
   }
   scale(a: number, b: number) {

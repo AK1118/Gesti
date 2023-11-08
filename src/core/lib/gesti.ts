@@ -38,8 +38,6 @@ class Gesti {
       let canvasRect: DOMRect = option.canvas.getBoundingClientRect();
       if (option.rect) canvasRect = option.rect as DOMRect;
       else option.rect = canvasRect;
-      option.renderContext.imageSmoothingEnabled = true;
-      option.renderContext.imageSmoothingQuality = "high";
       this.kit = new ImageToolkit(option);
       return;
     }

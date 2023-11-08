@@ -114,6 +114,16 @@ type ListenerCallback = (object: any) => void;
 //画布控制器
 interface ImageToolKitController {
   /**
+   * @description 挂载一个对象进入gesti内
+   * @param view 
+   */
+  mount(view:ViewObject):void;
+  /**
+   * @description 卸载一个对象在gesti内
+   * @param view 
+   */
+  unMount(view:ViewObject):void;
+  /**
    *
    * @param view 将可操作对象载入gesti内
    */
