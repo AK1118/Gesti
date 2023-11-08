@@ -157,31 +157,37 @@ abstract class BaseViewObject extends OperationObserver {
   public get position(): Vector {
     return this.rect.position;
   }
-  get width():number{
+  get width(): number {
     return this.size.width;
   }
-  get height():number{
+  get height(): number {
     return this.size.height;
   }
-  get positionX():number{
+  get positionX(): number {
     return this.position.x;
   }
-  get positionY():number{
+  get positionY(): number {
     return this.position.y;
   }
-  protected onMount():void{}
-  protected onUnMount():void{}
+  /**
+   * @description 强制刷新画布
+   */
+  protected forceUpdate(){
+    this.kit.render();
+  }
+  protected onMount(): void {}
+  protected onUnMount(): void {}
   //手指抬起在范围内时调用
-  protected didEventUpWithInner():void{}
+  protected didEventUpWithInner(): void {}
   //手指抬起在范围外时调用
-  protected didEventUpWithOuter():void{}
+  protected didEventUpWithOuter(): void {}
 }
 
 abstract class ViewObject extends BaseViewObject implements RenderObject {
   //辅助线
   private auxiliary: AuxiliaryLine;
   public originFamily: ViewObjectFamily;
-  
+
   constructor() {
     super();
     this.rect = Rect.zero;
@@ -235,28 +241,31 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.isMirror = !this.isMirror;
     return this.isMirror;
   }
-  public render(paint: Painter,isCache?:boolean) {
+  public render(paint: Painter, isCache?: boolean) {
     if (!this.mounted) return;
-    this.draw(paint,isCache);
+    this.draw(paint, isCache);
   }
 
   abstract setDecoration(args: any): void;
-
-  public draw(paint: Painter,isCache?:boolean): void {
+  
+  private renderCache(paint: Painter) {
+    this.drawImage(paint);
+  }
+   
+  public draw(paint: Painter, isCache?: boolean): void {
+    //渲染缓存不需要设置或渲染其他属性
+    if (isCache) return this.renderCache(paint);
     paint.beginPath();
     paint.save();
     //缓存不需要这两个
-    if(!isCache){
-      paint.translate(this.rect.position.x, this.rect.position.y);
-      paint.rotate(this.rect.getAngle);
-    }
+    paint.translate(this.rect.position.x, this.rect.position.y);
+    paint.rotate(this.rect.getAngle);
     if (this.isMirror) paint.scale(-1, 1);
     paint.globalAlpha = this.opacity;
     this.drawImage(paint);
     paint.globalAlpha = 1;
     if (this.isMirror) paint.scale(-1, 1);
-
-    if (this.selected&&!isCache) {
+    if (this.selected) {
       //边框
       this.drawSelected(paint);
       //按钮
@@ -271,10 +280,10 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     /*更新顶点数据*/
     this.rect.updateVertex();
     paint.closePath();
-    if (this.selected) {
-      //辅助线
-      this.auxiliary?.draw(paint, this);
-    }
+    // if (this.selected) {
+    //   //辅助线
+    //   this.auxiliary?.draw(paint, this);
+    // }
   }
 
   /**
@@ -386,7 +395,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.onChanged();
     this.didEventUpWithInner();
   }
-  public onUpWithOuter(paint: Painter):void{
+  public onUpWithOuter(paint: Painter): void {
     this.didEventUpWithOuter();
   }
   private readonly enlargeScale: number = 1.1;

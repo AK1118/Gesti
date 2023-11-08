@@ -79,6 +79,7 @@ abstract class TextBoxBase extends ViewObject {
     const getTextSingles = (texts: Array<string>): Array<TextSingle> => {
       return texts.map((text) => {
         const textSingle = this.getTextSingle(text);
+        //设置rect的大小
         size.height = Math.max(textSingle.height, size.height);
         size.width += textSingle.width;
         size.width = Math.min(this.fixedOption.maxWidth, size.width);
@@ -274,7 +275,7 @@ abstract class TextBoxBase extends ViewObject {
     this.setSize(size);
   }
   protected didChangeScale(scale: number): void {
-    this.isRectDirty = true;
+    this.isDirty = true;
 
   }
   private updateFontSizeByRectSizeHeight(): void {
@@ -304,7 +305,7 @@ abstract class TextBoxBase extends ViewObject {
     return this._renderCache;
   }
   protected cacheCanvas: HTMLCanvasElement;
-  protected isRectDirty: boolean = true;
+  protected isDirty: boolean = true;
   public didEventUpWithInner(): void {
     this.doCache();
   }
@@ -313,13 +314,13 @@ abstract class TextBoxBase extends ViewObject {
   }
   protected doCache(): void {
     //没变过大小就不缓存
-    if (!this.isRectDirty) return;
+    if (!this.isDirty) return;
     this.updateFontSizeByRectSizeHeight();
     this.flushCache();
     this.cache();
     this.updateCache();
     //重置没改过大小
-    this.isRectDirty = false;
+    this.isDirty = false;
   }
   private cache(): void {
     const painter: Painter = this.getCacheCanvasPainter();
@@ -331,7 +332,7 @@ abstract class TextBoxBase extends ViewObject {
   }
   //创建时,刷新缓存时调用
   private createCacheCanvas(): HTMLCanvasElement {
-    this.cacheCanvas = this.cacheCanvas || document.createElement("canvas");
+    this.cacheCanvas = this.cacheCanvas || document.getElementById("canvas2") as HTMLCanvasElement;
     this.cacheCanvas.width = this.width;
     this.cacheCanvas.height = this.height;
     return this.cacheCanvas;
@@ -377,7 +378,7 @@ class TextBox extends TextBoxBase implements TextHandler {
     this.computeTextSingle(true);
   }
   readonly family: ViewObjectFamily = ViewObjectFamily.text;
-  get value(): any {
+  get value(): string {
     return this.fixedText;
   }
   setDecoration(args: any): void {
@@ -385,7 +386,7 @@ class TextBox extends TextBoxBase implements TextHandler {
   }
   drawImage(paint: Painter): void {
     //改过大小，且有缓存，渲染缓存
-    if (this.isRectDirty && this.isRenderCache) {
+    if (this.isDirty && this.isRenderCache) {
       paint.drawImage(
         this.cacheCanvas,
         -this.width * 0.5,
@@ -394,8 +395,8 @@ class TextBox extends TextBoxBase implements TextHandler {
         this.height
       );
     } else{
-      this.isRectDirty=true;
       this.renderText(paint);
+      this.isDirty=true;
     }
   }
 
@@ -410,7 +411,12 @@ class TextBox extends TextBoxBase implements TextHandler {
     this.rebuild();
   }
   private rebuild() {
-    this.kit.render();
+    this.isDirty=false;
+    this.computeTextSingle(false);
+    //强制更新Gesti
+    this.forceUpdate();
+    //更新完毕后需要更新缓存
+    this.doCache();
   }
 }
 

@@ -10,9 +10,21 @@ import GestiConfig from "../../../config/gestiConfig";
 import DragButton from "./dragbutton";
 
 class HorizonButton extends DragButton {
-  protected percentage: [x: number, y: number]=[0.55, 0];
+  protected percentage: [x: number, y: number]=[0.5, 0];
   draw(paint: Painter): void {
     this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
+  }
+  effect(currentButtonRect?: Rect): void {
+    const mag = this.getButtonWidthMasterMag(currentButtonRect);
+    if (this.preMag === -1) this.preMag = mag;
+    const deltaScale: number = mag / this.preMag;
+      const [offsetX,offsetY]=currentButtonRect.position.sub(this.master.position).toArray();
+      this.master.setSize({
+        width:this.master.width*deltaScale,
+        height:this.master.height,
+      });
+    // this.master.setScale(deltaScale);
+    this.preMag = mag;
   }
   drawButton(position: Vector, size: Size, radius: number, paint: Painter): void {
     this.setAxis("horizontal");

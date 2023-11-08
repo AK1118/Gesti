@@ -36,6 +36,10 @@ enum SizeButtonLocation{
     LB,
     RT,
     RB,
+    RC,
+    BC,
+    LC,
+    TC,
   }
 export {
     FuncButtonTrigger,

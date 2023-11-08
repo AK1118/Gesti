@@ -28,6 +28,10 @@ class SizeButton extends DragButton {
       case SizeButtonLocation.LB:this.percentage=[-.5,.5];break;
       case SizeButtonLocation.RT:this.percentage=[.5,-.5];break;
       case SizeButtonLocation.RB:this.percentage=[.5,.5];break;
+      case SizeButtonLocation.RC:this.percentage=[.5,.0];break;
+      case SizeButtonLocation.BC:this.percentage=[0,.5];break;
+      case SizeButtonLocation.LC:this.percentage=[-.5,0];break;
+      case SizeButtonLocation.TC:this.percentage=[0,-.5];break;
     }   
   }
   
@@ -45,6 +49,20 @@ class SizeButton extends DragButton {
       };break;
       case SizeButtonLocation.RB:{
        
+      };break;
+      case SizeButtonLocation.RC:{
+        delta.y=0;
+      };break
+      case SizeButtonLocation.BC:{
+        delta.x=0;
+      };break
+      case SizeButtonLocation.LC:{
+        delta.x*=-1;
+        delta.y=0;
+      };break;
+      case SizeButtonLocation.TC:{
+        delta.x=0;
+        delta.y*=-1;
       };break;
     }
   }
