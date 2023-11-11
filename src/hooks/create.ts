@@ -1,5 +1,5 @@
 import ImageBox from "../core/viewObject/image";
-import TextBox from "../core/viewObject/text";
+import TextBox from "../core/viewObject/text/text";
 import XImage from "../core/lib/ximage";
 
 function createTextBoxView(text: string, options?: TextOptions): TextBox {

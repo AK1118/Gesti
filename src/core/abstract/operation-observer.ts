@@ -12,10 +12,9 @@ interface OperationType {
   angle: number;
   scale: number;
   position: Vector;
-  addPosition:Vector;
+  addPosition: Vector;
   drag: { angle: number; size: Size };
 }
-
 
 /**
  * 被观察者应该实现的抽象类
@@ -159,7 +158,9 @@ abstract class OperationObserver {
       case "size":
         this.beforeChangeSize(value);
         break;
-        case "addPosition":this.beforeAddPosition(value);break;
+      case "addPosition":
+        this.beforeAddPosition(value);
+        break;
       default: {
       }
     }
@@ -173,17 +174,21 @@ abstract class OperationObserver {
     this.record(value, type);
     switch (type) {
       case "size":
-        this.didChangeSize(value);
+        {
+          this._didChangeSize(value);
+          this.didChangeSize(value);
+        }
+
         break;
       case "angle":
         this.didChangeAngle(value);
         break;
 
       case "scale":
-       {
-        this._didChangeScale(value);
-        this.didChangeScale(value);
-       }
+        {
+          this._didChangeDeltaScale(value);
+          this.didChangeDeltaScale(value);
+        }
         break;
 
       case "position":
@@ -213,17 +218,17 @@ abstract class OperationObserver {
   //改变角度
   protected didChangeAngle(angle: number) {}
   protected beforeChangeAngle(angle: number): void {}
+  protected _didChangeSize(size: Size): void {}
   protected didChangeSize(size: Size): void {}
   protected beforeChangeSize(size: Size): void {}
   protected didChangePosition(position: Vector): void {}
   protected _didChangePosition(position: Vector): void {}
   protected beforeChangePosition(position: Vector): void {}
-  protected didChangeScale(scale: number): void {}
-  protected _didChangeScale(scale:number):void{}
+  protected didChangeDeltaScale(deltaScale: number): void {}
+  protected _didChangeDeltaScale(deltaScale: number): void {}
   protected didDrag(value: { size: Size; angle: number }): void {}
-  protected didAddPosition(delta:Vector):void{}
-  protected beforeAddPosition(delta:Vector):void{};
-  
+  protected didAddPosition(delta: Vector): void {}
+  protected beforeAddPosition(delta: Vector): void {}
 }
 
 export default OperationObserver;

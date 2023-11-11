@@ -13,7 +13,7 @@ import GestiReaderH5 from "../../utils/reader/reader-H5";
 import Rect from "./rect";
 import Vector from "./vector";
 import ImageBox from "../viewObject/image";
-import TextBox from "../viewObject/text";
+import TextBox from "../viewObject/text/text";
 import WriteFactory from "../viewObject/write/write-factory";
 import XImage from "./ximage";
 import GestiReaderWechat from "../../utils/reader/reader-WeChat";
@@ -875,6 +875,14 @@ class _Tools {
       (a: ViewObject, b: ViewObject) => a.getLayer() - b.getLayer()
     );
   }
+  /**
+   * @deprecated
+   * @deprecated 废弃
+   * @param ViewObjectList 
+   * @param node 
+   * @param kit 
+   * @returns 
+   */
   public fallbackViewObject(
     ViewObjectList: Array<ViewObject>,
     node: RecordNode,
@@ -890,10 +898,10 @@ class _Tools {
           obj.rect.position = node.data;
           break;
         case "angle":
-          obj.rect.setAngle(node.data);
+          obj.setAngle(node.data);
           break;
         case "scale":
-          obj.rect.setScale(node.data);
+          obj.setDeltaScale(node.data);
           break;
         case "size":
           obj.rect.setSize(node.data.width, node.data.height);

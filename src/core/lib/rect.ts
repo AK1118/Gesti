@@ -11,20 +11,35 @@ declare interface onDragFunction {
 }
 
 export class Size {
-  width: number;
-  height: number;
+  private _width: number;
+  private _height: number;
   constructor(width: number, height: number) {
-    this.width = width;
-    this.height = height;
+    this._width = width;
+    this._height = height;
   }
-  static get zero():Size{
-    return new Size(0,0);
+  static get zero(): Size {
+    return new Size(0, 0);
+  }
+  get width(): number {
+    return this._width;
+  }
+  get height(): number {
+    return this._height;
   }
   toVector() {
-    return new Vector(this.width, this.height);
+    return new Vector(this._width, this._height);
   }
   copy(): Size {
-    return new Size(this.width, this.height);
+    return new Size(this._width, this._height);
+  }
+  equals(size: Size | { width?: number; height?: number }): boolean {
+    return size?.width === this._width && size?.height === this._height;
+  }
+  public setWidth(width: number): void {
+    this._width = width;
+  }
+  public setHeight(height: number): void {
+    this._height = height;
   }
 }
 
@@ -35,7 +50,8 @@ class Rect extends ObserverObj {
   private _vertex: Vertex;
   private _position: Vector;
   private _size: Size;
-  private _scale: number;
+  private _deltaScale: number;
+  private _absoluteScale:number=1;
   public readonly key: string = Math.random().toString(16).substring(2);
   constructor(
     params?: RectParams,
@@ -72,7 +88,7 @@ class Rect extends ObserverObj {
     ]);
     this._vertex.rotate(this.getAngle, this);
   }
-  static get zero():Rect{
+  static get zero(): Rect {
     return new Rect();
   }
   public get position(): Vector {
@@ -81,8 +97,11 @@ class Rect extends ObserverObj {
   public get size(): Size {
     return this._size;
   }
-  public get scale(): number {
-    return this._scale;
+  public get absoluteScale():number{
+    return this._absoluteScale;
+  }
+  public get deltaScale(): number {
+    return this._deltaScale;
   }
   public get vertex(): Vertex {
     return this._vertex;
@@ -91,7 +110,7 @@ class Rect extends ObserverObj {
     return this._angle;
   }
   public set position(position: Vector) {
-    if(position.equals(this.position))return;
+    if (position.equals(this.position)) return;
     this.beforeReport(this._position, "position");
     this._position = position;
     this._position.x = this._position.x;
@@ -99,55 +118,46 @@ class Rect extends ObserverObj {
     this.report(position, "position");
   }
   public setPosition(position: Vector): void {
-    if(position.equals(this.position))return;
+    if (position.equals(this.position)) return;
     this.beforeReport(this._position, "position");
     this._position = position;
     this._position.x = this._position.x;
     this._position.y = this._position.y;
     this.report(position, "position");
   }
-  public addPosition(delta:Vector){
-    if(delta.equals(Vector.zero))return;
+  public addPosition(delta: Vector) {
+    if (delta.equals(Vector.zero)) return;
     this.beforeReport(delta, "addPosition");
     this._position.add(delta);
     this.report(delta, "addPosition");
   }
-  public setScale(scale: number, change?: boolean): void {
-    if(scale===this.scale)return;
-    this.beforeReport(scale, "scale");
+  public setDeltaScale(deltaScale: number, change?: boolean): void {
+    this._absoluteScale*=deltaScale;
+    if (deltaScale === this.deltaScale) return;
+    this.beforeReport(deltaScale, "scale");
     //是否真正改变大小，还是之通知倍数改变了，后续可以考虑移除监听scale
     if (change ?? true) {
-      this._size.width *= scale;
-      this._size.height *= scale;
+      this.size.setWidth(this.size.width * deltaScale);
+      this.size.setHeight(this.size.height * deltaScale);
     }
-    this.report(scale, "scale");
+    this.report(deltaScale, "scale");
   }
   /**
    * @description 拖拽处需要表明拖拽
    * @param width
    * @param height
    */
-  public setSize(width: number, height: number, isDrag?: boolean): void {
-    if(width===this.size.width&&height===this.size.height)return;
+  public setSize(width: number, height: number): void {
+    if (width === this.size.width && height === this.size.height)return;
     //之前
-    if (isDrag)
-      this.beforeReport(
-        { size: this.size.copy(), angle: this._angle },
-        "drag"
-      );
-    else this.beforeReport(new Size(width, height), "size");
-    this._size.width = width;
-    this._size.height = height;
-    //之后
-    if (isDrag)
-      this.report(
-        { size: new Size(width, height), angle: this._angle },
-        "drag"
-      );
-    else this.report(new Size(width, height), "size");
+    this.beforeReport(new Size(width, height), "size");
+    this.size.setWidth(width);
+    this.size.setHeight(height);
+    this.report(new Size(width, height), "size");
+    
   }
   public setAngle(angle: number, isDrag?: boolean): void {
-    if(angle===this._angle)return;
+    if (angle === this._angle) return;
     //之前
     if (isDrag)
       this.beforeReport(
@@ -194,17 +204,17 @@ class Rect extends ObserverObj {
       }
     );
   }
-  
+
   public set(newRect: Rect) {
     this.position.set(newRect.position);
     this.setAngle(newRect.getAngle);
-    this.setScale(newRect.scale);
+    this.setDeltaScale(newRect.deltaScale);
     this.setSize(newRect.size.width, newRect.size.height);
   }
-  public setPositionXY(x:number,y:number){
-    if(this.position.x===x&&this.position.y===y)return;
+  public setPositionXY(x: number, y: number) {
+    if (this.position.x === x && this.position.y === y) return;
     this.beforeReport(this._position, "position");
-    this._position.setXY(x,y);
+    this._position.setXY(x, y);
     this.report(this._position, "position");
   }
 }

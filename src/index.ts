@@ -87,7 +87,7 @@ import {
 } from "./utils/utils"
 import Group from "./core/viewObject/group";
 import ImageBox from "./core/viewObject/image";
-import TextBox from "./core/viewObject/text";
+import TextBox from "./core/viewObject/text/text";
 import WriteViewObj from "./core/viewObject/write";
 import XImage from "./core/lib/ximage";
 import CloseButton from "./core/viewObject/buttons/closeButton";

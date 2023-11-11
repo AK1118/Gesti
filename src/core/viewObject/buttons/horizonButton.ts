@@ -14,6 +14,9 @@ class HorizonButton extends DragButton {
   draw(paint: Painter): void {
     this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
   }
+  public onUpWithInner(): void {
+      this.computeSelfLocation();
+  }
   effect(currentButtonRect?: Rect): void {
     const mag = this.getButtonWidthMasterMag(currentButtonRect);
     if (this.preMag === -1) this.preMag = mag;

@@ -2,7 +2,7 @@
 import { gesticonfig } from "../config/gestiConfig";
 import Gesti from "../core/lib/gesti";
 import GestiReader from "../core/abstract/reader";
-import TextBox from "../core/viewObject/text";
+import TextBox from "../core/viewObject/text/text";
 import Widgets from "../static/widgets";
 import XImage from "../core/lib/ximage";
 import {

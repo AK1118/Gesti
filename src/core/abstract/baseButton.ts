@@ -44,6 +44,12 @@ export abstract class BaseButton implements RenderObject {
   public reset() {
     this.computeSelfLocation();
   }
+  public onUpWithInner():void{
+    
+  }
+  public onUpWithOuter(): void {
+    
+  }
   /**
    * @description 设置相对定位
    * @param options
@@ -78,9 +84,7 @@ export abstract class BaseButton implements RenderObject {
     }
     /**
      * 获取比例关系，后续依赖这个关系改变
-     * 关于 scale=1时，由于是相对定位，且 1/n=n,所以在等于1时需要做特殊处理
      */
-    // this.scaleWithMaster = new Vector(scaleWidth == 1 ? 0 : scaleWidth, scaleHeight == 1 ? 0 : scaleHeight);
     this.scaleWithMaster = new Vector(scaleWidth, scaleHeight);
   }
   

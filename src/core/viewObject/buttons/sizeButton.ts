@@ -76,7 +76,7 @@ class SizeButton extends DragButton {
     }
     const deltaScale: number = mag / this.preMag;
     const rScale: number = deltaScale + (1 - deltaScale) / 2;
-    this.master.setScale(rScale);
+    this.master.setDeltaScale(rScale);
     const currentMasterSize: Size = this.master.size.copy();
     
     let delta = currentMasterSize

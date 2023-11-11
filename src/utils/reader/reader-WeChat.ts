@@ -4,7 +4,7 @@ import Painter from "../../core/lib/painter";
 import Rect from "../../core/lib/rect";
 import CutterH5 from "../cutters/cutter-H5";
 import ImageBox from "../../core/viewObject/image";
-import TextBox from "../../core/viewObject/text";
+import TextBox from "../../core/viewObject/text/text";
 import WriteViewObj from "../../core/viewObject/write";
 import XImage from "../../core/lib/ximage";
 import CutterWeChat from "../cutters/cutter-WeChat";

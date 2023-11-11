@@ -196,7 +196,7 @@ class WriteViewObj extends ViewObject {
       height,
     };
   }
-  public didChangeScale(scale: number): void {
+  public didChangeDeltaScale(scale: number): void {
     this._scalex = this.rect.size.width / this.relativeRect.size.width;
     this._scaley = this.rect.size.height / this.relativeRect.size.height;
     if (this.type == "rect") {

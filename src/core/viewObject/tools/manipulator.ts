@@ -38,8 +38,8 @@ class Manipulator<Widget extends ViewObject> extends ViewObject{
     protected didChangeAngle(angle: number): void {
         this.widget.setAngle(angle);
     }
-    protected didChangeScale(scale: number): void {
-        this.widget.setScale(scale);
+    protected didChangeDeltaScale(scale: number): void {
+        this.widget.setDeltaScale(scale);
     }
     constructor(widget:Widget){
         super();

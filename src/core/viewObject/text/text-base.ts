@@ -1,27 +1,17 @@
-import ViewObject, { toJSONInterface } from "../abstract/view-object";
-import { ViewObjectFamily } from "../enums";
-import ImageToolkit from "../lib/image-toolkit";
-import Painter from "../lib/painter";
-import Rect, { Size } from "../lib/rect";
-import { TextHandler } from "../../types/index";
-import Vector from "../lib/vector";
-import { Point } from "../lib/vertex";
+import ViewObject, { toJSONInterface } from "../../abstract/view-object";
+import { ViewObjectFamily } from "../../enums";
+import ImageToolkit from "../../lib/image-toolkit";
+import Painter from "../../lib/painter";
+import Rect, { Size } from "../../lib/rect";
+import { TextHandler } from "../../../types/index";
+import Vector from "../../lib/vector";
+import { Point } from "../../lib/vertex";
 
-interface TextSingle {
-  text: string;
-  texts?: Array<TextSingle>;
-  width: number;
-  height: number;
-}
-interface FixedOption {
-  fontSize: number;
-  maxWidth: number;
-}
 /**
  * 普通模式，矩形根据文字而定
  * 拖拽模式，文字根据缩放倍数而定
  */
-abstract class TextBoxBase extends ViewObject {
+export abstract class TextBoxBase extends ViewObject {
   protected fixedText: string;
   private readonly defaultLineColor: string = "black";
   private readonly defaultLineWidth: number = 2;
@@ -34,12 +24,17 @@ abstract class TextBoxBase extends ViewObject {
     italic: false,
     maxWidth: 300,
   };
+  get textWrap(): boolean {
+    return true;
+  }
   protected paint: Painter;
   protected texts: Array<TextSingle> = [];
   private rowsCount: number = 1;
-  private readonly fixedOption: FixedOption = {
+  protected readonly fixedOption: FixedOption = {
     fontSize: 20,
     maxWidth: 300,
+    fixedWidth: 0,
+    fixedHeight: 0,
   };
   updateText(text: string, options?: TextOptions): Promise<void> {
     return Promise.resolve();
@@ -80,9 +75,9 @@ abstract class TextBoxBase extends ViewObject {
       return texts.map((text) => {
         const textSingle = this.getTextSingle(text);
         //设置rect的大小
-        size.height = Math.max(textSingle.height, size.height);
-        size.width += textSingle.width;
-        size.width = Math.min(this.fixedOption.maxWidth, size.width);
+        size.setHeight(Math.max(textSingle.height, size.height));
+        size.setWidth(size.width + textSingle.width);
+        size.setWidth(Math.min(this.fixedOption.maxWidth, size.width));
         if (text.length != 1) textSingle.texts = getTextSingles(text.split(""));
         return textSingle;
       }) as unknown as Array<TextSingle>;
@@ -90,6 +85,8 @@ abstract class TextBoxBase extends ViewObject {
     this.texts = getTextSingles(splitTexts);
     if (isInitialization) {
       this.updateRectSize(size);
+      this.fixedOption.fixedHeight = size.height;
+      this.fixedOption.fixedWidth = size.width;
     }
     this.computeDrawPoint(this.texts, true);
 
@@ -102,8 +99,7 @@ abstract class TextBoxBase extends ViewObject {
    */
   private handleSplitText(text: string): Array<string> {
     const result = [];
-    const regex =
-      /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[.,\/#!$%\^&\*;:{}=\-_`~()]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
+    const regex = /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[.,\/#!$%\^&\*;:{}=\-_`~()]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
     let match: Array<string> = [];
     while ((match = regex.exec(text)) !== null) {
       result.push(match[0]);
@@ -120,7 +116,7 @@ abstract class TextBoxBase extends ViewObject {
    */
   private computeDrawPoint(
     texts: Array<TextSingle>,
-    isInitialization: boolean = false
+    isInitialization: boolean = false,
   ): Array<Vector | null | Array<Vector>> {
     const points: Array<Vector | null | Array<Vector>> = [];
     let startX: number = this.size.width * -0.5;
@@ -158,17 +154,25 @@ abstract class TextBoxBase extends ViewObject {
     };
 
     this.rowsCount = 1;
+    //处理换行
     const handleSorting = (textData: TextSingle) => {
       x = startX; // 换行后 x 重置
       y += textData.height;
       this.rowsCount += 1;
     };
+    //获取x变量每次增加的Δ x
+    const computedDeltaX=(textWidth:number)=>(textWidth+spacing);
+    /**
+     * 现在是既换行又缩小
+     * 换行过后由于scale 被缩放,看起来被压扁
+     */
     texts.forEach((textData, ndx) => {
       /**预先获取宽度，判断是否超出rect宽度*/
       let width: number = getTextWidth(textData.texts || textData);
       maxWordWidth = Math.max(width, maxWordWidth);
+      if(x + width >checkRectSizeWidth)console.log(x + width ,checkRectSizeWidth)
       // 如果文本宽度超出矩形宽度，需要换行。换行符不需要另外换行，有特殊处理
-      if (x + width > checkRectSizeWidth && !isEnter(textData)) {
+      if ((x + width)> checkRectSizeWidth && !isEnter(textData)) {
         handleSorting(textData);
       } else if (/\n/.test(textData.text)) {
         //换行符
@@ -184,13 +188,13 @@ abstract class TextBoxBase extends ViewObject {
         let _x = x;
         textData.texts.forEach((_) => {
           childPoint.push(new Vector(_x, drawY));
-          _x += _.width + spacing;
+          _x += computedDeltaX(_.width);
         });
         points.push(childPoint);
         x = _x; // 更新 x 位置
       } else {
         points.push(new Vector(drawX, drawY));
-        x += textData.width + spacing; // 更新 x 位置
+        x += computedDeltaX(textData.width); // 更新 x 位置
       }
     });
     y += this.textOptions.fontSize * this.textOptions.lineHeight;
@@ -222,13 +226,11 @@ abstract class TextBoxBase extends ViewObject {
     const spacing =
       this.textOptions.spacing *
       (this.textOptions.fontSize / this.fixedOption.fontSize);
-
     const render = (point, textData: TextSingle) => {
       const offsetY =
         this.size.height * -0.5 +
         textData.height * 0.5 +
-        this.textOptions.fontSize * 0.1;
-
+        this.textOptions.fontSize * 0.1; 
       renderTexts(point, textData.text, offsetY);
       if (this.textOptions?.lineThrough) {
         renderLine(point, textData.width, offsetY);
@@ -248,13 +250,34 @@ abstract class TextBoxBase extends ViewObject {
       this.paint.lineTo(lineX, point.y + offsetY);
     };
     const renderTexts = (point: Point, text: string, offsetY: number) => {
-      paint.fillText(text, ~~point.x, ~~(point.y + offsetY));
+      paint.fillText(
+        text,
+        point.x + this.renderTextOffsetX,
+        ~~(point.y + offsetY)
+      );
     };
-
+    paint.save();
+    this.beforeRenderTextAndLines(paint);
+    this.renderTextAndLines(points, render);
+    this.afterRenderTextAndLines(paint);
+    paint.strokeStyle = this.textOptions?.lineColor ?? this.defaultLineColor;
+    if (paint.lineWidth !== this.textOptions?.lineWidth)
+      paint.lineWidth = this.textOptions?.lineWidth ?? this.defaultLineWidth;
+    paint.stroke();
+    paint.closePath();
+    paint.restore();
+  }
+  get renderTextOffsetX():number{
+    return 0;
+  }
+  //渲染文字前
+  protected beforeRenderTextAndLines(paint: Painter) {}
+  protected afterRenderTextAndLines(paint: Painter) {}
+  //渲染文字后
+  protected renderTextAndLines(points, render): void {
     this.texts.forEach((textData, ndx) => {
       const point = points[ndx];
       if (!point) return;
-
       if (!Array.isArray(point)) {
         render(point, textData);
       } else {
@@ -264,20 +287,24 @@ abstract class TextBoxBase extends ViewObject {
         });
       }
     });
-    paint.strokeStyle = this.textOptions?.lineColor ?? this.defaultLineColor;
-    if (paint.lineWidth !== this.textOptions?.lineWidth)
-      paint.lineWidth = this.textOptions?.lineWidth ?? this.defaultLineWidth;
-    paint.stroke();
-    paint.closePath();
-    const end = performance.now();
   }
   private updateRectSize(size: Size): void {
+    //拖拽时设置scale 等于设置大小，松开时再设置大小就会判断一样的值
     this.setSize(size);
   }
-  protected didChangeScale(scale: number): void {
+  protected didChangeDeltaScale(scale: number): void {
     this.isDirty = true;
-
+    this.extendDidChangeDeltaScale(scale);
   }
+  /**
+   * 扩展给扩展类类用
+   * @param scale
+   */
+  protected extendDidChangeDeltaScale(scale: number): void {}
+  protected didChangeSize(size: Size): void {
+    this.extendDidChangeSize(size);
+  }
+  protected extendDidChangeSize(size: Size): void {}
   private updateFontSizeByRectSizeHeight(): void {
     const rectHeight: number = this.size.height;
     const lineHeight = this.textOptions.lineHeight;
@@ -332,7 +359,9 @@ abstract class TextBoxBase extends ViewObject {
   }
   //创建时,刷新缓存时调用
   private createCacheCanvas(): HTMLCanvasElement {
-    this.cacheCanvas = this.cacheCanvas || document.getElementById("canvas2") as HTMLCanvasElement;
+    this.cacheCanvas =
+      this.cacheCanvas ||
+      (document.getElementById("canvas2") as HTMLCanvasElement);
     this.cacheCanvas.width = this.width;
     this.cacheCanvas.height = this.height;
     return this.cacheCanvas;
@@ -351,7 +380,7 @@ abstract class TextBoxBase extends ViewObject {
 /**
  * 文字
  */
-class TextBox extends TextBoxBase implements TextHandler {
+class TextViewBase extends TextBoxBase implements TextHandler {
   constructor(text: string, option?: TextOptions) {
     super();
     this.fixedText = text;
@@ -394,9 +423,9 @@ class TextBox extends TextBoxBase implements TextHandler {
         this.width,
         this.height
       );
-    } else{
+    } else {
       this.renderText(paint);
-      this.isDirty=true;
+      this.isDirty = true;
     }
   }
 
@@ -411,7 +440,7 @@ class TextBox extends TextBoxBase implements TextHandler {
     this.rebuild();
   }
   private rebuild() {
-    this.isDirty=false;
+    this.isDirty = false;
     this.computeTextSingle(false);
     //强制更新Gesti
     this.forceUpdate();
@@ -420,4 +449,4 @@ class TextBox extends TextBoxBase implements TextHandler {
   }
 }
 
-export default TextBox;
+export default TextViewBase;

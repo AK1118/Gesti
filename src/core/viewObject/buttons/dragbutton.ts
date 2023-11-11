@@ -56,7 +56,7 @@ class DragButton extends BaseButton {
     if (this.preMag === -1) this.preMag = mag;
     const deltaScale: number = mag / this.preMag;
       const [offsetX,offsetY]=currentButtonRect.position.sub(this.master.position).toArray();
-    this.master.setScale(deltaScale);
+    this.master.setDeltaScale(deltaScale);
     if (!this.angleDisabled) {
       const angle = Math.atan2(offsetY, offsetX) - this.oldAngle;
       this.master.rect.setAngle(angle);

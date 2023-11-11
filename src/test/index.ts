@@ -4,8 +4,9 @@ import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
 import SizeButton from "@/core/viewObject/buttons/sizeButton";
 import Group from "@/core/viewObject/group";
+import TextArea from "@/core/viewObject/text/text-area";
 import { createGesti, createImageBox, createTextBox, createXImage, doCenter, exportAll, importAll, loadToGesti } from "@/hooks/index";
-import { HorizonButton, MirrorButton, VerticalButton } from "@/index";
+import { HorizonButton, MirrorButton, TextBox, VerticalButton } from "@/index";
 
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const offScreenCanvas: HTMLCanvasElement =
@@ -25,6 +26,7 @@ gesti.initialization({
   canvas,
   renderContext:g,
 });
+// gesti.debug=true;
 const controller=gesti.controller;
 const img: HTMLImageElement = document.querySelector("#dog");
 const ximage = createXImage({
@@ -51,8 +53,8 @@ const textBox = createTextBox("新建文本", {
   resetFontSizeWithRect: true,
 });
 const str=`你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
-const str1=`你好`;
-const textBox2 = createTextBox(str1, {
+const str1=`你好1234567890`;
+const textBox2 = new TextBox(str1, {
   resetFontSizeWithRect: false,
   fontSize:10,
   spacing:0,
@@ -80,6 +82,7 @@ textBox2.installButton(new SizeButton(SizeButtonLocation.LT));
 // textBox2.installButton(new SizeButton(SizeButtonLocation.TC));
 // textBox2.installButton(new SizeButton(SizeButtonLocation.LC));
 textBox2.installButton(new HorizonButton());
+textBox2.installButton(new RotateButton());
 // textBox2.installButton(new DragButton());
 
 //loadToGesti(group)

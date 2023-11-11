@@ -71,10 +71,10 @@ declare class Vector {
   static sub(v1: Vector, v2: Vector): Vector;
   static add(v1: Vector, v2: Vector): Vector;
   static troweling(v: Vector): Vector;
-  static get zero():Vector;
-  half():Vector;
-  toZero():void;
-  double():Vector;
+  static get zero(): Vector;
+  half(): Vector;
+  toZero(): void;
+  double(): Vector;
 }
 
 declare interface GestiEventParams {
@@ -280,4 +280,18 @@ declare type Boundary = {
 declare interface Delta {
   readonly deltaX: number;
   readonly deltaY: number;
+}
+declare interface TextSingle {
+  text: string;
+  texts?: Array<TextSingle>;
+  width: number;
+  height: number;
+}
+declare interface FixedOption {
+  fontSize: number;
+  maxWidth: number;
+  //初始化时的宽度
+  fixedWidth: number;
+  //初始化时的高度
+  fixedHeight: number;
 }

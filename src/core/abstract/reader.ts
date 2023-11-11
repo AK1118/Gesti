@@ -2,7 +2,7 @@ import ViewObject from "./view-object";
 import GesteControllerImpl from "../lib/controller";
 import Rect from "../lib/rect";
 import ImageBox from "../viewObject/image";
-import TextBox from "../viewObject/text";
+import TextBox from "../viewObject/text/text";
 import WriteViewObj from "../viewObject/write";
 import XImage from "../lib/ximage";
 // import {
