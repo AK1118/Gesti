@@ -10,10 +10,10 @@ import { Size } from "@/core/lib/rect";
 abstract class TextBase extends TextViewBase {
   protected beforeRenderTextAndLines(paint: Painter): void {
     paint.save();
-    //paint.scale(this.scaleWidth, 1);
+    paint.scale(this.scaleWidth, 1);
   }
   get renderTextOffsetX(): number {
-    return 0//(this.width * -0.5) / this.scaleWidth + this.width * 0.5;
+    return (this.width * -0.5) / this.scaleWidth + this.width * 0.5;
   }
   get textWrap(): boolean {
     return false;

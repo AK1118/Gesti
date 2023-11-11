@@ -99,7 +99,8 @@ export abstract class TextBoxBase extends ViewObject {
    */
   private handleSplitText(text: string): Array<string> {
     const result = [];
-    const regex = /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[.,\/#!$%\^&\*;:{}=\-_`~()]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
+    const regex =
+      /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[.,\/#!$%\^&\*;:{}=\-_`~()]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
     let match: Array<string> = [];
     while ((match = regex.exec(text)) !== null) {
       result.push(match[0]);
@@ -116,16 +117,25 @@ export abstract class TextBoxBase extends ViewObject {
    */
   private computeDrawPoint(
     texts: Array<TextSingle>,
-    isInitialization: boolean = false,
+    isInitialization: boolean = false
   ): Array<Vector | null | Array<Vector>> {
     const points: Array<Vector | null | Array<Vector>> = [];
     let startX: number = this.size.width * -0.5;
-    let x = startX; // 初始 x 位置
-    let y = 0;
+    //做判断换行坐标
+    const checkOffset: Offset = {
+      offsetX: startX,
+      offsetY: 0,
+    };
+    //做为实际渲染坐标
+    const realOffset: Offset = {
+      offsetX: startX,
+      offsetY: 0,
+    };
+
     /**
-     * maxWordWidth 最长单词宽度
+     * thatMaxWordWidth 最长单词宽度
      */
-    let maxWordWidth: number = 0;
+    let thatMaxWordWidth: number = 0;
     const spacing =
       this.textOptions.spacing *
       (this.textOptions.fontSize / this.fixedOption.fontSize);
@@ -140,70 +150,98 @@ export abstract class TextBoxBase extends ViewObject {
         });
         width -= spacing;
       } else width = texts.width;
+      //如果不换行，就触发文字宽度弹性机制
+      if (!this.textWrap) return width * (this.scaleWidth - 0.01);
       return width;
     };
-    /**是否是换行符 */
-    const isEnter = (textData: Array<TextSingle> | TextSingle): boolean => {
-      if (Array.isArray(textData)) {
-        for (let i = 0; i < textData.length; i++) {
-          if (/\n/.test(textData[i].text)) return true;
-        }
-        return false;
-      }
-      return /\n/.test(textData.text);
-    };
-
-    this.rowsCount = 1;
-    //处理换行
-    const handleSorting = (textData: TextSingle) => {
-      x = startX; // 换行后 x 重置
-      y += textData.height;
-      this.rowsCount += 1;
+    //获取realX变量每次增加的Δ x
+    const computedDeltaX = (textWidth: number) => {
+      return textWidth + spacing;
     };
     //获取x变量每次增加的Δ x
-    const computedDeltaX=(textWidth:number)=>(textWidth+spacing);
-    /**
-     * 现在是既换行又缩小
-     * 换行过后由于scale 被缩放,看起来被压扁
-     */
-    texts.forEach((textData, ndx) => {
+    const computedCheckDeltaX = (textWidth: number) => {
+      if(this.textWrap)return (textWidth + spacing);
+      return (textWidth + spacing) * this.scaleWidth;
+    };
+    this.addRows(true);
+    //处理换行
+    const handleSorting = (textData: TextSingle) => {
+      checkOffset.offsetX = startX; // 换行后 x 重置
+      realOffset.offsetX = startX;
+      checkOffset.offsetY += textData.height;
+      this.addRows();
+    };
+
+    texts.forEach((textData) => {
       /**预先获取宽度，判断是否超出rect宽度*/
-      let width: number = getTextWidth(textData.texts || textData);
-      maxWordWidth = Math.max(width, maxWordWidth);
-      if(x + width >checkRectSizeWidth)console.log(x + width ,checkRectSizeWidth)
+      const width: number = getTextWidth(textData.texts || textData);
+      //最大单词宽度
+      thatMaxWordWidth = Math.max(width, thatMaxWordWidth);
+      const currentX: number = checkOffset.offsetX + width;
       // 如果文本宽度超出矩形宽度，需要换行。换行符不需要另外换行，有特殊处理
-      if ((x + width)> checkRectSizeWidth && !isEnter(textData)) {
+      if (currentX > checkRectSizeWidth && !this.isEnter(textData)) {
         handleSorting(textData);
       } else if (/\n/.test(textData.text)) {
-        //换行符
+        //换行符触发换行
         handleSorting(textData);
         return points.push(null);
       }
       //空格不会出现在文本最前方
-      if (x === startX && textData.text === " ") return points.push(null);
-      const drawX = x; // 将文本绘制在字符中心
-      const drawY = y;
+      if (checkOffset.offsetX === startX && textData.text === " ")
+        return points.push(null);
+
       if (textData?.texts) {
-        const childPoint: Array<Vector> = [];
-        let _x = x;
-        textData.texts.forEach((_) => {
-          childPoint.push(new Vector(_x, drawY));
-          _x += computedDeltaX(_.width);
+        //复合字符串
+        const childPoint = textData.texts.map((text) => {
+          const textWidth: number = text.width;
+          const point = new Vector(realOffset.offsetX, checkOffset.offsetY);
+          realOffset.offsetX += computedDeltaX(textWidth);
+          //检测宽度会随着矩形比例而变化
+          checkOffset.offsetX += computedCheckDeltaX(textWidth);
+          return point;
         });
         points.push(childPoint);
-        x = _x; // 更新 x 位置
       } else {
-        points.push(new Vector(drawX, drawY));
-        x += computedDeltaX(textData.width); // 更新 x 位置
+        //单字符
+        points.push(new Vector(realOffset.offsetX, checkOffset.offsetY));
+        const textWidth: number = textData.width;
+        realOffset.offsetX += computedDeltaX(textWidth);
+        checkOffset.offsetX += computedCheckDeltaX(textWidth);
       }
     });
-    y += this.textOptions.fontSize * this.textOptions.lineHeight;
+    //在最后需要多加一行的高度给Rect
+    checkOffset.offsetY +=
+      this.textOptions.fontSize * this.textOptions.lineHeight;
     if (isInitialization) {
       this.updateRectSize(
-        new Size(Math.max(this.size.width, maxWordWidth), y) //maxWordWidth 是某个文字最大宽度，比如一个单词最大宽度，防止矩形宽度小于单词宽度
+        new Size(
+          Math.max(this.size.width, thatMaxWordWidth),
+          checkOffset.offsetY
+        ) //thatMaxWordWidth 是某个文字最大宽度，比如一个单词最大宽度，防止矩形宽度小于单词宽度
       );
     }
     return points;
+  }
+  /**
+   * @description 增加行数
+   * @param reset  是否复位
+   */
+  private addRows(reset?: boolean): void {
+    if (reset) {
+      this.rowsCount = 1;
+      return;
+    }
+    this.rowsCount += 1;
+  }
+  /**是否是换行符 */
+  protected isEnter(textData: Array<TextSingle> | TextSingle): boolean {
+    if (Array.isArray(textData)) {
+      for (let i = 0; i < textData.length; i++) {
+        if (/\n/.test(textData[i].text)) return true;
+      }
+      return false;
+    }
+    return /\n/.test(textData.text);
   }
 
   protected renderText(paint: Painter): void {
@@ -230,8 +268,8 @@ export abstract class TextBoxBase extends ViewObject {
       const offsetY =
         this.size.height * -0.5 +
         textData.height * 0.5 +
-        this.textOptions.fontSize * 0.1; 
-      renderTexts(point, textData.text, offsetY);
+        this.textOptions.fontSize * 0.1;
+      renderTexts(point, textData.text, offsetY, textData.width);
       if (this.textOptions?.lineThrough) {
         renderLine(point, textData.width, offsetY);
       }
@@ -249,7 +287,12 @@ export abstract class TextBoxBase extends ViewObject {
       if (lineX > this.size.width * 0.5) lineX -= spacing;
       this.paint.lineTo(lineX, point.y + offsetY);
     };
-    const renderTexts = (point: Point, text: string, offsetY: number) => {
+    const renderTexts = (
+      point: Point,
+      text: string,
+      offsetY: number,
+      textWidth: number
+    ) => {
       paint.fillText(
         text,
         point.x + this.renderTextOffsetX,
@@ -267,7 +310,7 @@ export abstract class TextBoxBase extends ViewObject {
     paint.closePath();
     paint.restore();
   }
-  get renderTextOffsetX():number{
+  get renderTextOffsetX(): number {
     return 0;
   }
   //渲染文字前

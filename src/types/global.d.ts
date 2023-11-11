@@ -286,6 +286,7 @@ declare interface TextSingle {
   texts?: Array<TextSingle>;
   width: number;
   height: number;
+  next?:boolean
 }
 declare interface FixedOption {
   fontSize: number;
