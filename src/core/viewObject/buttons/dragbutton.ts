@@ -1,4 +1,4 @@
-import { FuncButtonTrigger } from "../../enums";
+import { ButtonLocation, FuncButtonTrigger } from "../../enums";
 
 import BaseButton from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
@@ -9,7 +9,7 @@ import ViewObject from "../../abstract/view-object";
 import GestiConfig from "../../../config/gestiConfig";
 import { Delta } from "../../../utils/event/event";
 class DragButton extends BaseButton {
-  protected percentage: [x: number, y: number]=[0.5, 0.5];
+  protected buttonLocation:ButtonLocation=ButtonLocation.RB;
   public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
   private preViewObjectRect: Rect = null;
   public oldAngle: number = 0;
@@ -48,7 +48,7 @@ class DragButton extends BaseButton {
    * 为拖拽改变大小初始化
    */
   private initScale() {
-    this.setRelativePositionRect(this.percentage);
+    this.setRelativePositionRect();
     this.preMag = -1;
   }
   effect(currentButtonRect?: Rect): void {

@@ -1,4 +1,4 @@
-import { FuncButtonTrigger } from "../../enums";
+import { ButtonLocation, FuncButtonTrigger } from "../../enums";
 
 import BaseButton from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
@@ -11,7 +11,7 @@ import GestiConfig from "../../../config/gestiConfig";
 
 
 class LockButton extends BaseButton {
-    protected percentage: [x: number, y: number]=[-.5, -.5];
+    protected buttonLocation:ButtonLocation=ButtonLocation.RT;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
 

@@ -1,4 +1,4 @@
-import { FuncButtonTrigger } from "@/core/enums";
+import { ButtonLocation, FuncButtonTrigger } from "@/core/enums";
 import RenderObject from "../interfaces/render-object";
 import Painter from "@/core/lib/painter";
 import CatchPointUtil from "../../utils/event/catchPointUtil";
@@ -7,6 +7,9 @@ import Rect from "../lib/rect";
 import Vector from "../lib/vector";
 //按钮抽象类
 export abstract class BaseButton implements RenderObject {
+  constructor(location?: ButtonLocation) {
+    this.location=this.setLocationByEnum(location);
+  }
   name: string = "";
   //隐藏
   disabled: boolean = false;
@@ -34,38 +37,28 @@ export abstract class BaseButton implements RenderObject {
   set free(canBeeLocking: boolean) {
     this.canBeeLocking = !canBeeLocking;
   }
-  public options: {
-    percentage?: [x: number, y: number];
-    position?: Vector;
-  };
+  protected abstract buttonLocation: ButtonLocation;
+  private location: [x: number, y: number];
   /**
    * 重置按钮坐标
    */
   public reset() {
     this.computeSelfLocation();
   }
-  public onUpWithInner():void{
-    
-  }
-  public onUpWithOuter(): void {
-    
-  }
+  public onUpWithInner(): void {}
+  public onUpWithOuter(): void {}
   /**
    * @description 设置相对定位
    * @param options
    */
   public computeSelfLocation() {
-    if(this.disabled)return;
-    if (this.percentage) this.setRelativePositionRect(this.percentage);
-
+    if (this.disabled) return;
+    this.setRelativePositionRect();
     if (!this.originPositionWithSize)
       this.originPositionWithSize = {
-        offsetX:
-         ~~ (this.relativeRect.position.x),
-        offsetY:
-         ~~ (this.relativeRect.position.y),
+        offsetX: ~~this.relativeRect.position.x,
+        offsetY: ~~this.relativeRect.position.y,
       };
-
     this.setAbsolutePosition();
     this.oldAngle = Math.atan2(
       ~~this.relativeRect.position.y,
@@ -87,7 +80,7 @@ export abstract class BaseButton implements RenderObject {
      */
     this.scaleWithMaster = new Vector(scaleWidth, scaleHeight);
   }
-  
+
   abstract trigger: FuncButtonTrigger;
   abstract setMaster(master: RenderObject): void;
   abstract effect(currentButtonRect?: Rect): void;
@@ -95,19 +88,15 @@ export abstract class BaseButton implements RenderObject {
   abstract draw(paint: Painter): void;
   abstract render(paint: Painter): void;
   abstract onSelected(): void;
-  protected abstract percentage:[x: number, y: number];
-   public  initialization(master:ViewObject){
-    this.master=master;
+  public initialization(master: ViewObject) {
+    this.master = master;
     this.beforeMounted();
+    this.setLocationByEnum();
     this.computeSelfLocation();
     this.afterMounted();
   }
-  protected beforeMounted(...args):void{
-
-  }
-  protected afterMounted(...args):void{
-
-  }
+  protected beforeMounted(...args): void {}
+  protected afterMounted(...args): void {}
   get getAbsolutePosition(): Vector {
     return Vector.add(this.relativeRect.position, this.master.rect.position);
   }
@@ -121,15 +110,47 @@ export abstract class BaseButton implements RenderObject {
     if (this.master.isLock && this.canBeeLocking) return false;
     return CatchPointUtil.checkInsideArc(target, event, this.senseRadius);
   }
+  protected setLocationByEnum(_location?: ButtonLocation): [x:number,y:number] {
+    const location = _location || this.buttonLocation;
+    this.buttonLocation=location;
+    let result:[x:number,y:number];
+    switch (location) {
+      case ButtonLocation.LT:
+        result = [-0.5, -0.5];
+        break;
+      case ButtonLocation.LB:
+        result = [-0.5, 0.5];
+        break;
+      case ButtonLocation.RT:
+        result = [0.5, -0.5];
+        break;
+      case ButtonLocation.RB:
+        result = [0.5, 0.5];
+        break;
+      case ButtonLocation.RC:
+        result = [0.5, 0.0];
+        break;
+      case ButtonLocation.BC:
+        result = [0, 0.5];
+        break;
+      case ButtonLocation.LC:
+        result = [-0.5, 0];
+        break;
+      case ButtonLocation.TC:
+        result = [0, -0.5];
+        break;
+    }
+    return result;
+  }
   /**
    * @description 根据父Box的大小宽度比作为基础定位
-   * @param percentage ,占比值，四个点坐标
+   * @param location ,占比值，四个点坐标
    */
-  public setRelativePositionRect(percentage: [x: number, y: number]) {
-
+  public setRelativePositionRect() {
     const { width, height } = this.master.rect.size;
-    const [percent_x, percent_y] = percentage;
-  
+    console.log("位置",this.location);
+    const [percent_x, percent_y] = this.location;
+
     //更改相对定位，看好了，这可是按钮类里面的
     this.relativeRect.position = new Vector(
       width * percent_x,
@@ -151,17 +172,22 @@ export abstract class BaseButton implements RenderObject {
     this.relativeRect.position = position;
   }
   hide(): void {
-    this.disabled=true;
+    this.disabled = true;
   }
-  get position():Vector{
+  get position(): Vector {
     return this.rect.position;
   }
-  setSenseRadius(senseRadius:number){
-    this.senseRadius=senseRadius;
-    this.radius=senseRadius;
-    this.reset()
+  setSenseRadius(senseRadius: number) {
+    this.senseRadius = senseRadius;
+    this.radius = senseRadius;
+    this.reset();
   }
-  abstract drawButton(position:Vector,size:Size,radius:number,paint:Painter):void;
+  abstract drawButton(
+    position: Vector,
+    size: Size,
+    radius: number,
+    paint: Painter
+  ): void;
 }
 
 export default BaseButton;

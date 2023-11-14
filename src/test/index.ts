@@ -1,4 +1,4 @@
-import { SizeButtonLocation } from "@/core/enums";
+import { ButtonLocation } from "@/core/enums";
 import Painter from "@/core/lib/painter";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
@@ -38,13 +38,13 @@ const ximage = createXImage({
 
 const imageBox = createImageBox(ximage);
 console.log(imageBox.size);
-const drawButton = new DragButton({
-  angleDisabled:false,
-});
+// const drawButton = new DragButton({
+//   angleDisabled:false,
+// });
 doCenter(imageBox)
 // const unLockButton = new UnLockButton(imageBox);
 // imageBox.installButton(drawButton);
-// imageBox.installButton(new SizeButton(SizeButtonLocation.LT));
+// imageBox.installButton(new SizeButton(ButtonLocation.LT));
 // imageBox.installButton(new RotateButton());
 // loadToGesti(imageBox)
 // doUpdate();
@@ -53,14 +53,18 @@ const textBox = createTextBox("新建文本", {
   resetFontSizeWithRect: true,
 });
 const str=`你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
-const str1=`你好你好，这是一篇英语短文1234567890`;
+const str1=`你好你好，
+这是一篇英语短文12
+34567890`;
 const textBox2 = new TextBox(str1, {
   resetFontSizeWithRect: false,
   fontSize:10,
   spacing:0,
-  lineHeight:1.5,
-  color:"black",
+  lineHeight:1,
+  color:"skyblue",
+  underLine:true,
   backgroundColor:"white",
+
 });
 
 const group: Group = new Group();
@@ -72,19 +76,21 @@ doCenter(textBox2)
 //loadToGesti(imageBox)
  //group.add(imageBox);
 // group.add(textBox2);
-textBox2.installButton(new SizeButton(SizeButtonLocation.LT));
-// textBox2.installButton(new SizeButton(SizeButtonLocation.LB));
+// textBox2.installButton(new SizeButton(ButtonLocation.LT));
+// textBox2.installButton(new SizeButton(ButtonLocation.LB));
 
-// textBox2.installButton(new SizeButton(SizeButtonLocation.RT));
-// textBox2.installButton(new SizeButton(SizeButtonLocation.BC));
-// textBox2.installButton(new SizeButton(SizeButtonLocation.RC));
-// textBox2.installButton(new SizeButton(SizeButtonLocation.RB));
-// textBox2.installButton(new SizeButton(SizeButtonLocation.TC));
-// textBox2.installButton(new SizeButton(SizeButtonLocation.LC));
-textBox2.installButton(new HorizonButton());
-textBox2.installButton(new VerticalButton());
+// textBox2.installButton(new SizeButton(ButtonLocation.RT));
+// textBox2.installButton(new SizeButton(ButtonLocation.BC));
+// textBox2.installButton(new SizeButton(ButtonLocation.RC));
+// textBox2.installButton(new SizeButton(ButtonLocation.RB));
+// textBox2.installButton(new SizeButton(ButtonLocation.TC));
+// textBox2.installButton(new SizeButton(ButtonLocation.LC));
+// textBox2.installButton(new HorizonButton());
+// textBox2.installButton(new VerticalButton());
+textBox2.installButton(new MirrorButton(
+  ButtonLocation.RT
+));
 // textBox2.installButton(new DragButton());
-
 //loadToGesti(group)
 
 

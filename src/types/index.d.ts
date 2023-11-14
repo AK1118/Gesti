@@ -48,6 +48,19 @@ declare interface RectParams {
   width: number;
   height: number;
 }
+/**
+ * 按钮位置枚举
+ */
+export declare enum ButtonLocation {
+  LT,
+  LB,
+  RT,
+  RB,
+  RC,
+  BC,
+  LC,
+  TC,
+}
 
 export declare interface TextOptions {
   fontFamily?: string;

@@ -55,17 +55,20 @@ class Widgets {
         paint.closePath();
     }
     /**
+     * 
+     * 图像为一个ICON,想要图像居中,就需要知道图像的宽高
+     * 
      * @description 镜像翻转
      * @param paint 
      * @param offset 
      */
     public static drawMirror(paint: Painter, offset: Offset): void {
-        const scale = .3;
+        const scale = 1;
         const {
             offsetX,
             offsetY
         } = offset;
-
+        const width:number=30,height:number=30;
         paint.beginPath();
         paint.fillStyle = GestiConfig.theme.buttonIconColor;
         paint.strokeStyle = GestiConfig.theme.buttonIconColor;
@@ -167,9 +170,9 @@ class Widgets {
         } = offset;
         paint.beginPath();
         paint.fillStyle=GestiConfig.theme.buttonIconColor;
-        paint.fillRect(x-3,y-3,6,6);
-        // paint.arc(x,y,3,0,Math.PI*2);
-        // paint.fill();
+        // paint.fillRect(x-5,y-5,10,10);
+        paint.arc(x,y,5,0,Math.PI*2);
+        paint.fill();
         paint.closePath();
     }
 

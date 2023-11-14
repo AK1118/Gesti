@@ -7,7 +7,7 @@
 import Painter from "@/core/lib/painter";
 import SizeButton from "../buttons/sizeButton";
 import ViewObject from "@/core/abstract/view-object";
-import { SizeButtonLocation, ViewObjectFamily } from "@/core/enums";
+import { ButtonLocation, ViewObjectFamily } from "@/core/enums";
 import RotateButton from "../buttons/rotateButton";
 /**
  * 代理操作机械收框架，代理渲染元素并操作
@@ -50,10 +50,10 @@ class Manipulator<Widget extends ViewObject> extends ViewObject{
         this.mountFrameWork();
     }
     private mountFrameWork():void{
-        this.installButton(new SizeButton(SizeButtonLocation.LT));
-        this.installButton(new SizeButton(SizeButtonLocation.LB));
-        this.installButton(new SizeButton(SizeButtonLocation.RT));
-        this.installButton(new SizeButton(SizeButtonLocation.RB));
+        this.installButton(new SizeButton(ButtonLocation.LT));
+        this.installButton(new SizeButton(ButtonLocation.LB));
+        this.installButton(new SizeButton(ButtonLocation.RT));
+        this.installButton(new SizeButton(ButtonLocation.RB));
         this.installButton(new RotateButton())
     }
 }

@@ -6,61 +6,53 @@ import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
 import Widgets from "../../../static/widgets";
 import DragButton from "./dragbutton";
-import { SizeButtonLocation } from "../../enums";
+import { ButtonLocation } from "../../enums";
 import Vector from "@/core/lib/vector";
 
 class SizeButton extends DragButton {
-
-  protected percentage: [x: number, y: number]=[-0.5, 0.5];
-  private selfLocation:SizeButtonLocation;
-  constructor(location:SizeButtonLocation){
+  protected buttonLocation:ButtonLocation=ButtonLocation.RT;
+  private selfLocation:ButtonLocation;
+  constructor(location:ButtonLocation){
     super();
     this.selfLocation=location;
+    this.buttonLocation=location;
     this.beforeMounted(location);
   }
   /**
    * @description 在按钮挂载前设置位置
    * @param location 
    */
-  protected beforeMounted(location:SizeButtonLocation): void {
-    switch(location){
-      case SizeButtonLocation.LT:this.percentage=[-.5,-.5];break;
-      case SizeButtonLocation.LB:this.percentage=[-.5,.5];break;
-      case SizeButtonLocation.RT:this.percentage=[.5,-.5];break;
-      case SizeButtonLocation.RB:this.percentage=[.5,.5];break;
-      case SizeButtonLocation.RC:this.percentage=[.5,.0];break;
-      case SizeButtonLocation.BC:this.percentage=[0,.5];break;
-      case SizeButtonLocation.LC:this.percentage=[-.5,0];break;
-      case SizeButtonLocation.TC:this.percentage=[0,-.5];break;
-    }   
+  protected beforeMounted(location:ButtonLocation): void {
+    //按钮功能原因.按钮必须设置枚举位置,不允许设置position位置,这是强制的.
+    this.setLocationByEnum(location);   
   }
   
   private manipulateDelta(delta:Vector):void{
     switch(this.selfLocation){
-      case SizeButtonLocation.LT:{
+      case ButtonLocation.LT:{
         delta.y*=-1;
         delta.x*=-1;
       };break;
-      case SizeButtonLocation.LB:{
+      case ButtonLocation.LB:{
         delta.x*=-1;
       };break;
-      case SizeButtonLocation.RT:{
+      case ButtonLocation.RT:{
         delta.y*=-1;
       };break;
-      case SizeButtonLocation.RB:{
+      case ButtonLocation.RB:{
        
       };break;
-      case SizeButtonLocation.RC:{
+      case ButtonLocation.RC:{
         delta.y=0;
       };break
-      case SizeButtonLocation.BC:{
+      case ButtonLocation.BC:{
         delta.x=0;
       };break
-      case SizeButtonLocation.LC:{
+      case ButtonLocation.LC:{
         delta.x*=-1;
         delta.y=0;
       };break;
-      case SizeButtonLocation.TC:{
+      case ButtonLocation.TC:{
         delta.x=0;
         delta.y*=-1;
       };break;

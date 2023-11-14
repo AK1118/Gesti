@@ -153,7 +153,7 @@ abstract class TextBase extends TextViewBase {
       return points;
     }
     if (
-      this.height - checkOffset.offsetY * this.scaleHeight >
+     ( this.height - checkOffset.offsetY * this.scaleHeight)/this.textOptions.lineHeight >=
         this.fixedOption.fontSize &&
       !isInitialization
     ) {

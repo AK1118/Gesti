@@ -1,12 +1,12 @@
 import Painter from "../../lib/painter";
 import Widgets from "../../../static/widgets";
 import SizeButton from "./sizeButton";
-import { SizeButtonLocation } from "../../enums";
+import { ButtonLocation } from "../../enums";
 import DragButton from "./dragbutton";
 import Rect from "@/core/lib/rect";
 
 class VerticalButton extends DragButton {
-  protected percentage: [x: number, y: number]=[0,-.5];
+  protected buttonLocation:ButtonLocation=ButtonLocation.BC;
   draw(paint: Painter): void {
     this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
   }

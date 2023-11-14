@@ -105,14 +105,15 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * @param paint
    */
   public drawSelected(paint: Painter): void {
+    const padding=2;
     paint.beginPath();
-    paint.lineWidth = 2;
-    paint.strokeStyle = "#fff";
+    paint.lineWidth = 1;
+    paint.strokeStyle = "#b2ccff";
     paint.strokeRect(
-      -this.rect.size.width >> 1,
-      -this.rect.size.height >> 1,
-      this.rect.size.width + 1,
-      this.rect.size.height + 1
+      -this.rect.size.width-padding >> 1,
+      -this.rect.size.height-padding >> 1,
+      this.rect.size.width+padding + 1,
+      this.rect.size.height+padding + 1
     );
     paint.closePath();
     paint.stroke();

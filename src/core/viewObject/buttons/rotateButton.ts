@@ -1,4 +1,4 @@
-import { FuncButtonTrigger } from "../../enums";
+import { ButtonLocation, FuncButtonTrigger } from "../../enums";
 
 import BaseButton from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
@@ -16,7 +16,7 @@ class RotateButton extends BaseButton {
   public radius: number = 10;
   private disable: boolean = false;
   key: string | number = +new Date();
-  protected percentage: [x: number, y: number]=[0,.7];
+  protected buttonLocation:ButtonLocation=ButtonLocation.BC;
   constructor() {
     super();
     this.name = "rotate";

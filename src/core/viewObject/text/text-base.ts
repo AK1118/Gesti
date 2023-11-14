@@ -88,7 +88,11 @@ export abstract class TextBoxBase extends ViewObject {
     };
     this.texts = getTextSingles(splitTexts);
 
-    this.computeDrawPoint(this.texts, isInitialization?size:this.size, isInitialization);
+    this.computeDrawPoint(
+      this.texts,
+      isInitialization ? size : this.size,
+      isInitialization
+    );
 
     return this.texts;
   }
@@ -156,7 +160,7 @@ export abstract class TextBoxBase extends ViewObject {
     const handleSorting = (textData: TextSingle) => {
       checkOffset.offsetX = startX; // 换行后 x 重置
       realOffset.offsetX = startX;
-      checkOffset.offsetY += textData.height; 
+      checkOffset.offsetY += textData.height;
       this.addRows();
     };
     texts.forEach((textData) => {
@@ -212,7 +216,7 @@ export abstract class TextBoxBase extends ViewObject {
     }
     return points;
   }
-  
+
   //单个文字或者多个文字的宽度
   protected getTextWidth = (
     texts: Array<TextSingle> | TextSingle,
@@ -271,7 +275,9 @@ export abstract class TextBoxBase extends ViewObject {
     const spacing =
       this.textOptions.spacing *
       (this.textOptions.fontSize / this.fixedOption.fontSize);
+
     const render = (point, textData: TextSingle) => {
+      const textHeight = textData.height;
       const offsetY =
         this.size.height * -0.5 +
         textData.height * 0.5 +
@@ -281,18 +287,22 @@ export abstract class TextBoxBase extends ViewObject {
         renderLine(point, textData.width, offsetY);
       }
       if (this.textOptions?.underLine) {
-        renderLine(point, textData.width, 0);
+        renderLine(point, textData.width, this.height * -0.5 + textHeight);
       }
       if (this.textOptions?.overLine) {
-        const textHeight = textData.height;
-        renderLine(point, textData.width, -textHeight);
+        renderLine(
+          point,
+          textData.width,
+          -textHeight + this.height * -0.5 + textHeight
+        );
       }
     };
     const renderLine = (point: Point, width: number, offsetY: number) => {
-      this.paint.moveTo(point.x, point.y + offsetY);
-      let lineX = point.x + width + spacing;
+      const lineOffsetY = offsetY + this.renderTextOffsetY;
+      paint.moveTo(point.x + this.renderTextOffsetX, point.y + lineOffsetY);
+      let lineX = point.x + width + spacing + this.renderTextOffsetX;
       if (lineX > this.size.width * 0.5) lineX -= spacing;
-      this.paint.lineTo(lineX, point.y + offsetY);
+      paint.lineTo(lineX, point.y + lineOffsetY);
     };
     const renderTexts = (
       point: Point,
@@ -311,8 +321,10 @@ export abstract class TextBoxBase extends ViewObject {
     this.renderTextAndLines(points, render);
     this.afterRenderTextAndLines(paint);
     paint.strokeStyle = this.textOptions?.lineColor ?? this.defaultLineColor;
-    if (paint.lineWidth !== this.textOptions?.lineWidth)
-      paint.lineWidth = this.textOptions?.lineWidth ?? this.defaultLineWidth;
+    paint.lineWidth =
+      (this.textOptions?.lineWidth ?? this.defaultLineWidth) *
+      this.scaleHeight *
+      0.5;
     paint.stroke();
     paint.closePath();
     paint.restore();

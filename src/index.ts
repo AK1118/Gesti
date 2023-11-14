@@ -5,7 +5,7 @@
  * @Last Modified time: 2023-11-06 09:16:00
  */
 import SizeButton from "./core/viewObject/buttons/sizeButton";
-import { SizeButtonLocation, ViewObjectFamily } from "./core/enums";
+import { ButtonLocation, ViewObjectFamily } from "./core/enums";
 import Gesti from "./core/lib/gesti";
 
 import {
@@ -111,7 +111,7 @@ export {
   VerticalButton,
   HorizonButton,
   SizeButton,
-  SizeButtonLocation,
+  ButtonLocation,
   Manipulator
 };
 export { ImageBox, XImage, TextBox, WriteViewObj };

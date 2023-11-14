@@ -1,4 +1,4 @@
-import { FuncButtonTrigger } from "../../enums";
+import { ButtonLocation, FuncButtonTrigger } from "../../enums";
 
 import BaseButton from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
@@ -10,7 +10,7 @@ import GestiConfig from "../../../config/gestiConfig";
 import DragButton from "./dragbutton";
 
 class HorizonButton extends DragButton {
-  protected percentage: [x: number, y: number]=[0.5, 0];
+  protected buttonLocation:ButtonLocation=ButtonLocation.RC;
   draw(paint: Painter): void {
     this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
   }
