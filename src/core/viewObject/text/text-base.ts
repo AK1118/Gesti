@@ -33,9 +33,13 @@ export abstract class TextBoxBase extends ViewObject {
   protected readonly fixedOption: FixedOption = {
     fontSize: 20,
     maxWidth: 300,
-    fixedWidth: 0,
-    fixedHeight: 0,
   };
+  /**
+   * @deprecated
+   * @param text
+   * @param options
+   * @returns
+   */
   updateText(text: string, options?: TextOptions): Promise<void> {
     return Promise.resolve();
   }
@@ -83,12 +87,8 @@ export abstract class TextBoxBase extends ViewObject {
       }) as unknown as Array<TextSingle>;
     };
     this.texts = getTextSingles(splitTexts);
-    if (isInitialization) {
-      this.updateRectSize(size);
-      this.fixedOption.fixedHeight = size.height;
-      this.fixedOption.fixedWidth = size.width;
-    }
-    this.computeDrawPoint(this.texts, true);
+
+    this.computeDrawPoint(this.texts, isInitialization?size:this.size, isInitialization);
 
     return this.texts;
   }
@@ -100,13 +100,19 @@ export abstract class TextBoxBase extends ViewObject {
   private handleSplitText(text: string): Array<string> {
     const result = [];
     const regex =
-      /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[.,\/#!$%\^&\*;:{}=\-_`~()]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
+      /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[!\"#\$%&'\(\)\*\+,\-\./:;<=>\?@\[\\\]\^_`{\|}~]|[！？｡。，；：…“”‘’（）&#8203;``【】``&#8203;〔〕｛｝《》〈〉『』「」]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
     let match: Array<string> = [];
     while ((match = regex.exec(text)) !== null) {
       result.push(match[0]);
     }
 
     return result;
+  }
+  get spacing(): number {
+    return (
+      this.textOptions.spacing *
+      (this.textOptions.fontSize / this.fixedOption.fontSize)
+    );
   }
   /**
    * 渲染坐标来自上次计算
@@ -115,12 +121,13 @@ export abstract class TextBoxBase extends ViewObject {
    * @param texts
    * @returns
    */
-  private computeDrawPoint(
+  protected computeDrawPoint(
     texts: Array<TextSingle>,
+    rectSize: Size,
     isInitialization: boolean = false
   ): Array<Vector | null | Array<Vector>> {
     const points: Array<Vector | null | Array<Vector>> = [];
-    let startX: number = this.size.width * -0.5;
+    let startX: number = rectSize.width * -0.5;
     //做判断换行坐标
     const checkOffset: Offset = {
       offsetX: startX,
@@ -131,50 +138,33 @@ export abstract class TextBoxBase extends ViewObject {
       offsetX: startX,
       offsetY: 0,
     };
-
-    /**
-     * thatMaxWordWidth 最长单词宽度
-     */
+    //thatMaxWordWidth 最长单词宽度
     let thatMaxWordWidth: number = 0;
-    const spacing =
-      this.textOptions.spacing *
-      (this.textOptions.fontSize / this.fixedOption.fontSize);
     //Rect宽度，用户检测文字是否超出
-    const checkRectSizeWidth: number = this.size.width * 0.5;
-    //单个文字或者多个文字的宽度
-    const getTextWidth = (texts: Array<TextSingle> | TextSingle): number => {
-      let width: number = 0;
-      if (Array.isArray(texts)) {
-        texts.forEach((_) => {
-          width += _.width + spacing;
-        });
-        width -= spacing;
-      } else width = texts.width;
-      //如果不换行，就触发文字宽度弹性机制
-      if (!this.textWrap) return width * (this.scaleWidth - 0.01);
-      return width;
-    };
+    const checkRectSizeWidth: number = rectSize.width * 0.5;
     //获取realX变量每次增加的Δ x
     const computedDeltaX = (textWidth: number) => {
-      return textWidth + spacing;
+      return textWidth + this.spacing;
     };
     //获取x变量每次增加的Δ x
     const computedCheckDeltaX = (textWidth: number) => {
-      if(this.textWrap)return (textWidth + spacing);
-      return (textWidth + spacing) * this.scaleWidth;
+      if (this.textWrap) return textWidth + this.spacing;
+      return (textWidth + this.spacing) * this.scaleWidth;
     };
     this.addRows(true);
     //处理换行
     const handleSorting = (textData: TextSingle) => {
       checkOffset.offsetX = startX; // 换行后 x 重置
       realOffset.offsetX = startX;
-      checkOffset.offsetY += textData.height;
+      checkOffset.offsetY += textData.height; 
       this.addRows();
     };
-
     texts.forEach((textData) => {
       /**预先获取宽度，判断是否超出rect宽度*/
-      const width: number = getTextWidth(textData.texts || textData);
+      const width: number = this.getTextWidth(
+        textData.texts || textData,
+        this.spacing
+      );
       //最大单词宽度
       thatMaxWordWidth = Math.max(width, thatMaxWordWidth);
       const currentX: number = checkOffset.offsetX + width;
@@ -213,20 +203,37 @@ export abstract class TextBoxBase extends ViewObject {
     checkOffset.offsetY +=
       this.textOptions.fontSize * this.textOptions.lineHeight;
     if (isInitialization) {
-      this.updateRectSize(
-        new Size(
-          Math.max(this.size.width, thatMaxWordWidth),
-          checkOffset.offsetY
-        ) //thatMaxWordWidth 是某个文字最大宽度，比如一个单词最大宽度，防止矩形宽度小于单词宽度
+      const size: Size = new Size(
+        //thatMaxWordWidth 是某个文字最大宽度，比如一个单词最大宽度，防止矩形宽度小于单词宽度
+        Math.max(rectSize.width, thatMaxWordWidth),
+        checkOffset.offsetY
       );
+      this.updateRectSize(size);
     }
     return points;
   }
+  
+  //单个文字或者多个文字的宽度
+  protected getTextWidth = (
+    texts: Array<TextSingle> | TextSingle,
+    spacing: number
+  ): number => {
+    let width: number = 0;
+    if (Array.isArray(texts)) {
+      texts.forEach((_) => {
+        width += _.width + spacing;
+      });
+      width -= spacing;
+    } else width = texts.width;
+    //如果不换行，就触发文字宽度弹性机制
+    if (!this.textWrap) return width * (this.scaleWidth - 0.01);
+    return width;
+  };
   /**
    * @description 增加行数
    * @param reset  是否复位
    */
-  private addRows(reset?: boolean): void {
+  protected addRows(reset?: boolean): void {
     if (reset) {
       this.rowsCount = 1;
       return;
@@ -248,7 +255,7 @@ export abstract class TextBoxBase extends ViewObject {
     if (this.texts.length === 0) return;
     const color: string = this.textOptions.color;
     const backgroundColor: string = this.textOptions.backgroundColor;
-    const points = this.computeDrawPoint(this.texts);
+    const points = this.computeDrawPoint(this.texts, this.size);
     paint.beginPath();
     if (backgroundColor) {
       paint.fillStyle = backgroundColor;
@@ -296,7 +303,7 @@ export abstract class TextBoxBase extends ViewObject {
       paint.fillText(
         text,
         point.x + this.renderTextOffsetX,
-        ~~(point.y + offsetY)
+        ~~(point.y + offsetY) + this.renderTextOffsetY
       );
     };
     paint.save();
@@ -310,8 +317,17 @@ export abstract class TextBoxBase extends ViewObject {
     paint.closePath();
     paint.restore();
   }
+  //渲染文本时X轴偏移量
   get renderTextOffsetX(): number {
     return 0;
+  }
+  //渲染文本时Y轴偏移量
+  get renderTextOffsetY(): number {
+    return 0;
+  }
+  //是否根据矩形高度自适应文字大小
+  get isChangeFontSizeWithHeight(): boolean {
+    return true;
   }
   //渲染文字前
   protected beforeRenderTextAndLines(paint: Painter) {}
@@ -331,13 +347,14 @@ export abstract class TextBoxBase extends ViewObject {
       }
     });
   }
-  private updateRectSize(size: Size): void {
+  protected updateRectSize(size: Size): void {
     //拖拽时设置scale 等于设置大小，松开时再设置大小就会判断一样的值
     this.setSize(size);
   }
   protected didChangeDeltaScale(scale: number): void {
     this.isDirty = true;
     this.extendDidChangeDeltaScale(scale);
+    this.updateFontSizeByRectSizeHeight();
   }
   /**
    * 扩展给扩展类类用
@@ -348,12 +365,16 @@ export abstract class TextBoxBase extends ViewObject {
     this.extendDidChangeSize(size);
   }
   protected extendDidChangeSize(size: Size): void {}
-  private updateFontSizeByRectSizeHeight(): void {
-    const rectHeight: number = this.size.height;
+  /**
+   * @description 根据高度计算文字大小
+   * @returns
+   */
+  protected updateFontSizeByRectSizeHeight(): void {
+    const rectHeight: number = this.height;
     const lineHeight = this.textOptions.lineHeight;
     const columnHeight = rectHeight / this.rowsCount;
     const newFontSize: number = columnHeight / lineHeight;
-    this.textOptions.fontSize = newFontSize;
+    this.textOptions.fontSize = newFontSize / this.scaleHeight;
     this.computeTextSingle();
   }
 
@@ -385,7 +406,7 @@ export abstract class TextBoxBase extends ViewObject {
   protected doCache(): void {
     //没变过大小就不缓存
     if (!this.isDirty) return;
-    this.updateFontSizeByRectSizeHeight();
+    // this.updateFontSizeByRectSizeHeight();
     this.flushCache();
     this.cache();
     this.updateCache();
@@ -418,6 +439,7 @@ export abstract class TextBoxBase extends ViewObject {
     const cacheCanvas = this.getCacheCanvas();
     return new Painter(cacheCanvas.getContext("2d"));
   }
+  protected onInput(value: string): void {}
 }
 
 /**
@@ -431,7 +453,7 @@ class TextViewBase extends TextBoxBase implements TextHandler {
   }
   setText(text: string): void {
     this.fixedText = text;
-    this.rebuild();
+    this.onInput(this.fixedText);
   }
   setFontFamily(family: string): void {
     this.textOptions.fontFamily = family;

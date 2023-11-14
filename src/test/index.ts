@@ -54,7 +54,7 @@ const textBox = createTextBox("新建文本", {
 });
 const str=`你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.你好，这是一篇英语短文1234567890 😄 ⚪ Redux maintainer Mark Erikson appeared on the "Learn with Jason" show to explain how we recommend using Redux today. The show includes a live-coded example app that shows how to use Redux Toolkit and React-Redux hooks with TypeScript, as well as the new RTK Query data fetching APIs.`
 const str1=`你好你好，这是一篇英语短文1234567890`;
-const textBox2 = new TextBox(str, {
+const textBox2 = new TextBox(str1, {
   resetFontSizeWithRect: false,
   fontSize:10,
   spacing:0,
@@ -93,6 +93,11 @@ textBox2.installButton(new VerticalButton());
 // },1000)
 // const man=new Manipulator<Group>(group);
 // loadToGesti(man)
+(document.querySelector("#input") as any).value=textBox2.value;
+(document.querySelector("#input") as HTMLElement).oninput=(e:any)=>{
+  const value=e.target.value;
+  textBox2.setText(value);
+}
 
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");

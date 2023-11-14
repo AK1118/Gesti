@@ -291,8 +291,4 @@ declare interface TextSingle {
 declare interface FixedOption {
   fontSize: number;
   maxWidth: number;
-  //初始化时的宽度
-  fixedWidth: number;
-  //初始化时的高度
-  fixedHeight: number;
 }

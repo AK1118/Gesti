@@ -9,7 +9,6 @@ import Vertex from "./vertex";
 declare interface onDragFunction {
   (rect: Rect): void;
 }
-
 export class Size {
   private _width: number;
   private _height: number;
@@ -41,6 +40,16 @@ export class Size {
   public setHeight(height: number): void {
     this._height = height;
   }
+  public toObject():{
+    width:number,
+    height:number,
+  }{
+    return {
+      width:this._width,
+      height:this._height
+    }
+  }
+  
 }
 
 class Rect extends ObserverObj {

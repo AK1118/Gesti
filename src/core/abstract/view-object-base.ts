@@ -186,8 +186,7 @@ abstract class BaseViewObject extends OperationObserver {
     public setSize(size: { width?: number; height?: number }) {
       const { width, height } = size;
       if (this._fixedSize.equals(Size.zero)) {
-        this._fixedSize.setWidth(width ?? 0);
-        this._fixedSize.setHeight(height ?? 0);
+        this.setFixedSize(size);
       }
       this.rect.setSize(width ?? this.width, height ?? this.height);
     }
@@ -207,6 +206,11 @@ abstract class BaseViewObject extends OperationObserver {
       this.funcButton.forEach((button: Button) => {
         if (!arr.includes(button.name) && !button.disabled) button.reset();
       });
+    }
+    protected setFixedSize(size: { width?: number; height?: number }):void{
+      const { width, height } = size;
+      this._fixedSize.setWidth(width ?? 0);
+      this._fixedSize.setHeight(height ?? 0);
     }
     /**
      * @description 强制刷新画布

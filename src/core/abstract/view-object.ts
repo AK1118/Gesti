@@ -238,6 +238,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.deltaScale = deltaScale;
     this.rect.setDeltaScale(deltaScale);
   }
+  
 
   /**
    * 世界坐标居中
@@ -267,7 +268,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   protected _didChangeDeltaScale(scale: number): void {
     this.computedRespectRatio();
   }
-
+  
   private computedRespectRatio(): void {
     /**
      目前宽高/绝对倍数=真实宽高
