@@ -115,24 +115,32 @@ abstract class TextBase extends TextViewBase {
        */
       thatMaxRowWidth = Math.max(checkOffset.offsetX, thatMaxRowWidth);
     });
-    console.log(
-      "zui大宽度",
-      thatMaxRowWidth,
-      checkRectSizeWidth,
-      rectSize.width * 0.5
-    );
+
     //在最后需要多加一行的高度给Rect
     checkOffset.offsetY +=
       this.textOptions.fontSize * this.textOptions.lineHeight;
 
     /**
-     * 1.超过就设置变大
-     * 2.再次设置变大时不影响拉伸，但是拉伸根据原始大小而来，所以拉伸大小需要重新设置，且等于
-     * width/absScale=delW
-     * delW/fixedWidth=scaleWidth
-     * fixedWidth=delW/scaleWidth
+     * 根据文字自适应大小
      */
+    return this.autoFixedSize(
+      checkOffset,
+      isInitialization,
+      thatMaxRowWidth,
+      thatMaxWordWidth,
+      rectSize,
+      points
+    );
+  }
 
+  private autoFixedSize(
+    checkOffset: Offset,
+    isInitialization: boolean,
+    thatMaxRowWidth: number,
+    thatMaxWordWidth: number,
+    rectSize: Size,
+    points
+  ): Array<Vector | null | Array<Vector>> {
     if (
       checkOffset.offsetY * this.scaleHeight > this.height &&
       !isInitialization
@@ -144,22 +152,40 @@ abstract class TextBase extends TextViewBase {
       this.resetRectSizeAndOthers(size);
       return points;
     }
+    if (
+      this.height - checkOffset.offsetY * this.scaleHeight >
+        this.fixedOption.fontSize &&
+      !isInitialization
+    ) {
+      const size: Size = new Size(
+        this.width,
+        checkOffset.offsetY * this.scaleHeight - this.fixedOption.fontSize
+      );
+      this.resetRectSizeAndOthers(size);
+      return points;
+    }
 
     /**
      * 宽度始终等于最大行宽
      */
-    const currentOffsetWidth: number = thatMaxRowWidth*2;
-    if (currentOffsetWidth >rectSize.width && !isInitialization) {
+    const currentOffsetWidth: number = thatMaxRowWidth * 2;
+    if (currentOffsetWidth > rectSize.width && !isInitialization) {
       const size: Size = new Size(currentOffsetWidth, this.height);
       this.resetRectSizeAndOthers(size);
       return points;
     }
-    if ((rectSize.width-currentOffsetWidth)>this.fixedOption.fontSize && !isInitialization) {
-      const size: Size = new Size(rectSize.width-this.fixedOption.fontSize, this.height);
+
+    if (
+      rectSize.width - currentOffsetWidth > this.fixedOption.fontSize &&
+      !isInitialization
+    ) {
+      const size: Size = new Size(
+        rectSize.width - this.fixedOption.fontSize,
+        this.height
+      );
       this.resetRectSizeAndOthers(size);
       return points;
     }
-
     if (isInitialization) {
       const size: Size = new Size(
         Math.max(rectSize.width, thatMaxWordWidth), //thatMaxWordWidth 是某个文字最大宽度，比如一个单词最大宽度，防止矩形宽度小于单词宽度
@@ -169,6 +195,7 @@ abstract class TextBase extends TextViewBase {
     }
     return points;
   }
+
   private resetRectSizeAndOthers(size: Size) {
     const preScaleWidth = this.scaleWidth,
       preScaleHeight = this.scaleHeight;
