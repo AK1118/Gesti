@@ -35,7 +35,7 @@ class SizeButton extends DragButton {
     this.setLocationByEnum(location);   
   }
   
-  private manipulateDelta(delta:Vector):void{
+  protected manipulateDelta(delta:Vector):void{
     switch(this.selfLocation){
       case ButtonLocation.LT:{
         delta.y*=-1;

@@ -15,10 +15,13 @@ class Delta implements Delta {
     return new Delta(0,0);
   }
   update(vector: Vector) {
+    if(vector.x===this.beforeVector.x&&vector.y===this.beforeVector.y)return;
     //初始化时before 和 vector 坐标相等
     if(this.beforeVector.x===0&&this.beforeVector.y===0){
       this.beforeVector = vector;
     }
+    //两个相同不更新
+    
     [this._deltaX, this._deltaY] = Vector.sub(
       vector,
       this.beforeVector

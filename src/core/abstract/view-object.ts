@@ -29,6 +29,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.rect = Rect.zero;
     this.relativeRect = Rect.zero;
   }
+
   //获取对象值
   abstract get value(): any;
 
@@ -42,6 +43,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.rect.updateVertex();
     //挂载
     this.mount();
+    this.setFixedSize(this.size.toObject());
   }
   //卸载按钮
   public unInstallButton(buttons: Array<Button>) {
@@ -82,7 +84,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     if (this.isMirror) paint.scale(-1, 1);
     if (this.selected) {
       //边框
-      this.drawSelectedBorder(paint,this.size);
+      this.drawSelectedBorder(paint, this.size);
       //按钮
       this.updateFuncButton(paint);
     } else {
@@ -104,7 +106,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * 被选中后外边框
    * @param paint
    */
-  public drawSelectedBorder(paint: Painter,size:Size): void {
+  public drawSelectedBorder(paint: Painter, size: Size): void {
     const padding = 2;
     paint.beginPath();
     paint.lineWidth = 1;
@@ -240,6 +242,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * @param deltaScale
    */
   public setDeltaScale(deltaScale: number) {
+    this.delta.update(this.position);
     this.deltaScale = deltaScale;
     this.rect.setDeltaScale(deltaScale);
   }
@@ -286,6 +289,11 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   protected _didChangePosition(position: Vector): void {
     if (!this.delta) this.delta = new Delta(position.x, position.y);
     this.delta.update(position.copy());
+  }
+  protected _didChangeScaleWidth(): void {
+    if (!this.sizeDelta)
+      this.sizeDelta = new Delta(this.size.width, this.size.height);
+    this.sizeDelta.update(this.size.toVector());
   }
   /**
    * 撤销 | 取消撤销回调

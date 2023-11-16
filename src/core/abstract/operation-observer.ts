@@ -205,7 +205,10 @@ abstract class OperationObserver {
         }
         break;
       case "addPosition":
-        this.didAddPosition(value);
+        {
+          this._didAddPosition(value);
+          this.didAddPosition(value);
+        }
         break;
       default: {
       }
@@ -229,6 +232,7 @@ abstract class OperationObserver {
   protected didDrag(value: { size: Size; angle: number }): void {}
   protected didAddPosition(delta: Vector): void {}
   protected beforeAddPosition(delta: Vector): void {}
+  protected _didAddPosition(delta: Vector): void {}
 }
 
 export default OperationObserver;

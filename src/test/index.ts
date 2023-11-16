@@ -62,16 +62,18 @@ const textBox2 = new TextBox(str1, {
  loadToGesti(textBox2);
 const group: Group = new Group();
 group.add(textBox2);
-group.add(imageBox);
+ group.add(imageBox);
 
 textBox2.setPosition(0,0);
 
 loadToGesti(group);
 
-group.installButton(new HorizonButton());
-group.installButton(new VerticalButton());
+group.installButton(new HorizonButton(ButtonLocation.RC));
+group.installButton(new HorizonButton(ButtonLocation.LC));
+group.installButton(new VerticalButton(ButtonLocation.BC));
+group.installButton(new VerticalButton(ButtonLocation.TC));
 group.installButton(new SizeButton(ButtonLocation.LT));
-
+group.installButton(new DragButton());
 
 
 (document.querySelector("#input") as any).value=textBox2.value;
