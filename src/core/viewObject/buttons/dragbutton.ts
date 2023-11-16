@@ -1,6 +1,6 @@
 import { ButtonLocation, FuncButtonTrigger } from "../../enums";
 
-import BaseButton from "../../abstract/baseButton";
+import BaseButton, { ButtonOption } from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
 import Vector from "../../lib/vector";
@@ -8,8 +8,11 @@ import Widgets from "../../../static/widgets";
 import ViewObject from "../../abstract/view-object";
 import GestiConfig from "../../../config/gestiConfig";
 import { Delta } from "../../../utils/event/event";
+import { Icon } from "@/core/lib/icon";
+import DragIcon from "@/static/icons/dragIcon";
 class DragButton extends BaseButton {
-  protected buttonLocation:ButtonLocation=ButtonLocation.RB;
+  protected buttonLocation: ButtonLocation = ButtonLocation.RB;
+  protected icon: Icon=new DragIcon();
   public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
   private preViewObjectRect: Rect = null;
   public oldAngle: number = 0;
@@ -22,9 +25,11 @@ class DragButton extends BaseButton {
   constructor(
     options?: {
       angleDisabled?: boolean;
-    }
+      buttonOption?: ButtonOption,
+    },
+    
   ) {
-    super();
+    super(options?.buttonOption);
     this.rect.onDrag = (currentButtonRect: Rect) => {
       /*拖拽缩放*/
       this.rect = currentButtonRect;
@@ -38,9 +43,7 @@ class DragButton extends BaseButton {
     this.updateRelativePosition();
     this.setAbsolutePosition(vector);
   }
-  public setAxis(axis: "ratio" | "horizontal" | "vertical" | "free") {
-    
-  }
+  public setAxis(axis: "ratio" | "horizontal" | "vertical" | "free") {}
   setMaster(master: ViewObject): void {
     this.master = master;
   }
@@ -55,7 +58,9 @@ class DragButton extends BaseButton {
     const mag = this.getButtonWidthMasterMag(currentButtonRect);
     if (this.preMag === -1) this.preMag = mag;
     const deltaScale: number = mag / this.preMag;
-      const [offsetX,offsetY]=currentButtonRect.position.sub(this.master.position).toArray();
+    const [offsetX, offsetY] = currentButtonRect.position
+      .sub(this.master.position)
+      .toArray();
     this.master.setDeltaScale(deltaScale);
     if (!this.angleDisabled) {
       const angle = Math.atan2(offsetY, offsetX) - this.oldAngle;
@@ -89,34 +94,6 @@ class DragButton extends BaseButton {
   }
   show() {
     this.disable = false;
-  }
-  draw(paint: Painter): void {
-    this.drawButton(
-      this.relativeRect.position,
-      this.master.rect.size,
-      this.radius,
-      paint
-    );
-  }
-  drawButton(
-    position: Vector,
-    size: Size,
-    radius: number,
-    paint: Painter
-  ): void {
-    const { width, height } = size;
-    const halfRadius = this.radius * 0.75;
-    const x = position.x,
-      y = position.y;
-    paint.beginPath();
-    paint.fillStyle = GestiConfig.theme.buttonsBgColor;
-    paint.arc(x, y, this.radius, 0, Math.PI * 2);
-    paint.closePath();
-    paint.fill();
-    Widgets.drawGrag(paint, {
-      offsetX: x - halfRadius + 2,
-      offsetY: y - halfRadius + 2,
-    });
   }
 }
 

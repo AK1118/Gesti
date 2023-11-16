@@ -7,10 +7,13 @@ import Vector from "../../lib/vector";
 import Widgets from "../../../static/widgets";
 import ViewObject from "../../abstract/view-object";
 import GestiConfig from "../../../config/gestiConfig";
+import { Icon } from "@/core/lib/icon";
+import { LockIcon } from "@/composite/icons";
 
 
 
 class LockButton extends BaseButton {
+    protected icon: Icon=new LockIcon();
     protected buttonLocation:ButtonLocation=ButtonLocation.RT;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
@@ -24,29 +27,6 @@ class LockButton extends BaseButton {
     }
     effect(): void {
         this.master.lock();
-    }
-    draw(paint: Painter): void {
-        this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
-    }
-    drawButton(position: Vector, size: Size,radius:number, paint: Painter): void {
-        const {
-            width,
-            height
-        } = size;
-        const halfRadius = this.radius * .75;
-        const x = position.x, y = position.y;
-        paint.beginPath();
-        paint.fillStyle = GestiConfig.theme.buttonsBgColor;
-        paint.arc(x, y, this.radius, 0, Math.PI * 2);
-        paint.closePath();
-        paint.fill();
-        Widgets.drawLock(paint, {
-            offsetX: x - halfRadius + 1,
-            offsetY: -height / 2 - halfRadius + 3
-        });
-    }
-    render(paint: Painter): void {
-        this.draw(paint);
     }
     onSelected(): void {
 

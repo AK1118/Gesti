@@ -7,9 +7,12 @@ import Vector from "../../lib/vector";
 import Widgets from "../../../static/widgets";
 import ViewObject from "../../abstract/view-object";
 import GestiConfig from "../../../config/gestiConfig";
+import { Icon } from "@/core/lib/icon";
+import RotateIcon from "@/static/icons/rotateIcon";
 
 class RotateButton extends BaseButton {
   public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
+  protected icon: Icon=new RotateIcon();
   private oldViewObjectRect: Rect = null;
   private oldRadius: number = 0;
   public oldAngle: number = 0;
@@ -72,35 +75,6 @@ class RotateButton extends BaseButton {
   }
   show() {
     this.disable = false;
-  }
-  draw(paint: Painter) {
-    if (this.disable) return;
-    this.drawButton(
-      this.relativeRect.position,
-      this.master.rect.size,
-      this.radius,
-      paint
-    );
-  }
-  drawButton(
-    position: Vector,
-    size: Size,
-    radius: number,
-    paint: Painter
-  ): void {
-    const { width, height } = size;
-    const halfRadius = this.radius * 0.75;
-    const x = position.x,
-      y = position.y;
-    paint.beginPath();
-    paint.fillStyle = GestiConfig.theme.buttonsBgColor;
-    paint.arc(x, y, this.radius, 0, Math.PI * 2);
-    paint.closePath();
-    paint.fill();
-    Widgets.drawRotate(paint, {
-      offsetX: x,
-      offsetY: y,
-    });
   }
 }
 

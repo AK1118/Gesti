@@ -5,11 +5,29 @@ import CatchPointUtil from "../../utils/event/catchPointUtil";
 import ViewObject from "./view-object";
 import Rect from "../lib/rect";
 import Vector from "../lib/vector";
+import { Icon } from "../lib/icon";
+import DefaultIcon from "@/static/icons/defaultIcon";
+export type ButtonOption={
+  location?:ButtonLocation,
+  icon?:Icon,
+};
 //按钮抽象类
 export abstract class BaseButton implements RenderObject {
-  constructor(location?: ButtonLocation) {
-    this.location=this.setLocationByEnum(location);
+  protected icon: Icon = new DefaultIcon({
+    color: "#c1c1c1",
+    size: 20,
+  });
+  //自定义位置
+  private customLocation: ButtonLocation;
+  private customIcon:Icon;
+  //是否显示背景，按钮默认有一个白色背景
+  private displayBackground:boolean=true;
+  constructor(option?: ButtonOption) {
+    if (!option) return;
+    this.customLocation = option?.location;
+    this.customIcon=option?.icon;
   }
+  protected abstract buttonLocation: ButtonLocation;
   name: string = "";
   //隐藏
   disabled: boolean = false;
@@ -18,9 +36,9 @@ export abstract class BaseButton implements RenderObject {
   relativeRect: Rect = new Rect();
   master: ViewObject;
   //渲染UI按钮半径
-  radius: number = 20;
+  radius: number = 10;
   //点击感应范围
-  senseRadius: number = 20;
+  senseRadius: number = 10;
   oldAngle: number;
   //初始化时按钮离主体中心点的距离
   originDistance: number;
@@ -37,7 +55,7 @@ export abstract class BaseButton implements RenderObject {
   set free(canBeeLocking: boolean) {
     this.canBeeLocking = !canBeeLocking;
   }
-  protected abstract buttonLocation: ButtonLocation;
+
   private location: [x: number, y: number];
   /**
    * 重置按钮坐标
@@ -85,13 +103,33 @@ export abstract class BaseButton implements RenderObject {
   abstract setMaster(master: RenderObject): void;
   abstract effect(currentButtonRect?: Rect): void;
   abstract updatePosition(vector: Vector): void;
-  abstract draw(paint: Painter): void;
-  abstract render(paint: Painter): void;
+  draw(paint: Painter): void {
+    if(this.displayBackground)this.renderBackground(paint,this.relativeRect.position);
+    this.drawButton(
+      this.relativeRect.position,
+      this.master.rect.size,
+      this.radius,
+      paint
+    );
+  }
+  private renderBackground(paint:Painter,position:Vector):void{
+    paint.beginPath();
+    paint.arc(position.x,position.y,this.senseRadius,0,Math.PI*2);
+    paint.closePath();
+    paint.fillStyle="#ffffff";
+    paint.fill();
+  }
+  render(paint: Painter): void {
+    this.draw(paint);
+  }
   abstract onSelected(): void;
   public initialization(master: ViewObject) {
     this.master = master;
     this.beforeMounted();
-    this.setLocationByEnum();
+    this.location = this.setLocationByEnum(this.customLocation);
+    this.icon=this.customIcon||this.icon;
+    //icon的大小等于半径
+    this.icon.setSize(this.radius);
     this.computeSelfLocation();
     this.afterMounted();
   }
@@ -110,10 +148,13 @@ export abstract class BaseButton implements RenderObject {
     if (this.master.isLock && this.canBeeLocking) return false;
     return CatchPointUtil.checkInsideArc(target, event, this.senseRadius);
   }
-  protected setLocationByEnum(_location?: ButtonLocation): [x:number,y:number] {
+  protected setLocationByEnum(
+    _location?: ButtonLocation
+  ): [x: number, y: number] {
+    //如果没有自定义位置，就使用自己的位置
     const location = _location || this.buttonLocation;
-    this.buttonLocation=location;
-    let result:[x:number,y:number];
+    this.buttonLocation = location;
+    let result: [x: number, y: number];
     switch (location) {
       case ButtonLocation.LT:
         result = [-0.5, -0.5];
@@ -148,7 +189,6 @@ export abstract class BaseButton implements RenderObject {
    */
   public setRelativePositionRect() {
     const { width, height } = this.master.rect.size;
-    console.log("位置",this.location);
     const [percent_x, percent_y] = this.location;
 
     //更改相对定位，看好了，这可是按钮类里面的
@@ -160,7 +200,10 @@ export abstract class BaseButton implements RenderObject {
   public updateRelativePosition() {
     const master: Size = this.master.rect.size;
     const { width, height } = master;
-
+    if(!this.scaleWithMaster){
+      this.scaleWithMaster=new Vector(1,1);
+      return;
+    }
     let newWidth = width / this.scaleWithMaster.x,
       newHeight = height / this.scaleWithMaster.y;
     if (this.scaleWithMaster.x == 0) newWidth = 0;
@@ -180,14 +223,21 @@ export abstract class BaseButton implements RenderObject {
   setSenseRadius(senseRadius: number) {
     this.senseRadius = senseRadius;
     this.radius = senseRadius;
+    this.icon.setSize(this.radius);
     this.reset();
   }
-  abstract drawButton(
+  //设置Icon颜色
+  public setIconColor(color:string){
+    this.icon.setColor(color);
+  }
+  protected drawButton(
     position: Vector,
     size: Size,
     radius: number,
     paint: Painter
-  ): void;
+  ) {
+    this.icon.render(paint, position);
+  }
 }
 
 export default BaseButton;

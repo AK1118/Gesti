@@ -4,12 +4,12 @@ import SizeButton from "./sizeButton";
 import { ButtonLocation } from "../../enums";
 import DragButton from "./dragbutton";
 import Rect from "@/core/lib/rect";
+import { Icon } from "@/core/lib/icon";
+import { DefaultIcon } from "@/composite/icons";
 
 class VerticalButton extends DragButton {
   protected buttonLocation:ButtonLocation=ButtonLocation.BC;
-  draw(paint: Painter): void {
-    this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
-  }
+  protected icon: Icon=new DefaultIcon();
   effect(currentButtonRect?: Rect): void {
     const mag = this.getButtonWidthMasterMag(currentButtonRect);
     if (this.preMag === -1) this.preMag = mag;
@@ -21,17 +21,6 @@ class VerticalButton extends DragButton {
       });
     // this.master.setScale(deltaScale);
     this.preMag = mag;
-  }
-  drawButton(position: Vector, size: Size, radius: number, paint: Painter): void {
-    this.setAxis("horizontal");
-    //按钮渲染样式
-    this.draw = function (paint) {
-      const { x, y } = this.relativeRect.position;
-      Widgets.drawChangeSizeAlone(paint, {
-        offsetX: x,
-        offsetY: y,
-      });
-    };
   }
 }
 

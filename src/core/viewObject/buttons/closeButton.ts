@@ -7,7 +7,10 @@ import Vector from "../../lib/vector";
 import Widgets from "../../../static/widgets";
 import ViewObject from "../../abstract/view-object";
 import GestiConfig from "../../../config/gestiConfig";
+import { Icon } from "@/core/lib/icon";
+import { CloseIcon } from "@/composite/icons";
 class CloseButton extends BaseButton {
+    protected icon: Icon=new CloseIcon();
     protected buttonLocation:ButtonLocation=ButtonLocation.RT;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     updatePosition(vector: Vector): void {
@@ -19,29 +22,6 @@ class CloseButton extends BaseButton {
     }
     effect(): void {
         this.master.hide();
-    }
-    draw(paint: Painter): void {
-        this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
-    }
-    drawButton(position: Vector, size: Size,radius:number, paint: Painter): void {
-        const {
-            width,
-            height
-        } = size;
-        const halfRadius = this.radius * .75;
-        const x = position.x, y = position.y;
-        paint.beginPath();
-        paint.fillStyle = GestiConfig.theme.buttonsBgColor;
-        paint.arc(x, y, this.radius, 0, Math.PI * 2);
-        paint.closePath();
-        paint.fill();
-        Widgets.drawClose(paint, {
-            offsetX: x - halfRadius + 4,
-            offsetY: -height / 2 - 3
-        });
-    }
-    render(paint: Painter): void {
-        this.draw(paint);
     }
     onSelected(): void {
 

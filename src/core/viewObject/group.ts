@@ -8,6 +8,7 @@ import Vector from "../lib/vector";
 abstract class GroupBase extends ViewObject {
   private beforeAngle: number = 0;
   private views: Array<ViewObject> = [];
+  
   public ready(kit: ImageToolkit): void {
     //将组合添加到最底层
     kit.layerBottom(this);
@@ -179,7 +180,7 @@ class Group extends GroupBase {
       this.rect.size.height
     );
     paint.stroke();
-    // this.updateChildrenLocation();
+    this.updateChildrenLocation();
   }
   export(painter?: Painter): Promise<Object> {
     throw new Error("Method not implemented.");

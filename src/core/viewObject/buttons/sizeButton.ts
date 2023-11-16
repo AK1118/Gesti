@@ -8,12 +8,20 @@ import Widgets from "../../../static/widgets";
 import DragButton from "./dragbutton";
 import { ButtonLocation } from "../../enums";
 import Vector from "@/core/lib/vector";
+import { Icon } from "@/core/lib/icon";
+import ScaleIcon from "@/static/icons/scaleIcon";
+import { ButtonOption } from "@/core/abstract/baseButton";
+import { DefaultIcon } from "@/composite/icons";
 
 class SizeButton extends DragButton {
-  protected buttonLocation:ButtonLocation=ButtonLocation.RT;
+  protected buttonLocation:ButtonLocation=ButtonLocation.RB;
   private selfLocation:ButtonLocation;
-  constructor(location:ButtonLocation){
-    super();
+  protected icon: Icon=new DefaultIcon();
+  constructor(location:ButtonLocation,option?:ButtonOption){
+    super({
+      angleDisabled:true,
+      buttonOption:option,
+    },);
     this.selfLocation=location;
     this.buttonLocation=location;
     this.beforeMounted(location);
@@ -99,20 +107,6 @@ class SizeButton extends DragButton {
     // 现在 newDelta 包含了根据给定角度 angle 重新计算的移动速度
     this.master.addPosition(newDeltaX,newDeltaY);
     this.preMag = deltaScale < 1 ? mag + delta.mag() : mag - delta.mag();
-  }
-  draw(paint: Painter): void {
-    this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
-  }
-  drawButton(position: Vector, size: Size, radius: number, paint: Painter): void {
-    this.setAxis("horizontal");
-    //按钮渲染样式
-    this.draw = function (paint) {
-      const { x, y } = this.relativeRect.position;
-      Widgets.drawChangeSizeAlone(paint, {
-        offsetX: x,
-        offsetY: y,
-      });
-    };
   }
 }
 

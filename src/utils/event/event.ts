@@ -44,6 +44,9 @@ class Delta implements Delta {
     this.clean();
     this.beforeVector.toZero();
   }
+  get isZero():boolean{
+    return this._deltaX===0&&this._deltaY===0;
+  }
 }
 
 interface GestiEvent {

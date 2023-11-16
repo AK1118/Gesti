@@ -1,3 +1,10 @@
+/*
+ * @Author: AK1118 
+ * @Date: 2023-11-15 16:08:39 
+ * @Last Modified by:   AK1118 
+ * @Last Modified time: 2023-11-15 16:08:39 
+ */
+
 declare class Vector {
   x: number;
   y: number;
@@ -28,6 +35,7 @@ declare class Vector {
   double(): Vector;
 }
 
+
 declare class Size {
   width: number;
   height: number;
@@ -35,6 +43,26 @@ declare class Size {
   toVector(): Vector;
   copy(): Size;
   static get zero(): Size;
+}
+
+declare type ButtonOption={
+  location?:ButtonLocation,
+  icon?:Icon,
+};
+
+declare class Painter{}
+
+type IconDataType = number[][][];
+
+declare interface Icon {
+  color: string;
+  size: number;
+  //静态
+  get data(): IconDataType;
+  //设置大小时根据静态数据更新数据
+  computedData: IconDataType;
+  render(paint: Painter, location: Vector);
+  setSize(value: number): void;
 }
 
 export declare interface gesticonfig {
@@ -48,6 +76,7 @@ declare interface RectParams {
   width: number;
   height: number;
 }
+
 /**
  * 按钮位置枚举
  */
@@ -75,7 +104,8 @@ export declare interface TextOptions {
   width?: number;
   height?: number;
 }
-export declare interface createImageOptions {
+
+declare interface createImageOptions {
   data:
     | HTMLImageElement
     | SVGImageElement
@@ -93,6 +123,7 @@ export declare interface createImageOptions {
   maxScale?: number;
   minScale?: number;
 }
+
 export declare enum ViewObjectFamily {
   image,
   write,
@@ -366,38 +397,29 @@ export declare abstract class GestiController {
     options?: createImageOptions
   ): Promise<XImage>;
 }
-export declare abstract class Button {}
+
+declare abstract class BaseButton {
+  constructor(option?:ButtonOption);
+}
+
+export declare abstract class Button extends BaseButton{}
+
 export declare class CloseButton extends Button {
-  new(view: ViewObject): CloseButton;
-  constructor(view: ViewObject);
 }
 export declare class DragButton extends Button {
-  new(view: ViewObject): DragButton;
-  constructor(view: ViewObject);
 }
 export declare class MirrorButton extends Button {
-  new(view: ViewObject): MirrorButton;
-  constructor(view: ViewObject);
 }
 export declare class LockButton extends Button {
-  new(view: ViewObject): LockButton;
-  constructor(view: ViewObject);
 }
 export declare class RotateButton extends Button {
-  new(view: ViewObject): RotateButton;
-  constructor(view: ViewObject);
 }
 export declare class UnLockButton extends Button {
-  new(view: ViewObject): UnLockButton;
-  constructor(view: ViewObject);
+  constructor(option?:ButtonOption);
 }
 export declare class VerticalButton extends Button {
-  new(view: ViewObject): VerticalButton;
-  constructor(view: ViewObject);
 }
 export declare class HorizonButton extends Button {
-  new(view: ViewObject): HorizonButton;
-  constructor(view: ViewObject);
 }
 export declare const createGesti: (config?: gesticonfig) => Gesti;
 /**

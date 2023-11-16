@@ -6,6 +6,7 @@ import Rect, { Size } from "../../lib/rect";
 import { TextHandler } from "../../../types/index";
 import Vector from "../../lib/vector";
 import { Point } from "../../lib/vertex";
+import Platform from "../tools/platform";
 
 /**
  * 普通模式，矩形根据文字而定
@@ -18,7 +19,7 @@ export abstract class TextBoxBase extends ViewObject {
   protected textOptions: TextOptions = {
     fontSize: 20,
     color: "black",
-    spacing: 10,
+    spacing: 0,
     lineHeight: 1.5,
     bold: false,
     italic: false,
@@ -313,7 +314,7 @@ export abstract class TextBoxBase extends ViewObject {
       paint.fillText(
         text,
         point.x + this.renderTextOffsetX,
-        ~~(point.y + offsetY) + this.renderTextOffsetY
+        (point.y + offsetY) + this.renderTextOffsetY
       );
     };
     paint.save();
@@ -407,8 +408,19 @@ export abstract class TextBoxBase extends ViewObject {
   get isRenderCache(): boolean {
     return this._renderCache;
   }
-  protected cacheCanvas: HTMLCanvasElement;
+  protected cacheCanvas: HTMLCanvasElement | OffscreenCanvas;
   protected isDirty: boolean = true;
+  private isUseCache:boolean=true;
+  /**
+   * @description 使用缓存
+   * @test
+   */
+  public useCache(){
+    this.isUseCache=true;
+  }
+  public unUseCache(){
+    this.isUseCache=false;
+  }
   public didEventUpWithInner(): void {
     this.doCache();
   }
@@ -416,6 +428,8 @@ export abstract class TextBoxBase extends ViewObject {
     this.doCache();
   }
   protected doCache(): void {
+    //是否使用缓存
+    if(!this.isUseCache)return;
     //没变过大小就不缓存
     if (!this.isDirty) return;
     // this.updateFontSizeByRectSizeHeight();
@@ -433,13 +447,28 @@ export abstract class TextBoxBase extends ViewObject {
     this.render(painter, true);
     painter.translate(-this.width * 0.5, -this.height * 0.5);
   }
+  /**
+   * @description 获取平台的离屏画布
+   * @test
+   * @returns 
+   */
+  private getCacheCanvasByPlatform():any{
+    if(this.cacheCanvas)return this.cacheCanvas;
+    if(Platform.isBrowser)return new OffscreenCanvas(this.width, this.height);
+    if(Platform.isWeChatMiniProgram)return wx.createOffscreenCanvas(this.width,this.height);
+    //当前只支持浏览器和微信小程序离屏缓存
+    if(!Platform.isBrowser&&!Platform.isWeChatMiniProgram){
+      throw new Error("Your platform does not support OffscreenCanvas in [Gesti]. Please run textBox.unUseCache() to resolve this error.");
+    }
+    return this.cacheCanvas;
+  }
   //创建时,刷新缓存时调用
-  private createCacheCanvas(): HTMLCanvasElement {
+  private createCacheCanvas(): HTMLCanvasElement | OffscreenCanvas {
     this.cacheCanvas =
-      this.cacheCanvas ||
-      (document.getElementById("canvas2") as HTMLCanvasElement);
+     this.getCacheCanvasByPlatform();
     this.cacheCanvas.width = this.width;
     this.cacheCanvas.height = this.height;
+
     return this.cacheCanvas;
   }
   //渲染时调用
@@ -449,7 +478,7 @@ export abstract class TextBoxBase extends ViewObject {
   //获取画笔
   private getCacheCanvasPainter(): Painter {
     const cacheCanvas = this.getCacheCanvas();
-    return new Painter(cacheCanvas.getContext("2d"));
+    return new Painter(cacheCanvas.getContext("2d") as any);
   }
   protected onInput(value: string): void {}
 }

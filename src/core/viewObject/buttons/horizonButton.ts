@@ -8,12 +8,12 @@ import Widgets from "../../../static/widgets";
 import ViewObject from "../../abstract/view-object";
 import GestiConfig from "../../../config/gestiConfig";
 import DragButton from "./dragbutton";
+import { Icon } from "@/core/lib/icon";
+import { DefaultIcon } from "@/composite/icons";
 
 class HorizonButton extends DragButton {
   protected buttonLocation:ButtonLocation=ButtonLocation.RC;
-  draw(paint: Painter): void {
-    this.drawButton(this.relativeRect.position,this.master.rect.size,this.radius,paint);
-  }
+  protected icon: Icon=new DefaultIcon();
   public onUpWithInner(): void {
       this.computeSelfLocation();
   }
@@ -28,17 +28,6 @@ class HorizonButton extends DragButton {
       });
     // this.master.setScale(deltaScale);
     this.preMag = mag;
-  }
-  drawButton(position: Vector, size: Size, radius: number, paint: Painter): void {
-    this.setAxis("horizontal");
-    //按钮渲染样式
-    this.draw = function (paint) {
-      const { x, y } = this.relativeRect.position;
-      Widgets.drawChangeSizeAlone(paint, {
-        offsetX: x,
-        offsetY: y,
-      });
-    };
   }
 }
 

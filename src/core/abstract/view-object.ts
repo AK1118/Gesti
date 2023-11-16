@@ -82,12 +82,12 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     if (this.isMirror) paint.scale(-1, 1);
     if (this.selected) {
       //边框
-      this.drawSelected(paint);
+      this.drawSelectedBorder(paint,this.size);
       //按钮
       this.updateFuncButton(paint);
     } else {
       //根据配置开关虚线框
-      if (GestiConfig.dashedLine) this.strokeDashBorder(paint);
+      // if (GestiConfig.dashedLine) this.strokeDashBorder(paint);
     }
     paint.restore();
     paint.translate(0, 0);
@@ -104,22 +104,23 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * 被选中后外边框
    * @param paint
    */
-  public drawSelected(paint: Painter): void {
-    const padding=2;
+  public drawSelectedBorder(paint: Painter,size:Size): void {
+    const padding = 2;
     paint.beginPath();
     paint.lineWidth = 1;
     paint.strokeStyle = "#b2ccff";
     paint.strokeRect(
-      -this.rect.size.width-padding >> 1,
-      -this.rect.size.height-padding >> 1,
-      this.rect.size.width+padding + 1,
-      this.rect.size.height+padding + 1
+      (-this.width - padding) >> 1,
+      (-this.height - padding) >> 1,
+      this.width + padding + 1,
+      this.height + padding + 1
     );
     paint.closePath();
     paint.stroke();
   }
   /**
    * 对象渲染虚线框
+   * @deprecated
    */
   public strokeDashBorder(paint: Painter): void {
     paint.closePath();
@@ -128,10 +129,10 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     paint.setlineDash([3, 3]);
     paint.strokeStyle = "#999";
     paint.strokeRect(
-      -this.rect.size.width >> 1,
-      -this.rect.size.height >> 1,
-      this.rect.size.width + 1,
-      this.rect.size.height + 1
+      -this.width >> 1,
+      -this.height >> 1,
+      this.width + 1,
+      this.height + 1
     );
     paint.closePath();
     paint.stroke();
@@ -159,7 +160,8 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       const newy = Math.sin(angle) * len + y;
       const vector = new Vector(~~newx, ~~newy);
       button.updatePosition(vector);
-      button.render(paint);
+      //运动时不显示按钮
+      if (this.delta.isZero) button.render(paint);
     });
   }
   /**
@@ -205,6 +207,8 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       // item.setMaster(this);
       item.reset();
     });
+    //在下次运动前，delta应该置于0
+    this.delta.clean();
   }
   //
   public onUpWithInner(paint: Painter) {
@@ -239,7 +243,6 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.deltaScale = deltaScale;
     this.rect.setDeltaScale(deltaScale);
   }
-  
 
   /**
    * 世界坐标居中
@@ -269,7 +272,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   protected _didChangeDeltaScale(scale: number): void {
     this.computedRespectRatio();
   }
-  
+
   private computedRespectRatio(): void {
     /**
      目前宽高/绝对倍数=真实宽高
@@ -301,8 +304,8 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       rect: {
         x: ~~this.rect.position.x,
         y: ~~this.rect.position.y,
-        width: ~~this.rect.size.width,
-        height: ~~this.rect.size.height,
+        width: ~~this.width,
+        height: ~~this.height,
         angle: this.rect.getAngle,
       },
       relativeRect: {
