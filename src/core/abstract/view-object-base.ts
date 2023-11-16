@@ -224,7 +224,7 @@ abstract class BaseViewObject extends OperationObserver {
       if (!arr.includes(button.name) && !button.disabled) button.reset();
     });
   }
-  protected setFixedSize(size: { width?: number; height?: number }): void {
+  public setFixedSize(size: { width?: number; height?: number }): void {
     const { width, height } = size;
     this._fixedSize.setWidth(width ?? 0);
     this._fixedSize.setHeight(height ?? 0);

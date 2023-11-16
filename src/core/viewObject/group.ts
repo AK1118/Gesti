@@ -1,6 +1,6 @@
 /*
- * @Author: AK1118 
- * @Date: 2023-11-16 09:18:27 
+ * @Author: AK1118
+ * @Date: 2023-11-16 09:18:27
  * @Last Modified by: AK1118
  * @Last Modified time: 2023-11-16 10:02:43
  */
@@ -11,12 +11,12 @@ import Painter from "../lib/painter";
 import Rect from "../lib/rect";
 import Vector from "../lib/vector";
 /**
- * 
+ *
  */
 abstract class GroupBase extends ViewObject {
   private beforeAngle: number = 0;
   private views: Array<ViewObject> = [];
-  
+
   public ready(kit: ImageToolkit): void {
     //将组合添加到最底层
     kit.layerBottom(this);
@@ -25,7 +25,7 @@ abstract class GroupBase extends ViewObject {
     if (!obj)
       throw Error("The addition object should be of the ViewObject type.");
     this.views.push(obj);
-    if(this.mounted)this.onAddObj(obj);
+    if (this.mounted) this.onAddObj(obj);
     return this.views.length;
   }
   /**
@@ -50,14 +50,14 @@ abstract class GroupBase extends ViewObject {
    * @override
    */
   protected onMounted(): void {
-      //初始化子类
-      this.initializationChildren();
+    //初始化子类
+    this.initializationChildren();
   }
-  private initializationChildren():void{
-    this.views.forEach(_=>{
-      !_.mounted&&this.kit.mount(_);
+  private initializationChildren(): void {
+    this.views.forEach((_) => {
+      !_.mounted && this.kit.mount(_);
       this.onAddObj(_);
-    })
+    });
   }
   public remove(obj: ViewObject) {
     const ndx: number = this.views.findIndex((_) => _.key === obj.key);
@@ -69,12 +69,28 @@ abstract class GroupBase extends ViewObject {
   }
   /**
    * @override
-   * @param angle 
+   * @param angle
    */
   public didChangeAngle(angle: number): void {
     this.updateChildrenAngle();
   }
-  
+
+  protected didChangeScaleWidth(): void {
+   
+    this.views.forEach((_) => {
+      // _.setSize({ width: _.fixedSize.width * (this.scaleWidth)});
+      console.log(this.scaleWidth,_.scaleWidth);
+    //  _.setPosition(_.position.x+(_.sizeDelta.deltaX*.5),_.position.y);
+      // _.addPosition(11,0);
+    });
+  }
+
+  protected didChangeSize(size: Size): void {
+    this.views.forEach((_) => {
+      _.addPosition(this.delta.deltaX,this.delta.deltaY);
+    });
+  }
+
   /**
    * @description 计算中心点
    */
@@ -99,7 +115,7 @@ abstract class GroupBase extends ViewObject {
   }
   /**
    * @override
-   * @param scale 
+   * @param scale
    */
   public didChangeDeltaScale(scale: number): void {
     this.views.forEach((_: ViewObject) => {
@@ -123,32 +139,32 @@ abstract class GroupBase extends ViewObject {
     });
   }
   protected didChangePosition(position: Vector): void {
-      this.updateChildrenLocation();
+    this.updateChildrenLocation();
   }
   /**
    * @description 位置通过加法被改变
-   * @param delta 
+   * @param delta
    */
   protected didAddPosition(delta: Vector): void {
     this.views.forEach((_) => {
       _.addPosition(delta.x, delta.y);
     });
-    this.delta.update(this.position.copy())
+    this.delta.update(this.position.copy());
   }
   /**
    * @description 释放子元素
    * 释放子元素后，自会对自己就行隐藏，不会被Unmount
-   * 
-   * 
+   *
+   *
    */
-  public freeAll():void{
+  public freeAll(): void {
     this.views.forEach((_) => {
       _.unBackground();
     });
     this.hide();
   }
   protected onMount(): void {
-      this.kit?.layerBottom?.(this);
+    this.kit?.layerBottom?.(this);
   }
   /**
    * @description 根据子元素设置大小
@@ -162,7 +178,7 @@ abstract class GroupBase extends ViewObject {
         minY = 9999;
       const sum: Vector = new Vector(0, 0);
       this.views.forEach((item) => {
-        if(!item.mounted)return;
+        if (!item.mounted) return;
         const points = item.getVertex();
         points.forEach((_) => {
           maxX = Math.max(maxX, _.x);
@@ -173,7 +189,9 @@ abstract class GroupBase extends ViewObject {
       });
       const width = Math.floor(maxX - minX),
         height = Math.floor(maxY - minY);
+      this.setFixedSize({ width, height });
       this.setSize({ width, height });
+
       const max = new Vector(maxX, maxY);
       const min = new Vector(minX, minY);
       //计算设置位置
@@ -217,11 +235,9 @@ class Group extends GroupBase {
 
 export default Group;
 
-
-
 // /*
-//  * @Author: AK1118 
-//  * @Date: 2023-11-16 09:18:27 
+//  * @Author: AK1118
+//  * @Date: 2023-11-16 09:18:27
 //  * @Last Modified by: AK1118
 //  * @Last Modified time: 2023-11-16 10:02:43
 //  */
@@ -232,7 +248,7 @@ export default Group;
 // import Rect from "../lib/rect";
 // import Vector from "../lib/vector";
 // /**
-//  * 
+//  *
 //  */
 // abstract class GroupBase extends ViewObject {
 //   private beforeAngle: number = 0;
@@ -290,14 +306,14 @@ export default Group;
 //   }
 //   /**
 //    * @override
-//    * @param angle 
+//    * @param angle
 //    */
 //   public didChangeAngle(angle: number): void {
 //     this.updateChildrenAngle();
 //   }
 //   /**
 //    * @override
-//    * @param size 
+//    * @param size
 //    */
 //   protected didChangeSize(size: Size): void {
 //       this.views.forEach((item) => {
@@ -308,8 +324,7 @@ export default Group;
 //         // });
 //       });
 //   }
-  
-  
+
 //   /**
 //    * @description 根据子元素设置大小
 //    */
@@ -335,7 +350,7 @@ export default Group;
 //         height = Math.floor(maxY - minY);
 //         this.setFixedSize({ width, height });
 //       this.setSize({ width, height });
-      
+
 //       const max = new Vector(maxX, maxY);
 //       const min = new Vector(minX, minY);
 //       //计算设置位置
@@ -343,7 +358,7 @@ export default Group;
 //       sum.add(min);
 //       this.computePosition(sum);
 //     }
-    
+
 //   }
 //   /**
 //    * @description 计算中心点
@@ -369,7 +384,7 @@ export default Group;
 //   }
 //   /**
 //    * @override
-//    * @param scale 
+//    * @param scale
 //    */
 //   public didChangeDeltaScale(scale: number): void {
 //     this.views.forEach((_: ViewObject) => {
@@ -398,9 +413,9 @@ export default Group;
 //    * @override
 //    */
 //   protected didChangeScaleWidth(): void {
-  
+
 //     this.views.forEach((_) => {
-      
+
 //       //  console.log("差距",_.sizeDelta);
 //       //_.addPosition(_.sizeDelta.deltaX*-.5, 0);
 //       //_.setPosition(_.position.x+_.width*this.scaleWidth*.5, _.position.y)
@@ -411,7 +426,7 @@ export default Group;
 //   }
 //   /**
 //    * @description 位置通过加法被改变
-//    * @param delta 
+//    * @param delta
 //    */
 //   protected didAddPosition(delta: Vector): void {
 //     this.views.forEach((_) => {
@@ -422,8 +437,8 @@ export default Group;
 //   /**
 //    * @description 释放子元素
 //    * 释放子元素后，自会对自己就行隐藏，不会被Unmount
-//    * 
-//    * 
+//    *
+//    *
 //    */
 //   public freeAll():void{
 //     this.views.forEach((_) => {

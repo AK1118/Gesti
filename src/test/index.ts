@@ -61,10 +61,10 @@ const textBox2 = new TextBox(str1, {
 // loadToGesti(imageBox);
  loadToGesti(textBox2);
 const group: Group = new Group();
-group.add(textBox2);
+// group.add(textBox2);
  group.add(imageBox);
 
-textBox2.setPosition(0,0);
+// textBox2.setPosition(100,100);
 
 loadToGesti(group);
 
