@@ -1,14 +1,22 @@
+/*
+ * @Author: AK1118 
+ * @Date: 2023-11-16 09:18:27 
+ * @Last Modified by: AK1118
+ * @Last Modified time: 2023-11-16 10:02:43
+ */
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import Painter from "../lib/painter";
 import Rect from "../lib/rect";
 import Vector from "../lib/vector";
-
+/**
+ * 
+ */
 abstract class GroupBase extends ViewObject {
   private beforeAngle: number = 0;
   private views: Array<ViewObject> = [];
-  
+
   public ready(kit: ImageToolkit): void {
     //将组合添加到最底层
     kit.layerBottom(this);
@@ -17,7 +25,7 @@ abstract class GroupBase extends ViewObject {
     if (!obj)
       throw Error("The addition object should be of the ViewObject type.");
     this.views.push(obj);
-    this.onAddObj(obj);
+    if(this.mounted)this.onAddObj(obj);
     return this.views.length;
   }
   /**
@@ -26,11 +34,9 @@ abstract class GroupBase extends ViewObject {
    */
   onAddObj(obj: ViewObject) {
     //设置对象为背景对象，不给选中
-    if(this.mounted)obj.toBackground();
+    obj.toBackground();
     //计算设置大小
     this.computeSize();
-    //设置层级为最底层
-    this.kit?.layerBottom?.(this);
   }
   public addAll(objs: Array<ViewObject>): number {
     if (!Array.isArray(objs))
@@ -40,6 +46,19 @@ abstract class GroupBase extends ViewObject {
     objs.forEach((_) => this.add(_));
     return this.views.length;
   }
+  /**
+   * @override
+   */
+  protected onMounted(): void {
+      //初始化子类
+      this.initializationChildren();
+  }
+  private initializationChildren():void{
+    this.views.forEach(_=>{
+      !_.mounted&&this.kit.mount(_);
+      this.onAddObj(_);
+    })
+  }
   public remove(obj: ViewObject) {
     const ndx: number = this.views.findIndex((_) => _.key === obj.key);
     if (ndx != -1) this.views.splice(ndx, 1);
@@ -48,6 +67,10 @@ abstract class GroupBase extends ViewObject {
     const obj: ViewObject | undefined = this.views.find((_) => _.id === id);
     if (obj) this.remove(obj);
   }
+  /**
+   * @override
+   * @param angle 
+   */
   public didChangeAngle(angle: number): void {
     this.updateChildrenAngle();
   }
@@ -63,6 +86,7 @@ abstract class GroupBase extends ViewObject {
         minY = 9999;
       const sum: Vector = new Vector(0, 0);
       this.views.forEach((item) => {
+        if(!item.mounted)return;
         const points = item.getVertex();
         points.forEach((_) => {
           maxX = Math.max(maxX, _.x);
@@ -104,6 +128,10 @@ abstract class GroupBase extends ViewObject {
     });
     this.beforeAngle = this.rect.getAngle;
   }
+  /**
+   * @override
+   * @param scale 
+   */
   public didChangeDeltaScale(scale: number): void {
     this.views.forEach((_: ViewObject) => {
       //获取两点偏移量
@@ -172,8 +200,8 @@ class Group extends GroupBase {
   public drawSelected(paint: Painter): void {}
 
   drawImage(paint: Painter): void {
-    paint.fillStyle = "skyblue";
-    paint.fillRect(
+    paint.fillStyle = "red";
+    paint.strokeRect(
       this.rect.size.width * -0.5,
       this.rect.size.height * -0.5,
       this.rect.size.width,

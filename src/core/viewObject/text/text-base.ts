@@ -68,6 +68,14 @@ export abstract class TextBoxBase extends ViewObject {
     //设置字体大小
     paint.font = this.getFont();
   }
+  /**
+   * @override
+   */
+  public mount(): void {
+      this.computeTextSingle(true);
+      this.setMount(true);
+      // this.onMounted();
+  }
   protected computeTextSingle(
     isInitialization: boolean = false
   ): Array<TextSingle> {

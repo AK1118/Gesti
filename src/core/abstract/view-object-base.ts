@@ -86,13 +86,17 @@ abstract class BaseViewObject extends OperationObserver {
   
     public mount(): void {
       this._mounted = true;
-      this.onMount();
+      this.onMounted();
     }
     public unMount(): void {
+      if(!this._mounted)return;
       this._mounted = false;
       this.onUnMount();
     }
-  
+    protected setMount(isMounted:boolean):void{
+      this._mounted=isMounted;
+      this._mounted?this.onMounted():this.onUnMount();
+    }
     get mounted(): boolean {
       return this._mounted;
     }
@@ -218,7 +222,7 @@ abstract class BaseViewObject extends OperationObserver {
     protected forceUpdate() {
       this.kit.render();
     }
-    protected onMount(): void {}
+    protected onMounted(): void {}
     protected onUnMount(): void {}
     //手指抬起在范围内时调用
     protected didEventUpWithInner(): void {}

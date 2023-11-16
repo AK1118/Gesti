@@ -130,10 +130,10 @@ abstract class ImageToolkitBase {
    * @param item
    */
   private cleaning(item: ViewObject) {
-    if (item && item.rect) {
-      const { width, height } = item.rect.size;
-      if (width <= 3 && height <= 3) item.unMount();
-    }
+    // if (item && item.rect) {
+    //   const { width, height } = item.rect.size;
+    //   if (width <= 3 && height <= 3) item.unMount();
+    // }
   }
   public getCanvasRect(): Rect {
     return this.canvasRect;

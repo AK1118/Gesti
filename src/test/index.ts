@@ -52,19 +52,27 @@ const str=`你好，这是一篇英语短文1234567890 😄 ⚪ Redux
 const str1=`你好你好，
 这是一篇英语短文12
 34567890`;
-const textBox2 = new TextBox(str, {
+const textBox2 = new TextBox(str1, {
   color:"red",
   fontSize:10,
   backgroundColor:'white',
   maxWidth:300,
 });
-loadToGesti(imageBox);
-loadToGesti(textBox2);
-doCenter(textBox2);
+// loadToGesti(imageBox);
+ loadToGesti(textBox2);
 const group: Group = new Group();
-
-group.add(imageBox);
 group.add(textBox2);
+group.add(imageBox);
+
+textBox2.setPosition(0,0);
+
+loadToGesti(group);
+
+group.installButton(new HorizonButton());
+group.installButton(new VerticalButton());
+group.installButton(new SizeButton(ButtonLocation.LT));
+
+
 
 (document.querySelector("#input") as any).value=textBox2.value;
 (document.querySelector("#input") as HTMLElement).oninput=(e:any)=>{
