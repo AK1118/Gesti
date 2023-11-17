@@ -7,25 +7,26 @@ import Rect from "../lib/rect";
 import Vector from "../lib/vector";
 import { Icon } from "../lib/icon";
 import DefaultIcon from "@/static/icons/defaultIcon";
-export type ButtonOption={
-  location?:ButtonLocation,
-  icon?:Icon,
+export type ButtonOption = {
+  location?: ButtonLocation;
+  icon?: Icon;
 };
 //按钮抽象类
 export abstract class BaseButton implements RenderObject {
   protected icon: Icon = new DefaultIcon({
     color: "#c1c1c1",
-    size: 20,
+    size: 10,
   });
   //自定义位置
   private customLocation: ButtonLocation;
-  private customIcon:Icon;
+  private customIcon: Icon;
   //是否显示背景，按钮默认有一个白色背景
-  private displayBackground:boolean=true;
+  private displayBackground: boolean = true;
+  private background: string = "rgba(255,255,255,.8)";
   constructor(option?: ButtonOption) {
     if (!option) return;
     this.customLocation = option?.location;
-    this.customIcon=option?.icon;
+    this.customIcon = option?.icon;
   }
   protected abstract buttonLocation: ButtonLocation;
   name: string = "";
@@ -71,7 +72,7 @@ export abstract class BaseButton implements RenderObject {
    */
   public computeSelfLocation() {
     if (this.disabled) return;
-    this.setRelativePositionRect();
+    this.computeRelativePositionByLocation();
     if (!this.originPositionWithSize)
       this.originPositionWithSize = {
         offsetX: ~~this.relativeRect.position.x,
@@ -104,7 +105,9 @@ export abstract class BaseButton implements RenderObject {
   abstract effect(currentButtonRect?: Rect): void;
   abstract updatePosition(vector: Vector): void;
   draw(paint: Painter): void {
-    if(this.displayBackground)this.renderBackground(paint,this.relativeRect.position);
+    //是否显示背景
+    if (this.displayBackground)
+      this.renderBackground(paint, this.relativeRect.position);
     this.drawButton(
       this.relativeRect.position,
       this.master.rect.size,
@@ -112,11 +115,11 @@ export abstract class BaseButton implements RenderObject {
       paint
     );
   }
-  private renderBackground(paint:Painter,position:Vector):void{
+  private renderBackground(paint: Painter, position: Vector): void {
     paint.beginPath();
-    paint.arc(position.x,position.y,this.senseRadius,0,Math.PI*2);
+    paint.arc(position.x, position.y, this.senseRadius, 0, Math.PI * 2);
     paint.closePath();
-    paint.fillStyle="#ffffff";
+    paint.fillStyle = this.background;
     paint.fill();
   }
   render(paint: Painter): void {
@@ -127,7 +130,7 @@ export abstract class BaseButton implements RenderObject {
     this.master = master;
     this.beforeMounted();
     this.location = this.setLocationByEnum(this.customLocation);
-    this.icon=this.customIcon||this.icon;
+    this.icon = this.customIcon || this.icon;
     //icon的大小等于半径
     this.icon.setSize(this.radius);
     this.computeSelfLocation();
@@ -154,7 +157,7 @@ export abstract class BaseButton implements RenderObject {
     //如果没有自定义位置，就使用自己的位置
     const location = _location || this.buttonLocation;
     this.buttonLocation = location;
-    let result: [x: number, y: number];
+    let result: [x: number, y: number]=[0,0];
     switch (location) {
       case ButtonLocation.LT:
         result = [-0.5, -0.5];
@@ -180,35 +183,86 @@ export abstract class BaseButton implements RenderObject {
       case ButtonLocation.TC:
         result = [0, -0.5];
         break;
+      case ButtonLocation.OutBC:
+        result = [0, 0.75];
+        break;
     }
     return result;
+  }
+  /**
+   * @description 根据枚举的值获取固定的位置，比如rotateButton的位置
+   */
+  private getFixedLocationPosition(
+    location: ButtonLocation,
+    width: number,
+    height: number,
+    px: number,
+    py: number
+  ): [x: number, y: number] {
+    const distance: number = 30;
+    const hf=height*.5,wf=width*.5;
+    const baseX=width*px,baseY=height*py;
+    switch (location) {
+      case ButtonLocation.OutBC:
+        return [baseX,hf+ distance];
+      case ButtonLocation.OutTC:
+        return [baseX, -hf- distance];
+      case ButtonLocation.OutRC:
+        return [wf + distance, baseY];
+      case ButtonLocation.OutLC:
+        return [-wf - distance, baseY];
+      case ButtonLocation.OutLT:
+        return [-wf - distance, -hf- distance];
+      case ButtonLocation.OutLB:
+        return [-wf-distance, hf + distance];
+      case ButtonLocation.OutRT:
+        return [wf + distance,-hf-distance];
+      case ButtonLocation.OutRB:
+        return [wf+distance, hf+distance];
+    }
+    return [baseX, baseY];
   }
   /**
    * @description 根据父Box的大小宽度比作为基础定位
    * @param location ,占比值，四个点坐标
    */
-  public setRelativePositionRect() {
+  private computeRelativePositionByLocation() {
     const { width, height } = this.master.rect.size;
     const [percent_x, percent_y] = this.location;
-
-    //更改相对定位，看好了，这可是按钮类里面的
-    this.relativeRect.position = new Vector(
-      width * percent_x,
-      height * percent_y
+    const [cx, cy] = this.getFixedLocationPosition(
+      this.buttonLocation,
+      width,
+      height,
+      percent_x,
+      percent_y
     );
+    // if(this.buttonLocation===ButtonLocation.OutBC){
+    //   positionY=height*.5+30;
+    // }
+    //更改相对定位，看好了，这可是按钮类里面的
+    this.relativeRect.position.setXY(cx, cy);
   }
-  public updateRelativePosition() {
-    const master: Size = this.master.rect.size;
+  public getOriginDistance(): number {
+    return this.originDistance;
+  }
+  /**
+   * @description 渲染按钮时用的点是相对坐标
+   * @abstract
+   * @returns
+   */
+  protected updateRelativePosition() {
+    const master: Size = this.master.size;
     const { width, height } = master;
-    if(!this.scaleWithMaster){
-      this.scaleWithMaster=new Vector(1,1);
+    if (!this.scaleWithMaster) {
+      this.scaleWithMaster = new Vector(1, 1);
       return;
     }
-    let newWidth = width / this.scaleWithMaster.x,
-      newHeight = height / this.scaleWithMaster.y;
-    if (this.scaleWithMaster.x == 0) newWidth = 0;
-    if (this.scaleWithMaster.y == 0) newHeight = 0;
-    this.relativeRect.position.setXY(newWidth, newHeight);
+    let newX = width / this.scaleWithMaster.x,
+      newY = height / this.scaleWithMaster.y;
+    if (this.scaleWithMaster.x == 0) newX = 0;
+    if (this.scaleWithMaster.y == 0) newY = 0;
+    this.relativeRect.position.setXY(newX, newY);
+    this.computeRelativePositionByLocation();
     this.originDistance = Vector.mag(this.relativeRect.position);
   }
   public setRelativePosition(position: Vector) {
@@ -227,8 +281,17 @@ export abstract class BaseButton implements RenderObject {
     this.reset();
   }
   //设置Icon颜色
-  public setIconColor(color:string){
+  public setIconColor(color: string) {
     this.icon.setColor(color);
+  }
+  /**
+   * @description 关闭背景
+   */
+  public hideBackground() {
+    this.displayBackground = false;
+  }
+  public setBackgroundColor(color: string) {
+    this.background = color;
   }
   protected drawButton(
     position: Vector,

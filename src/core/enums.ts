@@ -40,6 +40,14 @@ enum ButtonLocation {
   BC,
   LC,
   TC,
+  OutBC,
+  OutTC,
+  OutRC,
+  OutLC,
+  OutLT,
+  OutLB,
+  OutRT,
+  OutRB,
 }
 export {
   FuncButtonTrigger,

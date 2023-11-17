@@ -8,7 +8,7 @@ import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import Painter from "../lib/painter";
-import Rect from "../lib/rect";
+import Rect, { Size } from "../lib/rect";
 import Vector from "../lib/vector";
 /**
  *
@@ -74,20 +74,40 @@ abstract class GroupBase extends ViewObject {
   public didChangeAngle(angle: number): void {
     this.updateChildrenAngle();
   }
-
-  protected didChangeScaleWidth(): void {
-   
+  protected didChangeScaleHeight(): void {
     this.views.forEach((_) => {
-      // _.setSize({ width: _.fixedSize.width * (this.scaleWidth)});
-      console.log(this.scaleWidth,_.scaleWidth);
-    //  _.setPosition(_.position.x+(_.sizeDelta.deltaX*.5),_.position.y);
-      // _.addPosition(11,0);
+      _.setFixedSize(
+        new Size(
+          _.width / (_.absoluteScale * this.scaleWidth),
+          _.height / (_.absoluteScale * this.scaleHeight)
+        )
+      );
+      _.setScaleWidth(this.scaleWidth);
+      _.setScaleHeight(this.scaleHeight);
+      _.addPosition(this.delta.deltaX * -1, this.delta.deltaY * -1);
+    });
+  }
+  protected didChangeScaleWidth(): void {
+    this.views.forEach((_) => {
+      _.setFixedSize(
+        new Size(
+          _.width / (_.absoluteScale * this.scaleWidth),
+          _.height / (_.absoluteScale * this.scaleHeight)
+        )
+      );
+      _.setScaleWidth(this.scaleWidth);
+      _.setScaleHeight(this.scaleHeight);
+      // _.setSize({ width: _.fixedSize.width * this.scaleWidth});
+      // console.log(this.scaleWidth);
+
+      // _.setPosition(_.position.x+(_.sizeDelta.deltaX*.5),_.position.y);
+      _.addPosition(this.delta.deltaX * -1, this.delta.deltaY * -1);
     });
   }
 
   protected didChangeSize(size: Size): void {
     this.views.forEach((_) => {
-      _.addPosition(this.delta.deltaX,this.delta.deltaY);
+      _.addPosition(this.delta.deltaX, this.delta.deltaY);
     });
   }
 
@@ -171,7 +191,7 @@ abstract class GroupBase extends ViewObject {
    */
   protected computeSize(): void {
     //组合必须两个及两个以上
-    if (this.views.length >= 1) {
+    if (this.views.length >= 2) {
       let maxX = -9999,
         maxY = -9999,
         minX = 9999,

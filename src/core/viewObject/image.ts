@@ -38,8 +38,8 @@ class ImageBox extends ViewObject {
   }
   //@Override
   public drawImage(paint: Painter): void {
-    paint.save();
-    paint.scale(this.scaleWidth, this.scaleHeight);
+    // paint.save();
+    // paint.scale(this.scaleWidth, this.scaleHeight);
     paint.drawImage(
       this.image,
       this.rect.position.x >> 0,
@@ -47,7 +47,7 @@ class ImageBox extends ViewObject {
       this.rect.size.width >> 0,
       this.rect.size.height >> 0
     );
-    paint.restore()
+   // paint.restore()
   }
   async export(painter?: Painter): Promise<Object> {
     const cutter: Cutter = new Cutter(painter);

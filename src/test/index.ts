@@ -58,23 +58,29 @@ const textBox2 = new TextBox(str1, {
   backgroundColor:'white',
   maxWidth:300,
 });
-// loadToGesti(imageBox);
- loadToGesti(textBox2);
+loadToGesti(imageBox);
+//  loadToGesti(textBox2);
 const group: Group = new Group();
+
+textBox2.setPosition(0,0)
+
+// group.add(imageBox);
 // group.add(textBox2);
- group.add(imageBox);
 
-// textBox2.setPosition(100,100);
 
-loadToGesti(group);
+// loadToGesti(group);
 
-group.installButton(new HorizonButton(ButtonLocation.RC));
-group.installButton(new HorizonButton(ButtonLocation.LC));
-group.installButton(new VerticalButton(ButtonLocation.BC));
-group.installButton(new VerticalButton(ButtonLocation.TC));
-group.installButton(new SizeButton(ButtonLocation.LT));
-group.installButton(new DragButton());
 
+
+imageBox.installButton(new HorizonButton(ButtonLocation.RC));
+imageBox.installButton(new HorizonButton(ButtonLocation.LC));
+imageBox.installButton(new VerticalButton(ButtonLocation.BC));
+imageBox.installButton(new VerticalButton(ButtonLocation.TC));
+imageBox.installButton(new SizeButton(ButtonLocation.LT));
+imageBox.installButton(new DragButton());
+imageBox.installButton(new RotateButton({
+  location:ButtonLocation.OutRB
+}));
 
 (document.querySelector("#input") as any).value=textBox2.value;
 (document.querySelector("#input") as HTMLElement).oninput=(e:any)=>{

@@ -10,33 +10,31 @@ class RotateIcon extends IconBase{
         const scale = this.size / this.fixedSize;
         const x=location.x,y=location.y;
         const offset = this.size * -0.5;
-        const drawX =  x + offset*scale,drawY = y+ offset*scale;
         paint.beginPath();
         paint.fillStyle =this.color;
         paint.strokeStyle =this.color;
-        paint.arc(x,y,10*scale,0,Math.PI*.9);
+        paint.arc(x,y,12*scale,0,Math.PI*.9);
         paint.stroke();
         paint.closePath();
         paint.beginPath();
       
-        paint.arc(x,y,10*scale,Math.PI,Math.PI*1.9);
+        paint.arc(x,y,12*scale,Math.PI,Math.PI*1.9);
         paint.stroke();
         paint.closePath();
 
         paint.beginPath();
-        paint.moveTo(x-13*scale,y-4*scale);
-        paint.lineTo(x-10*scale,y);
-        paint.lineTo(x-5*scale,y-4*scale);
+        paint.moveTo(x-15*scale,y-4*scale);
+        paint.lineTo(x-12*scale,y);
+        paint.lineTo(x-8*scale,y-4*scale);
         paint.stroke();
         paint.closePath();
 
         paint.beginPath();
-        paint.moveTo(x+13*scale,y+4*scale);
-        paint.lineTo(x+10*scale,y);
-        paint.lineTo(x+5*scale,y+4*scale);
+        paint.moveTo(x+15*scale,y+4*scale);
+        paint.lineTo(x+12*scale,y);
+        paint.lineTo(x+8*scale,y+4*scale);
         paint.stroke();
         paint.closePath();
-        
     }
     
 }

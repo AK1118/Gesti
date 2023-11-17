@@ -26,7 +26,7 @@ class Delta implements Delta {
       vector,
       this.beforeVector
     ).toArray();
-    this.beforeVector = vector;
+    this.beforeVector = vector.copy();
   }
   get deltaX(): number {
     return this._deltaX;

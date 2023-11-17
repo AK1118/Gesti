@@ -106,11 +106,12 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * 被选中后外边框
    * @param paint
    */
+  private readonly borderColor:string="#b2ccff";
   public drawSelectedBorder(paint: Painter, size: Size): void {
     const padding = 2;
     paint.beginPath();
     paint.lineWidth = 1;
-    paint.strokeStyle = "#b2ccff";
+    paint.strokeStyle = this.borderColor;
     paint.strokeRect(
       (-this.width - padding) >> 1,
       (-this.height - padding) >> 1,
@@ -124,22 +125,22 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * 对象渲染虚线框
    * @deprecated
    */
-  public strokeDashBorder(paint: Painter): void {
-    paint.closePath();
-    paint.beginPath();
-    paint.lineWidth = 1;
-    paint.setlineDash([3, 3]);
-    paint.strokeStyle = "#999";
-    paint.strokeRect(
-      -this.width >> 1,
-      -this.height >> 1,
-      this.width + 1,
-      this.height + 1
-    );
-    paint.closePath();
-    paint.stroke();
-    paint.setlineDash([]);
-  }
+  // public strokeDashBorder(paint: Painter): void {
+  //   paint.closePath();
+  //   paint.beginPath();
+  //   paint.lineWidth = 1;
+  //   paint.setlineDash([3, 3]);
+  //   paint.strokeStyle = "#999";
+  //   paint.strokeRect(
+  //     -this.width >> 1,
+  //     -this.height >> 1,
+  //     this.width + 1,
+  //     this.height + 1
+  //   );
+  //   paint.closePath();
+  //   paint.stroke();
+  //   paint.setlineDash([]);
+  // }
   /**
    * 镜像翻转
    */
@@ -147,7 +148,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.isMirror = isMirror;
   }
   /**
-   * @description 刷新功能点
+   * @description 刷新按钮
    * @param paint
    */
   private updateFuncButton(paint: Painter): void {
@@ -155,7 +156,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     const x: number = rect.position.x,
       y: number = rect.position.y;
     this.funcButton.forEach((button: Button) => {
-      const len: number = button.originDistance;
+      const len: number = button.getOriginDistance();
       if (button.disabled) return;
       const angle = this.rect.getAngle + button.oldAngle;
       const newx = Math.cos(angle) * len + x;
@@ -167,7 +168,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     });
   }
   /**
-   * @description 功能点是否被点击
+   * @description 按钮是否被点击
    * @param eventPosition
    * @returns
    */
@@ -210,7 +211,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       item.reset();
     });
     //在下次运动前，delta应该置于0
-    this.delta.clean();
+    this.delta.cleanCurrentAndBefore();
   }
   //
   public onUpWithInner(paint: Painter) {

@@ -26,8 +26,7 @@ class DragButton extends BaseButton {
     options?: {
       angleDisabled?: boolean;
       buttonOption?: ButtonOption,
-    },
-    
+    }
   ) {
     super(options?.buttonOption);
     this.rect.onDrag = (currentButtonRect: Rect) => {
@@ -51,7 +50,7 @@ class DragButton extends BaseButton {
    * 为拖拽改变大小初始化
    */
   private initScale() {
-    this.setRelativePositionRect();
+    // this.computeRelativePositionByLocation();
     this.preMag = -1;
   }
   effect(currentButtonRect?: Rect): void {

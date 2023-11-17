@@ -1,6 +1,6 @@
 import { ButtonLocation, FuncButtonTrigger } from "../../enums";
 
-import BaseButton from "../../abstract/baseButton";
+import BaseButton, { ButtonOption } from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
 import Vector from "../../lib/vector";
@@ -19,13 +19,10 @@ class RotateButton extends BaseButton {
   public radius: number = 10;
   private disable: boolean = false;
   key: string | number = +new Date();
-  protected buttonLocation:ButtonLocation=ButtonLocation.BC;
-  constructor() {
-    super();
+  protected buttonLocation:ButtonLocation=ButtonLocation.OutBC;
+  constructor(buttonOption?: ButtonOption) {
+    super(buttonOption);
     this.name = "rotate";
-    // this.init({
-    //   position: new Vector(0, master.rect.size.height * 0.5 + 10),
-    // });
     this.initScale();
     this.rect.onDrag = (newRect: Rect) => {
       /*拖拽缩放*/
