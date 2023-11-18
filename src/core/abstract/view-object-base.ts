@@ -10,6 +10,8 @@ import GestiConfig from "../../config/gestiConfig";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
+import { ViewObjectExportEntity } from "@/types/serialization";
+// import { ViewObjectExportEntity } from "@/types/index";
 
 /**
  * 图层基类
@@ -235,6 +237,14 @@ abstract class BaseViewObject extends OperationObserver {
   protected forceUpdate() {
     this.kit.render();
   }
+  //导出为JSON
+  abstract export(painter?: Painter): Promise<ViewObjectExportEntity>;
+  //微信端导出
+  abstract exportWeChat(
+    painter?: Painter,
+    canvas?: any
+  ): Promise<ViewObjectExportEntity>;
+  // abstract import()
   protected onMounted(): void {}
   protected onUnMount(): void {}
   //手指抬起在范围内时调用
@@ -249,6 +259,7 @@ abstract class BaseViewObject extends OperationObserver {
   protected _didChangeScaleWidth(): void {}
 
   protected _didChangeScaleHeight(): void {}
+
 }
 
 export default BaseViewObject;

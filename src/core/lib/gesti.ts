@@ -84,6 +84,7 @@ class Gesti {
     this._controller = null;
     this.kit = null;
   }
+  
   static Family = ViewObjectFamily;
 }
 

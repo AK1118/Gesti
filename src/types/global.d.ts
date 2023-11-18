@@ -1,3 +1,5 @@
+
+
 //uniapp
 declare const uni: any;
 //微信小程序
@@ -26,6 +28,7 @@ declare interface RectParams {
   y?: number;
   width: number;
   height: number;
+  angle?:number,
 }
 /**
  * @description 初始化传入参数
@@ -76,6 +79,8 @@ declare class Vector {
   toZero(): void;
   double(): Vector;
 }
+
+
 
 declare interface GestiEventParams {
   v: Vector | Vector[];
@@ -129,6 +134,10 @@ declare interface createImageOptions {
    * 图片原始高度
    */
   fixedHeight?: number;
+  /**
+   * 图片网络地址
+   */
+  url?:string,
 }
 
 declare interface XImageOptions {
@@ -271,6 +280,8 @@ declare type GestiControllerListenerTypes =
 declare function textHandler(options?: TextOptions): any;
 
 declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";
+
+
 declare type Boundary = {
   x: number;
   y: number;
@@ -292,3 +303,8 @@ declare interface FixedOption {
   fontSize: number;
   maxWidth: number;
 }
+
+/**
+ * @description 导出平台，导出只有两个平台
+ */
+declare type PlatformType = "WeChat" | "Browser";

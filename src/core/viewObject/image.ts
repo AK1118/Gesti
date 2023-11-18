@@ -1,14 +1,17 @@
-import ViewObject, { toJSONInterface } from "../abstract/view-object";
+import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import Painter from "../lib/painter";
 import Rect from "../lib/rect";
-import { ImageChunk } from "../../types/index";
 import Cutter from "../../utils/cutters/cutter-H5";
 import ImageChunkConverterH5 from "../../utils/converters/image-chunk-converter-H5";
 import ImageChunkConverter from "../../utils/converters/image-chunk-converter-H5";
 import ImageChunkConverterWeChat from "../../utils/converters/image-chunk-converter-WeChat";
 import XImage from "../lib/ximage";
 import CutterWeChat from "../..//utils/cutters/cutter-WeChat";
+import CutterH5 from "../../utils/cutters/cutter-H5";
+import Platform from "./tools/platform";
+import { FetchXImageForImportCallback, ViewObjectExportImageBox, ViewObjectImportBaseInfo, ViewObjectImportImageBox } from "@/types/serialization";
+import { ImageChunk } from "@/types/index";
 class ImageBox extends ViewObject {
   family: ViewObjectFamily = ViewObjectFamily.image;
   get value(): any {
@@ -47,44 +50,49 @@ class ImageBox extends ViewObject {
       this.rect.size.width >> 0,
       this.rect.size.height >> 0
     );
-   // paint.restore()
+    // paint.restore()
   }
-  async export(painter?: Painter): Promise<Object> {
+  async export(painter?: Painter): Promise<ViewObjectExportImageBox> {
     const cutter: Cutter = new Cutter(painter);
     const chunkSize: number = 200;
-    const chunks: ImageChunk[] = await cutter.getChunks(chunkSize, this.ximage);
-    const coverter: ImageChunkConverter = new ImageChunkConverterH5();
-    const base64s: ImageChunk[] = coverter.coverAllImageChunkToBase64(chunks);
-    const json: toJSONInterface = {
-      viewObjType: "image",
-      options: {
-        options: {
-          data: base64s,
-        },
-        ...this.getBaseInfo(),
-        fixedWidth: this.ximage.fixedWidth,
-        fixedHeight: this.ximage.fixedHeight,
-      },
+    const url: string = this.ximage.url;
+    let data: ImageChunk[];
+    if (!url) {
+      const chunks: ImageChunk[] = await cutter.getChunks(
+        chunkSize,
+        this.ximage
+      );
+      const coverter: ImageChunkConverter = new ImageChunkConverterH5();
+      data = coverter.coverAllImageChunkToBase64(chunks);
+    }
+    //有图片路径时不适用切片数据
+    const json: ViewObjectExportImageBox = {
+      type: "image",
+      base: this.getBaseInfo(),
+      fixedHeight: this.ximage.fixedHeight,
+      fixedWidth: this.ximage.fixedWidth,
+      data,
+      url,
     };
     return json;
   }
-  async exportWeChat(painter?: Painter): Promise<Object> {
+  async exportWeChat(painter?: Painter): Promise<ViewObjectExportImageBox> {
     const cutter: CutterWeChat = new CutterWeChat(painter);
     const chunkSize: number = 200;
     const chunks: ImageChunk[] = await cutter.getChunks(chunkSize, this.ximage);
-    const converter: ImageChunkConverterWeChat = new ImageChunkConverterWeChat();
+    const converter: ImageChunkConverterWeChat =
+      new ImageChunkConverterWeChat();
     const base64s: ImageChunk[] = converter.coverAllImageChunkToBase64(chunks);
-    const json: toJSONInterface = {
-      viewObjType: "image",
-      options: {
-        options: {
-          data: base64s,
-        },
-        ...this.getBaseInfo(),
-        fixedWidth: this.ximage.fixedWidth,
-        fixedHeight: this.ximage.fixedHeight,
-      },
+
+    const json: ViewObjectExportImageBox = {
+      type: "image",
+      base: this.getBaseInfo(),
+      fixedHeight: this.ximage.fixedHeight,
+      fixedWidth: this.ximage.fixedWidth,
+      data: base64s,
+      url: this.ximage.url,
     };
+
     return json;
   }
   public didDrag(value: { size: Size; angle: number }): void {
@@ -93,7 +101,84 @@ class ImageBox extends ViewObject {
   public getXImage(): XImage {
     return this.ximage;
   }
+  /**
+   * 请求
+   */
+  private static fetchXImageCallback: FetchXImageForImportCallback = async (
+    entity: ViewObjectImportImageBox
+  ): Promise<XImage> => {
+    const url: string = entity.url;
+    const base: ViewObjectImportBaseInfo = entity.base;
+    const platform: PlatformType = Platform.platform;
+    if (platform == "Browser") {
+      const img = new Image();
+      img.src = url;
+      img.crossOrigin="anonymous";
+      await this._loadImg(img);
+      return new XImage({
+        data: img,
+        height: entity.fixedHeight,
+        width: entity.fixedWidth,
+        url,
+      });
+    }else if(platform=="WeChat"){
+      const offCanvas = wx.createOffscreenCanvas({
+        type: "2d",
+        width: entity.fixedWidth,
+        height: entity.fixedHeight,
+      });
+      const img=offCanvas.createImage();
+      img.src = url;
+      if(img?.crossOrigin)img.crossOrigin="anonymous";
+      await this._loadImg(img);
+      return new XImage({
+        data: img,
+        height: entity.fixedHeight,
+        width: entity.fixedWidth,
+        url,
+      });
+    }
+    return null;
+  };
   
+  private  static  async _loadImg(img):Promise<void>{
+    return new Promise((r)=>{
+      img.onload=()=>r();
+    });
+  }
 
+  public static setFetchXImageCallback(
+    _fetchXImageCallback: FetchXImageForImportCallback
+  ): void {
+    ImageBox.fetchXImageCallback = _fetchXImageCallback;
+  }
+  
+  static async reverse(entity: ViewObjectImportImageBox): Promise<ImageBox> {
+    const base: ViewObjectImportBaseInfo = entity.base,
+      url: string = entity?.url,
+      chunks: ImageChunk[] = entity?.data;
+    if (url) {
+      //网络路径存在，不负责请求，任务交由开发者，通过回调函数获取用户传入的XImage
+      const xImage: XImage = await ImageBox.fetchXImageCallback(entity);
+      if(!xImage)throw Error("Your platform does not support fetching this URL for ximage; you could run 'ImageBox.setFetchXImageCallback' to customize the fetch method and resolve this error.")
+      return new ImageBox(xImage);
+    } else if (chunks && chunks?.length != 0) {
+      //使用数据切片合并图片
+      const cutter = new CutterH5();
+      const source: ImageData = await cutter.merge(
+        entity.fixedWidth,
+        entity.fixedHeight,
+        chunks
+      );
+      const imageBitmap: ImageBitmap = await createImageBitmap(source);
+      const ximage = new XImage({
+        data: imageBitmap,
+        width: imageBitmap.width,
+        height: imageBitmap.height,
+      });
+      return new ImageBox(ximage);
+    }
+     return null;
+  }
 }
 export default ImageBox;

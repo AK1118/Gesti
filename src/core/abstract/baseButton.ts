@@ -19,6 +19,12 @@ export abstract class BaseButton implements RenderObject {
   });
   //自定义位置
   private customLocation: ButtonLocation;
+  /**
+   * 获取按钮的位置枚举
+   */
+  get btnLocation(): ButtonLocation {
+    return this.buttonLocation;
+  }
   private customIcon: Icon;
   //是否显示背景，按钮默认有一个白色背景
   private displayBackground: boolean = true;
@@ -49,6 +55,16 @@ export abstract class BaseButton implements RenderObject {
   private canBeeLocking: boolean = true;
   //与寄主的位置关系，根据寄主的大小获取最初的距离
   private originPositionWithSize: Offset;
+  private _mounted:boolean=false;
+  get mounted():boolean{
+    return this._mounted;
+  }
+  public mount():void{
+    this._mounted=true;
+  }
+  public unMount():void{
+    this._mounted=false;
+  }
   //能被锁住就不是自由的
   get isFree(): boolean {
     return !this.canBeeLocking;
@@ -134,6 +150,7 @@ export abstract class BaseButton implements RenderObject {
     //icon的大小等于半径
     this.icon.setSize(this.radius);
     this.computeSelfLocation();
+    this.mount();
     this.afterMounted();
   }
   protected beforeMounted(...args): void {}
@@ -155,9 +172,9 @@ export abstract class BaseButton implements RenderObject {
     _location?: ButtonLocation
   ): [x: number, y: number] {
     //如果没有自定义位置，就使用自己的位置
-    const location = _location || this.buttonLocation;
+    const location = _location ?? this.buttonLocation;
     this.buttonLocation = location;
-    let result: [x: number, y: number]=[0,0];
+    let result: [x: number, y: number] = [0, 0];
     switch (location) {
       case ButtonLocation.LT:
         result = [-0.5, -0.5];
@@ -200,25 +217,27 @@ export abstract class BaseButton implements RenderObject {
     py: number
   ): [x: number, y: number] {
     const distance: number = 30;
-    const hf=height*.5,wf=width*.5;
-    const baseX=width*px,baseY=height*py;
+    const hf = height * 0.5,
+      wf = width * 0.5;
+    const baseX = width * px,
+      baseY = height * py;
     switch (location) {
       case ButtonLocation.OutBC:
-        return [baseX,hf+ distance];
+        return [baseX, hf + distance];
       case ButtonLocation.OutTC:
-        return [baseX, -hf- distance];
+        return [baseX, -hf - distance];
       case ButtonLocation.OutRC:
         return [wf + distance, baseY];
       case ButtonLocation.OutLC:
         return [-wf - distance, baseY];
       case ButtonLocation.OutLT:
-        return [-wf - distance, -hf- distance];
+        return [-wf - distance, -hf - distance];
       case ButtonLocation.OutLB:
-        return [-wf-distance, hf + distance];
+        return [-wf - distance, hf + distance];
       case ButtonLocation.OutRT:
-        return [wf + distance,-hf-distance];
+        return [wf + distance, -hf - distance];
       case ButtonLocation.OutRB:
-        return [wf+distance, hf+distance];
+        return [wf + distance, hf + distance];
     }
     return [baseX, baseY];
   }
@@ -293,6 +312,15 @@ export abstract class BaseButton implements RenderObject {
   public setBackgroundColor(color: string) {
     this.background = color;
   }
+  public setLocation(location: ButtonLocation): void {
+    this.customLocation = location;
+    this.buttonLocation=location;
+    //如果已经被初始化
+    if (this.mounted){
+      this.initialization(this.master);
+    }
+  }
+
   protected drawButton(
     position: Vector,
     size: Size,

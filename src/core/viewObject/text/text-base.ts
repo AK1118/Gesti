@@ -1,4 +1,4 @@
-import ViewObject, { toJSONInterface } from "../../abstract/view-object";
+import ViewObject from "../../abstract/view-object";
 import { ViewObjectFamily } from "../../enums";
 import ImageToolkit from "../../lib/image-toolkit";
 import Painter from "../../lib/painter";
@@ -7,7 +7,7 @@ import { TextHandler } from "../../../types/index";
 import Vector from "../../lib/vector";
 import { Point } from "../../lib/vertex";
 import Platform from "../tools/platform";
-
+import { FetchXImageForImportCallback, ViewObjectExportEntity, ViewObjectExportImageBox, ViewObjectImportBaseInfo, ViewObjectImportImageBox } from "@/types/serialization";
 /**
  * 普通模式，矩形根据文字而定
  * 拖拽模式，文字根据缩放倍数而定
@@ -542,11 +542,10 @@ class TextViewBase extends TextBoxBase implements TextHandler {
       this.isDirty = true;
     }
   }
-
-  export(painter?: Painter): Promise<Object> {
+  export(painter?: Painter): Promise<ViewObjectExportEntity> {
     throw new Error("Method not implemented.");
   }
-  exportWeChat(painter?: Painter, canvas?: any): Promise<Object> {
+  exportWeChat(painter?: Painter, canvas?: any): Promise<ViewObjectExportEntity> {
     throw new Error("Method not implemented.");
   }
   setFontSize(fontSize: number): void {

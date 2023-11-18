@@ -7,7 +7,7 @@ import SizeButton from "@/core/viewObject/buttons/sizeButton";
 import Group from "@/core/viewObject/group";
 import TextArea from "@/core/viewObject/text/text-area";
 import { createGesti, createImageBox, createTextBox, createXImage, doCenter, exportAll, importAll, loadToGesti } from "@/hooks/index";
-import { CloseButton, HorizonButton, LockButton, MirrorButton, TextBox, UnLockButton, VerticalButton } from "@/index";
+import { CloseButton, HorizonButton, LockButton, MirrorButton, TextBox, UnLockButton, VerticalButton, XImage } from "@/index";
 import DragIcon from "@/static/icons/dragIcon";
 import ScaleIcon from "@/static/icons/scaleIcon";
 
@@ -37,7 +37,9 @@ const ximage = createXImage({
   width: img2.width,
   height: img2.height,
   scale: .5,
+  // url:img2.src,
 });
+
 const imageBox = createImageBox(ximage);
 const str=`你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show 
@@ -63,7 +65,7 @@ loadToGesti(imageBox);
 const group: Group = new Group();
 
 textBox2.setPosition(0,0)
-
+doCenter(imageBox)
 // group.add(imageBox);
 // group.add(textBox2);
 
@@ -77,10 +79,11 @@ imageBox.installButton(new HorizonButton(ButtonLocation.LC));
 imageBox.installButton(new VerticalButton(ButtonLocation.BC));
 imageBox.installButton(new VerticalButton(ButtonLocation.TC));
 imageBox.installButton(new SizeButton(ButtonLocation.LT));
-imageBox.installButton(new DragButton());
-imageBox.installButton(new RotateButton({
-  location:ButtonLocation.OutRB
+imageBox.installButton(new MirrorButton({
+  location:ButtonLocation.OutRT
 }));
+imageBox.installButton(new DragButton());
+imageBox.installButton(new RotateButton());
 
 (document.querySelector("#input") as any).value=textBox2.value;
 (document.querySelector("#input") as HTMLElement).oninput=(e:any)=>{

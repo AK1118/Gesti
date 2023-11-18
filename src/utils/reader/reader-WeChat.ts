@@ -38,12 +38,13 @@ class GestiReaderWechat extends GestiReader {
             options.options.data,
             weChatCanvas
           );
-          const image = weChatCanvas.createImage();
+         
           const offCanvas = wx.createOffscreenCanvas({
             type: "2d",
             width: options.fixedWidth,
             height: options.fixedHeight,
           });
+          const image = offCanvas.createImage();
           const offPaint = offCanvas.getContext("2d");
           offPaint.putImageData(source, 0, 0);
           image.src = offCanvas.toDataURL();
@@ -71,24 +72,24 @@ class GestiReaderWechat extends GestiReader {
     return viewObject;
   }
 
-  public async getObjectByJson(
-    str: string,
-    painter?: Painter,
-    weChatCanvas?: any
-  ) {
-    const json = JSON.parse(str);
-    const { options } = json;
-    const rect: Rect = this.getRectByRectJson(options.rect);
-    const relativeRect: Rect = super.getRectByRectJson(options.relativeRect);
-    let viewObject: ViewObject = await this.getViewObject(
-      json.viewObjType,
-      options,
-      painter,
-      weChatCanvas
-    );
-    this.buildUp(viewObject, rect, relativeRect, options);
-    return viewObject;
-  }
+  // public async getObjectByJson(
+  //   str: string,
+  //   painter?: Painter,
+  //   weChatCanvas?: any
+  // ) {
+  //   // const json = JSON.parse(str);
+  //   // const { options } = json;
+  //   // const rect: Rect = this.getRectByRectJson(options.rect);
+  //   // const relativeRect: Rect = super.getRectByRectJson(options.relativeRect);
+  //   // let viewObject: ViewObject = await this.getViewObject(
+  //   //   json.viewObjType,
+  //   //   options,
+  //   //   painter,
+  //   //   weChatCanvas
+  //   // );
+  //   // this.buildUp(viewObject, rect, relativeRect, options);
+  //   // return viewObject;
+  // }
 }
 
 export default GestiReaderWechat;

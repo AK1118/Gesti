@@ -7,6 +7,11 @@ class Platform{
     static get isWeChatMiniProgram():boolean{
         return typeof wx!=="undefined";
     }
+    static get platform():PlatformType{
+        if(Platform.isBrowser)return "Browser";
+        if(Platform.isWeChatMiniProgram)return "WeChat";
+        return "Browser";
+    }
 }
 
 export default Platform;

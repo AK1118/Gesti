@@ -4,6 +4,7 @@
  * @Last Modified by: AK1118
  * @Last Modified time: 2023-11-16 10:02:43
  */
+import { FetchXImageForImportCallback, ViewObjectExportEntity, ViewObjectExportImageBox, ViewObjectImportBaseInfo, ViewObjectImportImageBox } from "@/types/serialization";
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
@@ -245,10 +246,10 @@ class Group extends GroupBase {
     );
     paint.stroke();
   }
-  export(painter?: Painter): Promise<Object> {
+  export(painter?: Painter): Promise<ViewObjectExportEntity> {
     throw new Error("Method not implemented.");
   }
-  exportWeChat(painter?: Painter, canvas?: any): Promise<Object> {
+  exportWeChat(painter?: Painter, canvas?: any): Promise<ViewObjectExportEntity> {
     throw new Error("Method not implemented.");
   }
 }

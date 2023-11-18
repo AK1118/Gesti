@@ -98,7 +98,6 @@ import LockButton from "./core/viewObject/buttons/lockbutton";
 import UnLockButton from "./core/viewObject/buttons/delockButton";
 import VerticalButton from "./core/viewObject/buttons/verticalButton";
 import HorizonButton from "./core/viewObject/buttons/horizonButton";
-import Manipulator from "./core/viewObject/tools/manipulator";
 
 //按钮
 export {
@@ -112,7 +111,6 @@ export {
   HorizonButton,
   SizeButton,
   ButtonLocation,
-  Manipulator
 };
 export { ImageBox, XImage, TextBox, WriteViewObj };
 //枚举

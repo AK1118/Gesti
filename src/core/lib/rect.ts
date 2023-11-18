@@ -40,16 +40,15 @@ export class Size {
   public setHeight(height: number): void {
     this._height = height;
   }
-  public toObject():{
-    width:number,
-    height:number,
-  }{
+  public toObject(): {
+    width: number;
+    height: number;
+  } {
     return {
-      width:this._width,
-      height:this._height
-    }
+      width: this._width,
+      height: this._height,
+    };
   }
-  
 }
 
 class Rect extends ObserverObj {
@@ -60,14 +59,11 @@ class Rect extends ObserverObj {
   private _position: Vector;
   private _size: Size;
   private _deltaScale: number;
-  private _absoluteScale:number=1;
+  private _absoluteScale: number = 1;
   public readonly key: string = Math.random().toString(16).substring(2);
   constructor(
     params?: RectParams,
     key?: string,
-    options?: {
-      angle: number;
-    }
   ) {
     super();
     const { width, height, x, y } = params || {
@@ -81,9 +77,8 @@ class Rect extends ObserverObj {
     if (key) {
       this.key = key;
     }
-    if (options) {
-      const { angle } = options;
-      this.setAngle(angle);
+    if (params?.angle) {
+      this.setAngle(params?.angle);
     }
   }
   public updateVertex(): void {
@@ -106,7 +101,7 @@ class Rect extends ObserverObj {
   public get size(): Size {
     return this._size;
   }
-  public get absoluteScale():number{
+  public get absoluteScale(): number {
     return this._absoluteScale;
   }
   public get deltaScale(): number {
@@ -141,7 +136,7 @@ class Rect extends ObserverObj {
     this.report(delta, "addPosition");
   }
   public setDeltaScale(deltaScale: number, change?: boolean): void {
-    this._absoluteScale*=deltaScale;
+    this._absoluteScale *= deltaScale;
     if (deltaScale === this.deltaScale) return;
     this.beforeReport(deltaScale, "scale");
     //是否真正改变大小，还是之通知倍数改变了，后续可以考虑移除监听scale
@@ -157,13 +152,12 @@ class Rect extends ObserverObj {
    * @param height
    */
   public setSize(width: number, height: number): void {
-    if (width === this.size.width && height === this.size.height)return;
+    if (width === this.size.width && height === this.size.height) return;
     //之前
     this.beforeReport(new Size(width, height), "size");
     this.size.setWidth(width);
     this.size.setHeight(height);
     this.report(new Size(width, height), "size");
-    
   }
   public setAngle(angle: number, isDrag?: boolean): void {
     if (angle === this._angle) return;
@@ -206,11 +200,9 @@ class Rect extends ObserverObj {
         height: this._size.height,
         x: this._position.x,
         y: this._position.y,
-      },
-      key,
-      {
         angle: this.getAngle,
-      }
+      },
+      key
     );
   }
 
@@ -225,6 +217,10 @@ class Rect extends ObserverObj {
     this.beforeReport(this._position, "position");
     this._position.setXY(x, y);
     this.report(this._position, "position");
+  }
+
+  static format(option: RectParams): Rect {
+    return new Rect(option);
   }
 }
 

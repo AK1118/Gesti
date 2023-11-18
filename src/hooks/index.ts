@@ -152,24 +152,24 @@ const createImageBox = (xImage: XImage) => createImageBoxView(xImage);
  * @param option
  * @returns
  */
-const createXImage = (option: {
-  data:
-    | HTMLImageElement
-    | SVGImageElement
-    | HTMLVideoElement
-    | HTMLCanvasElement
-    | Blob
-    | ImageData
-    | ImageBitmap
-    | OffscreenCanvas;
-  originData?: any;
-  width: number;
-  height: number;
-  scale?: number;
-  maxScale?: number;
-  minScale?: number;
-}) => createXImageFun(option);
-
+const createXImage = (option: createImageOptions) => createXImageFun(option);
+// {
+//   data:
+//     | HTMLImageElement
+//     | SVGImageElement
+//     | HTMLVideoElement
+//     | HTMLCanvasElement
+//     | Blob
+//     | ImageData
+//     | ImageBitmap
+//     | OffscreenCanvas;
+//   originData?: any;
+//   width: number;
+//   height: number;
+//   scale?: number;
+//   maxScale?: number;
+//   minScale?: number;
+// }
 /**
  * @description 文字控制
  * @param text
@@ -533,7 +533,7 @@ const useReader = (json: string): Promise<ViewObject> => {
  */
 const useReaderH5=(json:string):Promise<ViewObject>=>{
     const reader:GestiReader=new GestiReaderH5();
-    return reader.getObjectByJson(json);
+    return null;//reader.getObjectByJson(json);
 }
 /**
  * @description 转换json为可读对象 微信小程序专用
@@ -545,7 +545,7 @@ const useReaderH5=(json:string):Promise<ViewObject>=>{
 const useReaderWeChat=(json: string,painter:CanvasRenderingContext2D,weChatCanvas: any):Promise<ViewObject>=>{
   const reader:GestiReaderWechat=new GestiReaderWechat();
   const _painter=new Painter(painter);
-  return reader.getObjectByJson(json,_painter,weChatCanvas);
+  return null;//reader.getObjectByJson(json,_painter,weChatCanvas);
 }
 
 /**

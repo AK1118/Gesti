@@ -7,17 +7,19 @@ import Button, { BaseButton } from "./baseButton";
 import OperationObserver from "./operation-observer";
 import AuxiliaryLine from "../../tools/auxiliary-lines";
 import GestiConfig from "../../config/gestiConfig";
-import { ViewObjectFamily } from "../enums";
+import { ButtonLocation, ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
 import BaseViewObject from "./view-object-base";
+import { ExportButton, FetchXImageForImportCallback, ViewObjectExportBaseInfo, ViewObjectExportImageBox, ViewObjectImportBaseInfo, ViewObjectImportImageBox } from "@/types/serialization";
+import Platform from "../viewObject/tools/platform";
 //转换为json的类型
-export type toJsonType = "image" | "text" | "write";
+// export type toJsonType = "image" | "text" | "write";
 
-export interface toJSONInterface {
-  viewObjType: toJsonType;
-  options: Object;
-}
+// export interface toJSONInterface {
+//   viewObjType: toJsonType;
+//   options: Object;
+// }
 
 abstract class ViewObject extends BaseViewObject implements RenderObject {
   //辅助线
@@ -47,7 +49,12 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   }
   //卸载按钮
   public unInstallButton(buttons: Array<Button>) {
-    this.funcButton = this.funcButton.filter((item) => !buttons.includes(item));
+    this.funcButton = this.funcButton.filter((item) => {
+      //是否在卸载队列内
+      const include:boolean=buttons.includes(item);
+      if(include)item.unMount();
+      return !include;
+    });
   }
   //安装按钮
   public installButton(button: Button) {
@@ -121,26 +128,6 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     paint.closePath();
     paint.stroke();
   }
-  /**
-   * 对象渲染虚线框
-   * @deprecated
-   */
-  // public strokeDashBorder(paint: Painter): void {
-  //   paint.closePath();
-  //   paint.beginPath();
-  //   paint.lineWidth = 1;
-  //   paint.setlineDash([3, 3]);
-  //   paint.strokeStyle = "#999";
-  //   paint.strokeRect(
-  //     -this.width >> 1,
-  //     -this.height >> 1,
-  //     this.width + 1,
-  //     this.height + 1
-  //   );
-  //   paint.closePath();
-  //   paint.stroke();
-  //   paint.setlineDash([]);
-  // }
   /**
    * 镜像翻转
    */
@@ -300,15 +287,13 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * 撤销 | 取消撤销回调
    */
   public didFallback() {}
-  //导出为JSON
-  abstract export(painter?: Painter): Promise<Object>;
-  //微信端导出
-  abstract exportWeChat(painter?: Painter, canvas?: any): Promise<Object>;
+
   /**
    * @description 提供公用基础信息导出
    * @returns
    */
-  public getBaseInfo(): Object {
+
+  public getBaseInfo(): ViewObjectExportBaseInfo {
     return {
       rect: {
         x: ~~this.rect.position.x,
@@ -326,10 +311,17 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       },
       mirror: this.isMirror,
       locked: this.isLock,
-      buttons: this.funcButton.map((button: Button) => button.constructor.name),
+      buttons: this.funcButton.map<ExportButton>((button: BaseButton)=>{
+        return {
+           type:button.constructor.name,
+           location:button.btnLocation
+        };
+      }),
       id: this.id,
       layer: this.getLayer(),
       isBackground: this.isBackground,
+      opacity:this.opacity,
+      platform:Platform.platform,
     };
   }
   /**
@@ -349,6 +341,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   public setAngle(angle: number) {
     this.rect.setAngle(angle);
   }
+   
 }
 
 export default ViewObject;

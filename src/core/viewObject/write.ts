@@ -1,8 +1,9 @@
 import OperationObserver from "../abstract/operation-observer";
-import ViewObject, { toJSONInterface } from "../abstract/view-object";
+import ViewObject from "../abstract/view-object";
 import Painter from "../lib/painter";
 import { ViewObjectFamily } from "../enums";
 import GestiConfig from "../../config/gestiConfig";
+import { FetchXImageForImportCallback, ViewObjectExportEntity, ViewObjectExportImageBox, ViewObjectImportBaseInfo, ViewObjectImportImageBox } from "@/types/serialization";
 /**
  * 实现逻辑
  * 新建一个 canvas等宽高的矩阵,锁定它，
@@ -11,28 +12,30 @@ import GestiConfig from "../../config/gestiConfig";
 class WriteViewObj extends ViewObject {
   
   family: ViewObjectFamily = ViewObjectFamily.write;
-  async export(): Promise<Object> {
-    this.points.forEach((item) => {
-      item.x = ~~item.x;
-      item.y = ~~item.y;
-    });
-    const json: toJSONInterface = {
-      viewObjType: "write",
-      options: {
-        config: {
-          ...this.config,
-          scaleX: this._scalex,
-          scaleY: this._scaley,
-        },
-        points: this.points,
+  async export(): Promise<ViewObjectExportEntity> {
+    // this.points.forEach((item) => {
+    //   item.x = ~~item.x;
+    //   item.y = ~~item.y;
+    // });
+    // const json = {
+    //   viewObjType: "write",
+    //   options: {
+    //     config: {
+    //       ...this.config,
+    //       scaleX: this._scalex,
+    //       scaleY: this._scaley,
+    //     },
+    //     points: this.points,
 
-        ...this.getBaseInfo(),
-      },
-    };
-    return json;
+    //     ...this.getBaseInfo(),
+    //   },
+    // };
+    // return json;
+    throw new Error("Method not implemented.");
   }
-  exportWeChat(painter?: Painter, canvas?: any): Promise<Object> {
-    return this.export();
+  exportWeChat(painter?: Painter, canvas?: any): Promise<ViewObjectExportEntity> {
+    // return this.export();
+    throw new Error("Method not implemented.");
   }
   private points: Array<Vector> = [];
   private _scalex: number = 1;

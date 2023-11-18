@@ -18,7 +18,7 @@ import WriteFactory from "../viewObject/write/write-factory";
 import XImage from "./ximage";
 import GestiReaderWechat from "../../utils/reader/reader-WeChat";
 import { classTypeIs } from "../../utils/utils";
-
+import { ViewObjectImportEntity } from "@/types/serialization";
 enum EventHandlerState {
   down,
   up,
@@ -357,10 +357,10 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         const str = JSON.parse(json);
         const reader = new GestiReaderH5();
         for await (const item of str) {
-          const obj: ViewObject = await reader.getObjectByJson(
-            JSON.stringify(item)
-          );
-          if (obj) this.addViewObject(obj);
+          const importEntity: ViewObjectImportEntity = item;
+          console.log(importEntity.base);
+          const obj: ViewObject = await reader.getObjectByJson(importEntity);
+          if (obj) this.load(obj);
         }
         this.render();
         r();
@@ -378,23 +378,23 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
    */
   importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
     return new Promise(async (r, j) => {
-      try {
-        if (json == "[]" || !json) throw Error("Import Json is Empty");
-        const str = JSON.parse(json);
-        const reader: GestiReaderWechat = new GestiReaderWechat();
-        for await (const item of str) {
-          const obj: ViewObject = await reader.getObjectByJson(
-            JSON.stringify(item),
-            this.paint,
-            weChatCanvas
-          );
-          if (obj) this.addViewObject(obj);
-        }
-        this.render();
-        r();
-      } catch (error) {
-        j(error);
-      }
+      // try {
+      //   if (json == "[]" || !json) throw Error("Import Json is Empty");
+      //   const str = JSON.parse(json);
+      //   const reader: GestiReaderWechat = new GestiReaderWechat();
+      //   for await (const item of str) {
+      //     const obj: ViewObject = await reader.getObjectByJson(
+      //       JSON.stringify(item),
+      //       this.paint,
+      //       weChatCanvas
+      //     );
+      //     if (obj) this.addViewObject(obj);
+      //   }
+      //   this.render();
+      //   r();
+      // } catch (error) {
+      //   j(error);
+      // }
     });
   }
   addListener(
@@ -764,7 +764,6 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   private addViewObject(obj: ViewObject): void {
     this.ViewObjectList.push(obj);
     obj.initialization(this);
-    this.center(null,obj);
     obj.setLayer(this.getViewObjectCount() - 1);
     this.callHook("onLoad", obj);
     this.render();
@@ -879,10 +878,10 @@ class _Tools {
   /**
    * @deprecated
    * @deprecated 废弃
-   * @param ViewObjectList 
-   * @param node 
-   * @param kit 
-   * @returns 
+   * @param ViewObjectList
+   * @param node
+   * @param kit
+   * @returns
    */
   public fallbackViewObject(
     ViewObjectList: Array<ViewObject>,

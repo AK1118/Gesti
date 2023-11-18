@@ -11,6 +11,8 @@ class XImage {
    */
   fixedWidth: number=0;
   fixedHeight: number=0;
+
+  url:string;
   /**
  *   interface createImageOptions {
         data?: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions,
@@ -23,7 +25,7 @@ class XImage {
  * 
  */
   constructor(params: createImageOptions) {
-    const { data, width, height, scale, originData, fixedWidth, fixedHeight } =
+    const { data, width, height, scale, originData, fixedWidth, fixedHeight,url } =
       params;
     if (!data || !width || !height) throw Error("数据或宽或高不能为空");
     this.originData = originData;
@@ -31,6 +33,7 @@ class XImage {
     this.width = width;
     this.height = height;
     this.scale = scale || 1;
+    this.url=url;
     /**
      * 需要保留图片原始大小
      */

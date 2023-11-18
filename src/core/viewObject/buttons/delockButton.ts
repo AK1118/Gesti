@@ -21,7 +21,7 @@ class UnLockButton extends BaseButton {
         
     }
     protected icon: Icon=new UnLockIcon();
-    protected buttonLocation:ButtonLocation=ButtonLocation.RT;
+    protected buttonLocation:ButtonLocation=ButtonLocation.LT;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
     updatePosition(vector: Vector): void {

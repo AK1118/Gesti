@@ -1,9 +1,11 @@
 /*
- * @Author: AK1118 
- * @Date: 2023-11-15 16:08:39 
- * @Last Modified by:   AK1118 
- * @Last Modified time: 2023-11-15 16:08:39 
+ * @Author: AK1118
+ * @Date: 2023-11-15 16:08:39
+ * @Last Modified by:   AK1118
+ * @Last Modified time: 2023-11-15 16:08:39
  */
+
+
 
 declare class Vector {
   x: number;
@@ -35,7 +37,6 @@ declare class Vector {
   double(): Vector;
 }
 
-
 declare class Size {
   width: number;
   height: number;
@@ -45,12 +46,12 @@ declare class Size {
   static get zero(): Size;
 }
 
-declare type ButtonOption={
-  location?:ButtonLocation,
-  icon?:Icon,
+declare type ButtonOption = {
+  location?: ButtonLocation;
+  icon?: Icon;
 };
 
-declare class Painter{}
+declare class Painter {}
 
 type IconDataType = number[][][];
 
@@ -89,7 +90,17 @@ export declare enum ButtonLocation {
   BC,
   LC,
   TC,
+  OutBC,
+  OutTC,
+  OutRC,
+  OutLC,
+  OutLT,
+  OutLB,
+  OutRT,
+  OutRB,
 }
+
+
 
 export declare interface TextOptions {
   fontFamily?: string;
@@ -201,7 +212,6 @@ export declare abstract class ViewObject {
   get mounted(): boolean;
 }
 export declare class XImage {
-  new(params: createImageOptions): XImage;
   constructor(params: createImageOptions);
   originData: any;
   data: any;
@@ -211,10 +221,14 @@ export declare class XImage {
   y: number;
   //背书
   scale: number;
+
+  fixedWidth: number;
+  fixedHeight: number;
+
+  url: string;
   //矩形位置大小信息
   toJson(): RectParams;
 }
-
 export declare class Group {
   remove(id: string): void;
   removeById(viewObject: ViewObject): void;
@@ -399,28 +413,21 @@ export declare abstract class GestiController {
 }
 
 declare abstract class BaseButton {
-  constructor(option?:ButtonOption);
+  constructor(option?: ButtonOption);
 }
 
-export declare abstract class Button extends BaseButton{}
+export declare abstract class Button extends BaseButton {}
 
-export declare class CloseButton extends Button {
-}
-export declare class DragButton extends Button {
-}
-export declare class MirrorButton extends Button {
-}
-export declare class LockButton extends Button {
-}
-export declare class RotateButton extends Button {
-}
+export declare class CloseButton extends Button {}
+export declare class DragButton extends Button {}
+export declare class MirrorButton extends Button {}
+export declare class LockButton extends Button {}
+export declare class RotateButton extends Button {}
 export declare class UnLockButton extends Button {
-  constructor(option?:ButtonOption);
+  constructor(option?: ButtonOption);
 }
-export declare class VerticalButton extends Button {
-}
-export declare class HorizonButton extends Button {
-}
+export declare class VerticalButton extends Button {}
+export declare class HorizonButton extends Button {}
 export declare const createGesti: (config?: gesticonfig) => Gesti;
 /**
  * Hook 分发

@@ -5,128 +5,128 @@ import ImageBox from "../viewObject/image";
 import TextBox from "../viewObject/text/text";
 import WriteViewObj from "../viewObject/write";
 import XImage from "../lib/ximage";
-// import {
-//   CloseButton,
-//   DragButton,
-//   MirrorButton,
-//   RotateButton,
-//   LockButton,
-//   UnLockButton,
-//   VerticalButton,
-//   HorizonButton,
-// } from "@/composite/buttons";
-import Button from "./baseButton";
-import CutterH5 from "../../utils/cutters/cutter-H5";
-import DragButton from "../viewObject/buttons/dragbutton";
-import MirrorButton from "../viewObject/buttons/mirrorbutton";
-import CloseButton from "../viewObject/buttons/closeButton";
-import RotateButton from "../viewObject/buttons/rotateButton";
-import UnLockButton from "../viewObject/buttons/delockButton";
-import HorizonButton from "../viewObject/buttons/horizonButton";
-import LockButton from "../viewObject/buttons/lockbutton";
-import VerticalButton from "../viewObject/buttons/verticalButton";
+import Button, { BaseButton } from "./baseButton";
+import Group from "../viewObject/group";
+import * as Buttons from "@/composite/buttons"
+import { ExportButton, FetchXImageForImportCallback, ViewObjectExportImageBox, ViewObjectExportTypes, ViewObjectImportBaseInfo, ViewObjectImportEntity, ViewObjectImportImageBox } from "@/types/serialization";
 abstract class GestiReader {
-  constructor() {}
+  constructor() {
+
+  }
+  
   private buttonClazzList = {
-    DragButton,
-    MirrorButton,
-    CloseButton,
-    RotateButton,
-    UnLockButton,
-    HorizonButton,
-    LockButton,
-    VerticalButton,
+    DragButton:Buttons.DragButton,
+    MirrorButton:Buttons.MirrorButton,
+    CloseButton:Buttons.CloseButton,
+    RotateButton:Buttons.RotateButton,
+    UnLockButton:Buttons.UnLockButton,
+    HorizonButton:Buttons.HorizonButton,
+    LockButton:Buttons.LockButton,
+    SizeButton:Buttons.SizeButton,
+    VerticalButton:Buttons.VerticalButton
   };
-  public async getViewObject(type: string, options: any): Promise<ViewObject> {
-    let viewObject: ViewObject;
-    switch (type) {
-      case "write":
-        {
-          viewObject = new WriteViewObj(
-            options.points,
-            options.config?.color ?? "red",
-            options.config
-          );
-        }
-        break;
-      case "image":
-        {
-          const cutter = new CutterH5();
-          const source: ImageData = await cutter.merge(
-            options.fixedWidth,
-            options.fixedHeight,
-            options.options.data
-          );
-          const ximage: XImage = await new GesteControllerImpl(
-            null
-          ).createImage(source);
-          viewObject = new ImageBox(ximage);
-        }
-        break;
-      case "text":
-        {
-          viewObject = new TextBox(options.text, options.options);
-        }
-        break;
+  
+  // public async getViewObject(type: string, options: any): Promise<ViewObject> {
+  //   let viewObject: ViewObject;
+  //   switch (type) {
+  //     // case "write":
+  //     //   {
+  //     //     viewObject = new WriteViewObj(
+  //     //       options.points,
+  //     //       options.config?.color ?? "red",
+  //     //       options.config
+  //     //     );
+  //     //   }
+  //     //   break;
+  //     case "image":
+  //       {
+  //         const entity:ViewObjectImportImageBox=options;
+  //         ImageBox.reverse(entity);
+
+  //         const cutter = new CutterH5();
+  //         const source: ImageData = await cutter.merge(
+  //           options.fixedWidth,
+  //           options.fixedHeight,
+  //           options.options.data
+  //         );
+  //         const ximage: XImage = await new GesteControllerImpl(
+  //           null
+  //         ).createImage(source);
+  //         viewObject = new ImageBox(ximage);
+  //       }
+  //       break;
+  //     // case "text":
+  //     //   {
+  //     //     viewObject = new TextBox(options.text, options.options);
+  //     //   }
+  //     //   break;
+  //   }
+  //   return viewObject;
+  // }
+
+
+  private readonly viewObjectMap:Record<ViewObjectExportTypes,any>={
+    "group":Group,
+    "image":ImageBox,
+    "text":TextBox,
+    "write":WriteViewObj,
+  };
+
+  /**
+   * @description 根据实体获取对象实体
+   * @param entity 
+   */
+  protected getViewObjectByEntity(entity:ViewObjectImportEntity):Promise<ViewObject>{
+    const type:ViewObjectExportTypes=entity.type;
+    if(type=="image"){
+      const imgEntity:ViewObjectExportImageBox=this.formatEntity<ViewObjectExportImageBox>(entity);
+      return ImageBox.reverse(imgEntity);
+    }else if(type=="text"){
+      
     }
-    return viewObject;
+    return null;
   }
-
-  public async getObjectByJson(str: string) {
-    const json = JSON.parse(str);
-    const { options } = json;
-    const rect: Rect = this.getRectByRectJson(options.rect);
-    const relativeRect: Rect = this.getRectByRectJson(options.relativeRect);
-    let viewObject: ViewObject = await this.getViewObject(
-      json.viewObjType,
-      options
-    );
-    this.buildUp(viewObject, rect, relativeRect, options);
-    return viewObject;
+  private formatEntity<T>(entity:ViewObjectImportEntity):T{
+    return entity as T;
   }
+  public async getObjectByJson(importEntity:ViewObjectImportEntity) {
+    const base: ViewObjectImportBaseInfo = importEntity.base;
+    const rect: Rect = Rect.format(base.rect);
+    const relativeRect: Rect = Rect.format(base.relativeRect);
+    const buttons:ExportButton[]=base.buttons;
 
-  public buildUp(
-    viewObject: ViewObject,
-    rect: Rect,
-    relativeRect: Rect,
-    options: any
-  ): ViewObject {
-    if (!viewObject.rect) viewObject.rect = rect;
-    if (!viewObject.relativeRect) viewObject.relativeRect = relativeRect;
-    viewObject.setMirror(options.mirror);
-    viewObject.rect.setSize(rect.size.width, rect.size.height);
-    viewObject.rect.setAngle(options.rect.angle);
-    viewObject.relativeRect.position = relativeRect.position;
-    viewObject.relativeRect.setSize(
-      relativeRect.size.width,
-      relativeRect.size.height
-    );
-    viewObject.setId(options.id);
-    viewObject.setLayer(options?.layer||0);
-    viewObject.relativeRect.setAngle(options.relativeRect.angle);
-    viewObject.custom();
-    viewObject.rect.setPosition(rect.position);
-    //安装按钮
-    this.installButton(viewObject, options.buttons);
-    //设置成为背景
-    options.isBackground&&viewObject.toBackground();
-    //是否锁定
-     options.locked && viewObject.lock();
-    return viewObject;
+    //根据实体获取对象
+    const view:ViewObject=await this.getViewObjectByEntity(importEntity);
+
+    //设置对象属性
+    view.rect=rect;
+    view.relativeRect=relativeRect;
+    view.setId(base.id);
+    view.setLayer(base.layer);
+    base.isBackground&&view.toBackground();
+    view.relativeRect.setAngle(relativeRect.getAngle);
+    view.custom();
+    base.locked&&view.lock();
+    base.mirror&&view.mirror();
+
+    console.log(view)
+    this.installButton(view,buttons);
+    return view;
   }
 
   //安装按钮
-  private installButton(viewObject: ViewObject, buttons: Array<string>) {
-    buttons.forEach((item) => {
-      const buttonConstructor = this.buttonClazzList[item];
+  private installButton(viewObject: ViewObject, buttons: ExportButton[]) {
+    buttons.forEach((item:ExportButton) => {
+      const buttonConstructor = this.buttonClazzList[item.type];
       if (!buttonConstructor)
         return console.error(
           "This buttonConstructor is not a constructor.",
           buttonConstructor,
-          this.buttonClazzList[item]
+          this.buttonClazzList[item.type]
         );
-      const button: Button = new buttonConstructor(viewObject);
+      const button: BaseButton = new buttonConstructor();
       viewObject.installButton(button);
+     button.setLocation(item.location);
     });
   }
 

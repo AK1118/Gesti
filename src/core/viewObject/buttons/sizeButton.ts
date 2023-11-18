@@ -15,14 +15,12 @@ import { DefaultIcon } from "@/composite/icons";
 
 class SizeButton extends DragButton {
   protected buttonLocation:ButtonLocation=ButtonLocation.RB;
-  private selfLocation:ButtonLocation;
   protected icon: Icon=new DefaultIcon();
   constructor(location:ButtonLocation,option?:ButtonOption){
     super({
       angleDisabled:true,
       buttonOption:option,
     },);
-    this.selfLocation=location;
     this.buttonLocation=location;
     this.beforeMounted(location);
   }
@@ -36,7 +34,7 @@ class SizeButton extends DragButton {
   }
   
   protected manipulateDelta(delta:Vector):void{
-    switch(this.selfLocation){
+    switch(this.buttonLocation){
       case ButtonLocation.LT:{
         delta.y*=-1;
         delta.x*=-1;
@@ -66,7 +64,10 @@ class SizeButton extends DragButton {
       };break;
     }
   }
-
+  public setLocation(location: ButtonLocation): void {
+      this.buttonLocation=location;
+      if(this.mounted)this.initialization(this.master);
+  }
   effect(currentButtonRect?: Rect): void {
     const mag = this.getButtonWidthMasterMag(currentButtonRect);
     const preMasterSize: Size = this.master.size.copy();
