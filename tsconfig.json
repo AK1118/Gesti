@@ -10,6 +10,7 @@
         "paths": {
             "@/core/*":["core/*"],
             "@/*":["*"],
+            "Serialization":["types/serialization.d.ts"]
         }
     },
     "include": [

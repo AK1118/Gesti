@@ -1,6 +1,6 @@
 /*
- * @Author: AK1118 
- * @Date: 2023-11-03 18:14:02 
+ * @Author: AK1118
+ * @Date: 2023-11-03 18:14:02
  * @Last Modified by: AK1118
  * @Last Modified time: 2023-11-06 09:16:00
  */
@@ -83,9 +83,10 @@ import {
   parseUint8Array,
   uint8ArrayConvert,
   uint8ArrayToChunks,
-  inToPx, mmToIn, ptToPx
-} from "./utils/utils"
-import Group from "./core/viewObject/group";
+  inToPx,
+  mmToIn,
+  ptToPx,
+} from "./utils/utils";
 import ImageBox from "./core/viewObject/image";
 import TextBox from "./core/viewObject/text/text";
 import WriteViewObj from "./core/viewObject/write";
@@ -110,8 +111,8 @@ export {
   VerticalButton,
   HorizonButton,
   SizeButton,
-  ButtonLocation,
 };
+export { ButtonLocation };
 export { ImageBox, XImage, TextBox, WriteViewObj };
 //枚举
 export { ViewObjectFamily };

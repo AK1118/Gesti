@@ -3,13 +3,14 @@ import Painter from "../../core/lib/painter";
 import { ImageChunk } from "../../types/index";
 import ImageChunkConverterWeChat from "../converters/image-chunk-converter-WeChat";
 import XImage from "../../core/lib/ximage";
+import { getOffscreenCanvasContext, getOffscreenCanvasWidthPlatform } from "../canvas";
 /**
  * 微信分割器
  */
 class CutterWeChat implements CutterInterface {
   painter: Painter;
-  constructor(painter: Painter) {
-    this.painter = painter;
+  constructor(painter?: Painter) {
+    this.painter=painter;
   }
   async getChunks(chunkSize: number, ximage: XImage): Promise<ImageChunk[]> {
     const imgWidth: number = ximage.fixedWidth,

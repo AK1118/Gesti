@@ -9,6 +9,7 @@ import Button, { BaseButton } from "./baseButton";
 import Group from "../viewObject/group";
 import * as Buttons from "@/composite/buttons"
 import { ExportButton, FetchXImageForImportCallback, ViewObjectExportImageBox, ViewObjectExportTypes, ViewObjectImportBaseInfo, ViewObjectImportEntity, ViewObjectImportImageBox } from "@/types/serialization";
+//import { ExportButton, FetchXImageForImportCallback, ViewObjectExportImageBox, ViewObjectExportTypes, ViewObjectImportBaseInfo, ViewObjectImportEntity, ViewObjectImportImageBox } from "Serialization";
 abstract class GestiReader {
   constructor() {
 
@@ -109,7 +110,6 @@ abstract class GestiReader {
     base.locked&&view.lock();
     base.mirror&&view.mirror();
 
-    console.log(view)
     this.installButton(view,buttons);
     return view;
   }
@@ -125,21 +125,17 @@ abstract class GestiReader {
           this.buttonClazzList[item.type]
         );
       const button: BaseButton = new buttonConstructor();
+      
+      button.setSenseRadius(item.radius);
+      button.setBackgroundColor(item.backgroundColor);
+      button.setIconColor(item.iconColor);
+
+
       viewObject.installButton(button);
      button.setLocation(item.location);
     });
   }
 
-  public getRectByRectJson(rectJson: any): Rect {
-    const jsonObj: any = rectJson;
-    const rect = new Rect({
-      width: jsonObj.width,
-      height: jsonObj.height,
-      x: jsonObj.x,
-      y: jsonObj.y,
-    });
-    return rect;
-  }
 }
 
 export default GestiReader;

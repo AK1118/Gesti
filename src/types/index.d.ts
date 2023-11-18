@@ -1,11 +1,11 @@
 /*
  * @Author: AK1118
  * @Date: 2023-11-15 16:08:39
- * @Last Modified by:   AK1118
- * @Last Modified time: 2023-11-15 16:08:39
+ * @Last Modified by: AK1118
+ * @Last Modified time: 2023-11-18 17:49:42
  */
 
-
+import "./serialization";
 
 declare class Vector {
   x: number;
@@ -79,10 +79,13 @@ declare interface RectParams {
 }
 
 /**
- * 按钮位置枚举
+ *
+ * @description 按钮位置枚举,前缀为Out的位置处于对象外层
  */
 export declare enum ButtonLocation {
+  /**左上 */
   LT,
+  /**左下 */
   LB,
   RT,
   RB,
@@ -99,8 +102,6 @@ export declare enum ButtonLocation {
   OutRT,
   OutRB,
 }
-
-
 
 export declare interface TextOptions {
   fontFamily?: string;
@@ -241,7 +242,6 @@ export declare interface TextHandler {
   setText(text: string): void;
 }
 export declare class TextBox extends ViewObject implements TextHandler {
-  new(text: string, options?: TextOptions): TextBox;
   constructor(text: string, options?: TextOptions);
   setText(text: string): void;
   setFontFamily(family: string): void;
@@ -254,7 +254,6 @@ export declare class TextBox extends ViewObject implements TextHandler {
 }
 
 export declare class ImageBox extends ViewObject {
-  new(xImage: XImage): ImageBox;
   setDecoration(xImage: XImage): void;
   constructor(ximage: XImage);
 }
@@ -269,8 +268,28 @@ export declare class WriteViewObj extends ViewObject {
 
 export declare type CenterAxis = "vertical" | "horizon";
 
+/**
+ * @description 初始化传入参数
+ */
+export declare interface InitializationOption {
+  //canvas
+  canvas: HTMLCanvasElement;
+  //画笔
+  renderContext: CanvasRenderingContext2D | null;
+  //离屏画布
+  offScreenCanvas?: HTMLCanvasElement;
+  //离屏画笔
+  offScreenCanvasRenderContext?: CanvasRenderingContext2D | null;
+  //画布矩形
+  rect?: {
+    x?: number;
+    y?: number;
+    width: number;
+    height: number;
+  };
+}
+
 export declare class Gesti {
-  new(config?: gesticonfig): Gesti;
   constructor(config?: gesticonfig);
   get controller(): GestiController;
   static Family: ViewObjectFamily;
@@ -281,6 +300,7 @@ export declare class Gesti {
    * @param canvas
    * @param paint
    * @param rect
+   * @deprecated
    */
   init(
     canvas: HTMLCanvasElement | null,
@@ -292,6 +312,11 @@ export declare class Gesti {
       height: number;
     }
   ): void;
+  /**
+   * @description 初始化Gesti
+   * @param option 传入一个对象
+   */
+  public initialization(option: InitializationOption): void;
 }
 declare type EventHandle = null;
 /**
@@ -334,7 +359,7 @@ export declare abstract class GestiController {
     prepend?: boolean
   ): void;
   updateText(text: string, options?: TextOptions): void;
-  center(axis?: CenterAxis, view?: ViewObject): void;
+  center( view?: ViewObject,axis?: CenterAxis): void;
   addText(text: string, options?: TextOptions): Promise<ViewObject>;
   cancel(view?: ViewObject): void;
   cancelAll(): void;
@@ -416,18 +441,51 @@ declare abstract class BaseButton {
   constructor(option?: ButtonOption);
 }
 
-export declare abstract class Button extends BaseButton {}
+export declare abstract class Button extends BaseButton {
+  get btnLocation(): ButtonLocation;
+  protected drawButton(
+    position: Vector,
+    size: Size,
+    radius: number,
+    paint: Painter
+  ): void;
+  public setLocation(location: ButtonLocation): void;
+  public setBackgroundColor(color: string): void;
+  public hideBackground(): void;
+  public setIconColor(color: string): void;
+  public setSenseRadius(senseRadius: number): void;
+}
 
 export declare class CloseButton extends Button {}
-export declare class DragButton extends Button {}
+export declare class DragButton extends Button {
+  constructor(options?: {
+    angleDisabled?: boolean;
+    buttonOption?: ButtonOption;
+  });
+}
 export declare class MirrorButton extends Button {}
 export declare class LockButton extends Button {}
 export declare class RotateButton extends Button {}
+export declare class SizeButton extends Button{
+  constructor(location:ButtonLocation,option?:ButtonOption);
+}
 export declare class UnLockButton extends Button {
   constructor(option?: ButtonOption);
 }
-export declare class VerticalButton extends Button {}
-export declare class HorizonButton extends Button {}
+declare type VerticalButtonLocationType='top'| 'bottom';
+export declare class VerticalButton extends Button {
+  constructor(
+    location?:VerticalButtonLocationType,
+    option?: ButtonOption
+  );
+}
+declare type HorizonButtonLocationType='left'| 'right';
+export declare class HorizonButton extends Button {
+  constructor(
+    location?: HorizonButtonLocationType,
+    option?: ButtonOption
+  );
+}
 export declare const createGesti: (config?: gesticonfig) => Gesti;
 /**
  * Hook 分发
@@ -617,8 +675,8 @@ export declare const doUpdate: (view?: ViewObject, target?: Gesti) => void;
 export declare const doCancelAll: (view?: ViewObject, target?: Gesti) => void;
 export declare const doCancelEvent: (view?: ViewObject, target?: Gesti) => void;
 export declare const doCenter: (
-  axis?: CenterAxis,
   view?: ViewObject,
+  axis?: CenterAxis,
   target?: Gesti
 ) => void;
 export declare const doRotate: (

@@ -9,8 +9,9 @@ import { DefaultIcon } from "@/composite/icons";
 import { ButtonOption } from "@/core/abstract/baseButton";
 
 class VerticalButton extends SizeButton {
-  constructor(location?:ButtonLocation.TC|ButtonLocation.BC,option?:ButtonOption){
-    super(location||ButtonLocation.BC,option);
+  constructor(location?:'top'|'bottom',option?:ButtonOption){
+    const _location=location==="top"?ButtonLocation.TC:ButtonLocation.BC;
+    super(_location||ButtonLocation.BC,option);
   }
   protected icon: Icon=new DefaultIcon();
   // effect(currentButtonRect?: Rect): void {

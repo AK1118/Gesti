@@ -34,6 +34,7 @@ const warn = (msg: string) => {
 };
 
 const getCurrentInstance = () => currentInstance;
+
 const setCurrentInstance = (instance: Gesti) => {
   currentInstance = instance;
 };
@@ -490,7 +491,7 @@ const doCenter = (
   target: Gesti = currentInstance
 ) => {
   //不安全的做法
-  target.controller.center(axis, view);
+  target.controller.center(view,axis);
 };
 //设置坐标位置
 const doPosition=(x:number,y:number,view?:ViewObject,target: Gesti = currentInstance)=>{

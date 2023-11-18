@@ -19,6 +19,7 @@ import XImage from "./ximage";
 import GestiReaderWechat from "../../utils/reader/reader-WeChat";
 import { classTypeIs } from "../../utils/utils";
 import { ViewObjectImportEntity } from "@/types/serialization";
+import { InitializationOption } from "@/types/index";
 enum EventHandlerState {
   down,
   up,
@@ -451,7 +452,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         });
     }
   }
-  center(axis?: CenterAxis, view?: ViewObject): void {
+  center(view?: ViewObject,axis?: CenterAxis): void {
     if (view) view.center(this.canvasRect.size, axis);
     else this.selectedViewObject?.center(this.canvasRect.size, axis);
     this.render();

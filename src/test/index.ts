@@ -74,10 +74,10 @@ doCenter(imageBox)
 
 
 
-imageBox.installButton(new HorizonButton(ButtonLocation.RC));
-imageBox.installButton(new HorizonButton(ButtonLocation.LC));
-imageBox.installButton(new VerticalButton(ButtonLocation.BC));
-imageBox.installButton(new VerticalButton(ButtonLocation.TC));
+imageBox.installButton(new HorizonButton("left"));
+imageBox.installButton(new HorizonButton("right"));
+imageBox.installButton(new VerticalButton());
+imageBox.installButton(new VerticalButton("bottom"));
 imageBox.installButton(new SizeButton(ButtonLocation.LT));
 imageBox.installButton(new MirrorButton({
   location:ButtonLocation.OutRT

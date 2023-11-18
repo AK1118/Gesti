@@ -131,8 +131,8 @@ class GesteControllerImpl implements GestiController {
   updateText(text: string, options?: TextOptions): void {
     this.kit.updateText(text, options);
   }
-  center(axis?: CenterAxis, view?: ViewObject): void {
-    this.kit.center(axis, view);
+  center(view?: ViewObject,axis?: CenterAxis): void {
+    this.kit.center( view,axis);
   }
   addText(text: string, options?: TextOptions): Promise<ViewObject> {
     return this.kit.addText(text, options);

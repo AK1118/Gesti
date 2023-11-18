@@ -15,8 +15,9 @@ import SizeButton from "./sizeButton";
 class HorizonButton extends SizeButton {
   protected buttonLocation:ButtonLocation;
   protected icon: Icon=new DefaultIcon();
-  constructor(location?:ButtonLocation.LC|ButtonLocation.RC,option?:ButtonOption){
-    super(location||ButtonLocation.RC,option);
+  constructor(location?:'left'|'right',option?:ButtonOption){
+    const _location=location==="right"?ButtonLocation.RC:ButtonLocation.LC;
+    super(_location||ButtonLocation.RC,option);
   }
   public onUpWithInner(): void {
       this.computeSelfLocation();

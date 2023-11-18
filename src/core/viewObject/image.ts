@@ -10,8 +10,17 @@ import XImage from "../lib/ximage";
 import CutterWeChat from "../..//utils/cutters/cutter-WeChat";
 import CutterH5 from "../../utils/cutters/cutter-H5";
 import Platform from "./tools/platform";
-import { FetchXImageForImportCallback, ViewObjectExportImageBox, ViewObjectImportBaseInfo, ViewObjectImportImageBox } from "@/types/serialization";
+import {
+  FetchXImageForImportCallback,
+  ViewObjectExportImageBox,
+  ViewObjectImportBaseInfo,
+  ViewObjectImportImageBox,
+} from "@/types/serialization";
 import { ImageChunk } from "@/types/index";
+import {
+  getOffscreenCanvasContext,
+  getOffscreenCanvasWidthPlatform,
+} from "@/utils/canvas";
 class ImageBox extends ViewObject {
   family: ViewObjectFamily = ViewObjectFamily.image;
   get value(): any {
@@ -52,14 +61,14 @@ class ImageBox extends ViewObject {
     );
     // paint.restore()
   }
+  private readonly chunkSize: number = 200;
   async export(painter?: Painter): Promise<ViewObjectExportImageBox> {
     const cutter: Cutter = new Cutter(painter);
-    const chunkSize: number = 200;
     const url: string = this.ximage.url;
     let data: ImageChunk[];
     if (!url) {
       const chunks: ImageChunk[] = await cutter.getChunks(
-        chunkSize,
+        this.chunkSize,
         this.ximage
       );
       const coverter: ImageChunkConverter = new ImageChunkConverterH5();
@@ -113,7 +122,7 @@ class ImageBox extends ViewObject {
     if (platform == "Browser") {
       const img = new Image();
       img.src = url;
-      img.crossOrigin="anonymous";
+      img.crossOrigin = "anonymous";
       await this._loadImg(img);
       return new XImage({
         data: img,
@@ -121,15 +130,15 @@ class ImageBox extends ViewObject {
         width: entity.fixedWidth,
         url,
       });
-    }else if(platform=="WeChat"){
+    } else if (platform == "WeChat") {
       const offCanvas = wx.createOffscreenCanvas({
         type: "2d",
         width: entity.fixedWidth,
         height: entity.fixedHeight,
       });
-      const img=offCanvas.createImage();
+      const img = offCanvas.createImage();
       img.src = url;
-      if(img?.crossOrigin)img.crossOrigin="anonymous";
+      if (img?.crossOrigin) img.crossOrigin = "anonymous";
       await this._loadImg(img);
       return new XImage({
         data: img,
@@ -140,10 +149,10 @@ class ImageBox extends ViewObject {
     }
     return null;
   };
-  
-  private  static  async _loadImg(img):Promise<void>{
-    return new Promise((r)=>{
-      img.onload=()=>r();
+
+  private static async _loadImg(img): Promise<void> {
+    return new Promise((r) => {
+      img.onload = () => r();
     });
   }
 
@@ -152,18 +161,25 @@ class ImageBox extends ViewObject {
   ): void {
     ImageBox.fetchXImageCallback = _fetchXImageCallback;
   }
-  
-  static async reverse(entity: ViewObjectImportImageBox): Promise<ImageBox> {
+
+  public static async reverse(
+    entity: ViewObjectImportImageBox
+  ): Promise<ImageBox> {
     const base: ViewObjectImportBaseInfo = entity.base,
       url: string = entity?.url,
       chunks: ImageChunk[] = entity?.data;
+
     if (url) {
       //网络路径存在，不负责请求，任务交由开发者，通过回调函数获取用户传入的XImage
       const xImage: XImage = await ImageBox.fetchXImageCallback(entity);
-      if(!xImage)throw Error("Your platform does not support fetching this URL for ximage; you could run 'ImageBox.setFetchXImageCallback' to customize the fetch method and resolve this error.")
+      if (!xImage)
+        throw Error(
+          "Your platform does not support fetching this URL for ximage; you could run 'ImageBox.setFetchXImageCallback' to customize the fetch method and resolve this error."
+        );
       return new ImageBox(xImage);
-    } else if (chunks && chunks?.length != 0) {
-      //使用数据切片合并图片
+    } /*使用数据切片合并图片*/ else if (chunks && chunks?.length != 0) {
+      //微信小程序
+      if (Platform.isWeChatMiniProgram) return this.reverseWeChat(entity);
       const cutter = new CutterH5();
       const source: ImageData = await cutter.merge(
         entity.fixedWidth,
@@ -178,7 +194,34 @@ class ImageBox extends ViewObject {
       });
       return new ImageBox(ximage);
     }
-     return null;
+    return null;
+  }
+
+  public static async reverseWeChat(
+    entity: ViewObjectImportImageBox
+  ): Promise<ImageBox> {
+    const chunks: ImageChunk[] = entity?.data;
+
+    const offCanvas = getOffscreenCanvasWidthPlatform(200, 200);
+    //使用数据切片合并图片
+    const cutter = new CutterWeChat();
+
+    const source: ImageData = await cutter.merge(
+      entity.fixedWidth,
+      entity.fixedHeight,
+      chunks,
+      offCanvas
+    );
+
+    const image = offCanvas.createImage();
+    await this._loadImg(image);
+    const ximage = new XImage({
+      data: image,
+      width: entity.fixedWidth,
+      height: entity.fixedHeight,
+    });
+    return new ImageBox(ximage);
+    return null;
   }
 }
 export default ImageBox;

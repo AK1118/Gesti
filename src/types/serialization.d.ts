@@ -2,8 +2,9 @@ import { ButtonLocation } from "@/core/enums";
 import {  XImage } from "./index";
 
 
-declare module 'Serialization' {
-  interface ExportRect {
+ declare module 'Serialization' {
+  
+   interface ExportRect {
     x: number;
     y: number;
     width: number;
@@ -14,8 +15,10 @@ declare module 'Serialization' {
   interface ExportButton {
     type: string;
     location?: ButtonLocation;
-    iconSize?: number;
+    radius?: number;
     iconColor?: string;
+    backgroundColor?:string;
+    displayBackground?:boolean;
   }
 
   interface ViewObjectExportBaseInfo {

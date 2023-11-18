@@ -314,7 +314,11 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       buttons: this.funcButton.map<ExportButton>((button: BaseButton)=>{
         return {
            type:button.constructor.name,
-           location:button.btnLocation
+           location:button.btnLocation,
+           radius:button.senseRadius,
+           backgroundColor:button.background,
+           iconColor:button.iconColor,
+           displayBackground:button.displayBackground,
         };
       }),
       id: this.id,

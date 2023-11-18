@@ -7,7 +7,11 @@ const copyConfig = {
   targets: [
     {
       src: "./src/types/index.d.ts",
-      dest: "dist/types/index.d.ts",
+      dest: "dist/types/",
+    },
+    {
+      src: "./src/types/serialization.d.ts",
+      dest: "dist/types/",
     },
     {
         src:"LICENSE",
@@ -20,7 +24,7 @@ const plugins = [
   cleanupPlugin(),
   typescript(),
   //压缩打包代码
-  terser(),
+  // terser(),
   copy(copyConfig),
 ];
 

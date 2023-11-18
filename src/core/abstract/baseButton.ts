@@ -17,6 +17,7 @@ export abstract class BaseButton implements RenderObject {
     color: "#c1c1c1",
     size: 10,
   });
+  public iconColor:string="#c1c1c1";
   //自定义位置
   private customLocation: ButtonLocation;
   /**
@@ -27,8 +28,8 @@ export abstract class BaseButton implements RenderObject {
   }
   private customIcon: Icon;
   //是否显示背景，按钮默认有一个白色背景
-  private displayBackground: boolean = true;
-  private background: string = "rgba(255,255,255,.8)";
+  public displayBackground: boolean = true;
+  public background: string = "rgba(255,255,255,.8)";
   constructor(option?: ButtonOption) {
     if (!option) return;
     this.customLocation = option?.location;
@@ -55,15 +56,15 @@ export abstract class BaseButton implements RenderObject {
   private canBeeLocking: boolean = true;
   //与寄主的位置关系，根据寄主的大小获取最初的距离
   private originPositionWithSize: Offset;
-  private _mounted:boolean=false;
-  get mounted():boolean{
+  private _mounted: boolean = false;
+  get mounted(): boolean {
     return this._mounted;
   }
-  public mount():void{
-    this._mounted=true;
+  public mount(): void {
+    this._mounted = true;
   }
-  public unMount():void{
-    this._mounted=false;
+  public unMount(): void {
+    this._mounted = false;
   }
   //能被锁住就不是自由的
   get isFree(): boolean {
@@ -296,11 +297,14 @@ export abstract class BaseButton implements RenderObject {
   setSenseRadius(senseRadius: number) {
     this.senseRadius = senseRadius;
     this.radius = senseRadius;
+    if (!this.mounted) return;
     this.icon.setSize(this.radius);
     this.reset();
   }
+  
   //设置Icon颜色
   public setIconColor(color: string) {
+    this.iconColor=color;
     this.icon.setColor(color);
   }
   /**
@@ -314,9 +318,9 @@ export abstract class BaseButton implements RenderObject {
   }
   public setLocation(location: ButtonLocation): void {
     this.customLocation = location;
-    this.buttonLocation=location;
+    this.buttonLocation = location;
     //如果已经被初始化
-    if (this.mounted){
+    if (this.mounted) {
       this.initialization(this.master);
     }
   }

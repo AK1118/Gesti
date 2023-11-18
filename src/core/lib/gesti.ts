@@ -4,6 +4,7 @@ import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "./image-toolkit";
 import GestiController from "../interfaces/gesticontroller";
 import XImage from "./ximage";
+import { InitializationOption } from "@/types/index";
 /**
  * 初始化该 @Gesti 实例时，由于平台不确定，用户必须传入 @CanvasRenderingContext2D 画笔作为
  */

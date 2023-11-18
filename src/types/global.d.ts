@@ -30,26 +30,8 @@ declare interface RectParams {
   height: number;
   angle?:number,
 }
-/**
- * @description 初始化传入参数
- */
-declare interface InitializationOption {
-  //canvas
-  canvas: HTMLCanvasElement;
-  //画笔
-  renderContext: CanvasRenderingContext2D | null;
-  //离屏画布
-  offScreenCanvas?: HTMLCanvasElement;
-  //离屏画笔
-  offScreenCanvasRenderContext?: CanvasRenderingContext2D | null;
-  //画布矩形
-  rect?: {
-    x?: number;
-    y?: number;
-    width: number;
-    height: number;
-  };
-}
+
+
 declare class Vector {
   x: number;
   y: number;

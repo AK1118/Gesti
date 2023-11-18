@@ -38,7 +38,7 @@ interface LayerController {
   /**
    * 被选中对象居中画布
    */
-  center(axis?: CenterAxis, view?: ViewObject): void;
+  center( view?: ViewObject,axis?: CenterAxis): void;
   /**
      * 更新文字图层内容
      * @param text:String
