@@ -10,7 +10,7 @@ import WriteBase from "../../abstract/write-category";
  * donw在某个被选中的物体之中时，不能开始绘制
  */
 class Write extends WriteBase {
-    async getWriteViewObject(): Promise<ViewObject> {
+    async getWriteViewObject(): Promise<WriteViewObj> {
         const rect:Rect=this.getRect();
         const x=rect.position.x,y=rect.position.y;
         this.points.forEach((item:Vector)=>{

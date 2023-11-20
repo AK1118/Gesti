@@ -5,8 +5,6 @@
  * @Last Modified time: 2023-11-18 17:49:42
  */
 
-import "./serialization";
-
 declare class Vector {
   x: number;
   y: number;
@@ -104,17 +102,83 @@ export declare enum ButtonLocation {
 }
 
 export declare interface TextOptions {
+  /**
+   * @description 字体风格，可以浏览器搜索 canvas自定义字体
+   */
   fontFamily?: string;
+  weight?: FontWeight;
+  fontStyle?: FontStyleType;
   fontSize?: number;
+  /**
+   * @description 文字间距
+   */
   spacing?: number;
+  /**
+   * @description 文字颜色
+   */
   color?: string;
-  linesMarks?: Array<number>;
+  /**
+   * @description 是否显示下划线,建议使用underLine
+   * @deprecated
+   */
+  line?: boolean;
+  /**
+   * @description 下划线
+   */
+  underLine?: boolean;
+  /**
+   * @description 删除线
+   */
+  lineThrough?: boolean;
+  /**
+   * @description 上划线
+   */
+  overLine?: boolean;
+  /**
+   * @description 划线宽度
+   */
   lineWidth?: number;
+  /**
+   * @description 下划线颜色
+   *
+   */
   lineColor?: string;
+  /**
+   * @deprecated
+   * @description 已废弃，设置无效
+   */
   lineOffsetY?: number;
+  /**
+   * @description 文字间距高度
+   */
   lineHeight?: number;
+  /**
+   * @deprecated
+   * @description 已废弃，设置无效
+   */
+
   width?: number;
+  /**
+   * @deprecated
+   * @description 已废弃，设置无效
+   */
   height?: number;
+  /**
+   * @description 如果为true,文字大小会随着选框的高而变化
+   */
+  resetFontSizeWithRect?: boolean;
+  /**
+   * @description 传入一个整数类型，用于限制字体大小最大值，默认不会限制
+   */
+  maxFontSize?: number;
+  /**
+   * @description 文字背景颜色
+   */
+  backgroundColor?: string;
+  /**
+   * @description 最大宽度
+   */
+  maxWidth?: number;
 }
 
 declare interface createImageOptions {
@@ -181,8 +245,6 @@ export declare abstract class ViewObject {
   unLock(): void;
   //隐藏
   hide(): void;
-  //显示
-  show(): void;
   //安装按钮
   installButton(button: Button): void;
   //卸载按钮
@@ -234,15 +296,25 @@ export declare class Group {
   remove(id: string): void;
   removeById(viewObject: ViewObject): void;
 }
+
+export type FontStyleType = "normal" | "italic" | "oblique";
+export type FontWeight="bold"|"normal"|100|200|300|400|500|600|700|800|900;
+
+
 export declare interface TextHandler {
   setFontSize(fontSize: number): void;
   setFontFamily(family: string): void;
   setSpacing(value: number): void;
   setColor(color: string): void;
   setText(text: string): void;
+  setFontStyle(style: FontStyleType): void;
+  setWeight(weight:FontWeight):void;
 }
+
 export declare class TextBox extends ViewObject implements TextHandler {
   constructor(text: string, options?: TextOptions);
+  setWeight(weight: FontWeight): void;
+  setFontStyle(style: FontStyleType): void;
   setText(text: string): void;
   setFontFamily(family: string): void;
   setSpacing(value: number): void;
@@ -257,6 +329,9 @@ export declare class ImageBox extends ViewObject {
   setDecoration(xImage: XImage): void;
   constructor(ximage: XImage);
 }
+
+
+export declare type GraffitiCloser=[()=>void,(callback:(view:any)=>void)=>void];
 
 export declare class WriteViewObj extends ViewObject {
   setDecoration(decoration: {
@@ -319,17 +394,22 @@ export declare class Gesti {
   public initialization(option: InitializationOption): void;
 }
 declare type EventHandle = null;
+export declare type GraffitiTypes="circle" | "write" | "line" | "rect" | "none";
 /**
  * 添加监听
  */
 export declare type GestiControllerListenerTypes =
-  | "onSelect"
-  | "onHide"
-  | "onCancel"
-  | "onHover"
-  | "onLeave"
-  | "onUpdate"
-  | "onLoad";
+| "onSelect"
+| "onHide"
+| "onCancel"
+| "onHover"
+| "onLeave"
+| "onUpdate"
+| "onLoad"
+| "onDestroy"
+| "onMirror"
+| "onBeforeDestroy"
+| "onCreateGraffiti";
 export declare abstract class GestiController {
   /**
    * @ImageToolkit
@@ -348,7 +428,7 @@ export declare abstract class GestiController {
   importAll(json: string): Promise<void>;
   exportAll(): Promise<string>;
   addWrite(options: {
-    type: "circle" | "write" | "line" | "rect" | "none";
+    type: GraffitiTypes;
     lineWidth?: number;
     color?: string;
     isFill?: boolean;
@@ -359,7 +439,7 @@ export declare abstract class GestiController {
     prepend?: boolean
   ): void;
   updateText(text: string, options?: TextOptions): void;
-  center( view?: ViewObject,axis?: CenterAxis): void;
+  center(view?: ViewObject, axis?: CenterAxis): void;
   addText(text: string, options?: TextOptions): Promise<ViewObject>;
   cancel(view?: ViewObject): void;
   cancelAll(): void;
@@ -466,25 +546,19 @@ export declare class DragButton extends Button {
 export declare class MirrorButton extends Button {}
 export declare class LockButton extends Button {}
 export declare class RotateButton extends Button {}
-export declare class SizeButton extends Button{
-  constructor(location:ButtonLocation,option?:ButtonOption);
+export declare class SizeButton extends Button {
+  constructor(location: ButtonLocation, option?: ButtonOption);
 }
 export declare class UnLockButton extends Button {
   constructor(option?: ButtonOption);
 }
-declare type VerticalButtonLocationType='top'| 'bottom';
+declare type VerticalButtonLocationType = "top" | "bottom";
 export declare class VerticalButton extends Button {
-  constructor(
-    location?:VerticalButtonLocationType,
-    option?: ButtonOption
-  );
+  constructor(location?: VerticalButtonLocationType, option?: ButtonOption);
 }
-declare type HorizonButtonLocationType='left'| 'right';
+declare type HorizonButtonLocationType = "left" | "right";
 export declare class HorizonButton extends Button {
-  constructor(
-    location?: HorizonButtonLocationType,
-    option?: ButtonOption
-  );
+  constructor(location?: HorizonButtonLocationType, option?: ButtonOption);
 }
 export declare const createGesti: (config?: gesticonfig) => Gesti;
 /**

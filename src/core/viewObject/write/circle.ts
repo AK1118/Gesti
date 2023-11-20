@@ -47,7 +47,7 @@ class WriteCircle extends WriteBase {
       height,
     };
   }
-  async getWriteViewObject(): Promise<ViewObject> {
+  async getWriteViewObject(): Promise<WriteViewObj> {
     if (!this.startPoint) return null;
     const { sx, sy, x, y, minx, miny, width, height } = this.getParams();
     const p1 = new Vector(sx, sy),

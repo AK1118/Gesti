@@ -2,6 +2,12 @@ import Painter from "@/core/lib/painter";
 import TextViewBase, { TextBoxBase } from "./text-base";
 import { Size } from "@/core/lib/rect";
 import Vector from "@/core/lib/vector";
+import {
+  Reverse,
+  ViewObjectExportEntity,
+  ViewObjectExportTextBox,
+} from "Serialization";
+import { ViewObject } from "@/types/index";
 
 /**
  * 1.改变大小时文字大小不会发生变化，只会被挤压拉伸
@@ -153,7 +159,8 @@ abstract class TextBase extends TextViewBase {
       return points;
     }
     if (
-     ( this.height - checkOffset.offsetY * this.scaleHeight)/this.textOptions.lineHeight >=
+      (this.height - checkOffset.offsetY * this.scaleHeight) /
+        this.textOptions.lineHeight >=
         this.fixedOption.fontSize &&
       !isInitialization
     ) {
@@ -219,6 +226,24 @@ abstract class TextBase extends TextViewBase {
   }
 }
 
-class TextBox extends TextBase {}
+class TextBox extends TextBase {
+  public static async reverse(
+    entity: ViewObjectExportTextBox
+  ): Promise<TextBox> {
+    return new TextBox(entity.text, entity.option);
+  }
+  export(painter?: Painter): Promise<ViewObjectExportTextBox> {
+    const entity: ViewObjectExportTextBox = {
+      type: "text",
+      text: this.fixedText,
+      option: this.textOptions,
+      base: this.getBaseInfo(),
+    };
+    return Promise.resolve(entity);
+  }
+  exportWeChat(painter?: Painter, canvas?: any): Promise<ViewObjectExportEntity> {
+      return this.export();
+  }
+}
 
 export default TextBox;

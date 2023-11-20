@@ -6,6 +6,7 @@ import WriteCircle from "./circle";
 import WriteLine from "./line";
 import WriteRect from "./rect";
 import Write from "./write";
+import WriteViewObj from "../write";
 
 export enum WriteType {
   None,
@@ -51,6 +52,10 @@ class WriteFactory {
     if (this.config.type == "write") this.currentType = WriteType.Write;
     if (this.config.type == "line") this.currentType = WriteType.Line;
     if (this.config.type == "rect") this.currentType = WriteType.Rect;
+  }
+  public close() {
+    this.config.type = "none";
+    this.currentType = WriteType.None;
   }
   public onDraw() {
     switch (this.currentType) {
@@ -114,20 +119,29 @@ class WriteFactory {
   }
   //绘制完毕，返回一个可操作对象
   async done(): Promise<ViewObject> {
-    if (!this.current)  return Promise.resolve(null);
+    if (!this.current) return Promise.resolve(null);
     const obj = await this.current.getWriteViewObject();
     obj?.custom();
     if (obj?.rect) {
-        //太小的不要
+      //太小的不要
       const { width, height } = obj.rect.size;
       if (width <= 3 && height <= 3) return Promise.resolve(null);
     }
     this.current = null;
+    if (obj) this.onAddition(obj);
     return obj;
   }
 
   cancel(): void {
     this.current = null;
+  }
+  private onAddition: (view: any) => void = (view: any) => {};
+  /**
+   * @description 创建涂鸦对象时回调
+   * @param graffiti
+   */
+  public onCreateGraffiti(callback: (view: any) => void) {
+    this.onAddition = callback;
   }
 }
 export default WriteFactory;

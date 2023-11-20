@@ -1,10 +1,12 @@
 import { ButtonLocation } from "@/core/enums";
-import {  XImage } from "./index";
+import { GraffitiTypes, TextOptions, ViewObject, XImage } from "./index";
 
+declare module "Serialization" {
+  type FetchXImageForImportCallback = (
+    data: ViewObjectExportEntity
+  ) => Promise<XImage>;
 
- declare module 'Serialization' {
-  
-   interface ExportRect {
+  interface ExportRect {
     x: number;
     y: number;
     width: number;
@@ -17,12 +19,20 @@ import {  XImage } from "./index";
     location?: ButtonLocation;
     radius?: number;
     iconColor?: string;
-    backgroundColor?:string;
-    displayBackground?:boolean;
+    backgroundColor?: string;
+    displayBackground?: boolean;
   }
 
   interface ViewObjectExportBaseInfo {
     rect: ExportRect;
+    fixedSize: {
+      width: number;
+      height: number;
+    };
+    sizeScale: {
+      scaleWidth: number;
+      scaleHeight: number;
+    };
     relativeRect: ExportRect;
     mirror: boolean;
     locked: boolean;
@@ -50,14 +60,31 @@ import {  XImage } from "./index";
     fixedWidth: number;
     fixedHeight: number;
   }
+  interface ViewObjectExportTextBox extends ViewObjectExportEntity {
+    text: string;
+    option: TextOptions;
+  }
 
-  interface ViewObjectImportImageBox extends ViewObjectExportImageBox {}
-
-  interface ViewObjectImportEntity extends ViewObjectExportEntity {}
+  interface ViewObjectExportGraffiti extends ViewObjectExportEntity {
+    config: {
+      color?: string;
+      lineWidth?: number;
+      type: GraffitiTypes;
+      isFill?: boolean;
+    };
+    points:Array<Vector>
+  }
 
   interface ViewObjectImportBaseInfo extends ViewObjectExportBaseInfo {}
 
-  type FetchXImageForImportCallback = (
-    data: ViewObjectExportEntity
-  ) => Promise<XImage>;
+  interface ViewObjectImportEntity extends ViewObjectExportEntity {}
+
+  interface ViewObjectImportImageBox extends ViewObjectExportImageBox {}
+
+  interface ViewObjectImportTextBox extends ViewObjectExportTextBox {}
+
+  interface ViewObjectImportGraffiti extends ViewObjectExportGraffiti{}
+  interface Reverse<Entity extends ViewObjectExportEntity> {
+    reverse(entity: Entity): Promise<ViewObject>;
+  }
 }

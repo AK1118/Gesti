@@ -1,3 +1,4 @@
+import { GraffitiCloser, TextOptions } from "@/types/index";
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import XImage from "../lib/ximage";
@@ -197,7 +198,7 @@ interface ImageToolKitController {
     lineWidth?: number;
     color?: string;
     isFill?: boolean;
-  }): void;
+  }): GraffitiCloser;
   /**
    * @description 导出所有对象成JSON字符串
    * @param offScreenPainter  离屏渲染对象

@@ -1,21 +1,16 @@
 import ViewObject from "./view-object";
-import GesteControllerImpl from "../lib/controller";
 import Rect from "../lib/rect";
 import ImageBox from "../viewObject/image";
 import TextBox from "../viewObject/text/text";
 import WriteViewObj from "../viewObject/write";
-import XImage from "../lib/ximage";
 import Button, { BaseButton } from "./baseButton";
 import Group from "../viewObject/group";
 import * as Buttons from "@/composite/buttons"
-import { ExportButton, FetchXImageForImportCallback, ViewObjectExportImageBox, ViewObjectExportTypes, ViewObjectImportBaseInfo, ViewObjectImportEntity, ViewObjectImportImageBox } from "@/types/serialization";
+import { ExportButton, FetchXImageForImportCallback, ViewObjectExportEntity, ViewObjectExportGraffiti, ViewObjectExportImageBox, ViewObjectExportTextBox, ViewObjectExportTypes, ViewObjectImportBaseInfo, ViewObjectImportEntity, ViewObjectImportGraffiti, ViewObjectImportImageBox, ViewObjectImportTextBox } from "@/types/serialization";
 //import { ExportButton, FetchXImageForImportCallback, ViewObjectExportImageBox, ViewObjectExportTypes, ViewObjectImportBaseInfo, ViewObjectImportEntity, ViewObjectImportImageBox } from "Serialization";
 abstract class GestiReader {
-  constructor() {
-
-  }
-  
-  private buttonClazzList = {
+  constructor() {}
+  private readonly buttonClazzList = {
     DragButton:Buttons.DragButton,
     MirrorButton:Buttons.MirrorButton,
     CloseButton:Buttons.CloseButton,
@@ -80,14 +75,18 @@ abstract class GestiReader {
   protected getViewObjectByEntity(entity:ViewObjectImportEntity):Promise<ViewObject>{
     const type:ViewObjectExportTypes=entity.type;
     if(type=="image"){
-      const imgEntity:ViewObjectExportImageBox=this.formatEntity<ViewObjectExportImageBox>(entity);
+      const imgEntity:ViewObjectImportImageBox=this.formatEntity<ViewObjectExportImageBox>(entity);
       return ImageBox.reverse(imgEntity);
     }else if(type=="text"){
-      
+      const textEntity:ViewObjectImportTextBox=this.formatEntity<ViewObjectExportTextBox>(entity);
+      return TextBox.reverse(textEntity);
+    }else if(type=="write"){
+      const textWrite:ViewObjectImportGraffiti=this.formatEntity<ViewObjectExportGraffiti>(entity);
+      return WriteViewObj.reserve(textWrite);
     }
     return null;
   }
-  private formatEntity<T>(entity:ViewObjectImportEntity):T{
+  private formatEntity<T extends ViewObjectImportEntity>(entity:ViewObjectExportEntity):T{
     return entity as T;
   }
   public async getObjectByJson(importEntity:ViewObjectImportEntity) {
@@ -109,7 +108,9 @@ abstract class GestiReader {
     view.custom();
     base.locked&&view.lock();
     base.mirror&&view.mirror();
-
+    view.setFixedSize(base.fixedSize);
+    view.setScaleWidth(base.sizeScale.scaleWidth);
+    view.setScaleHeight(base.sizeScale.scaleHeight);
     this.installButton(view,buttons);
     return view;
   }

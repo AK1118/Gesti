@@ -309,6 +309,11 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
         height: ~~this.relativeRect.size.height,
         angle: this.rect.getAngle,
       },
+      fixedSize:this.fixedSize.toObject(),
+      sizeScale:{
+        scaleWidth:this.scaleWidth,
+        scaleHeight:this.scaleHeight
+      },
       mirror: this.isMirror,
       locked: this.isLock,
       buttons: this.funcButton.map<ExportButton>((button: BaseButton)=>{

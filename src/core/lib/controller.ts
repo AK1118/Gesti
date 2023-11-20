@@ -4,6 +4,7 @@ import ImageToolkit from "./image-toolkit";
 import GestiController from "../interfaces/gesticontroller";
 import Vector from "./vector";
 import XImage from "./ximage";
+import { GraffitiCloser, TextOptions } from "@/types/index";
 
 declare type CenterAxis = "vertical" | "horizon";
 
@@ -117,7 +118,7 @@ class GesteControllerImpl implements GestiController {
     lineWidth?: number;
     color?: string;
     isFill?: boolean;
-  }): void {
+  }): GraffitiCloser {
     return this.kit.addWrite(options);
   }
   addListener(

@@ -3,11 +3,18 @@ import { ViewObjectFamily } from "../../enums";
 import ImageToolkit from "../../lib/image-toolkit";
 import Painter from "../../lib/painter";
 import Rect, { Size } from "../../lib/rect";
-import { TextHandler } from "../../../types/index";
+import { FontStyleType, FontWeight, TextHandler, TextOptions } from "../../../types/index";
 import Vector from "../../lib/vector";
 import { Point } from "../../lib/vertex";
 import Platform from "../tools/platform";
-import { FetchXImageForImportCallback, ViewObjectExportEntity, ViewObjectExportImageBox, ViewObjectImportBaseInfo, ViewObjectImportImageBox } from "@/types/serialization";
+import {
+  FetchXImageForImportCallback,
+  ViewObjectExportEntity,
+  ViewObjectExportImageBox,
+  ViewObjectImportBaseInfo,
+  ViewObjectImportImageBox,
+} from "@/types/serialization";
+import { getOffscreenCanvasWidthPlatform } from "@/utils/canvas";
 /**
  * 普通模式，矩形根据文字而定
  * 拖拽模式，文字根据缩放倍数而定
@@ -21,8 +28,8 @@ export abstract class TextBoxBase extends ViewObject {
     color: "black",
     spacing: 0,
     lineHeight: 1.5,
-    bold: false,
-    italic: false,
+    weight: "normal",
+    fontStyle:"normal",
     maxWidth: 300,
   };
   get textWrap(): boolean {
@@ -56,8 +63,8 @@ export abstract class TextBoxBase extends ViewObject {
     return textSingle;
   };
   private getFont(): string {
-    const bold = this.textOptions.bold ? "bold" : "";
-    const italic = this.textOptions.italic ? "italic" : "";
+    const bold = this.textOptions.weight;
+    const italic = this.textOptions.fontStyle;
     return `${bold} ${italic} ${this.textOptions.fontSize}px ${this.textOptions.fontFamily}`;
   }
   /**
@@ -72,9 +79,8 @@ export abstract class TextBoxBase extends ViewObject {
    * @override
    */
   public mount(): void {
-      this.computeTextSingle(true);
-      this.setMount(true);
-      // this.onMounted();
+    this.computeTextSingle(true);
+    this.setMount(true);
   }
   protected computeTextSingle(
     isInitialization: boolean = false
@@ -319,10 +325,11 @@ export abstract class TextBoxBase extends ViewObject {
       offsetY: number,
       textWidth: number
     ) => {
+      this.setFontDecorations(paint);
       paint.fillText(
         text,
         point.x + this.renderTextOffsetX,
-        (point.y + offsetY) + this.renderTextOffsetY
+        point.y + offsetY + this.renderTextOffsetY
       );
     };
     paint.save();
@@ -418,16 +425,16 @@ export abstract class TextBoxBase extends ViewObject {
   }
   protected cacheCanvas: HTMLCanvasElement | OffscreenCanvas;
   protected isDirty: boolean = true;
-  private isUseCache:boolean=true;
+  protected isUseCache: boolean = true;
   /**
    * @description 使用缓存
    * @test
    */
-  public useCache(){
-    this.isUseCache=true;
+  public useCache() {
+    this.isUseCache = true;
   }
-  public unUseCache(){
-    this.isUseCache=false;
+  public unUseCache() {
+    this.isUseCache = false;
   }
   public didEventUpWithInner(): void {
     this.doCache();
@@ -436,8 +443,10 @@ export abstract class TextBoxBase extends ViewObject {
     this.doCache();
   }
   protected doCache(): void {
-    //是否使用缓存
-    if(!this.isUseCache)return;
+    //是否使用缓存  该平台是否存在离屏画布
+    if (!this.isUseCache || !this.getCacheCanvasByPlatform()){
+      return;
+    }
     //没变过大小就不缓存
     if (!this.isDirty) return;
     // this.updateFontSizeByRectSizeHeight();
@@ -458,22 +467,28 @@ export abstract class TextBoxBase extends ViewObject {
   /**
    * @description 获取平台的离屏画布
    * @test
-   * @returns 
+   * @returns
    */
-  private getCacheCanvasByPlatform():any{
-    if(this.cacheCanvas)return this.cacheCanvas;
-    if(Platform.isBrowser)return new OffscreenCanvas(this.width, this.height);
-    if(Platform.isWeChatMiniProgram)return wx.createOffscreenCanvas(this.width,this.height);
-    //当前只支持浏览器和微信小程序离屏缓存
-    if(!Platform.isBrowser&&!Platform.isWeChatMiniProgram){
-      throw new Error("Your platform does not support OffscreenCanvas in [Gesti]. Please run textBox.unUseCache() to resolve this error.");
+  private getCacheCanvasByPlatform(): any {
+    if (this.cacheCanvas) return this.cacheCanvas;
+    const offScreenCanvas = getOffscreenCanvasWidthPlatform(
+      this.width,
+      this.height
+    );
+    this.cacheCanvas=offScreenCanvas;
+    if (!offScreenCanvas) {
+      this.unUseCache();
+      return null;
+      // throw new Error(
+      //   "Your platform does not support OffscreenCanvas in [Gesti]. Please run textBox.unUseCache() to resolve this error."
+      // );
     }
     return this.cacheCanvas;
   }
   //创建时,刷新缓存时调用
   private createCacheCanvas(): HTMLCanvasElement | OffscreenCanvas {
-    this.cacheCanvas =
-     this.getCacheCanvasByPlatform();
+    this.cacheCanvas = this.getCacheCanvasByPlatform();
+
     this.cacheCanvas.width = this.width;
     this.cacheCanvas.height = this.height;
 
@@ -500,6 +515,9 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     this.fixedText = text;
     Object.assign(this.textOptions, option);
   }
+  setFontStyle(style:FontStyleType): void {
+    this.textOptions.fontStyle=style;
+  }
   setText(text: string): void {
     this.fixedText = text;
     this.onInput(this.fixedText);
@@ -516,6 +534,9 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     this.textOptions.color = color;
     this.rebuild();
   }
+  setWeight(weight:FontWeight):void{
+    this.textOptions.weight=weight;
+  }
   public ready(kit: ImageToolkit): void {
     this.paint = kit.getPainter();
     this.computeTextSingle(true);
@@ -529,7 +550,7 @@ class TextViewBase extends TextBoxBase implements TextHandler {
   }
   drawImage(paint: Painter): void {
     //改过大小，且有缓存，渲染缓存
-    if (this.isDirty && this.isRenderCache) {
+    if (this.isDirty && this.isRenderCache||!this.isUseCache) {
       paint.drawImage(
         this.cacheCanvas,
         -this.width * 0.5,
@@ -545,7 +566,10 @@ class TextViewBase extends TextBoxBase implements TextHandler {
   export(painter?: Painter): Promise<ViewObjectExportEntity> {
     throw new Error("Method not implemented.");
   }
-  exportWeChat(painter?: Painter, canvas?: any): Promise<ViewObjectExportEntity> {
+  exportWeChat(
+    painter?: Painter,
+    canvas?: any
+  ): Promise<ViewObjectExportEntity> {
     throw new Error("Method not implemented.");
   }
   setFontSize(fontSize: number): void {

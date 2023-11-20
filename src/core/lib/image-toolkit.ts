@@ -19,7 +19,11 @@ import XImage from "./ximage";
 import GestiReaderWechat from "../../utils/reader/reader-WeChat";
 import { classTypeIs } from "../../utils/utils";
 import { ViewObjectImportEntity } from "@/types/serialization";
-import { InitializationOption } from "@/types/index";
+import {
+  GraffitiCloser,
+  InitializationOption,
+  TextOptions,
+} from "@/types/index";
 enum EventHandlerState {
   down,
   up,
@@ -452,7 +456,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         });
     }
   }
-  center(view?: ViewObject,axis?: CenterAxis): void {
+  center(view?: ViewObject, axis?: CenterAxis): void {
     if (view) view.center(this.canvasRect.size, axis);
     else this.selectedViewObject?.center(this.canvasRect.size, axis);
     this.render();
@@ -664,6 +668,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     const writeObj = this.writeFactory.done();
     writeObj.then((value) => {
       if (value) {
+        this.callHook("onCreateGraffiti", value);
         this.addViewObject(value);
       }
     });
@@ -808,8 +813,17 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     lineWidth?: number;
     color?: string;
     isFill?: boolean;
-  }): void {
+  }): GraffitiCloser {
     this.writeFactory.setConfig(options);
+    return [
+      () => {
+        //关闭涂鸦
+        this.writeFactory.close();
+      },
+     (callback)=>{
+      this.writeFactory.onCreateGraffiti.bind(this.writeFactory)(callback);
+     },
+    ];
   }
 }
 

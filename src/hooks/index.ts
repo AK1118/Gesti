@@ -1,4 +1,3 @@
-
 import { gesticonfig } from "../config/gestiConfig";
 import Gesti from "../core/lib/gesti";
 import GestiReader from "../core/abstract/reader";
@@ -23,6 +22,7 @@ import UnLockButton from "../core/viewObject/buttons/delockButton";
 import HorizonButton from "../core/viewObject/buttons/horizonButton";
 import LockButton from "../core/viewObject/buttons/lockbutton";
 import VerticalButton from "../core/viewObject/buttons/verticalButton";
+import { GraffitiCloser, TextOptions } from "@/types/index";
 
 let currentInstance: Gesti = null;
 
@@ -154,23 +154,6 @@ const createImageBox = (xImage: XImage) => createImageBoxView(xImage);
  * @returns
  */
 const createXImage = (option: createImageOptions) => createXImageFun(option);
-// {
-//   data:
-//     | HTMLImageElement
-//     | SVGImageElement
-//     | HTMLVideoElement
-//     | HTMLCanvasElement
-//     | Blob
-//     | ImageData
-//     | ImageBitmap
-//     | OffscreenCanvas;
-//   originData?: any;
-//   width: number;
-//   height: number;
-//   scale?: number;
-//   maxScale?: number;
-//   minScale?: number;
-// }
 /**
  * @description 文字控制
  * @param text
@@ -178,6 +161,7 @@ const createXImage = (option: createImageOptions) => createXImageFun(option);
  * @param options
  * @param target
  * @returns
+ * @deprecated
  */
 function textHandler(
   text: string,
@@ -236,14 +220,14 @@ const createGraffiti =
   (
     option?: { lineWidth?: number; color?: string; isFill?: boolean },
     target: Gesti = currentInstance
-  ): void => {
+  ): GraffitiCloser => {
     if (!target) {
       error("Target is empty");
       return;
     }
     setCurrentInstance(target);
     const controller = getCurrentController();
-    controller.addWrite({ type: type, ...option });
+    return controller.addWrite({ type: type, ...option });
   };
 
 const useGraffitiRect = createGraffiti("rect");
@@ -352,7 +336,10 @@ const createMirrorButton = (view: ViewObject): BaseButton => new MirrorButton();
  * @param view
  * @param button
  */
-const installButton = (view: ViewObject, button: BaseButton | Array<BaseButton>) => {
+const installButton = (
+  view: ViewObject,
+  button: BaseButton | Array<BaseButton>
+) => {
   if (Array.isArray(button)) {
     button.forEach((item) => view.installButton(item));
   } else {
@@ -360,7 +347,10 @@ const installButton = (view: ViewObject, button: BaseButton | Array<BaseButton>)
   }
 };
 
-const unInstallButton = (view: ViewObject, button: BaseButton | Array<BaseButton>) => {
+const unInstallButton = (
+  view: ViewObject,
+  button: BaseButton | Array<BaseButton>
+) => {
   if (Array.isArray(button)) {
     view.unInstallButton(button);
   } else {
@@ -448,7 +438,7 @@ const doSomething =
         currentInstance.dispose();
         setCurrentInstance(null);
         break;
-      };
+      }
       case "cleanAll":
         controller.cleanAll();
         break;
@@ -491,19 +481,24 @@ const doCenter = (
   target: Gesti = currentInstance
 ) => {
   //不安全的做法
-  target.controller.center(view,axis);
+  target.controller.center(view, axis);
 };
 //设置坐标位置
-const doPosition=(x:number,y:number,view?:ViewObject,target: Gesti = currentInstance)=>{
+const doPosition = (
+  x: number,
+  y: number,
+  view?: ViewObject,
+  target: Gesti = currentInstance
+) => {
   //不安全的做法
-  target.controller.position(x,y,view);
-}
+  target.controller.position(x, y, view);
+};
 /**
  * @description 旋转某个元素
- * @param angle 
- * @param existing 
- * @param view 
- * @param target 
+ * @param angle
+ * @param existing
+ * @param view
+ * @param target
  */
 const doRotate = (
   angle: number,
@@ -530,24 +525,28 @@ const useReader = (json: string): Promise<ViewObject> => {
 /**
  * @description 转换json为可读对象 H5专用
  * @param json 特定格式json
- * @returns 
+ * @returns
  */
-const useReaderH5=(json:string):Promise<ViewObject>=>{
-    const reader:GestiReader=new GestiReaderH5();
-    return null;//reader.getObjectByJson(json);
-}
+const useReaderH5 = (json: string): Promise<ViewObject> => {
+  const reader: GestiReader = new GestiReaderH5();
+  return null; //reader.getObjectByJson(json);
+};
 /**
  * @description 转换json为可读对象 微信小程序专用
  * @param json 特定格式json
  * @param painter 画笔
- * @param weChatCanvas 画布 
- * @returns 
+ * @param weChatCanvas 画布
+ * @returns
  */
-const useReaderWeChat=(json: string,painter:CanvasRenderingContext2D,weChatCanvas: any):Promise<ViewObject>=>{
-  const reader:GestiReaderWechat=new GestiReaderWechat();
-  const _painter=new Painter(painter);
-  return null;//reader.getObjectByJson(json,_painter,weChatCanvas);
-}
+const useReaderWeChat = (
+  json: string,
+  painter: CanvasRenderingContext2D,
+  weChatCanvas: any
+): Promise<ViewObject> => {
+  const reader: GestiReaderWechat = new GestiReaderWechat();
+  const _painter = new Painter(painter);
+  return null; //reader.getObjectByJson(json,_painter,weChatCanvas);
+};
 
 /**
  * @description 获取当前选中对象
@@ -565,18 +564,16 @@ const currentViewObject = (target: Gesti = currentInstance): ViewObject => {
   return controller.currentViewObject;
 };
 
-
 /**
  * @description 获取节点
- * @param type 
- * @returns 
+ * @param type
+ * @returns
  */
-const useGetViewObjectById=(target: Gesti = currentInstance)=>{
+const useGetViewObjectById = (target: Gesti = currentInstance) => {
   setCurrentInstance(target);
   const controller = getCurrentController();
   return controller.getViewObjectById;
-}
-
+};
 
 const drive = (type: "move" | "up" | "down" | "wheel") => {
   return (
@@ -596,7 +593,6 @@ const driveMove = drive("move");
 const driveUp = drive("up");
 const driveDown = drive("down");
 const driveWheel = drive("wheel");
-
 
 export {
   createGesti /**创建Gesti实例 */,
@@ -649,7 +645,7 @@ export {
   doUpward,
   doDownward,
   doLeftward,
-  doPosition/*设置对象位置*/,
+  doPosition /*设置对象位置*/,
   doRightward,
   doCenter,
   doUpdate,
@@ -667,5 +663,5 @@ export {
   removeListener,
   useReaderH5,
   useReaderWeChat,
-  useGetViewObjectById/* 通过id获取对象 */,
+  useGetViewObjectById /* 通过id获取对象 */,
 };

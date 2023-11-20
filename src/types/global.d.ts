@@ -166,87 +166,10 @@ declare interface XImageOptions {
   fixedHeight?: number;
 }
 
-declare interface TextOptions {
-  /**
-   * @description 字体风格，可以浏览器搜索 canvas自定义字体
-   */
-  fontFamily?: string;
-  bold?: boolean;
-  italic?: boolean;
-  fontSize?: number;
-  /**
-   * @description 文字间距
-   */
-  spacing?: number;
-  /**
-   * @description 文字颜色
-   */
-  color?: string;
-  /**
-   * @description 是否显示下划线,建议使用underLine
-   * @deprecated
-   */
-  line?: boolean;
-  /**
-   * @description 下划线
-   */
-  underLine?: boolean;
-  /**
-   * @description 删除线
-   */
-  lineThrough?: boolean;
-  /**
-   * @description 上划线
-   */
-  overLine?: boolean;
-  /**
-   * @description 划线宽度
-   */
-  lineWidth?: number;
-  /**
-   * @description 下划线颜色
-   *
-   */
-  lineColor?: string;
-  /**
-   * @deprecated
-   * @description 已废弃，设置无效
-   */
-  lineOffsetY?: number;
-  /**
-   * @description 文字间距高度
-   */
-  lineHeight?: number;
-  /**
-   * @deprecated
-   * @description 已废弃，设置无效
-   */
 
-  width?: number;
-  /**
-   * @deprecated
-   * @description 已废弃，设置无效
-   */
-  height?: number;
-  /**
-   * @description 如果为true,文字大小会随着选框的高而变化
-   */
-  resetFontSizeWithRect?: boolean;
-  /**
-   * @description 传入一个整数类型，用于限制字体大小最大值，默认不会限制
-   */
-  maxFontSize?: number;
-  /**
-   * @description 文字背景颜色
-   */
-  backgroundColor?: string;
-  /**
-   * @description 最大宽度
-   */
-  maxWidth?: number;
-}
 
 declare type CenterAxis = "vertical" | "horizon";
+
 declare type GestiControllerListenerTypes =
   | "onSelect"
   | "onHide"
@@ -257,9 +180,9 @@ declare type GestiControllerListenerTypes =
   | "onLoad"
   | "onDestroy"
   | "onMirror"
-  | "onBeforeDestroy";
+  | "onBeforeDestroy"
+  | "onCreateGraffiti";
 
-declare function textHandler(options?: TextOptions): any;
 
 declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";
 

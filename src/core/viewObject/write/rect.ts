@@ -29,7 +29,7 @@ class WriteRect extends WriteBase{
         }else this.paint.stroke();
         this.currentPosition=position;
     }
-    async getWriteViewObject(): Promise<ViewObject> {
+    async getWriteViewObject(): Promise<WriteViewObj> {
         
         if(!this.startPoint)return null;
        

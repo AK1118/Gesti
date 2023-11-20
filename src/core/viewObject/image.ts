@@ -196,7 +196,7 @@ class ImageBox extends ViewObject {
     }
     return null;
   }
-
+  
   public static async reverseWeChat(
     entity: ViewObjectImportImageBox
   ): Promise<ImageBox> {

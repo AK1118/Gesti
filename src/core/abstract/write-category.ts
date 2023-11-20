@@ -1,5 +1,6 @@
 import Painter from "../../core/lib/painter";
 import Rect from "../../core/lib/rect";
+import WriteViewObj from "../viewObject/write";
 import ViewObject from "./view-object";
 
 /**
@@ -79,7 +80,7 @@ abstract class WriteBase {
      * 获取刚刚画的部分
      * @returns 
      */
-    abstract  getWriteViewObject(): Promise<ViewObject>;
+    abstract  getWriteViewObject(): Promise<WriteViewObj>;
 }
 
 

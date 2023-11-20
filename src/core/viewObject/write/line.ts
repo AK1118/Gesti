@@ -2,6 +2,7 @@ import ViewObject from "../../abstract/view-object";
 import WriteBase from "../../abstract/write-category";
 import WriteViewObj from "../write";
 import Rect from "../../lib/rect";
+import Vector from "@/core/lib/vector";
 
 
 class WriteLine extends WriteBase {
@@ -21,7 +22,7 @@ class WriteLine extends WriteBase {
         this.paint.closePath()
         this.currentPosition = position;
     }
-    async getWriteViewObject(): Promise<ViewObject> {
+    async getWriteViewObject(): Promise<WriteViewObj> {
         if (!this.startPoint) return null;
         const sx = this.startPoint.x, sy = this.startPoint.y;
         const x = this.currentPosition.x, y = this.currentPosition.y;
