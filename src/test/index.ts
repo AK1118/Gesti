@@ -29,8 +29,11 @@ const gesti = createGesti({
   auxiliary: false,
 });
 gesti.initialization({
-  canvas,
   renderContext:g,
+  rect:{
+    canvasWidth:canvas.width,
+    canvasHeight:canvas.height
+  }
 });
 // gesti.debug=true;
 const controller=gesti.controller;
@@ -123,7 +126,7 @@ imageBox.installButton(new RotateButton());
 (document.querySelector("#input") as any).value=textBox2.value;
 (document.querySelector("#input") as HTMLElement).oninput=(e:any)=>{
   const value=e.target.value;
-  textBox2.setText(value);
+  controller.updateText(value);
 }
 
 document.getElementById("import").addEventListener("click", () => {

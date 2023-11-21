@@ -32,20 +32,9 @@ class Gesti {
 
   public initialization(option: InitializationOption): GestiController {
     if (!option) throw Error("The option is should not undefined.");
-    if (!(option.canvas && option.renderContext))
-      throw Error("Both the Canvas and renderContext must not be undefined.");
+    if (!option.renderContext)
+      throw Error("RenderContext must not be undefined.");
     this._controller && this.dispose();
-    if (
-      typeof document != "undefined" &&
-      option.canvas &&
-      option.renderContext
-    ) {
-      let canvasRect: DOMRect = option.canvas.getBoundingClientRect();
-      if (option.rect) canvasRect = option.rect as DOMRect;
-      else option.rect = canvasRect;
-      this.kit = new ImageToolkit(option);
-      return this.controller;
-    }
     if (option.rect) this.kit = new ImageToolkit(option);
     return this.controller;
   }
@@ -67,7 +56,11 @@ class Gesti {
       width: number;
       height: number;
     }
-  ) {}
+  ) {
+    throw Error(
+      "This method has been deprecated,please run method gesti.initialization(options) to initialization gesti."
+    );
+  }
   /**
    * @description 设置配置，跟构造函数一样
    * @param config

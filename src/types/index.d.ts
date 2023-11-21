@@ -2,7 +2,7 @@
  * @Author: AK1118
  * @Date: 2023-11-15 16:08:39
  * @Last Modified by: AK1118
- * @Last Modified time: 2023-11-21 14:58:22
+ * @Last Modified time: 2023-11-21 17:15:58
  */
 
 import { ViewObjectExportBaseInfo } from "Serialization";
@@ -353,6 +353,8 @@ export declare class TextBox extends ViewObject implements TextHandler {
   setDecoration(options: TextOptions): void;
   get fontSize(): number;
   updateText(text: string, options?: TextOptions): Promise<void>;
+  public useCache() :void;
+  public unUseCache():void;
 }
 
 export declare class ImageBox extends ViewObject {
@@ -380,19 +382,19 @@ export declare type CenterAxis = "vertical" | "horizon";
  */
 export declare interface InitializationOption {
   //canvas
-  canvas: HTMLCanvasElement;
+  // canvas?: HTMLCanvasElement;
   //画笔
   renderContext: CanvasRenderingContext2D | null;
   //离屏画布
-  offScreenCanvas?: HTMLCanvasElement;
+  // offScreenCanvas?: HTMLCanvasElement;
   //离屏画笔
-  offScreenCanvasRenderContext?: CanvasRenderingContext2D | null;
+  // offScreenCanvasRenderContext?: CanvasRenderingContext2D | null;
   //画布矩形
-  rect?: {
+  rect: {
     x?: number;
     y?: number;
-    width: number;
-    height: number;
+    canvasWidth: number;
+    canvasHeight: number;
   };
 }
 

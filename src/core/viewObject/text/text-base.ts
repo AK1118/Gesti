@@ -567,8 +567,8 @@ class TextViewBase extends TextBoxBase implements TextHandler {
   get value(): string {
     return this.fixedText;
   }
-  setDecoration(args: any): void {
-    throw new Error("Method not implemented.");
+  setDecoration(args: TextOptions): void {
+    this.textOptions=Object.assign(this.textOptions,args)
   }
   async drawImage(paint: Painter): Promise<void> {
     //改过大小，且有缓存，渲染缓存

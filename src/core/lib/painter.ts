@@ -2,12 +2,16 @@
 	使用代理模式重写Painter，兼容原生Painter
 */
 class Painter implements Painter {
-  paint: CanvasRenderingContext2D|OffscreenCanvasRenderingContext2D  = null;
-  constructor(paint: CanvasRenderingContext2D|OffscreenCanvasRenderingContext2D ) {
+  paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D = null;
+  constructor(
+    paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  ) {
     this.setPaintQuality(paint);
     this.paint = paint;
   }
-  private setPaintQuality(paint: CanvasRenderingContext2D|OffscreenCanvasRenderingContext2D): void {
+  private setPaintQuality(
+    paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  ): void {
     try {
       if (paint?.imageSmoothingEnabled) paint.imageSmoothingEnabled = true;
       if (paint?.imageSmoothingQuality) paint.imageSmoothingQuality = "high";
@@ -41,7 +45,7 @@ class Painter implements Painter {
     if (this.paint.textBaseline) this.paint.textBaseline = baseLine;
   }
   draw() {
-     (this.paint as any)?.draw?.(this.paint);
+    (this.paint as any)?.draw();
   }
   strokeRect(x: number, y: number, w: number, h: number) {
     this.paint.strokeRect(x, y, w, h);
@@ -53,8 +57,13 @@ class Painter implements Painter {
     this.paint.stroke();
   }
   clearRect(x: number, y: number, w: number, h: number) {
-    if (typeof uni != "undefined" && (this.paint as any)?.draw) this.draw();
-    else this.paint.clearRect(x, y, w, h);
+    // if (typeof uni != "undefined" && (this.paint as any)?.draw) this.draw();
+    // else this.paint.clearRect(x, y, w, h);
+    if ('draw' in this.paint) {
+      this.draw();
+    } else {
+      this.paint.clearRect(x, y, w, h);
+    }
   }
   save() {
     this.paint.save();
@@ -77,8 +86,15 @@ class Painter implements Painter {
   fill() {
     this.paint.fill();
   }
-  arc(x: number, y: number, radius: number, start: number, end: number, counterclockwise?: boolean) {
-    this.paint.arc(x, y, radius, start, end,counterclockwise);
+  arc(
+    x: number,
+    y: number,
+    radius: number,
+    start: number,
+    end: number,
+    counterclockwise?: boolean
+  ) {
+    this.paint.arc(x, y, radius, start, end, counterclockwise);
   }
   arcTo(x1: number, y1: number, x2: number, y2: number, radius: number) {
     this.paint.arcTo(x1, y1, x2, y2, radius);

@@ -25,22 +25,35 @@
 
 ### 安装
 
-	npm install gesti
+  ```
+  npm install gesti
+  ```
 
 ### 引入使用
 
-	import Gesti from "gesti";
+  ```
+  import Gesti from "gesti";
+  ```
 
 ### 初始化
 
-	const gesti=new Gesti();
-	//h5端适用，其他端请参考API自行添加
-	gesti.init(canvas);
+  ```
+  const gesti=new Gesti();
+      //h5端适用，其他端请参考API自行添加
+  const controller=gesti.initialization({
+    renderContext:g,
+    rect:{
+       canvasWidth:canvas.width,
+       canvasHeight:canvas.height
+     }
+  });
+  ```
 
-### 加入图片
+### 加入文字
 
-	//image 类型详情请参考API,传入一个 <img>也适用
-	 gesti.addImage(gesti.createImage(image));
+  ```
+    controller.load(new TextBox('New Text'));
+  ```
 
 # API
 
@@ -48,39 +61,16 @@
 
 | 方法名      | 返回值类型  |  所属    |    参数    |   说明   |
 | :----:      |   :----: | :----:   |  :----:   | :----:      | 
-| init      |    void      |     Gesti   |    (canvas?: HTMLCanvasElement, paint?: CanvasRenderingContext2D, rect?:rectParam)   |     初始化 Gesti 时调用，共3个可选参数。canvas 和 paint 必须二选一，且没有传入canvas时，必须传入paint 和 rect.       |
-| setConfig      |    void      |     Gesti   |   (config?: gesticonfig)   |     修改或设置配置，修改后会自动调用GestiController.update函数       |
+| ~~init~~      |    void      |     Gesti   |    (canvas?: HTMLCanvasElement, paint?: CanvasRenderingContext2D, rect?:rectParam)   |     初始化 Gesti 时调用，共3个可选参数。canvas 和 paint 必须二选一，且没有传入canvas时，必须传入paint 和 rect.       |
+| ~~setConfig~~      |    void      |     Gesti   |   (config?: gesticonfig)   |     修改或设置配置，修改后会自动调用GestiController.update函数       |
+| initialization      |    GestiController      |     Gesti   |   (options:InitializationOption)   |     初始化gesti，返回控制器       |
+| static mount      |    [Gesti,GestiController]      |     Gesti   |   (options:InitializationOption)   |     通过静态方法初始化gesti, 返回gesti实例和它的控制器      |
 
-
-| 属性名      | 返回值类型  |  所属    |    参数    |   说明   |
-| :----:      |   :----: | :----:   |  :----:   | :----: | 
-|  constructor | Gesti    |  Gesti |    config?: gesticonfig    |     构造函数,传入配置参数，当前只有两个可选参数  auxiliary?:boolean 控制辅助线开关和dashedLine?:boolean 控制包裹对象的虚线     |
-|  static XImage | XImage  |  Gesti |    -    |     暴露给外部声明Ximage对象类型     |
-|  controller | GestiController  |  Gesti |    -    |     控制器，获取控制器，详情请查看下方  GestiController   |
-|  static config | GestiConfig  |  Gesti |    -    |     Gesti全局配置对象   |
-
-
-#### init
-
-	init(canvas?: HTMLCanvasElement, paint?: CanvasRenderingContext2D, rect?: {
-        x?: number;
-        y?: number;
-        width: number;
-        height: number;
-    }): void;
-
-- 初始化 Gesti 时调用，共3个可选参数
-- canvas 和 paint 必须二选一，且没有传入canvas时，必须传入paint 和 rect.
-
-***在H5端，推荐您直接传入一个canvas即可***
-
-- 带有 ❗ 的方法都不建议使用
 
 ## GestiController
 
 | 方法名      | 返回值类型              |  所属    |    参数    |   说明   |
 | :---       |    :----:         |  :----:   |    :----:   |   :----: |
-| ❗addText    | Promise\<boolean\>|      GestiController     |    text: string, options?: TextOptions ) |    新增文字图层到画布内    |
 | updateText  | void              |    GestiController  |       (text: string, options?:TextOptions )     |      更新被选中的文字图层的文字内容，或者文字属性   |
 | layerLower  | void             |      GestiController     |    -      |    图层向下移动一层    |
 | layerRise  | void             |      GestiController     |     -     |    图层向上移动一层    |
@@ -90,8 +80,6 @@
 | deLock    | void             |      GestiController     |     -     |    解锁当前选中图层    |
 | cancel    | void             |      GestiController     |      -    |    取消当前被聚焦对象    |
 | cancelAll    | void             |      GestiController     |     -     |    取消所有被聚焦对象    |
-| fallback(暂未全局兼容)    | void             |      GestiController     |     -     |    撤销    |
-| cancelFallback(暂未全局兼容)    | void             |      GestiController     |    -      |    取消上次撤销    |
 | down    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标\|手指点击事件时调用    |
 | up    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标\|手指抬起事件时调用    |
 | move    | void             |      GestiController     |     (e: MouseEvent \| Event \| EventHandle)     |    鼠标\|手指移动事件时调用    |
@@ -106,11 +94,7 @@
 | update    | void  |   GestiController |    -    |   调用后会重绘canvas,一般在改变数据后画布未刷新时使用     |
 | importAll    | Promise\<void\>  |   GestiController |    (json: string)   |   以json形式导入对象集合 H5 |
 | exportAll  | Promise\<string\>  |   GestiController |    -   |   以json形式导出对象集合 H5    |
-| exportAllWithWeChat| Promise\<string\>  |   GestiController |    (json: string)   |   以json形式导入对象集合 微信小程序 canvas 2D |
-| importAllWithWeChat| Promise\<void\>  |   GestiController |    -   |   以json形式导出对象集合    微信小程序 canvas 2D |
 | center   | void  |   GestiController |   (axis?: "vertical" \| "horizon")   |  垂直居中或者水平居中，不填写参数水平垂直居中    |
-| ❗addImage   | 	Promise\<boolean\>  |   GestiController |   (ximage: XImage \| Promise<XImage>)   |  添加一张图片到画布内    |
-| ❗createImage   | 	Promise\<XImage\>  |   GestiController |   (image: HTMLImageElement \| SVGImageElement \| HTMLVideoElement \| HTMLCanvasElement \| Blob \| ImageData \| ImageBitmap \| OffscreenCanvas, options?: createImageOptions)   |  传入图片数据，返回一个Ximage对象,详细使用方法参考Demo    |
 | cancelEvent   | void  |   GestiController |   -   |  取消Gesti自带的鼠标手指时间监听。使用该函数后需要自行调用鼠标各个事件，请参考上方  down,up,move  ,使用详情参考Demo    |
 | addWrite   | 	void  |   GestiController |   (options: {type: "circle" \| "write" \| "line" \| "rect" \| "none";lineWidth?: number;color?: string;isFill?: boolean;})   |  添加涂鸦功能，调用该函数且传入options.type不为"none"时，下一次在canvas内滑动会触发生成对应的涂鸦对象,直到再次调用该函数且options.type为"none"时停止    |
 | getViewObjectById  | Promise\<ViewObject\>  |   GestiController |    (id:string)   |  通过id获取ViewObject对象    |
@@ -309,15 +293,21 @@
 ####  HTML
 
 	<canvas id="canvas" width="300" height="300"></canvas>
-    <img  id="img" src=""/>
 
-#### JavaScript 或 Typescript
+#### JavaScript
 
-	const canvas: HTMLCanvasElement = document.querySelector("canvas");
-	const gesti = new Gesti();
-	const img: HTMLImageElement = document.querySelector("#img");
-	gesti.init(canvas);
-	gesti.controller.addImage(gesti.createImage(img))
+    const canvas = document.querySelector("canvas");
+    const renderContext= canvas.getContext("2d");
+    const [gesti,controller]=Gesti.mount({
+        renderContext,
+        rect:{
+          canvasWidth:canvas.width,
+          canvasHeight:canvas.height
+        }
+    });
+    controller.load(new Text(`New Text.
+      新建文本`))
+
 
 
 ***不是吗？***

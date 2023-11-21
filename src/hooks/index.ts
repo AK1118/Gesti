@@ -161,7 +161,6 @@ const createXImage = (option: createImageOptions) => createXImageFun(option);
  * @param options
  * @param target
  * @returns
- * @deprecated
  */
 function textHandler(
   text: string,
@@ -169,7 +168,9 @@ function textHandler(
   options?: TextOptions,
   target: Gesti = currentInstance
 ) {
-  textBox.updateText(text, options);
+  //textBox.updateText(text, options);
+  textBox.setText(text);
+  textBox.setDecoration(options);
   if (!target) {
     error("Target is empty");
     return Promise.reject("Target is empty");

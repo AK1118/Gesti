@@ -186,13 +186,13 @@ abstract class ImageToolkitBase {
 class ImageToolkit extends ImageToolkitBase implements GestiController {
   constructor(option: InitializationOption) {
     super();
-    const { x: offsetX, y: offsetY, width, height } = option?.rect || {};
+    const { x: offsetX, y: offsetY, canvasWidth, canvasHeight } = option?.rect || {};
     this.offset = new Vector(offsetX || 0, offsetY || 0);
     this.canvasRect = new Rect({
       x: this.offset.x,
       y: this.offset.y,
-      width: option.rect.width,
-      height: option.rect.height,
+      width: canvasWidth,
+      height: canvasHeight,
     });
     this.paint = new Painter(option.renderContext);
     this.writeFactory = new WriteFactory(this.paint);
@@ -454,13 +454,18 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     return this.exportAll(offScreenPainter, "WeChat");
   }
   updateText(text: string, options?: TextOptions): void {
-    const isTextBox = classTypeIs(this.selectedViewObject, TextBox);
+    //const isTextBox = classTypeIs(this.selectedViewObject, TextBox);
+    const isTextBox:boolean=this.selectedViewObject?.family===ViewObjectFamily.text;
     if (isTextBox) {
-      (this.selectedViewObject as TextBox)
-        .updateText(text, options)
-        .then(() => {
-          this.render();
-        });
+      const view:TextBox=this.selectedViewObject as TextBox;
+      view.setDecoration(options??{});
+      view.setText(text);
+      this.render();
+      // (this.selectedViewObject as TextBox)
+      //   .updateText(text, options)
+      //   .then(() => {
+      //     this.render();
+      //   });
     }
   }
   center(view?: ViewObject, axis?: CenterAxis): void {
