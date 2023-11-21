@@ -22,7 +22,7 @@ abstract class BaseViewObject extends OperationObserver {
   //瞬时缩放倍数
   protected deltaScale: number = 1;
   //是否被选中
-  protected selected: boolean = false;
+  public selected: boolean = false;
   //图层唯一身份码
   public readonly key: string | number = +new Date();
   //是否处于镜像

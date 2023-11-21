@@ -2,7 +2,7 @@
  * @Author: AK1118
  * @Date: 2023-11-03 18:14:02
  * @Last Modified by: AK1118
- * @Last Modified time: 2023-11-06 09:16:00
+ * @Last Modified time: 2023-11-21 14:58:59
  */
 import SizeButton from "./core/viewObject/buttons/sizeButton";
 import { ButtonLocation, ViewObjectFamily } from "./core/enums";
@@ -72,11 +72,11 @@ import {
   onBeforeDestroy,
   doDestroyGesti,
   doCleanAll,
-  exportAllWithWeChat,
-  importAllWithWeChat,
+  // exportAllWithWeChat,
+  // importAllWithWeChat,
   doPosition,
   useReaderH5,
-  useReaderWeChat,
+  // useReaderWeChat,
   useGetViewObjectById,
 } from "./hooks/index";
 import {
@@ -100,6 +100,7 @@ import UnLockButton from "./core/viewObject/buttons/delockButton";
 import VerticalButton from "./core/viewObject/buttons/verticalButton";
 import HorizonButton from "./core/viewObject/buttons/horizonButton";
 import { createTextBoxView } from "./hooks/create";
+import GestiConfig from "./config/gestiConfig";
 
 //按钮
 export {
@@ -117,6 +118,7 @@ export { ButtonLocation };
 export { ImageBox, XImage, TextBox, WriteViewObj };
 //枚举
 export { ViewObjectFamily };
+export {GestiConfig};
 //Hooks
 export {
   createGesti /**创建Gesti实例 */,
@@ -147,8 +149,8 @@ export {
   loadToGesti /**加载某个可操作对象到画布内 */,
   importAll,
   exportAll,
-  exportAllWithWeChat,
-  importAllWithWeChat,
+  // exportAllWithWeChat,
+  // importAllWithWeChat,
   createDragButton,
   createHorizonButton,
   createVerticalButton,
@@ -188,11 +190,12 @@ export {
   mmToIn,
   ptToPx,
   doPosition,
-  useReaderWeChat,
+  // useReaderWeChat,
   useReaderH5,
   useGetViewObjectById,
   parseUint8Array,
   uint8ArrayConvert,
   uint8ArrayToChunks,
+  
 };
 export default Gesti;

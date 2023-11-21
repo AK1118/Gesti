@@ -2,8 +2,10 @@
  * @Author: AK1118
  * @Date: 2023-11-15 16:08:39
  * @Last Modified by: AK1118
- * @Last Modified time: 2023-11-18 17:49:42
+ * @Last Modified time: 2023-11-21 14:58:22
  */
+
+import { ViewObjectExportBaseInfo } from "Serialization";
 
 declare class Vector {
   x: number;
@@ -67,6 +69,10 @@ declare interface Icon {
 export declare interface gesticonfig {
   auxiliary?: boolean;
   dashedLine?: boolean;
+}
+
+export declare class GestiConfig{
+  static DPR:number;
 }
 
 declare interface RectParams {
@@ -232,13 +238,29 @@ export declare interface ImageChunk {
   base64: string;
 }
 export declare abstract class ViewObject {
-  getBaseInfo(): Object;
+  public getBaseInfo(): ViewObjectExportBaseInfo;
   readonly rect: Rect;
   get value(): any;
   readonly family: ViewObjectFamily;
   readonly originFamily: ViewObjectFamily;
   readonly name: string;
+  get position(): Vector;
+  get size(): Size;
+  get width(): number;
+  get height(): number;
+  get positionX(): number;
+  get positionY(): number;
+  get scaleWidth(): number;
+  get scaleHeight(): number;
+  get absoluteScale():number;
+  get mounted(): boolean;
+  get id(): string;
+  readonly key: string;
+  readonly selected: boolean;
+  public disabled: boolean;
+  get isLock():boolean;
   setName(name: string): void;
+  public setId(id: string): void;
   //上锁
   lock(): void;
   //解锁
@@ -247,6 +269,8 @@ export declare abstract class ViewObject {
   hide(): void;
   //安装按钮
   installButton(button: Button): void;
+  
+  installMultipleButtons(buttons: Array<Button>):void 
   //卸载按钮
   unInstallButton(buttons: Array<Button>): void;
   //设置样式
@@ -260,8 +284,6 @@ export declare abstract class ViewObject {
    * @param opacity  0.0~1.0
    */
   setOpacity(opacity: number): void;
-  //是否已被选中
-  readonly selected: boolean;
   /**
    * 将对象设置为背景
    */
@@ -270,9 +292,7 @@ export declare abstract class ViewObject {
    * 取消对象为背景
    */
   public unBackground(): void;
-  get position(): Vector;
-  get size(): Size;
-  get mounted(): boolean;
+  public getLayer(): number;
 }
 export declare class XImage {
   constructor(params: createImageOptions);
@@ -298,8 +318,18 @@ export declare class Group {
 }
 
 export type FontStyleType = "normal" | "italic" | "oblique";
-export type FontWeight="bold"|"normal"|100|200|300|400|500|600|700|800|900;
-
+export type FontWeight =
+  | "bold"
+  | "normal"
+  | 100
+  | 200
+  | 300
+  | 400
+  | 500
+  | 600
+  | 700
+  | 800
+  | 900;
 
 export declare interface TextHandler {
   setFontSize(fontSize: number): void;
@@ -308,7 +338,7 @@ export declare interface TextHandler {
   setColor(color: string): void;
   setText(text: string): void;
   setFontStyle(style: FontStyleType): void;
-  setWeight(weight:FontWeight):void;
+  setWeight(weight: FontWeight): void;
 }
 
 export declare class TextBox extends ViewObject implements TextHandler {
@@ -330,8 +360,10 @@ export declare class ImageBox extends ViewObject {
   constructor(ximage: XImage);
 }
 
-
-export declare type GraffitiCloser=[()=>void,(callback:(view:any)=>void)=>void];
+export declare type GraffitiCloser = [
+  () => void,
+  (callback: (view: any) => void) => void
+];
 
 export declare class WriteViewObj extends ViewObject {
   setDecoration(decoration: {
@@ -392,24 +424,30 @@ export declare class Gesti {
    * @param option 传入一个对象
    */
   public initialization(option: InitializationOption): void;
+  public static DPR:number;
 }
 declare type EventHandle = null;
-export declare type GraffitiTypes="circle" | "write" | "line" | "rect" | "none";
+export declare type GraffitiTypes =
+  | "circle"
+  | "write"
+  | "line"
+  | "rect"
+  | "none";
 /**
  * 添加监听
  */
 export declare type GestiControllerListenerTypes =
-| "onSelect"
-| "onHide"
-| "onCancel"
-| "onHover"
-| "onLeave"
-| "onUpdate"
-| "onLoad"
-| "onDestroy"
-| "onMirror"
-| "onBeforeDestroy"
-| "onCreateGraffiti";
+  | "onSelect"
+  | "onHide"
+  | "onCancel"
+  | "onHover"
+  | "onLeave"
+  | "onUpdate"
+  | "onLoad"
+  | "onDestroy"
+  | "onMirror"
+  | "onBeforeDestroy"
+  | "onCreateGraffiti";
 export declare abstract class GestiController {
   /**
    * @ImageToolkit

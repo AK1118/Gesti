@@ -4,7 +4,9 @@ import XImage from "../lib/ximage";
 
 interface CutterInterface {
   painter: Painter;
-  getChunks(chunkSize: number, ximage: XImage): Promise<ImageChunk[]>;
+  canvas:any;
+  chunkSize:number;
+  getChunks(ximage: XImage): Promise<ImageChunk[]>;
   merge(
     width: number,
     height: number,

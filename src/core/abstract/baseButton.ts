@@ -7,6 +7,7 @@ import Rect from "../lib/rect";
 import Vector from "../lib/vector";
 import { Icon } from "../lib/icon";
 import DefaultIcon from "@/static/icons/defaultIcon";
+import GestiConfig from "@/config/gestiConfig";
 export type ButtonOption = {
   location?: ButtonLocation;
   icon?: Icon;
@@ -217,7 +218,7 @@ export abstract class BaseButton implements RenderObject {
     px: number,
     py: number
   ): [x: number, y: number] {
-    const distance: number = 30;
+    const distance: number = 30 * GestiConfig.DPR;
     const hf = height * 0.5,
       wf = width * 0.5;
     const baseX = width * px,

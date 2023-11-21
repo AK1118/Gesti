@@ -1,6 +1,6 @@
 import { gesticonfig } from "../config/gestiConfig";
 import Gesti from "../core/lib/gesti";
-import GestiReader from "../core/abstract/reader";
+import GestiReader from "../core/bases/reader-base";
 import TextBox from "../core/viewObject/text/text";
 import Widgets from "../static/widgets";
 import XImage from "../core/lib/ximage";
@@ -10,7 +10,7 @@ import {
   createXImageFun,
 } from "./create";
 import GestiReaderH5 from "../utils/reader/reader-H5";
-import GestiReaderWechat from "../utils/reader/reader-WeChat";
+// import GestiReaderWechat from "../utils/reader/reader-WeChat";
 import Painter from "../core/lib/painter";
 import DragButton from "../core/viewObject/buttons/dragbutton";
 import CloseButton from "../core/viewObject/buttons/closeButton";
@@ -265,23 +265,23 @@ const importAll = (
  * @param target
  * @returns
  */
-const importAllWithWeChat = (
-  json: string,
-  weChatCanvas: any,
-  target: Gesti = currentInstance
-): Promise<void> => {
-  if (!target) {
-    error("Target is empty");
-    return Promise.reject("Target is empty");
-  }
-  if (!json) {
-    warn("Json is empty");
-    return Promise.reject("json is empty");
-  }
-  setCurrentInstance(target);
-  const controller = getCurrentController();
-  return controller.importAllWithWeChat(json, weChatCanvas);
-};
+// const importAllWithWeChat = (
+//   json: string,
+//   weChatCanvas: any,
+//   target: Gesti = currentInstance
+// ): Promise<void> => {
+//   if (!target) {
+//     error("Target is empty");
+//     return Promise.reject("Target is empty");
+//   }
+//   if (!json) {
+//     warn("Json is empty");
+//     return Promise.reject("json is empty");
+//   }
+//   setCurrentInstance(target);
+//   const controller = getCurrentController();
+//   return controller.importAllWithWeChat(json, weChatCanvas);
+// };
 
 /**
  * @description H5专用,导出可操作对象为json格式的 Array\<Object\>
@@ -308,18 +308,18 @@ const exportAll = (
  * @param target
  * @returns
  */
-const exportAllWithWeChat = (
-  offscreenPainter: CanvasRenderingContext2D,
-  target: Gesti = currentInstance
-): Promise<string> => {
-  if (!target) {
-    error("Target is empty");
-    return Promise.reject("Target is empty");
-  }
-  setCurrentInstance(target);
-  const controller = getCurrentController();
-  return controller.exportAllWithWeChat(offscreenPainter);
-};
+// const exportAllWithWeChat = (
+//   offscreenPainter: CanvasRenderingContext2D,
+//   target: Gesti = currentInstance
+// ): Promise<string> => {
+//   if (!target) {
+//     error("Target is empty");
+//     return Promise.reject("Target is empty");
+//   }
+//   setCurrentInstance(target);
+//   const controller = getCurrentController();
+//   return controller.exportAllWithWeChat(offscreenPainter);
+// };
 
 const createDragButton = (view: ViewObject): BaseButton => new DragButton();
 const createHorizonButton = (view: ViewObject): BaseButton =>
@@ -536,17 +536,18 @@ const useReaderH5 = (json: string): Promise<ViewObject> => {
  * @param json 特定格式json
  * @param painter 画笔
  * @param weChatCanvas 画布
+ * @deprecated
  * @returns
  */
-const useReaderWeChat = (
-  json: string,
-  painter: CanvasRenderingContext2D,
-  weChatCanvas: any
-): Promise<ViewObject> => {
-  const reader: GestiReaderWechat = new GestiReaderWechat();
-  const _painter = new Painter(painter);
-  return null; //reader.getObjectByJson(json,_painter,weChatCanvas);
-};
+// const useReaderWeChat = (
+//   json: string,
+//   painter: CanvasRenderingContext2D,
+//   weChatCanvas: any
+// ): Promise<ViewObject> => {
+//   const reader: GestiReaderWechat = new GestiReaderWechat();
+//   const _painter = new Painter(painter);
+//   return null; //reader.getObjectByJson(json,_painter,weChatCanvas);
+// };
 
 /**
  * @description 获取当前选中对象
@@ -622,8 +623,8 @@ export {
   useCloseGraffiti /**关闭涂鸦输入 */,
   importAll,
   exportAll,
-  importAllWithWeChat,
-  exportAllWithWeChat,
+  // importAllWithWeChat,
+  // exportAllWithWeChat,
   createDragButton,
   createHorizonButton,
   createVerticalButton,
@@ -662,6 +663,6 @@ export {
   doCleanAll,
   removeListener,
   useReaderH5,
-  useReaderWeChat,
+  // useReaderWeChat,
   useGetViewObjectById /* 通过id获取对象 */,
 };

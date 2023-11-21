@@ -4,23 +4,13 @@ import { ImageChunk } from "../../types/index";
 import Vector from "../../core/lib/vector";
 import ImageChunkConverter from "../converters/image-chunk-converter-H5";
 import XImage from "../../core/lib/ximage";
+import CutterBase from "@/core/bases/cutter-base";
 
 /**
  * 图片切割
  * 只做图片切割工作，其他不管
  */
-class CutterH5 implements CutterInterface {
-  painter: Painter;
-  private offScreenPainter: OffscreenRenderingContext;
-  /**
-   * @description offScreen为false时，你必须要传入一个painter对象
-   * @param offScreen
-   * @param painter
-   */
-  constructor(painter?: Painter) {
-    this.painter=painter;
-  }
-
+class CutterH5  extends CutterBase{
   /**
    * @description 切割图片成小块
    * @param chunkSize
@@ -29,15 +19,15 @@ class CutterH5 implements CutterInterface {
    * @returns
    */
   public async getChunks(
-    chunkSize: number,
     ximage: XImage
   ): Promise<ImageChunk[]> {
+    let chunkSize:number=this.chunkSize;
     const imgWidth: number = ximage.fixedWidth,
       imgHeight: number = ximage.fixedHeight;
       //当切块过小时合并
       if(imgWidth-chunkSize<20)chunkSize=imgWidth;
       if(imgHeight-chunkSize<20)chunkSize=imgHeight;
-    const g: any = this.painter;
+    const g: Painter = this.painter;
     const chunks: ImageChunk[] = [];
     const image = ximage.data;
     for (let y: number = 0; y < imgHeight; y += chunkSize) {
@@ -47,7 +37,6 @@ class CutterH5 implements CutterInterface {
       for (let x: number = 0; x < imgWidth; x += chunkSize) {
         const endX = Math.min(x + chunkSize, imgWidth);
         const width = endX - x;
-
         g.paint.drawImage(
           image,
           x,
@@ -79,7 +68,7 @@ class CutterH5 implements CutterInterface {
     height: number,
     chunks: ImageChunk[]
   ): Promise<ImageData> {
-    const g: any = this.offScreenPainter || this.painter;
+    const g: any = this.painter;
     const converter: ImageChunkConverter = new ImageChunkConverter();
     const imageData: ImageData = new ImageData(width, height, {
       colorSpace: "srgb",

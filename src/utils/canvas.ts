@@ -15,19 +15,21 @@ const getOffscreenCanvasWidthPlatform = (
   //当前只支持浏览器和微信小程序离屏缓存
   if (!Platform.isBrowser && !Platform.isWeChatMiniProgram) {
     throw new Error(
-      "Your platform does not support OffscreenCanvas in [Gesti]. Please run textBox.unUseCache() to resolve this error."
+      "Your platform does not support OffscreenCanvas in [Gesti]."
     );
   }
   return null;
 };
 
+const getOffscreenCanvasContext = (offCanvas): Painter => {
+  const paint = offCanvas.getContext("2d");
+  return new Painter(paint);
+};
 
-const getOffscreenCanvasContext=(offCanvas):Painter=>{
-    const paint=offCanvas.getContext("2d");
-    return new Painter(paint);
-}
+const waitingLoadImg = (img): Promise<void> => {
+  return new Promise((r) => {
+    img.onload = () => r();
+  });
+};
 
-export {
-    getOffscreenCanvasWidthPlatform,
-    getOffscreenCanvasContext
-}
+export { getOffscreenCanvasWidthPlatform, getOffscreenCanvasContext,waitingLoadImg };

@@ -3,16 +3,17 @@ import Painter from "../../core/lib/painter";
 import { ImageChunk } from "../../types/index";
 import ImageChunkConverterWeChat from "../converters/image-chunk-converter-WeChat";
 import XImage from "../../core/lib/ximage";
-import { getOffscreenCanvasContext, getOffscreenCanvasWidthPlatform } from "../canvas";
+import {
+  getOffscreenCanvasContext,
+  getOffscreenCanvasWidthPlatform,
+} from "../canvas";
+import CutterBase from "@/core/bases/cutter-base";
 /**
  * 微信分割器
  */
-class CutterWeChat implements CutterInterface {
-  painter: Painter;
-  constructor(painter?: Painter) {
-    this.painter=painter;
-  }
-  async getChunks(chunkSize: number, ximage: XImage): Promise<ImageChunk[]> {
+class CutterWeChat extends CutterBase {
+  async getChunks(ximage: XImage): Promise<ImageChunk[]> {
+    let chunkSize: number = this.chunkSize;
     const imgWidth: number = ximage.fixedWidth,
       imgHeight: number = ximage.fixedHeight;
     //当切块过小时合并

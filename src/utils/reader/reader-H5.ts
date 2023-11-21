@@ -1,6 +1,7 @@
-import GestiReader from "../../core/abstract/reader";
+import ReaderBase from "@/core/bases/reader-base";
 
-class GestiReaderH5 extends GestiReader{
+
+class GestiReaderH5 extends ReaderBase{
 
 }
 

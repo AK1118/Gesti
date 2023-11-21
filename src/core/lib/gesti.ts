@@ -5,9 +5,7 @@ import ImageToolkit from "./image-toolkit";
 import GestiController from "../interfaces/gesticontroller";
 import XImage from "./ximage";
 import { InitializationOption } from "@/types/index";
-/**
- * 初始化该 @Gesti 实例时，由于平台不确定，用户必须传入 @CanvasRenderingContext2D 画笔作为
- */
+
 class Gesti {
   private kit: ImageToolkit;
   public static XImage = XImage;
@@ -26,7 +24,13 @@ class Gesti {
     if (this.kit) this.kit.isDebug = value;
   }
 
-  public initialization(option: InitializationOption): void {
+  public static mount(option: InitializationOption): [Gesti, GestiController] {
+    const gesti = new Gesti();
+    const controller = gesti.initialization(option);
+    return [gesti, controller];
+  }
+
+  public initialization(option: InitializationOption): GestiController {
     if (!option) throw Error("The option is should not undefined.");
     if (!(option.canvas && option.renderContext))
       throw Error("Both the Canvas and renderContext must not be undefined.");
@@ -40,9 +44,10 @@ class Gesti {
       if (option.rect) canvasRect = option.rect as DOMRect;
       else option.rect = canvasRect;
       this.kit = new ImageToolkit(option);
-      return;
+      return this.controller;
     }
     if (option.rect) this.kit = new ImageToolkit(option);
+    return this.controller;
   }
 
   /**
@@ -85,7 +90,7 @@ class Gesti {
     this._controller = null;
     this.kit = null;
   }
-  
+
   static Family = ViewObjectFamily;
 }
 

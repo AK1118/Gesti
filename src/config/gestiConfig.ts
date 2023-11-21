@@ -3,6 +3,7 @@ export interface gesticonfig{
     dashedLine?:boolean,
 }
 class GestiConfig{
+    public static DPR:number=1;
     //开启辅助参考线
     static auxiliary:boolean=true;
     static dashedLine:boolean=true;

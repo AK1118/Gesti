@@ -29,11 +29,17 @@ class WriteFactory {
   private currentType: WriteType = WriteType.None;
   public current: WriteBase;
   private paint: Painter;
+  //是否正在等待涂鸦中
+  public get watching():boolean{
+    return this.config?.type != "none";
+  }
   public listen: (obj: ViewObject) => void;
   private config: {
     color?: string;
     lineWidth?: number;
     type: GraffitiType;
+  }={
+    type:"none"
   };
   public setConfig(config: {
     color?: string;

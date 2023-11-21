@@ -15,7 +15,7 @@ const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const offScreenCanvas: HTMLCanvasElement =
   document.querySelector("#offScreenCanvas");
 const img2: HTMLImageElement = document.querySelector("#bg");
-canvas.width = 500;
+canvas.width = Math.min(window.innerWidth,500);
 canvas.height = 500;
 offScreenCanvas.width = 10000;
 offScreenCanvas.height = 500;
@@ -60,7 +60,7 @@ const str1=`你好你好，
 const textBox2 = new TextBox(str, {
   color:"red",
   fontSize:10,
-  backgroundColor:'white',
+  // backgroundColor:'white',
   maxWidth:300,
   weight:100,
 });
@@ -68,23 +68,29 @@ const textBox = new TextBox(str1, {
   color:"red",
   weight:900,
   fontSize:10,
-  backgroundColor:'white',
+  // backgroundColor:'white',
   maxWidth:300,
-  fontStyle:"italic"
+  fontStyle:"italic",
+  fontFamily:"楷体"
 });
- loadToGesti(imageBox);
- loadToGesti(textBox2);
-//  loadToGesti(textBox);
+loadToGesti(imageBox);
+  loadToGesti(textBox2);
+  loadToGesti(textBox);
 const group: Group = new Group();
 
 textBox2.setPosition(0,0)
 doCenter(textBox2)
+doCenter(imageBox)
+textBox2.toBackground();
+controller.layerBottom(textBox2)
+controller.layerLower(textBox)
 // group.add(imageBox);
 // group.add(textBox2);
 
-const [closer,onAddition]=controller.addWrite({
+const [close,onAddition]=controller.addWrite({
   type:"write"
 });
+close();
 onAddition((textBox2)=>{
   console.log(textBox2.installButton)
   textBox2.installButton(new HorizonButton("left"));
@@ -107,6 +113,9 @@ textBox2.installButton(new VerticalButton("bottom"));
 textBox2.installButton(new SizeButton(ButtonLocation.LT));
 textBox2.installButton(new MirrorButton({
   location:ButtonLocation.OutRT
+}));
+textBox2.installButton(new LockButton({
+  location:ButtonLocation.RT
 }));
 imageBox.installButton(new DragButton());
 imageBox.installButton(new RotateButton());

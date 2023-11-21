@@ -208,7 +208,7 @@ interface ImageToolKitController {
    * @description 导出所有对象成JSON字符串
    * @param offScreenPainter  离屏渲染对象
    */
-  exportAllWithWeChat(offScreenPainter: CanvasRenderingContext2D): Promise<string>;
+  // exportAllWithWeChat(offScreenPainter: CanvasRenderingContext2D): Promise<string>;
   /**
    * @description 导入Json字符串解析成canvas对象
    * @param json
@@ -219,7 +219,7 @@ interface ImageToolKitController {
    * @param json 导入JSON
    * @param weChatCanvas 微信2d画布
    */
-  importAllWithWeChat(json: string, weChatCanvas: any): Promise<void>;
+  // importAllWithWeChat(json: string, weChatCanvas: any): Promise<void>;
 
   /**
    * @description 销毁Gesti对象
@@ -229,7 +229,16 @@ interface ImageToolKitController {
   querySelector(select:string|ViewObjectFamily):Promise<ViewObject|ViewObject[]>;
 
   getViewObjectById<T extends ViewObject>(id:string):Promise<T>;
-  
+
+  /**
+   * 获取所有的视图对象
+   */
+  getAllViewObject():Array<ViewObject>;
+
+  /**
+   * 异步，获取所有的视图对象
+   */
+  getAllViewObjectSync():Promise<Array<ViewObject>>;
 }
 /**
  * 控制器类，提供接口供给用户使用

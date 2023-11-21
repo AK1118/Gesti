@@ -11,7 +11,14 @@ import { ButtonLocation, ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
 import BaseViewObject from "./view-object-base";
-import { ExportButton, FetchXImageForImportCallback, ViewObjectExportBaseInfo, ViewObjectExportImageBox, ViewObjectImportBaseInfo, ViewObjectImportImageBox } from "@/types/serialization";
+import {
+  ExportButton,
+  FetchXImageForImportCallback,
+  ViewObjectExportBaseInfo,
+  ViewObjectExportImageBox,
+  ViewObjectImportBaseInfo,
+  ViewObjectImportImageBox,
+} from "@/types/serialization";
 import Platform from "../viewObject/tools/platform";
 //转换为json的类型
 // export type toJsonType = "image" | "text" | "write";
@@ -51,8 +58,8 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   public unInstallButton(buttons: Array<Button>) {
     this.funcButton = this.funcButton.filter((item) => {
       //是否在卸载队列内
-      const include:boolean=buttons.includes(item);
-      if(include)item.unMount();
+      const include: boolean = buttons.includes(item);
+      if (include) item.unMount();
       return !include;
     });
   }
@@ -60,6 +67,13 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   public installButton(button: Button) {
     button.initialization(this);
     this.funcButton.push(button);
+  }
+  //安装多个按钮
+  public installMultipleButtons(buttons: Array<Button>):void {
+    if (!Array.isArray(buttons))
+      throw new Error("Must be a class Button Array.");
+    buttons.forEach((_) => _.initialization(this));
+    this.funcButton.push(...buttons);
   }
   public mirror(): boolean {
     this.isMirror = !this.isMirror;
@@ -113,7 +127,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * 被选中后外边框
    * @param paint
    */
-  private readonly borderColor:string="#b2ccff";
+  private readonly borderColor: string = "#b2ccff";
   public drawSelectedBorder(paint: Painter, size: Size): void {
     const padding = 2;
     paint.beginPath();
@@ -309,28 +323,28 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
         height: ~~this.relativeRect.size.height,
         angle: this.rect.getAngle,
       },
-      fixedSize:this.fixedSize.toObject(),
-      sizeScale:{
-        scaleWidth:this.scaleWidth,
-        scaleHeight:this.scaleHeight
+      fixedSize: this.fixedSize.toObject(),
+      sizeScale: {
+        scaleWidth: this.scaleWidth,
+        scaleHeight: this.scaleHeight,
       },
       mirror: this.isMirror,
       locked: this.isLock,
-      buttons: this.funcButton.map<ExportButton>((button: BaseButton)=>{
+      buttons: this.funcButton.map<ExportButton>((button: BaseButton) => {
         return {
-           type:button.constructor.name,
-           location:button.btnLocation,
-           radius:button.senseRadius,
-           backgroundColor:button.background,
-           iconColor:button.iconColor,
-           displayBackground:button.displayBackground,
+          type: button.constructor.name,
+          location: button.btnLocation,
+          radius: button.senseRadius,
+          backgroundColor: button.background,
+          iconColor: button.iconColor,
+          displayBackground: button.displayBackground,
         };
       }),
       id: this.id,
       layer: this.getLayer(),
       isBackground: this.isBackground,
-      opacity:this.opacity,
-      platform:Platform.platform,
+      opacity: this.opacity,
+      platform: Platform.platform,
     };
   }
   /**
@@ -350,7 +364,6 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   public setAngle(angle: number) {
     this.rect.setAngle(angle);
   }
-   
 }
 
 export default ViewObject;

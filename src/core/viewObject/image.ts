@@ -20,6 +20,7 @@ import { ImageChunk } from "@/types/index";
 import {
   getOffscreenCanvasContext,
   getOffscreenCanvasWidthPlatform,
+  waitingLoadImg,
 } from "@/utils/canvas";
 class ImageBox extends ViewObject {
   family: ViewObjectFamily = ViewObjectFamily.image;
@@ -63,14 +64,11 @@ class ImageBox extends ViewObject {
   }
   private readonly chunkSize: number = 200;
   async export(painter?: Painter): Promise<ViewObjectExportImageBox> {
-    const cutter: Cutter = new Cutter(painter);
+    const cutter: Cutter = new Cutter();
     const url: string = this.ximage.url;
     let data: ImageChunk[];
     if (!url) {
-      const chunks: ImageChunk[] = await cutter.getChunks(
-        this.chunkSize,
-        this.ximage
-      );
+      const chunks: ImageChunk[] = await cutter.getChunks(this.ximage);
       const coverter: ImageChunkConverter = new ImageChunkConverterH5();
       data = coverter.coverAllImageChunkToBase64(chunks);
     }
@@ -86,9 +84,9 @@ class ImageBox extends ViewObject {
     return json;
   }
   async exportWeChat(painter?: Painter): Promise<ViewObjectExportImageBox> {
-    const cutter: CutterWeChat = new CutterWeChat(painter);
+    const cutter: CutterWeChat = new CutterWeChat();
     const chunkSize: number = 200;
-    const chunks: ImageChunk[] = await cutter.getChunks(chunkSize, this.ximage);
+    const chunks: ImageChunk[] = await cutter.getChunks(this.ximage);
     const converter: ImageChunkConverterWeChat =
       new ImageChunkConverterWeChat();
     const base64s: ImageChunk[] = converter.coverAllImageChunkToBase64(chunks);
@@ -123,7 +121,7 @@ class ImageBox extends ViewObject {
       const img = new Image();
       img.src = url;
       img.crossOrigin = "anonymous";
-      await this._loadImg(img);
+      await waitingLoadImg(img);
       return new XImage({
         data: img,
         height: entity.fixedHeight,
@@ -139,7 +137,7 @@ class ImageBox extends ViewObject {
       const img = offCanvas.createImage();
       img.src = url;
       if (img?.crossOrigin) img.crossOrigin = "anonymous";
-      await this._loadImg(img);
+      await waitingLoadImg(img);
       return new XImage({
         data: img,
         height: entity.fixedHeight,
@@ -196,32 +194,35 @@ class ImageBox extends ViewObject {
     }
     return null;
   }
-  
+
   public static async reverseWeChat(
     entity: ViewObjectImportImageBox
   ): Promise<ImageBox> {
     const chunks: ImageChunk[] = entity?.data;
-
-    const offCanvas = getOffscreenCanvasWidthPlatform(200, 200);
+    const offCanvas = getOffscreenCanvasWidthPlatform(
+      entity.fixedWidth,
+      entity.fixedHeight
+    );
+    const offPainter: Painter = getOffscreenCanvasContext(offCanvas);
     //使用数据切片合并图片
     const cutter = new CutterWeChat();
-
     const source: ImageData = await cutter.merge(
       entity.fixedWidth,
       entity.fixedHeight,
       chunks,
       offCanvas
     );
-
-    const image = offCanvas.createImage();
-    await this._loadImg(image);
+    offPainter.putImageData(source, 0, 0);
+    const image=offCanvas.createImage();
+    image.src=offCanvas.toDataURL();
+    await waitingLoadImg(image);
     const ximage = new XImage({
       data: image,
       width: entity.fixedWidth,
       height: entity.fixedHeight,
     });
+
     return new ImageBox(ximage);
-    return null;
   }
 }
 export default ImageBox;

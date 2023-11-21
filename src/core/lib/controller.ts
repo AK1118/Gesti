@@ -18,6 +18,12 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  getAllViewObject(): ViewObject[] {
+   return this.kit.getAllViewObject();
+  }
+  getAllViewObjectSync(): Promise<ViewObject[]> {
+    return this.kit.getAllViewObjectSync();
+  }
   mount(view: ViewObject): void {
     this.kit.mount(view);
   }
@@ -109,7 +115,6 @@ class GesteControllerImpl implements GestiController {
   importAll(json: string): Promise<void> {
     return this.kit.importAll(json);
   }
-
   exportAll(offScreenPainter: CanvasRenderingContext2D): Promise<string> {
     return this.kit.exportAll(offScreenPainter);
   }

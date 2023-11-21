@@ -16,7 +16,7 @@ import ImageBox from "../viewObject/image";
 import TextBox from "../viewObject/text/text";
 import WriteFactory from "../viewObject/write/write-factory";
 import XImage from "./ximage";
-import GestiReaderWechat from "../../utils/reader/reader-WeChat";
+// import GestiReaderWechat from "../../utils/reader/reader-WeChat";
 import { classTypeIs } from "../../utils/utils";
 import { ViewObjectImportEntity } from "@/types/serialization";
 import {
@@ -24,6 +24,7 @@ import {
   InitializationOption,
   TextOptions,
 } from "@/types/index";
+import WriteViewObj from "../viewObject/write";
 enum EventHandlerState {
   down,
   up,
@@ -197,6 +198,13 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  getAllViewObject(): ViewObject[] {
+    return this.ViewObjectList;
+  }
+  getAllViewObjectSync(): Promise<ViewObject[]> {
+      return Promise.resolve(this.ViewObjectList);
+  }
+
   mount(view: ViewObject): void {
     this.load(view);
   }
@@ -363,7 +371,6 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         const reader = new GestiReaderH5();
         for await (const item of str) {
           const importEntity: ViewObjectImportEntity = item;
-          console.log(importEntity.base);
           const obj: ViewObject = await reader.getObjectByJson(importEntity);
           if (obj) this.load(obj);
         }
@@ -578,39 +585,72 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         return;
       }
     }
-
     /**
      * 处理拖拽的代码块，被选中图册是检测选中的最高优先级
      * 当有被选中图层时，拖拽的必然是他，不论层级
      *
      */
-    let selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(
+    let selectedTarget: ViewObject = CatchPointUtil.catchViewObject(
       this.ViewObjectList,
       event
     );
-
     /**
-     * 选中元素存在 且不是已选中元素,且不是锁定,且不是背景元素
-     */
-    if (
-      selectedViewObject &&
-      this.selectedViewObject === selectedViewObject &&
-      !this.selectedViewObject.isLock &&
-      !selectedViewObject.isBackground
-    ) {
-      this.drag.catchViewObject(selectedViewObject.rect, event);
-    }
-
-    /**
-     * 画笔代码块 可以有被选中的图层，前提是当前下落的位置必定不能在上一个被选中的图册内
-     *
+     * 已选中图层移动优先级>涂鸦动作优先级>选中图层动作优先级
+     * 没有选中的图层时执行涂鸦动作，判断涂鸦动作是否开启
      * */
-    if (
-      this.selectedViewObject != selectedViewObject ||
-      selectedViewObject == null
-    ) {
-      this.writeFactory.onDraw();
+    if (selectedTarget && !selectedTarget.isBackground) {
+      if (selectedTarget.selected) {
+        if (!selectedTarget.isLock)
+          this.drag.catchViewObject(selectedTarget.rect, event);
+        this.selectedViewObject = this.handleSelectedTarget(event);
+        return;
+      }
+
+      //涂鸦等待且现在手机点击在已选中对象内
+      if (this.writeFactory.watching && !selectedTarget.selected)
+        this.writeFactory.onDraw();
+
+      this.selectedViewObject = this.handleSelectedTarget(event);
+      this.ViewObjectList.forEach((item) =>
+        item.key === selectedTarget.key ? "" : item.cancel()
+      );
+    } else {
+      //点击图像外取消选中上一个对象
+      this.selectedViewObject?.cancel();
+      if (this.writeFactory.watching && !selectedTarget?.selected)
+        return this.writeFactory.onDraw();
     }
+
+    // /**
+    //  * 选中元素存在 且不是已选中元素,且不是锁定,且不是背景元素
+    //  */
+    // if (
+    //   selectedViewObject &&
+    //   this.selectedViewObject === selectedViewObject &&
+    //   !this.selectedViewObject.isLock &&
+    //   !selectedViewObject.isBackground
+    // ) {
+    //   this.drag.catchViewObject(selectedViewObject.rect, event);
+    // }
+
+    // /**
+    //  * 已选中图层移动优先级>涂鸦动作优先级>选中图层动作优先级
+    //  * */
+    // if (
+    //   this.selectedViewObject != selectedViewObject ||
+    //   selectedViewObject == null
+    // ) {
+    //   this.writeFactory.onDraw();
+    // }
+
+    // /**
+    //  * 按下，有选中对象
+    //  */
+    // const selectedTarget = this.handleSelectedTarget(event);
+    // if (selectedTarget ?? false) {
+    //   //判断抬起时手指是在对象范围内还是外
+    //   this.selectedViewObject = selectedTarget;
+    // }
 
     this.render();
   }
@@ -659,25 +699,31 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.debug(["Event Up,", v]);
     const event: Vector | Vector[] = this.correctEventPosition(v);
     //判断是否选中对象
-    const selectedObj = this.clickViewObject(event);
     this.eventHandlerState = EventHandlerState.up;
     //手势解析处理
     this.gesture.onUp(this.selectedViewObject, event);
     this.drag.cancel();
     //绘制完了新建一个viewObj图册对象
     const writeObj = this.writeFactory.done();
-    writeObj.then((value) => {
+    writeObj.then((value: WriteViewObj) => {
       if (value) {
+        this.selectedViewObject?.cancel();
         this.callHook("onCreateGraffiti", value);
         this.addViewObject(value);
       }
     });
 
-    /**
-     * 抬起时，有选中对象
-     */
-    if (this.selectedViewObject ?? false) {
-      //判断抬起时手指是在对象范围内还是外
+    // /**
+    //  * 抬起时，有选中对象
+    //  */
+    // const selectedTarget = this.handleSelectedTarget(event);
+    // if (selectedTarget ?? false) {
+    //   //判断抬起时手指是在对象范围内还是外
+    //   if (this._inObjectArea) selectedTarget.onUpWithInner(this.paint);
+    //   else selectedTarget.onUpWithOuter(this.paint);
+    //   this.selectedViewObject = selectedTarget;
+    // }
+    if (this.selectedViewObject) {
       if (this._inObjectArea) this.selectedViewObject.onUpWithInner(this.paint);
       else this.selectedViewObject.onUpWithOuter(this.paint);
     }
@@ -698,31 +744,28 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
    * 传入一个Vector坐标判断是否选中了图册
    * @param event
    */
-  private clickViewObject(event: Vector | Vector[]): ViewObject {
-    const selectedViewObject: ViewObject = CatchPointUtil.catchViewObject(
+  private handleSelectedTarget(event: Vector | Vector[]): ViewObject {
+    const selectedViewObjectTarget: ViewObject = CatchPointUtil.catchViewObject(
       this.ViewObjectList,
       event
     );
-    if (selectedViewObject ?? false) {
-      this.debug(["选中了", selectedViewObject]);
-      this.callHook("onSelect", selectedViewObject);
+    if (selectedViewObjectTarget ?? false) {
+      this.debug(["选中了", selectedViewObjectTarget]);
+      this.callHook("onSelect", selectedViewObjectTarget);
       this._inObjectArea = true;
       //之前是否有被选中图层 如果有就取消之前的选中
       if (
         this.selectedViewObject &&
-        selectedViewObject.key != this.selectedViewObject.key
+        selectedViewObjectTarget.key != this.selectedViewObject.key
       ) {
         this.selectedViewObject.cancel();
-        //换的时候不需要
-        //   this.callHook("onCancel", this.selectedViewObject);
       }
-      this.selectedViewObject = selectedViewObject;
       //选中后变为选中状态
-      this.selectedViewObject.onSelected();
+      selectedViewObjectTarget.onSelected();
       //不允许在锁定时被拖拽选中进行操作
-      if (!selectedViewObject.isLock)
-        this.drag.catchViewObject(this.selectedViewObject.rect, event);
-      return selectedViewObject;
+      if (!selectedViewObjectTarget.isLock)
+        this.drag.catchViewObject(selectedViewObjectTarget.rect, event);
+      return selectedViewObjectTarget;
     }
     return null;
   }
@@ -820,9 +863,9 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         //关闭涂鸦
         this.writeFactory.close();
       },
-     (callback)=>{
-      this.writeFactory.onCreateGraffiti.bind(this.writeFactory)(callback);
-     },
+      (callback) => {
+        this.writeFactory.onCreateGraffiti.bind(this.writeFactory)(callback);
+      },
     ];
   }
 }
@@ -842,54 +885,48 @@ class _Tools {
     );
     if (ndx === -1) return;
     const len = ViewObjectList.length - 1;
-    // 0为底部   len为顶部   0 0 1 0 0
-    //                      0 0 0 1 0
+  
     switch (operationType) {
       case LayerOperationType.top:
-        {
-          //暂存对象
-          if (ndx == len) break;
-          for (let i = ndx + 1; i < len; i++) {
-            ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() - 1);
-          }
-          selectedViewObject.setLayer(len);
+        if (ndx === len) break;
+        for (let i = ndx + 1; i <= len; i++) {
+          ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() - 1);
         }
+        selectedViewObject.setLayer(len);
         break;
       case LayerOperationType.bottom:
-        {
-          if (ndx == 0) break;
-          for (let i = ndx - 1; i < 0; i--) {
-            ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() + 1);
-          }
-          selectedViewObject.setLayer(0);
+        if (ndx === 0) break;
+        for (let i = ndx - 1; i >= 0; i--) {
+          ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() + 1);
         }
+        selectedViewObject.setLayer(0);
         break;
       case LayerOperationType.rise:
-        {
-          if (ndx == len) break;
-          ViewObjectList[ndx + 1].setLayer(ndx);
-          selectedViewObject.setLayer(ndx + 1);
-        }
+        if (ndx === len) break;
+        // 交换图层
+        const tempLayer = ViewObjectList[ndx].getLayer();
+        ViewObjectList[ndx].setLayer(ViewObjectList[ndx + 1].getLayer());
+        ViewObjectList[ndx + 1].setLayer(tempLayer);
+        selectedViewObject.setLayer(ndx + 1);
         break;
       case LayerOperationType.lower:
-        {
-          if (ndx == 0) break;
-          ViewObjectList[ndx - 1].setLayer(ndx);
-          selectedViewObject.setLayer(ndx - 1);
-        }
+        if (ndx === 0) break;
+        // 交换图层
+        const tempLayerLower = ViewObjectList[ndx].getLayer();
+        ViewObjectList[ndx].setLayer(ViewObjectList[ndx - 1].getLayer());
+        ViewObjectList[ndx - 1].setLayer(tempLayerLower);
+        selectedViewObject.setLayer(ndx - 1);
         break;
     }
     this.sortByLayer(ViewObjectList);
   }
-  /**
-   * @description 根据layer排序
-   * @param ViewObjectList
-   */
+  
   public sortByLayer(ViewObjectList: Array<ViewObject>): void {
     ViewObjectList.sort(
       (a: ViewObject, b: ViewObject) => a.getLayer() - b.getLayer()
     );
   }
+  
   /**
    * @deprecated
    * @deprecated 废弃

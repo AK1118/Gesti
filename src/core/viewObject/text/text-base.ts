@@ -3,7 +3,12 @@ import { ViewObjectFamily } from "../../enums";
 import ImageToolkit from "../../lib/image-toolkit";
 import Painter from "../../lib/painter";
 import Rect, { Size } from "../../lib/rect";
-import { FontStyleType, FontWeight, TextHandler, TextOptions } from "../../../types/index";
+import {
+  FontStyleType,
+  FontWeight,
+  TextHandler,
+  TextOptions,
+} from "../../../types/index";
 import Vector from "../../lib/vector";
 import { Point } from "../../lib/vertex";
 import Platform from "../tools/platform";
@@ -14,7 +19,11 @@ import {
   ViewObjectImportBaseInfo,
   ViewObjectImportImageBox,
 } from "@/types/serialization";
-import { getOffscreenCanvasWidthPlatform } from "@/utils/canvas";
+import {
+  getOffscreenCanvasContext,
+  getOffscreenCanvasWidthPlatform,
+  waitingLoadImg,
+} from "@/utils/canvas";
 /**
  * 普通模式，矩形根据文字而定
  * 拖拽模式，文字根据缩放倍数而定
@@ -29,7 +38,7 @@ export abstract class TextBoxBase extends ViewObject {
     spacing: 0,
     lineHeight: 1.5,
     weight: "normal",
-    fontStyle:"normal",
+    fontStyle: "normal",
     maxWidth: 300,
   };
   get textWrap(): boolean {
@@ -444,7 +453,7 @@ export abstract class TextBoxBase extends ViewObject {
   }
   protected doCache(): void {
     //是否使用缓存  该平台是否存在离屏画布
-    if (!this.isUseCache || !this.getCacheCanvasByPlatform()){
+    if (!this.isUseCache || !this.getCacheCanvasByPlatform()) {
       return;
     }
     //没变过大小就不缓存
@@ -456,13 +465,26 @@ export abstract class TextBoxBase extends ViewObject {
     //重置没改过大小
     this.isDirty = false;
   }
-  private cache(): void {
+  //最终渲染缓存图像  OffscreenCanvas | Image
+  protected renderedCacheImage = null;
+  private async cache(): Promise<void> {
     const painter: Painter = this.getCacheCanvasPainter();
     this.setFontDecorations(painter);
     painter.clearRect(0, 0, this.width, this.height);
     painter.translate(this.width * 0.5, this.height * 0.5);
     this.render(painter, true);
     painter.translate(-this.width * 0.5, -this.height * 0.5);
+
+    if (Platform.isBrowser) {
+      this.renderedCacheImage = this.cacheCanvas;
+    } else if (Platform.isWeChatMiniProgram) {
+      if (Platform.isWeChatMiniProgram) {
+        const img = (this.cacheCanvas as any)?.createImage();
+        img.src = (this.cacheCanvas as any)?.toDataURL();
+        await waitingLoadImg(img);
+        this.renderedCacheImage = img;
+      }
+    }
   }
   /**
    * @description 获取平台的离屏画布
@@ -475,7 +497,7 @@ export abstract class TextBoxBase extends ViewObject {
       this.width,
       this.height
     );
-    this.cacheCanvas=offScreenCanvas;
+    this.cacheCanvas = offScreenCanvas;
     if (!offScreenCanvas) {
       this.unUseCache();
       return null;
@@ -515,8 +537,8 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     this.fixedText = text;
     Object.assign(this.textOptions, option);
   }
-  setFontStyle(style:FontStyleType): void {
-    this.textOptions.fontStyle=style;
+  setFontStyle(style: FontStyleType): void {
+    this.textOptions.fontStyle = style;
   }
   setText(text: string): void {
     this.fixedText = text;
@@ -534,8 +556,8 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     this.textOptions.color = color;
     this.rebuild();
   }
-  setWeight(weight:FontWeight):void{
-    this.textOptions.weight=weight;
+  setWeight(weight: FontWeight): void {
+    this.textOptions.weight = weight;
   }
   public ready(kit: ImageToolkit): void {
     this.paint = kit.getPainter();
@@ -548,11 +570,14 @@ class TextViewBase extends TextBoxBase implements TextHandler {
   setDecoration(args: any): void {
     throw new Error("Method not implemented.");
   }
-  drawImage(paint: Painter): void {
+  async drawImage(paint: Painter): Promise<void> {
     //改过大小，且有缓存，渲染缓存
-    if (this.isDirty && this.isRenderCache||!this.isUseCache) {
+    if (
+      (this.isDirty && this.isRenderCache) ||
+      (!this.isUseCache && this.renderedCacheImage)
+    ) {
       paint.drawImage(
-        this.cacheCanvas,
+        this.renderedCacheImage,
         -this.width * 0.5,
         -this.height * 0.5,
         this.width,
