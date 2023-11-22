@@ -1,6 +1,6 @@
 {
   "name": "gesti",
-  "version": "1.3.60",
+  "version": "1.3.61",
   "description": "一个运行飞快的前端Canvas贴图工具",
   "main": "dist/index.esm.js",
   "module": "dist/index.amd.js",
