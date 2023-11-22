@@ -65,7 +65,7 @@
 | ~~setConfig~~      |    void      |     Gesti   |   (config?: gesticonfig)   |     修改或设置配置，修改后会自动调用GestiController.update函数       |
 | initialization      |    GestiController      |     Gesti   |   (options:InitializationOption)   |     初始化gesti，返回控制器       |
 | static mount      |    [Gesti,GestiController]      |     Gesti   |   (options:InitializationOption)   |     通过静态方法初始化gesti, 返回gesti实例和它的控制器      |
-
+| static installPlugin      |    void      |     Gesti   |   (key:PluginsKey,plugin:any)   |     安装预设插件，使用某功能时再安装对应插件      |
 
 ## GestiController
 
