@@ -9,7 +9,7 @@ import Group from "@/core/viewObject/group";
 import TextArea from "@/core/viewObject/text/text-area";
 import WriteRect from "@/core/viewObject/write/rect";
 import { createGesti, doCenter, exportAll, importAll, loadToGesti } from "@/hooks/index";
-import {  HorizonButton, ImageBox, LockButton, MirrorButton, TextBox, UnLockButton, VerticalButton, XImage } from "@/index";
+import {  CloseButton, HorizonButton, ImageBox, LockButton, MirrorButton, TextBox, UnLockButton, VerticalButton, XImage } from "@/index";
 
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const offScreenCanvas: HTMLCanvasElement =
@@ -22,6 +22,7 @@ offScreenCanvas.height = 500;
 const g = canvas.getContext("2d",{
   willReadFrequently:true,
 }); 
+
 
 const offScreenPainter = offScreenCanvas.getContext("2d");
 const gesti = createGesti({
@@ -38,6 +39,8 @@ gesti.initialization({
 // gesti.debug=true;
 const controller=gesti.controller;
 const img: HTMLImageElement = document.querySelector("#dog");
+
+
 const ximage = new XImage({
   data: img2,
   width: img2.width,
@@ -122,6 +125,8 @@ textBox2.installButton(new LockButton({
 }));
 imageBox.installButton(new DragButton());
 imageBox.installButton(new RotateButton());
+
+
 
 (document.querySelector("#input") as any).value=textBox2.value;
 (document.querySelector("#input") as HTMLElement).oninput=(e:any)=>{

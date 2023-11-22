@@ -101,6 +101,7 @@ import VerticalButton from "./core/viewObject/buttons/verticalButton";
 import HorizonButton from "./core/viewObject/buttons/horizonButton";
 import { createTextBoxView } from "./hooks/create";
 import GestiConfig from "./config/gestiConfig";
+import {  MirrorIcon,CloseIcon,DelateIcon,ImageIcon,LockIcon,UnLockIcon,DefaultIcon } from "./composite/icons";
 
 //按钮
 export {
@@ -114,6 +115,8 @@ export {
   HorizonButton,
   SizeButton,
 };
+//Icons
+export { MirrorIcon,CloseIcon,DelateIcon,ImageIcon,LockIcon,UnLockIcon,DefaultIcon};
 export { ButtonLocation };
 export { ImageBox, XImage, TextBox, WriteViewObj };
 //枚举

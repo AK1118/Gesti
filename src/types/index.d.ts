@@ -55,7 +55,7 @@ declare class Painter {}
 
 type IconDataType = number[][][];
 
-declare interface Icon {
+export declare interface Icon {
   color: string;
   size: number;
   //静态
@@ -66,13 +66,41 @@ declare interface Icon {
   setSize(value: number): void;
 }
 
+declare class IconBase implements Icon {
+  color: string;
+  size: number;
+  get data(): IconDataType;
+  computedData: IconDataType;
+  render(paint: Painter, location: Vector);
+  setSize(value: number): void;
+}
+
+
+export declare class MirrorIcon extends IconBase{}
+
+export declare class CloseIcon extends IconBase {}
+
+export declare class DeleteIcon extends IconBase {}
+
+export declare class ImageIcon extends IconBase {
+  constructor(xImage:XImage);
+}
+
+export declare class LockIcon extends IconBase {}
+
+export declare class UnlockIcon extends IconBase {}
+
+export declare class DefaultIcon extends IconBase {}
+
+
+
 export declare interface gesticonfig {
   auxiliary?: boolean;
   dashedLine?: boolean;
 }
 
-export declare class GestiConfig{
-  static DPR:number;
+export declare class GestiConfig {
+  static DPR: number;
 }
 
 declare interface RectParams {
@@ -252,13 +280,13 @@ export declare abstract class ViewObject {
   get positionY(): number;
   get scaleWidth(): number;
   get scaleHeight(): number;
-  get absoluteScale():number;
+  get absoluteScale(): number;
   get mounted(): boolean;
   get id(): string;
   readonly key: string;
   readonly selected: boolean;
   public disabled: boolean;
-  get isLock():boolean;
+  get isLock(): boolean;
   setName(name: string): void;
   public setId(id: string): void;
   //上锁
@@ -269,8 +297,8 @@ export declare abstract class ViewObject {
   hide(): void;
   //安装按钮
   installButton(button: Button): void;
-  
-  installMultipleButtons(buttons: Array<Button>):void 
+
+  installMultipleButtons(buttons: Array<Button>): void;
   //卸载按钮
   unInstallButton(buttons: Array<Button>): void;
   //设置样式
@@ -353,8 +381,8 @@ export declare class TextBox extends ViewObject implements TextHandler {
   setDecoration(options: TextOptions): void;
   get fontSize(): number;
   updateText(text: string, options?: TextOptions): Promise<void>;
-  public useCache() :void;
-  public unUseCache():void;
+  public useCache(): void;
+  public unUseCache(): void;
 }
 
 export declare class ImageBox extends ViewObject {
@@ -426,7 +454,7 @@ export declare class Gesti {
    * @param option 传入一个对象
    */
   public initialization(option: InitializationOption): void;
-  public static DPR:number;
+  public static DPR: number;
 }
 declare type EventHandle = null;
 export declare type GraffitiTypes =
