@@ -4,7 +4,8 @@ import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "./image-toolkit";
 import GestiController from "../interfaces/gesticontroller";
 import XImage from "./ximage";
-import { InitializationOption } from "@/types/index";
+import { InitializationOption, PluginKeys } from "@/types/index";
+import Plugins from "./plugins";
 
 class Gesti {
   private kit: ImageToolkit;
@@ -85,6 +86,15 @@ class Gesti {
   }
 
   static Family = ViewObjectFamily;
+
+  /**
+   * @description 安装预设插件
+   * @param key 
+   * @param plugin 
+   */
+  public static installPlugin(key: PluginKeys, plugin: any): void {
+    Plugins.installPlugin(key, plugin);
+  }
 }
 
 export default Gesti;

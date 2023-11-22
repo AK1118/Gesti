@@ -7,6 +7,8 @@
 
 import { ViewObjectExportBaseInfo } from "Serialization";
 
+export declare type PluginKeys = "pako";
+
 declare class Vector {
   x: number;
   y: number;
@@ -75,15 +77,14 @@ declare class IconBase implements Icon {
   setSize(value: number): void;
 }
 
-
-export declare class MirrorIcon extends IconBase{}
+export declare class MirrorIcon extends IconBase {}
 
 export declare class CloseIcon extends IconBase {}
 
 export declare class DeleteIcon extends IconBase {}
 
 export declare class ImageIcon extends IconBase {
-  constructor(xImage:XImage);
+  constructor(xImage: XImage);
 }
 
 export declare class LockIcon extends IconBase {}
@@ -91,8 +92,6 @@ export declare class LockIcon extends IconBase {}
 export declare class UnlockIcon extends IconBase {}
 
 export declare class DefaultIcon extends IconBase {}
-
-
 
 export declare interface gesticonfig {
   auxiliary?: boolean;
@@ -455,6 +454,12 @@ export declare class Gesti {
    */
   public initialization(option: InitializationOption): void;
   public static DPR: number;
+  /**
+   * @description 安装预设插件
+   * @param key 
+   * @param plugin 
+   */
+  public static installPlugin(key: PluginKeys, plugin: any);
 }
 declare type EventHandle = null;
 export declare type GraffitiTypes =
