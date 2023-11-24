@@ -14,6 +14,7 @@ import { ButtonOption } from "@/core/abstract/baseButton";
 import { DefaultIcon } from "@/composite/icons";
 
 class SizeButton extends DragButton {
+  readonly name: ButtonNames="SizeButton";
   protected buttonLocation:ButtonLocation=ButtonLocation.RB;
   protected icon: Icon=new DefaultIcon();
   constructor(location:ButtonLocation,option?:ButtonOption){

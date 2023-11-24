@@ -10,7 +10,9 @@ import GestiConfig from "../../../config/gestiConfig";
 import { Delta } from "../../../utils/event/event";
 import { Icon } from "@/core/lib/icon";
 import DragIcon from "@/static/icons/dragIcon";
+
 class DragButton extends BaseButton {
+  readonly name: ButtonNames="DragButton";
   protected buttonLocation: ButtonLocation = ButtonLocation.RB;
   protected icon: Icon=new DragIcon();
   public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;

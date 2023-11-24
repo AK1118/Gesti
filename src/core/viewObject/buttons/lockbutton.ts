@@ -13,6 +13,7 @@ import { LockIcon } from "@/composite/icons";
 
 
 class LockButton extends BaseButton {
+    readonly name: ButtonNames="LockButton";
     protected icon: Icon=new LockIcon();
     protected buttonLocation:ButtonLocation=ButtonLocation.LT;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;

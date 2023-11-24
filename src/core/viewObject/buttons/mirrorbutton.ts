@@ -16,6 +16,7 @@ import RotateIcon from "@/static/icons/rotateIcon";
 import CloseIcon from "@/static/icons/closeIcon";
 
 class MirrorButton extends BaseButton {
+  readonly name: ButtonNames="MirrorButton";
   protected buttonLocation: ButtonLocation = ButtonLocation.LB;
   protected icon:Icon=new MirrorIcon();
 

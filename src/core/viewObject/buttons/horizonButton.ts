@@ -13,6 +13,7 @@ import { DefaultIcon } from "@/composite/icons";
 import SizeButton from "./sizeButton";
 
 class HorizonButton extends SizeButton {
+  readonly name: ButtonNames="HorizonButton";
   protected buttonLocation:ButtonLocation;
   protected icon: Icon=new DefaultIcon();
   constructor(location?:'left'|'right',option?:ButtonOption){

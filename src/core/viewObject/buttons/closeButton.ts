@@ -9,7 +9,9 @@ import ViewObject from "../../abstract/view-object";
 import GestiConfig from "../../../config/gestiConfig";
 import { Icon } from "@/core/lib/icon";
 import { CloseIcon } from "@/composite/icons";
+
 class CloseButton extends BaseButton {
+    readonly name: ButtonNames="CloseButton";
     protected icon: Icon=new CloseIcon();
     protected buttonLocation:ButtonLocation=ButtonLocation.RT;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;

@@ -12,6 +12,7 @@ import { UnLockIcon } from "@/composite/icons";
 
 
 class UnLockButton extends BaseButton {
+    readonly name: ButtonNames="UnLockButton";
     constructor(option?:ButtonOption){
         super(option);
         this.free=true;

@@ -14,6 +14,7 @@ export type ButtonOption = {
 };
 //按钮抽象类
 export abstract class BaseButton implements RenderObject {
+
   protected icon: Icon = new DefaultIcon({
     color: "#c1c1c1",
     size: 10,
@@ -37,7 +38,7 @@ export abstract class BaseButton implements RenderObject {
     this.customIcon = option?.icon;
   }
   protected abstract buttonLocation: ButtonLocation;
-  name: string = "";
+  abstract readonly name: ButtonNames;
   //隐藏
   disabled: boolean = false;
   rect: Rect = new Rect();

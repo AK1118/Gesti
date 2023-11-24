@@ -11,6 +11,7 @@ import { Icon } from "@/core/lib/icon";
 import RotateIcon from "@/static/icons/rotateIcon";
 
 class RotateButton extends BaseButton {
+  readonly name: ButtonNames="RotateButton";
   public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
   protected icon: Icon=new RotateIcon();
   private oldViewObjectRect: Rect = null;
@@ -22,7 +23,6 @@ class RotateButton extends BaseButton {
   protected buttonLocation:ButtonLocation=ButtonLocation.OutBC;
   constructor(buttonOption?: ButtonOption) {
     super(buttonOption);
-    this.name = "rotate";
     this.initScale();
     this.rect.onDrag = (newRect: Rect) => {
       /*拖拽缩放*/

@@ -62,7 +62,7 @@ const ximage = new XImage({
   width: img2.width,
   height: img2.height,
   scale: 0.5,
-  // url:img2.src,
+  url:img2.src,
 });
 
 const imageBox = new ImageBox(ximage);

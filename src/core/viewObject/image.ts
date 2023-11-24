@@ -103,7 +103,7 @@ class ImageBox extends ViewObject {
     return json;
   }
   public didDrag(value: { size: Size; angle: number }): void {
-    this.resetButtons(["rotate"]);
+    this.resetButtons(["RotateButton"]);
   }
   public getXImage(): XImage {
     return this.ximage;

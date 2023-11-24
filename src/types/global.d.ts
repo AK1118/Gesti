@@ -213,3 +213,6 @@ declare interface FixedOption {
  * @description 导出平台，导出只有两个平台
  */
 declare type PlatformType = "WeChat" | "Browser";
+
+//所有按钮名字
+declare type ButtonNames="CloseButton"|"UnLockButton"|"DragButton"|"HorizonButton"|"LockButton"|"MirrorButton"|"RotateButton"|"SizeButton"|"VerticalButton";
