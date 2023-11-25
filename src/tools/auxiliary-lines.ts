@@ -58,7 +58,7 @@ class AuxiliaryLine {
         const item: lp = {
           axis: "vertical",
           point: p,
-          offset: new Vector(0, 0),
+          offset: Vector.zero,
         };
         if (Math.abs(p.x - rp.x) < this.d || Math.abs(p.y - rp.y) < this.d) {
           if (Math.abs(p.x - rp.x) < this.d) {

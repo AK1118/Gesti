@@ -352,11 +352,15 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    */
   public custom() {}
 
+  private readonly setPosVec:Vector=Vector.zero;
   public setPosition(x: number, y: number): void {
-    this.rect.setPosition(new Vector(x, y));
+    this.setPosVec.setXY(x,y);
+    this.rect.setPosition(this.setPosVec);
   }
+  private readonly addPosVec:Vector=Vector.zero;
   public addPosition(deltaX: number, deltaY: number) {
-    this.rect.addPosition(new Vector(deltaX, deltaY));
+    this.addPosVec.setXY(deltaX,deltaY);
+    this.rect.addPosition(this.addPosVec);
   }
   public setOpacity(opacity: number): void {
     this.opacity = opacity;
