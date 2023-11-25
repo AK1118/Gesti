@@ -528,7 +528,7 @@ export declare abstract class GestiController {
   lock(view?: ViewObject): void;
   fallback(): void;
   //移除某个对象
-  remove(view?: ViewObject): void;
+  remove(view?: ViewObject): boolean;
   cancelFallback(): void;
   /**
    * @param {Event} e

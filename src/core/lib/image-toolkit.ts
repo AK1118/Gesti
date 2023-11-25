@@ -198,11 +198,13 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
-  remove(view?: ViewObject): void {
+  remove(view?: ViewObject): boolean {
     const _view=this.selectedViewObject||view;
-    if(!_view)return;
+    if(!_view)return false;
     this.setViewObjectList(this.ViewObjectList.filter(_=>_.key!=_view.key));
     this.callHook("onRemove",null);
+    this.render();
+    return true;
   }
   getAllViewObject(): ViewObject[] {
     return this.ViewObjectList;
