@@ -18,6 +18,9 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  remove(view?: ViewObject): void {
+    this.kit.remove(view);
+  }
   getAllViewObject(): ViewObject[] {
    return this.kit.getAllViewObject();
   }

@@ -456,8 +456,8 @@ export declare class Gesti {
   public static DPR: number;
   /**
    * @description 安装预设插件
-   * @param key 
-   * @param plugin 
+   * @param key
+   * @param plugin
    */
   public static installPlugin(key: PluginKeys, plugin: any);
 }
@@ -482,7 +482,9 @@ export declare type GestiControllerListenerTypes =
   | "onDestroy"
   | "onMirror"
   | "onBeforeDestroy"
-  | "onCreateGraffiti";
+  | "onCreateGraffiti"
+  | "onUpdateText"
+  | "onRemove";
 export declare abstract class GestiController {
   /**
    * @ImageToolkit
@@ -525,6 +527,8 @@ export declare abstract class GestiController {
   unLock(view?: ViewObject): void;
   lock(view?: ViewObject): void;
   fallback(): void;
+  //移除某个对象
+  remove(view?: ViewObject): void;
   cancelFallback(): void;
   /**
    * @param {Event} e

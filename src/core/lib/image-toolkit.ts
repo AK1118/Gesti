@@ -198,6 +198,12 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  remove(view?: ViewObject): void {
+    const _view=this.selectedViewObject||view;
+    if(!_view)return;
+    this.setViewObjectList(this.ViewObjectList.filter(_=>_.key!=_view.key));
+    this.callHook("onRemove",null);
+  }
   getAllViewObject(): ViewObject[] {
     return this.ViewObjectList;
   }
@@ -461,11 +467,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       view.setDecoration(options??{});
       view.setText(text);
       this.render();
-      // (this.selectedViewObject as TextBox)
-      //   .updateText(text, options)
-      //   .then(() => {
-      //     this.render();
-      //   });
+      this.callHook("onUpdateText",view)
     }
   }
   center(view?: ViewObject, axis?: CenterAxis): void {

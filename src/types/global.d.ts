@@ -181,7 +181,8 @@ declare type GestiControllerListenerTypes =
   | "onDestroy"
   | "onMirror"
   | "onBeforeDestroy"
-  | "onCreateGraffiti";
+  | "onCreateGraffiti"
+  | "onUpdateText"|"onRemove";
 
 
 declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";

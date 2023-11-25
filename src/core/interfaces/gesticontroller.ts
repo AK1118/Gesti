@@ -108,6 +108,8 @@ interface LayerController {
    */
   mirror(view?:ViewObject):boolean;
 
+  remove(view?:ViewObject):void;
+
 }
 
 type ListenerCallback = (object: any) => void;
