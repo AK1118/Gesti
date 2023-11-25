@@ -394,27 +394,11 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
    * @description 微信专用导入
    * @param json
    * @param weChatCanvas
+   * @deprecated
    * @returns
    */
   importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
     return new Promise(async (r, j) => {
-      // try {
-      //   if (json == "[]" || !json) throw Error("Import Json is Empty");
-      //   const str = JSON.parse(json);
-      //   const reader: GestiReaderWechat = new GestiReaderWechat();
-      //   for await (const item of str) {
-      //     const obj: ViewObject = await reader.getObjectByJson(
-      //       JSON.stringify(item),
-      //       this.paint,
-      //       weChatCanvas
-      //     );
-      //     if (obj) this.addViewObject(obj);
-      //   }
-      //   this.render();
-      //   r();
-      // } catch (error) {
-      //   j(error);
-      // }
     });
   }
   addListener(

@@ -225,7 +225,7 @@ declare interface createImageOptions {
     | ImageBitmap
     | OffscreenCanvas;
   originData?: any;
-  options: createImageOptions;
+  // options: createImageOptions;
   width: number;
   height: number;
   scale?: number;
