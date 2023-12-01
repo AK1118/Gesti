@@ -129,15 +129,15 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    */
   private readonly borderColor: string = "#b2ccff";
   public drawSelectedBorder(paint: Painter, size: Size): void {
-    const padding = 2;
+    const padding =3;
     paint.beginPath();
     paint.lineWidth = 1;
     paint.strokeStyle = this.borderColor;
     paint.strokeRect(
-      (-this.width - padding) >> 1,
-      (-this.height - padding) >> 1,
-      this.width + padding + 1,
-      this.height + padding + 1
+      (this.width + padding)*-.5,
+      (this.height + padding)*-.5,
+      this.width + padding,
+      this.height + padding
     );
     paint.closePath();
     paint.stroke();

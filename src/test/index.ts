@@ -1,10 +1,12 @@
 import { ImageIcon, LockIcon } from "@/composite/icons";
 import ViewObject from "@/core/abstract/view-object";
 import { ButtonLocation } from "@/core/enums";
+import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
 import SizeButton from "@/core/viewObject/buttons/sizeButton";
+import Rectangle from "@/core/viewObject/graphics/rectangle";
 import Group from "@/core/viewObject/group";
 import TextArea from "@/core/viewObject/text/text-area";
 import WriteRect from "@/core/viewObject/write/rect";
@@ -95,19 +97,45 @@ const textBox = new TextBox(str1, {
   fontStyle: "italic",
   fontFamily: "楷体",
 });
-loadToGesti(imageBox);
-loadToGesti(textBox2);
-loadToGesti(textBox);
-const group: Group = new Group();
+// loadToGesti(imageBox);
+// loadToGesti(textBox2);
+// loadToGesti(textBox);
 
-textBox2.setPosition(0, 0);
-doCenter(textBox2);
-doCenter(imageBox);
-textBox2.toBackground();
-controller.layerBottom(textBox2);
-controller.layerLower(textBox);
+// const group: Group = new Group();
+
+// textBox2.setPosition(0, 0);
+// doCenter(textBox2);
+// doCenter(imageBox);
+// textBox2.toBackground();
+// controller.layerBottom(textBox2);
+// controller.layerLower(textBox);
 // group.add(imageBox);
 // group.add(textBox2);
+const rect:Rectangle=new Rectangle({
+  width:100,
+  height:100,
+  backgroundColor:"skyblue",
+  gradient:new LineGradientDecoration(
+    {
+      colors:["white",'black','red'],
+      begin:{x:-50,y:-50},
+      end:{x:50,y:50}
+    }
+  ),
+  borderDecoration:{
+    borderWidth:10,
+    gradient:new LineGradientDecoration(
+      {
+        colors:["white",'black','red'],
+        begin:{x:-50,y:-50},
+        end:{x:50,y:50}
+      }
+    )
+  }
+});
+doCenter(rect)
+rect.installButton(new DragButton());
+loadToGesti(rect)
 
 const [close, onAddition] = controller.addWrite({
   type: "write",

@@ -2,12 +2,16 @@
 	使用代理模式重写Painter，兼容原生Painter
 */
 class Painter implements Painter {
-  paint: CanvasRenderingContext2D|OffscreenCanvasRenderingContext2D  = null;
-  constructor(paint: CanvasRenderingContext2D|OffscreenCanvasRenderingContext2D ) {
+  paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D = null;
+  constructor(
+    paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  ) {
     this.setPaintQuality(paint);
     this.paint = paint;
   }
-  private setPaintQuality(paint: CanvasRenderingContext2D|OffscreenCanvasRenderingContext2D): void {
+  private setPaintQuality(
+    paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  ): void {
     try {
       if (paint?.imageSmoothingEnabled) paint.imageSmoothingEnabled = true;
       if (paint?.imageSmoothingQuality) paint.imageSmoothingQuality = "high";
@@ -20,13 +24,13 @@ class Painter implements Painter {
     if (typeof window != "undefined") return this.paint.canvas;
     return undefined;
   }
-  set fillStyle(style: string) {
-    this.paint.fillStyle = style;
-  }
   set lineWidth(width: number) {
     this.paint.lineWidth = width;
   }
-  set strokeStyle(style: string) {
+  set fillStyle(style: string|CanvasGradient) {
+    this.paint.fillStyle = style;
+  }
+  set strokeStyle(style: string|CanvasGradient) {
     this.paint.strokeStyle = style;
   }
   set textBaseLine(
@@ -41,7 +45,7 @@ class Painter implements Painter {
     if (this.paint.textBaseline) this.paint.textBaseline = baseLine;
   }
   draw() {
-     (this.paint as any)?.draw?.(this.paint);
+    (this.paint as any)?.draw?.(this.paint);
   }
   strokeRect(x: number, y: number, w: number, h: number) {
     this.paint.strokeRect(x, y, w, h);
@@ -77,8 +81,15 @@ class Painter implements Painter {
   fill() {
     this.paint.fill();
   }
-  arc(x: number, y: number, radius: number, start: number, end: number, counterclockwise?: boolean) {
-    this.paint.arc(x, y, radius, start, end,counterclockwise);
+  arc(
+    x: number,
+    y: number,
+    radius: number,
+    start: number,
+    end: number,
+    counterclockwise?: boolean
+  ) {
+    this.paint.arc(x, y, radius, start, end, counterclockwise);
   }
   arcTo(x1: number, y1: number, x2: number, y2: number, radius: number) {
     this.paint.arcTo(x1, y1, x2, y2, radius);
@@ -192,11 +203,20 @@ class Painter implements Painter {
   quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
     this.paint.quadraticCurveTo(cpx, cpy, x, y);
   }
-  setlineDash(dash: any) {
+  setLineDash(dash: any) {
     this.paint?.setLineDash(dash);
   }
   putImageData(imagedata: ImageData, dx: number, dy: number): void {
     this.paint.putImageData(imagedata, dx, dy);
+  }
+  createLinearGradient(x0: number, y0: number, x1: number, y1: number):CanvasGradient{
+    return this.paint?.createLinearGradient?.(x0, y0, x1, y1);
+  }
+  createRadialGradient(x0: number, y0: number, r0: number, x1: number, y1: number, r1: number):CanvasGradient{
+    return this.paint.createRadialGradient(x0, y0, r0, x1, y1, r1);
+  }
+  createConicGradient(){
+    
   }
   /*清空画布|刷新画布*/
   update() {}
