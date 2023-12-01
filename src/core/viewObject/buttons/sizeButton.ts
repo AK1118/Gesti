@@ -6,7 +6,7 @@ import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
 import Widgets from "../../../static/widgets";
 import DragButton from "./dragbutton";
-import { ButtonLocation } from "../../enums";
+import { Alignment } from "../../enums";
 import Vector from "@/core/lib/vector";
 import { Icon } from "@/core/lib/icon";
 import ScaleIcon from "@/static/icons/scaleIcon";
@@ -15,9 +15,9 @@ import { DefaultIcon } from "@/composite/icons";
 
 class SizeButton extends DragButton {
   readonly name: ButtonNames="SizeButton";
-  protected buttonLocation:ButtonLocation=ButtonLocation.RB;
+  protected buttonLocation:Alignment=Alignment.bottomRight;
   protected icon: Icon=new DefaultIcon();
-  constructor(location:ButtonLocation,option?:ButtonOption){
+  constructor(location:Alignment,option?:ButtonOption){
     super({
       angleDisabled:true,
       buttonOption:option,
@@ -29,43 +29,43 @@ class SizeButton extends DragButton {
    * @description 在按钮挂载前设置位置
    * @param location 
    */
-  protected beforeMounted(location:ButtonLocation): void {
+  protected beforeMounted(location:Alignment): void {
     //按钮功能原因.按钮必须设置枚举位置,不允许设置position位置,这是强制的.
     this.setLocationByEnum(location);   
   }
   
   protected manipulateDelta(delta:Vector):void{
     switch(this.buttonLocation){
-      case ButtonLocation.LT:{
+      case Alignment.topLeft:{
         delta.y*=-1;
         delta.x*=-1;
       };break;
-      case ButtonLocation.LB:{
+      case Alignment.bottomLeft:{
         delta.x*=-1;
       };break;
-      case ButtonLocation.RT:{
+      case Alignment.topRight:{
         delta.y*=-1;
       };break;
-      case ButtonLocation.RB:{
+      case Alignment.bottomRight:{
        
       };break;
-      case ButtonLocation.RC:{
+      case Alignment.centerRight:{
         delta.y=0;
       };break
-      case ButtonLocation.BC:{
+      case Alignment.bottomCenter:{
         delta.x=0;
       };break
-      case ButtonLocation.LC:{
+      case Alignment.centerLeft:{
         delta.x*=-1;
         delta.y=0;
       };break;
-      case ButtonLocation.TC:{
+      case Alignment.topCenter:{
         delta.x=0;
         delta.y*=-1;
       };break;
     }
   }
-  public setLocation(location: ButtonLocation): void {
+  public setLocation(location: Alignment): void {
       this.buttonLocation=location;
       if(this.mounted)this.initialization(this.master);
   }

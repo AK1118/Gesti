@@ -1,4 +1,4 @@
-import { ButtonLocation, FuncButtonTrigger } from "../../enums";
+import { Alignment, FuncButtonTrigger } from "../../enums";
 
 import BaseButton from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
@@ -17,7 +17,7 @@ import CloseIcon from "@/static/icons/closeIcon";
 
 class MirrorButton extends BaseButton {
   readonly name: ButtonNames="MirrorButton";
-  protected buttonLocation: ButtonLocation = ButtonLocation.LB;
+  protected buttonLocation: Alignment = Alignment.bottomLeft;
   protected icon:Icon=new MirrorIcon();
 
   trigger: FuncButtonTrigger = FuncButtonTrigger.click;

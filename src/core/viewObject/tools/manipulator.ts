@@ -7,7 +7,7 @@
 import Painter from "@/core/lib/painter";
 import SizeButton from "../buttons/sizeButton";
 import ViewObject from "@/core/abstract/view-object";
-import { ButtonLocation, ViewObjectFamily } from "@/core/enums";
+import { Alignment, ViewObjectFamily } from "@/core/enums";
 import RotateButton from "../buttons/rotateButton";
 import Widgets from "@/static/widgets";
 /**
@@ -51,10 +51,10 @@ import Widgets from "@/static/widgets";
 //         this.mountFrameWork();
 //     }
 //     private mountFrameWork():void{
-//         this.installButton(new SizeButton(ButtonLocation.LT));
-//         this.installButton(new SizeButton(ButtonLocation.LB));
-//         this.installButton(new SizeButton(ButtonLocation.RT));
-//         this.installButton(new SizeButton(ButtonLocation.RB));
+//         this.installButton(new SizeButton(Alignment.LT));
+//         this.installButton(new SizeButton(Alignment.LB));
+//         this.installButton(new SizeButton(Alignment.RT));
+//         this.installButton(new SizeButton(Alignment.RB));
 //         this.installButton(new RotateButton())
 //     }
 // }

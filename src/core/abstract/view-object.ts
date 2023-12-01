@@ -7,7 +7,7 @@ import Button, { BaseButton } from "./baseButton";
 import OperationObserver from "./operation-observer";
 import AuxiliaryLine from "../../tools/auxiliary-lines";
 import GestiConfig from "../../config/gestiConfig";
-import { ButtonLocation, ViewObjectFamily } from "../enums";
+import { Alignment, ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
 import BaseViewObject from "./view-object-base";

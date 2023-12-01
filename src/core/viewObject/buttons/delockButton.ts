@@ -1,4 +1,4 @@
-import { ButtonLocation, FuncButtonTrigger } from "../../enums";
+import { Alignment, FuncButtonTrigger } from "../../enums";
 
 import BaseButton, { ButtonOption } from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
@@ -22,7 +22,7 @@ class UnLockButton extends BaseButton {
         
     }
     protected icon: Icon=new UnLockIcon();
-    protected buttonLocation:ButtonLocation=ButtonLocation.LT;
+    protected buttonLocation:Alignment=Alignment.topLeft;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
     updatePosition(vector: Vector): void {

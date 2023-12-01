@@ -5,7 +5,7 @@
  * @Last Modified time: 2023-11-21 14:58:59
  */
 import SizeButton from "./core/viewObject/buttons/sizeButton";
-import { ButtonLocation, ViewObjectFamily } from "./core/enums";
+import { Alignment, ViewObjectFamily } from "./core/enums";
 import Gesti from "./core/lib/gesti";
 
 import {
@@ -117,7 +117,7 @@ export {
 };
 //Icons
 export { MirrorIcon,CloseIcon,DelateIcon,ImageIcon,LockIcon,UnLockIcon,DefaultIcon};
-export { ButtonLocation };
+export { Alignment };
 export { ImageBox, XImage, TextBox, WriteViewObj };
 //枚举
 export { ViewObjectFamily };

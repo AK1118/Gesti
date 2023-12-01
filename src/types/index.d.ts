@@ -49,7 +49,7 @@ declare class Size {
 }
 
 declare type ButtonOption = {
-  location?: ButtonLocation;
+  location?: Alignment;
   icon?: Icon;
 };
 
@@ -113,25 +113,25 @@ declare interface RectParams {
  *
  * @description 按钮位置枚举,前缀为Out的位置处于对象外层
  */
-export declare enum ButtonLocation {
-  /**左上 */
-  LT,
-  /**左下 */
-  LB,
-  RT,
-  RB,
-  RC,
-  BC,
-  LC,
-  TC,
-  OutBC,
-  OutTC,
-  OutRC,
-  OutLC,
-  OutLT,
-  OutLB,
-  OutRT,
-  OutRB,
+export declare enum Alignment {
+  topLeft,
+  topCenter,
+  topRight,
+  centerLeft,
+  center,
+  centerRight,
+  bottomLeft,
+  bottomCenter,
+  bottomRight,
+  outTopLeft,
+  outTopCenter,
+  outTopRight,
+  outCenterLeft,
+  outCenter,
+  outCenterRight,
+  outBottomLeft,
+  outBottomCenter,
+  outBottomRight,
 }
 
 export declare interface TextOptions {
@@ -599,14 +599,14 @@ declare abstract class BaseButton {
 }
 
 export declare abstract class Button extends BaseButton {
-  get btnLocation(): ButtonLocation;
+  get btnLocation(): Alignment;
   protected drawButton(
     position: Vector,
     size: Size,
     radius: number,
     paint: Painter
   ): void;
-  public setLocation(location: ButtonLocation): void;
+  public setLocation(location: Alignment): void;
   public setBackgroundColor(color: string): void;
   public hideBackground(): void;
   public setIconColor(color: string): void;
@@ -624,18 +624,18 @@ export declare class MirrorButton extends Button {}
 export declare class LockButton extends Button {}
 export declare class RotateButton extends Button {}
 export declare class SizeButton extends Button {
-  constructor(location: ButtonLocation, option?: ButtonOption);
+  constructor(location: Alignment, option?: ButtonOption);
 }
 export declare class UnLockButton extends Button {
   constructor(option?: ButtonOption);
 }
-declare type VerticalButtonLocationType = "top" | "bottom";
+declare type VerticalAlignmentType = "top" | "bottom";
 export declare class VerticalButton extends Button {
-  constructor(location?: VerticalButtonLocationType, option?: ButtonOption);
+  constructor(location?: VerticalAlignmentType, option?: ButtonOption);
 }
-declare type HorizonButtonLocationType = "left" | "right";
+declare type HorizonAlignmentType = "left" | "right";
 export declare class HorizonButton extends Button {
-  constructor(location?: HorizonButtonLocationType, option?: ButtonOption);
+  constructor(location?: HorizonAlignmentType, option?: ButtonOption);
 }
 export declare const createGesti: (config?: gesticonfig) => Gesti;
 /**

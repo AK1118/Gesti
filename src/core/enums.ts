@@ -79,5 +79,6 @@ export {
   FuncButtonTrigger,
   OperationTypeEmum,
   ViewObjectFamily,
-  ButtonLocation,
+  // ButtonLocation,
+  Alignment
 };

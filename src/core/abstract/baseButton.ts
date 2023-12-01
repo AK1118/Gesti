@@ -1,4 +1,4 @@
-import { ButtonLocation, FuncButtonTrigger } from "@/core/enums";
+import { Alignment, FuncButtonTrigger } from "@/core/enums";
 import RenderObject from "../interfaces/render-object";
 import Painter from "@/core/lib/painter";
 import CatchPointUtil from "../../utils/event/catchPointUtil";
@@ -9,7 +9,7 @@ import { Icon } from "../lib/icon";
 import DefaultIcon from "@/static/icons/defaultIcon";
 import GestiConfig from "@/config/gestiConfig";
 export type ButtonOption = {
-  location?: ButtonLocation;
+  location?: Alignment;
   icon?: Icon;
 };
 //按钮抽象类
@@ -21,11 +21,11 @@ export abstract class BaseButton implements RenderObject {
   });
   public iconColor:string="#c1c1c1";
   //自定义位置
-  private customLocation: ButtonLocation;
+  private customLocation: Alignment;
   /**
    * 获取按钮的位置枚举
    */
-  get btnLocation(): ButtonLocation {
+  get btnLocation(): Alignment {
     return this.buttonLocation;
   }
   private customIcon: Icon;
@@ -37,7 +37,7 @@ export abstract class BaseButton implements RenderObject {
     this.customLocation = option?.location;
     this.customIcon = option?.icon;
   }
-  protected abstract buttonLocation: ButtonLocation;
+  protected abstract buttonLocation: Alignment;
   abstract readonly name: ButtonNames;
   //隐藏
   disabled: boolean = false;
@@ -172,38 +172,38 @@ export abstract class BaseButton implements RenderObject {
     return CatchPointUtil.checkInsideArc(target, event, this.senseRadius);
   }
   protected setLocationByEnum(
-    _location?: ButtonLocation
+    _location?: Alignment
   ): [x: number, y: number] {
     //如果没有自定义位置，就使用自己的位置
     const location = _location ?? this.buttonLocation;
     this.buttonLocation = location;
     let result: [x: number, y: number] = [0, 0];
     switch (location) {
-      case ButtonLocation.LT:
+      case Alignment.topLeft:
         result = [-0.5, -0.5];
         break;
-      case ButtonLocation.LB:
+      case Alignment.bottomLeft:
         result = [-0.5, 0.5];
         break;
-      case ButtonLocation.RT:
+      case Alignment.topRight:
         result = [0.5, -0.5];
         break;
-      case ButtonLocation.RB:
+      case Alignment.bottomRight:
         result = [0.5, 0.5];
         break;
-      case ButtonLocation.RC:
+      case Alignment.centerRight:
         result = [0.5, 0.0];
         break;
-      case ButtonLocation.BC:
+      case Alignment.bottomCenter:
         result = [0, 0.5];
         break;
-      case ButtonLocation.LC:
+      case Alignment.centerLeft:
         result = [-0.5, 0];
         break;
-      case ButtonLocation.TC:
+      case Alignment.topCenter:
         result = [0, -0.5];
         break;
-      case ButtonLocation.OutBC:
+      case Alignment.outBottomCenter:
         result = [0, 0.75];
         break;
     }
@@ -213,7 +213,7 @@ export abstract class BaseButton implements RenderObject {
    * @description 根据枚举的值获取固定的位置，比如rotateButton的位置
    */
   private getFixedLocationPosition(
-    location: ButtonLocation,
+    location: Alignment,
     width: number,
     height: number,
     px: number,
@@ -225,21 +225,21 @@ export abstract class BaseButton implements RenderObject {
     const baseX = width * px,
       baseY = height * py;
     switch (location) {
-      case ButtonLocation.OutBC:
+      case Alignment.outBottomCenter:
         return [baseX, hf + distance];
-      case ButtonLocation.OutTC:
+      case Alignment.outTopCenter:
         return [baseX, -hf - distance];
-      case ButtonLocation.OutRC:
+      case Alignment.outCenterRight:
         return [wf + distance, baseY];
-      case ButtonLocation.OutLC:
+      case Alignment.outCenterLeft:
         return [-wf - distance, baseY];
-      case ButtonLocation.OutLT:
+      case Alignment.outTopLeft:
         return [-wf - distance, -hf - distance];
-      case ButtonLocation.OutLB:
+      case Alignment.outBottomLeft:
         return [-wf - distance, hf + distance];
-      case ButtonLocation.OutRT:
+      case Alignment.outTopRight:
         return [wf + distance, -hf - distance];
-      case ButtonLocation.OutRB:
+      case Alignment.outBottomRight:
         return [wf + distance, hf + distance];
     }
     return [baseX, baseY];
@@ -258,7 +258,7 @@ export abstract class BaseButton implements RenderObject {
       percent_x,
       percent_y
     );
-    // if(this.buttonLocation===ButtonLocation.OutBC){
+    // if(this.buttonLocation===Alignment.outBottomCenter){
     //   positionY=height*.5+30;
     // }
     //更改相对定位，看好了，这可是按钮类里面的
@@ -318,7 +318,7 @@ export abstract class BaseButton implements RenderObject {
   public setBackgroundColor(color: string) {
     this.background = color;
   }
-  public setLocation(location: ButtonLocation): void {
+  public setLocation(location: Alignment): void {
     this.customLocation = location;
     this.buttonLocation = location;
     //如果已经被初始化

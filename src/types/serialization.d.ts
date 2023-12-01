@@ -1,4 +1,4 @@
-import { ButtonLocation } from "@/core/enums";
+import { Alignment } from "@/core/enums";
 import { GraffitiTypes, TextOptions, ViewObject, XImage } from "./index";
 
 declare module "Serialization" {
@@ -16,7 +16,7 @@ declare module "Serialization" {
 
   interface ExportButton {
     type: string;
-    location?: ButtonLocation;
+    location?: Alignment;
     radius?: number;
     iconColor?: string;
     backgroundColor?: string;

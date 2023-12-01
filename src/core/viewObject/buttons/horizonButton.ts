@@ -1,4 +1,4 @@
-import { ButtonLocation, FuncButtonTrigger } from "../../enums";
+import { Alignment, FuncButtonTrigger } from "../../enums";
 
 import BaseButton, { ButtonOption } from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
@@ -14,11 +14,11 @@ import SizeButton from "./sizeButton";
 
 class HorizonButton extends SizeButton {
   readonly name: ButtonNames="HorizonButton";
-  protected buttonLocation:ButtonLocation;
+  protected buttonLocation:Alignment;
   protected icon: Icon=new DefaultIcon();
   constructor(location?:'left'|'right',option?:ButtonOption){
-    const _location=location==="right"?ButtonLocation.RC:ButtonLocation.LC;
-    super(_location||ButtonLocation.RC,option);
+    const _location=location==="right"?Alignment.centerRight:Alignment.centerLeft;
+    super(_location||Alignment.centerRight,option);
   }
   public onUpWithInner(): void {
       this.computeSelfLocation();

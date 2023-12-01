@@ -1,6 +1,6 @@
 import { ImageIcon, LockIcon } from "@/composite/icons";
 import ViewObject from "@/core/abstract/view-object";
-import { ButtonLocation } from "@/core/enums";
+import { Alignment } from "@/core/enums";
 import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
@@ -147,10 +147,10 @@ onAddition((textBox2) => {
   textBox2.installButton(new HorizonButton("right"));
   textBox2.installButton(new VerticalButton());
   textBox2.installButton(new VerticalButton("bottom"));
-  textBox2.installButton(new SizeButton(ButtonLocation.LT));
+  textBox2.installButton(new SizeButton(Alignment.topLeft));
   textBox2.installButton(
     new MirrorButton({
-      location: ButtonLocation.OutRT,
+      location: Alignment.outTopRight,
     })
   );
 });
@@ -162,15 +162,15 @@ textBox2.installButton(new HorizonButton("left"));
 textBox2.installButton(new HorizonButton("right"));
 textBox2.installButton(new VerticalButton());
 textBox2.installButton(new VerticalButton("bottom"));
-textBox2.installButton(new SizeButton(ButtonLocation.LT));
+textBox2.installButton(new SizeButton(Alignment.topLeft));
 textBox2.installButton(
   new MirrorButton({
-    location: ButtonLocation.OutRT,
+    location: Alignment.outTopRight,
   })
 );
 textBox2.installButton(
   new LockButton({
-    location: ButtonLocation.RT,
+    location: Alignment.topRight,
   })
 );
 imageBox.installButton(new DragButton());

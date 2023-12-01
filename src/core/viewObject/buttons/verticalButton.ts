@@ -1,7 +1,7 @@
 import Painter from "../../lib/painter";
 import Widgets from "../../../static/widgets";
 import SizeButton from "./sizeButton";
-import { ButtonLocation } from "../../enums";
+import { Alignment } from "../../enums";
 import DragButton from "./dragbutton";
 import Rect from "@/core/lib/rect";
 import { Icon } from "@/core/lib/icon";
@@ -11,8 +11,8 @@ import { ButtonOption } from "@/core/abstract/baseButton";
 class VerticalButton extends SizeButton {
   readonly  name: ButtonNames="VerticalButton";
   constructor(location?:'top'|'bottom',option?:ButtonOption){
-    const _location=location==="top"?ButtonLocation.TC:ButtonLocation.BC;
-    super(_location||ButtonLocation.BC,option);
+    const _location=location==="top"?Alignment.topCenter:Alignment.bottomCenter;
+    super(_location||Alignment.bottomCenter,option);
   }
   protected icon: Icon=new DefaultIcon();
   // effect(currentButtonRect?: Rect): void {
