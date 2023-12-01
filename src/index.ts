@@ -5,7 +5,7 @@
  * @Last Modified time: 2023-11-21 14:58:59
  */
 import SizeButton from "./core/viewObject/buttons/sizeButton";
-import { Alignment, ViewObjectFamily } from "./core/enums";
+import { ViewObjectFamily } from "./core/enums";
 import Gesti from "./core/lib/gesti";
 
 import {
@@ -102,6 +102,7 @@ import HorizonButton from "./core/viewObject/buttons/horizonButton";
 import { createTextBoxView } from "./hooks/create";
 import GestiConfig from "./config/gestiConfig";
 import {  MirrorIcon,CloseIcon,DelateIcon,ImageIcon,LockIcon,UnLockIcon,DefaultIcon } from "./composite/icons";
+import Alignment from "./core/lib/painting/alignment";
 
 //按钮
 export {

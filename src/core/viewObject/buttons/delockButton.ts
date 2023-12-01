@@ -1,5 +1,5 @@
-import { Alignment, FuncButtonTrigger } from "../../enums";
-
+import { FuncButtonTrigger } from "../../enums";
+import Alignment from "@/core/lib/painting/alignment";
 import BaseButton, { ButtonOption } from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
@@ -22,7 +22,7 @@ class UnLockButton extends BaseButton {
         
     }
     protected icon: Icon=new UnLockIcon();
-    protected buttonLocation:Alignment=Alignment.topLeft;
+    protected buttonAlignment:Alignment=Alignment.topLeft;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
     updatePosition(vector: Vector): void {

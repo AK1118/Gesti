@@ -32,26 +32,26 @@ enum ViewObjectFamily {
   group,
 }
 
-enum Alignment {
-  topLeft,
-  topCenter,
-  topRight,
-  centerLeft,
-  center,
-  centerRight,
-  bottomLeft,
-  bottomCenter,
-  bottomRight,
-  outTopLeft,
-  outTopCenter,
-  outTopRight,
-  outCenterLeft,
-  outCenter,
-  outCenterRight,
-  outBottomLeft,
-  outBottomCenter,
-  outBottomRight,
-}
+// enum Alignment {
+//   topLeft,
+//   topCenter,
+//   topRight,
+//   centerLeft,
+//   center,
+//   centerRight,
+//   bottomLeft,
+//   bottomCenter,
+//   bottomRight,
+//   outTopLeft,
+//   outTopCenter,
+//   outTopRight,
+//   outCenterLeft,
+//   outCenter,
+//   outCenterRight,
+//   outBottomLeft,
+//   outBottomCenter,
+//   outBottomRight,
+// }
 
 /**
  * @deprecated
@@ -80,5 +80,5 @@ export {
   OperationTypeEmum,
   ViewObjectFamily,
   // ButtonLocation,
-  Alignment
+  // Alignment
 };

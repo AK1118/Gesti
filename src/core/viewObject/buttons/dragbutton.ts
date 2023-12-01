@@ -1,5 +1,5 @@
-import { Alignment, FuncButtonTrigger } from "../../enums";
-
+import {  FuncButtonTrigger } from "../../enums";
+import Alignment from "@/core/lib/painting/alignment";
 import BaseButton, { ButtonOption } from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
@@ -12,8 +12,9 @@ import { Icon } from "@/core/lib/icon";
 import DragIcon from "@/static/icons/dragIcon";
 
 class DragButton extends BaseButton {
+  
   readonly name: ButtonNames="DragButton";
-  protected buttonLocation: Alignment = Alignment.bottomRight;
+  protected buttonAlignment: Alignment = Alignment.bottomRight;
   protected icon: Icon=new DragIcon();
   public trigger: FuncButtonTrigger = FuncButtonTrigger.drag;
   private preViewObjectRect: Rect = null;

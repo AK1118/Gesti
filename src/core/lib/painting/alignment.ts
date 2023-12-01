@@ -1,10 +1,18 @@
 class Alignment{
   private x: number;
   private y: number;
-
+  private offset:Offset={
+    offsetX:0,
+    offsetY:0,
+  };
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
+  }
+
+  public copyWithOffset(offset:Offset){
+    this.offset=offset;
+    return this;
   }
 
   static readonly center: Alignment = new Alignment(0, 0);
@@ -23,10 +31,13 @@ class Alignment{
    * 中心点，通过以下方法计算得出   x=[(-1+1)*.5]*100=-50 ,得到计算后的位置
    * @return Size
    */
-  public compute(size: Size): Size {
-    const factorX = (this.x + 1) * 0.5,
-      factorY = (this.y + 1) * 0.5;
-    return new Size(factorX * size.width, factorY * size.height);
+  public compute(size: Size): Offset {
+    const halfWidthDelta=size.width*.5;
+    const halfHeighDelta=size.width*.5;
+    return {
+      offsetX:halfWidthDelta * this.x+this.offset.offsetX, 
+      offsetY:halfHeighDelta * this.y+this.offset.offsetY,
+    };
   }
 
 

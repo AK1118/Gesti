@@ -6,23 +6,23 @@ import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
 import Widgets from "../../../static/widgets";
 import DragButton from "./dragbutton";
-import { Alignment } from "../../enums";
 import Vector from "@/core/lib/vector";
 import { Icon } from "@/core/lib/icon";
 import ScaleIcon from "@/static/icons/scaleIcon";
 import { ButtonOption } from "@/core/abstract/baseButton";
 import { DefaultIcon } from "@/composite/icons";
+import Alignment from "@/core/lib/painting/alignment";
 
 class SizeButton extends DragButton {
   readonly name: ButtonNames="SizeButton";
-  protected buttonLocation:Alignment=Alignment.bottomRight;
+  protected buttonAlignment:Alignment=Alignment.bottomRight;
   protected icon: Icon=new DefaultIcon();
   constructor(location:Alignment,option?:ButtonOption){
     super({
       angleDisabled:true,
       buttonOption:option,
     },);
-    this.buttonLocation=location;
+    this.buttonAlignment=location;
     this.beforeMounted(location);
   }
   /**
@@ -31,11 +31,11 @@ class SizeButton extends DragButton {
    */
   protected beforeMounted(location:Alignment): void {
     //按钮功能原因.按钮必须设置枚举位置,不允许设置position位置,这是强制的.
-    this.setLocationByEnum(location);   
+    // this.setLocationByAlignment(location);   
   }
   
   protected manipulateDelta(delta:Vector):void{
-    switch(this.buttonLocation){
+    switch(this.buttonAlignment){
       case Alignment.topLeft:{
         delta.y*=-1;
         delta.x*=-1;
@@ -66,7 +66,7 @@ class SizeButton extends DragButton {
     }
   }
   public setLocation(location: Alignment): void {
-      this.buttonLocation=location;
+      this.buttonAlignment=location;
       if(this.mounted)this.initialization(this.master);
   }
   effect(currentButtonRect?: Rect): void {

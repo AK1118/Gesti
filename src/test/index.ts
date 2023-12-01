@@ -1,8 +1,8 @@
 import { ImageIcon, LockIcon } from "@/composite/icons";
 import ViewObject from "@/core/abstract/view-object";
-import { Alignment } from "@/core/enums";
 import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
+import Alignment from "@/core/lib/painting/alignment";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
 import SizeButton from "@/core/viewObject/buttons/sizeButton";
@@ -10,13 +10,7 @@ import Rectangle from "@/core/viewObject/graphics/rectangle";
 import Group from "@/core/viewObject/group";
 import TextArea from "@/core/viewObject/text/text-area";
 import WriteRect from "@/core/viewObject/write/rect";
-import {
-  createGesti,
-  doCenter,
-  exportAll,
-  importAll,
-  loadToGesti,
-} from "@/hooks/index";
+import { createGesti,importAll,exportAll,doCenter,loadToGesti } from "@/hooks/index";
 import Gesti, {
   CloseButton,
   HorizonButton,
@@ -134,70 +128,82 @@ const rect:Rectangle=new Rectangle({
   }
 });
 doCenter(rect)
-rect.installButton(new DragButton({
+const drag=new DragButton({
   buttonOption:{
-    location:Alignment.outBottomRight
+    alignment:Alignment.bottomRight
   }
-}));
+});
+rect.installButton(drag);
+const align:Alignment=Alignment.bottomCenter.copyWithOffset({
+  offsetX:0,
+  offsetY:30,
+})
+console.log("卧槽",align)
+rect.installButton(new RotateButton(
+  {
+    alignment:align
+  }
+))
+console.log(drag)
 loadToGesti(rect)
 
-const [close, onAddition] = controller.addWrite({
-  type: "write",
-});
-close();
-onAddition((textBox2) => {
-  console.log(textBox2.installButton);
-  textBox2.installButton(new HorizonButton("left"));
-  textBox2.installButton(new HorizonButton("right"));
-  textBox2.installButton(new VerticalButton());
-  textBox2.installButton(new VerticalButton("bottom"));
-  textBox2.installButton(new SizeButton(Alignment.topLeft));
-  textBox2.installButton(
-    new MirrorButton({
-      location: Alignment.outTopRight,
-    })
-  );
-});
-// setTimeout(()=>{
-//   closer();
-// },3000);
-// loadToGesti(group);
-textBox2.installButton(new HorizonButton("left"));
-textBox2.installButton(new HorizonButton("right"));
-textBox2.installButton(new VerticalButton());
-textBox2.installButton(new VerticalButton("bottom"));
-textBox2.installButton(new SizeButton(Alignment.topLeft));
-textBox2.installButton(
-  new MirrorButton({
-    location: Alignment.outTopRight,
-  })
-);
-textBox2.installButton(
-  new LockButton({
-    location: Alignment.topRight,
-  })
-);
-imageBox.installButton(new DragButton());
-imageBox.installButton(new RotateButton());
+// const [close, onAddition] = controller.addWrite({
+//   type: "write",
+// });
+// close();
+// onAddition((textBox2) => {
+//   console.log(textBox2.installButton);
+//   textBox2.installButton(new HorizonButton("left"));
+//   textBox2.installButton(new HorizonButton("right"));
+//   textBox2.installButton(new VerticalButton());
+//   textBox2.installButton(new VerticalButton("bottom"));
+//   textBox2.installButton(new SizeButton(Alignment.topLeft));
+//   textBox2.installButton(
+//     new MirrorButton({
+//       location: Alignment.topLeft,
+//     })
+//   );
+// });
+// // setTimeout(()=>{
+// //   closer();
+// // },3000);
+// // loadToGesti(group);
+// textBox2.installButton(new HorizonButton("left"));
+// textBox2.installButton(new HorizonButton("right"));
+// textBox2.installButton(new VerticalButton());
+// textBox2.installButton(new VerticalButton("bottom"));
+// textBox2.installButton(new SizeButton(Alignment.topLeft));
+// textBox2.installButton(
+//   new MirrorButton({
+//     location: Alignment.topLeft,
+//   })
+// );
+// textBox2.installButton(
+//   new LockButton({
+//     location: Alignment.topRight,
+//   })
+// );
+// imageBox.installButton(new DragButton());
+// imageBox.installButton(new RotateButton());
 
-(document.querySelector("#input") as any).value = textBox2.value;
-(document.querySelector("#input") as HTMLElement).oninput = (e: any) => {
-  const value = e.target.value;
-  controller.updateText(value);
-};
+// (document.querySelector("#input") as any).value = textBox2.value;
+// (document.querySelector("#input") as HTMLElement).oninput = (e: any) => {
+//   const value = e.target.value;
+//   controller.updateText(value);
+// };
 
-document.getElementById("import").addEventListener("click", () => {
-  console.log("导入");
-  const a = window.localStorage.getItem("aa");
-  importAll(a).then((e) => {
-    console.log("导入成功");
-  });
-});
+// document.getElementById("import").addEventListener("click", () => {
+//   console.log("导入");
+//   const a = window.localStorage.getItem("aa");
+//   importAll(a).then((e) => {
+//     console.log("导入成功");
+//   });
+// });
 
-document.getElementById("export").addEventListener("click", () => {
-  console.log("导出");
-  exportAll(offScreenPainter).then((json) => {
-    window.localStorage.setItem("aa", json);
-    console.log("导出成功");
-  });
-});
+// document.getElementById("export").addEventListener("click", () => {
+//   console.log("导出");
+//   exportAll(offScreenPainter).then((json) => {
+//     window.localStorage.setItem("aa", json);
+//     console.log("导出成功");
+//   });
+// });

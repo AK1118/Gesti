@@ -1,4 +1,4 @@
-import { Alignment, FuncButtonTrigger } from "@/core/enums";
+import {  FuncButtonTrigger } from "@/core/enums";
 import RenderObject from "../interfaces/render-object";
 import Painter from "@/core/lib/painter";
 import CatchPointUtil from "../../utils/event/catchPointUtil";
@@ -8,25 +8,25 @@ import Vector from "../lib/vector";
 import { Icon } from "../lib/icon";
 import DefaultIcon from "@/static/icons/defaultIcon";
 import GestiConfig from "@/config/gestiConfig";
+import Alignment from "../lib/painting/alignment";
 export type ButtonOption = {
-  location?: Alignment;
+  alignment?: Alignment;
   icon?: Icon;
 };
 //按钮抽象类
 export abstract class BaseButton implements RenderObject {
-
   protected icon: Icon = new DefaultIcon({
     color: "#c1c1c1",
     size: 10,
   });
   public iconColor:string="#c1c1c1";
   //自定义位置
-  private customLocation: Alignment;
+  private customAlignment: Alignment;
   /**
    * 获取按钮的位置枚举
    */
   get btnLocation(): Alignment {
-    return this.buttonLocation;
+    return this.buttonAlignment;
   }
   private customIcon: Icon;
   //是否显示背景，按钮默认有一个白色背景
@@ -34,10 +34,11 @@ export abstract class BaseButton implements RenderObject {
   public background: string = "rgba(255,255,255,.8)";
   constructor(option?: ButtonOption) {
     if (!option) return;
-    this.customLocation = option?.location;
+    this.customAlignment = option?.alignment;
+    console.log(this.customAlignment);
     this.customIcon = option?.icon;
   }
-  protected abstract buttonLocation: Alignment;
+  protected abstract buttonAlignment: Alignment;
   abstract readonly name: ButtonNames;
   //隐藏
   disabled: boolean = false;
@@ -148,7 +149,7 @@ export abstract class BaseButton implements RenderObject {
   public initialization(master: ViewObject) {
     this.master = master;
     this.beforeMounted();
-    this.location = this.setLocationByEnum(this.customLocation);
+    this.location = this.setLocationByAlignment(this.customAlignment);
     this.icon = this.customIcon || this.icon;
     //icon的大小等于半径
     this.icon.setSize(this.radius);
@@ -171,78 +172,15 @@ export abstract class BaseButton implements RenderObject {
     if (this.master.isLock && this.canBeeLocking) return false;
     return CatchPointUtil.checkInsideArc(target, event, this.senseRadius);
   }
-  protected setLocationByEnum(
+  protected setLocationByAlignment(
     _location?: Alignment
   ): [x: number, y: number] {
     //如果没有自定义位置，就使用自己的位置
-    const location = _location ?? this.buttonLocation;
-    this.buttonLocation = location;
-    let result: [x: number, y: number] = [0, 0];
-    switch (location) {
-      case Alignment.topLeft:
-        result = [-0.5, -0.5];
-        break;
-      case Alignment.bottomLeft:
-        result = [-0.5, 0.5];
-        break;
-      case Alignment.topRight:
-        result = [0.5, -0.5];
-        break;
-      case Alignment.bottomRight:
-        result = [0.5, 0.5];
-        break;
-      case Alignment.centerRight:
-        result = [0.5, 0.0];
-        break;
-      case Alignment.bottomCenter:
-        result = [0, 0.5];
-        break;
-      case Alignment.centerLeft:
-        result = [-0.5, 0];
-        break;
-      case Alignment.topCenter:
-        result = [0, -0.5];
-        break;
-      case Alignment.outBottomCenter:
-        result = [0, 0.75];
-        break;
-    }
-    return result;
-  }
-  /**
-   * @description 根据枚举的值获取固定的位置，比如rotateButton的位置
-   */
-  private getFixedLocationPosition(
-    location: Alignment,
-    width: number,
-    height: number,
-    px: number,
-    py: number
-  ): [x: number, y: number] {
-    const distance: number = 30 * GestiConfig.DPR;
-    const hf = height * 0.5,
-      wf = width * 0.5;
-    const baseX = width * px,
-      baseY = height * py;
-    switch (location) {
-      case Alignment.outBottomCenter:
-        return [baseX, hf + distance];
-      case Alignment.outTopCenter:
-        return [baseX, -hf - distance];
-      case Alignment.outCenterRight:
-        return [wf + distance, baseY];
-      case Alignment.outCenterLeft:
-        return [-wf - distance, baseY];
-      case Alignment.outTopLeft:
-        return [-wf - distance, -hf - distance];
-      case Alignment.outBottomLeft:
-        return [-wf - distance, hf + distance];
-      case Alignment.outTopRight:
-        return [wf + distance, -hf - distance];
-      case Alignment.outBottomRight:
-        return [wf + distance, hf + distance];
-    }
-    return [baseX, baseY];
+    const location = _location ?? this.buttonAlignment;
+    this.buttonAlignment = location;
+    const {offsetX,offsetY}:Offset=this.buttonAlignment.compute(this.master.size);
+    console.log(offsetX,offsetY);
+    return [offsetX,offsetY];
   }
   /**
    * @description 根据父Box的大小宽度比作为基础定位
@@ -250,16 +188,16 @@ export abstract class BaseButton implements RenderObject {
    */
   private computeRelativePositionByLocation() {
     const { width, height } = this.master.rect.size;
-    const [percent_x, percent_y] = this.location;
-    const [cx, cy] = this.getFixedLocationPosition(
-      this.buttonLocation,
-      width,
-      height,
-      percent_x,
-      percent_y
-    );
+    const {offsetX,offsetY}= this.buttonAlignment.compute(this.master.size);
+    // const [cx, cy] = this.getFixedLocationPosition(
+    //   this.buttonAlignment,
+    //   width,
+    //   height,
+    //   percent_x,
+    //   percent_y
+    // );
     //更改相对定位，看好了，这可是按钮类里面的
-    this.relativeRect.position.setXY(cx, cy);
+    this.relativeRect.position.setXY(offsetX, offsetY);
   }
   public getOriginDistance(): number {
     return this.originDistance;
@@ -316,8 +254,8 @@ export abstract class BaseButton implements RenderObject {
     this.background = color;
   }
   public setLocation(location: Alignment): void {
-    this.customLocation = location;
-    this.buttonLocation = location;
+    this.customAlignment = location;
+    this.buttonAlignment = location;
     //如果已经被初始化
     if (this.mounted) {
       this.initialization(this.master);

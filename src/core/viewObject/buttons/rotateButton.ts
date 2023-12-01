@@ -1,5 +1,5 @@
-import { Alignment, FuncButtonTrigger } from "../../enums";
-
+import {  FuncButtonTrigger } from "../../enums";
+import Alignment from "@/core/lib/painting/alignment";
 import BaseButton, { ButtonOption } from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
@@ -20,7 +20,7 @@ class RotateButton extends BaseButton {
   public radius: number = 10;
   private disable: boolean = false;
   key: string | number = +new Date();
-  protected buttonLocation:Alignment=Alignment.outBottomCenter;
+  protected buttonAlignment:Alignment=Alignment.bottomCenter;
   constructor(buttonOption?: ButtonOption) {
     super(buttonOption);
     this.initScale();

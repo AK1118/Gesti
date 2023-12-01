@@ -1,12 +1,12 @@
 import Painter from "../../lib/painter";
 import Widgets from "../../../static/widgets";
 import SizeButton from "./sizeButton";
-import { Alignment } from "../../enums";
 import DragButton from "./dragbutton";
 import Rect from "@/core/lib/rect";
 import { Icon } from "@/core/lib/icon";
 import { DefaultIcon } from "@/composite/icons";
 import { ButtonOption } from "@/core/abstract/baseButton";
+import Alignment from "@/core/lib/painting/alignment";
 
 class VerticalButton extends SizeButton {
   readonly  name: ButtonNames="VerticalButton";

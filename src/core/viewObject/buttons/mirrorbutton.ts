@@ -1,5 +1,5 @@
-import { Alignment, FuncButtonTrigger } from "../../enums";
-
+import {  FuncButtonTrigger } from "../../enums";
+import Alignment from "@/core/lib/painting/alignment";
 import BaseButton from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
@@ -17,7 +17,7 @@ import CloseIcon from "@/static/icons/closeIcon";
 
 class MirrorButton extends BaseButton {
   readonly name: ButtonNames="MirrorButton";
-  protected buttonLocation: Alignment = Alignment.bottomLeft;
+  protected buttonAlignment: Alignment = Alignment.bottomLeft;
   protected icon:Icon=new MirrorIcon();
 
   trigger: FuncButtonTrigger = FuncButtonTrigger.click;

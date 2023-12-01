@@ -1,5 +1,5 @@
-import { Alignment, FuncButtonTrigger } from "../../enums";
-
+import {  FuncButtonTrigger } from "../../enums";
+import Alignment from "@/core/lib/painting/alignment";
 import BaseButton, { ButtonOption } from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
