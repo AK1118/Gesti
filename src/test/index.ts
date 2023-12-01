@@ -134,7 +134,11 @@ const rect:Rectangle=new Rectangle({
   }
 });
 doCenter(rect)
-rect.installButton(new DragButton());
+rect.installButton(new DragButton({
+  buttonOption:{
+    location:Alignment.outBottomRight
+  }
+}));
 loadToGesti(rect)
 
 const [close, onAddition] = controller.addWrite({

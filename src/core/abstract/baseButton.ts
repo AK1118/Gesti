@@ -258,9 +258,6 @@ export abstract class BaseButton implements RenderObject {
       percent_x,
       percent_y
     );
-    // if(this.buttonLocation===Alignment.outBottomCenter){
-    //   positionY=height*.5+30;
-    // }
     //更改相对定位，看好了，这可是按钮类里面的
     this.relativeRect.position.setXY(cx, cy);
   }
