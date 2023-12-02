@@ -29,10 +29,10 @@ abstract class GradientDecorationBase {
    * @description 生成一个渐变对象，返回线性或者径向渐变
    * @param paint
    */
-  protected abstract generateGradient(paint: Painter):CanvasGradient;
+  protected abstract generateGradient(paint: Painter,size:Size):CanvasGradient;
 
-  public getGradient(paint:Painter):CanvasGradient{
-    return this.gradient||(this.gradient=this.generateGradient(paint));
+  public getGradient(paint:Painter,size:Size):CanvasGradient{
+    return this.gradient||(this.gradient=this.generateGradient(paint,size));
   }
 }
 

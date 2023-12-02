@@ -1,8 +1,13 @@
 import { PluginKeys } from "@/types/index";
 
+
+
+
+
 class Plugins{
     private static plugins:Record<PluginKeys,any>={
         "pako":null,
+        "offScreenCanvasFactory":null,
     };
     public static getPluginByKey(key:PluginKeys){
         return this.plugins[key];
@@ -11,5 +16,9 @@ class Plugins{
         this.plugins[key]=plugin;
     }
 }
+
+
+
+
 
 export default Plugins;

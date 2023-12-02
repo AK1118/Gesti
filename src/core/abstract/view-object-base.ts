@@ -17,6 +17,25 @@ import { ViewObjectExportEntity } from "@/types/serialization";
  * 图层基类
  */
 abstract class BaseViewObject extends OperationObserver {
+  // protected offScreenCanvas;
+  // protected offScreenPainter: Painter;
+  // private _isCache: boolean;
+  // protected get isUseCache(): boolean {
+  //   return (
+  //     this._isCache &&
+  //     this.offScreenCanvas != null &&
+  //     this.offScreenPainter != null
+  //   );
+  // }
+  // public useCache(): void {
+  //   this._isCache = true;
+  // }
+  // public unUseCache(): void {
+  //   this._isCache = false;
+  //   this.offScreenCanvas = null;
+  //   this.offScreenPainter = null;
+  // }
+
   //是否挂载到Gesti
   private _mounted: boolean = false;
   //瞬时缩放倍数
@@ -259,7 +278,6 @@ abstract class BaseViewObject extends OperationObserver {
   protected _didChangeScaleWidth(): void {}
 
   protected _didChangeScaleHeight(): void {}
-
 }
 
 export default BaseViewObject;

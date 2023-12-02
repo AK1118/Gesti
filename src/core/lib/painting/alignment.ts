@@ -39,8 +39,6 @@ class Alignment{
       offsetY:halfHeighDelta * this.y+this.offset.offsetY,
     };
   }
-
-
 }
 
 export default Alignment;

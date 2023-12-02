@@ -12,6 +12,10 @@ class Platform{
         if(Platform.isWeChatMiniProgram)return "WeChat";
         return "Browser";
     }
+
+    static get isTikTok():boolean{
+        return typeof tt!=="undefined";
+    }
 }
 
 export default Platform;

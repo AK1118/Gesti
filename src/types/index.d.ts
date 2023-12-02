@@ -7,8 +7,11 @@
 
 import { ViewObjectExportBaseInfo } from "Serialization";
 
-export declare type PluginKeys = "pako";
-
+export declare type PluginKeys = "pako"|"offScreenCanvasFactory";
+export declare interface OffScreenCanvasFactoryOption{
+  generateOffScreenCanvas:(width:number,height:number)=>any;
+  generateOffScreenContext:(offScreenCanvas:any)=>any;
+}
 declare class Vector {
   x: number;
   y: number;
@@ -109,29 +112,18 @@ declare interface RectParams {
   height: number;
 }
 
-/**
- *
- * @description 按钮位置枚举,前缀为Out的位置处于对象外层
- */
-export declare enum Alignment {
-  topLeft,
-  topCenter,
-  topRight,
-  centerLeft,
-  center,
-  centerRight,
-  bottomLeft,
-  bottomCenter,
-  bottomRight,
-  outTopLeft,
-  outTopCenter,
-  outTopRight,
-  outCenterLeft,
-  outCenter,
-  outCenterRight,
-  outBottomLeft,
-  outBottomCenter,
-  outBottomRight,
+export declare class Alignment {
+  constructor(x: number, y: number);
+  public copyWithOffset(offset: Offset): Alignment;
+  static readonly center: Alignment;
+  static readonly topLeft: Alignment;
+  static readonly bottomLeft: Alignment;
+  static readonly topRight: Alignment;
+  static readonly bottomRight: Alignment;
+  static readonly centerRight: Alignment;
+  static readonly bottomCenter: Alignment;
+  static readonly centerLeft: Alignment;
+  static readonly topCenter: Alignment;
 }
 
 export declare interface TextOptions {

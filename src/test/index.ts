@@ -3,6 +3,7 @@ import ViewObject from "@/core/abstract/view-object";
 import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
 import Alignment from "@/core/lib/painting/alignment";
+import OffScreenCanvasFactory from "@/core/lib/plugins/offscreenCanvasFactory";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
 import SizeButton from "@/core/viewObject/buttons/sizeButton";
@@ -10,7 +11,13 @@ import Rectangle from "@/core/viewObject/graphics/rectangle";
 import Group from "@/core/viewObject/group";
 import TextArea from "@/core/viewObject/text/text-area";
 import WriteRect from "@/core/viewObject/write/rect";
-import { createGesti,importAll,exportAll,doCenter,loadToGesti } from "@/hooks/index";
+import {
+  createGesti,
+  importAll,
+  exportAll,
+  doCenter,
+  loadToGesti,
+} from "@/hooks/index";
 import Gesti, {
   CloseButton,
   HorizonButton,
@@ -36,7 +43,14 @@ offScreenCanvas.height = 500;
 const g = canvas.getContext("2d", {
   willReadFrequently: true,
 });
-
+Gesti.installPlugin("offScreenCanvasFactory",new OffScreenCanvasFactory({
+  generateOffScreenCanvas:(width, height)=>{
+      return new OffscreenCanvas(width,height);
+  },
+  generateOffScreenContext:(offScreenCanvas)=>{
+      return offScreenCanvas.getContext("2d");
+  },
+}))
 const offScreenPainter = offScreenCanvas.getContext("2d");
 const gesti = createGesti({
   dashedLine: false,
@@ -58,7 +72,7 @@ const ximage = new XImage({
   width: img2.width,
   height: img2.height,
   scale: 0.5,
-  url:img2.src,
+  url: img2.src,
 });
 
 const imageBox = new ImageBox(ximage);
@@ -105,47 +119,47 @@ const textBox = new TextBox(str1, {
 // controller.layerLower(textBox);
 // group.add(imageBox);
 // group.add(textBox2);
-const rect:Rectangle=new Rectangle({
-  width:100,
-  height:100,
-  backgroundColor:"skyblue",
-  gradient:new LineGradientDecoration(
-    {
-      colors:["white",'black','red'],
-      begin:{x:-50,y:-50},
-      end:{x:50,y:50}
-    }
-  ),
-  borderDecoration:{
-    borderWidth:10,
-    gradient:new LineGradientDecoration(
-      {
-        colors:["white",'black','red'],
-        begin:{x:-50,y:-50},
-        end:{x:50,y:50}
-      }
-    )
-  }
+const rect: Rectangle = new Rectangle({
+  width: 100,
+  height: 100,
+  decoration: {
+    backgroundColor: "skyblue",
+    gradient: new LineGradientDecoration({
+      colors: ["white", "black", "red"],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    }),
+  },
+  // borderDecoration:{
+  //   borderWidth:10,
+  //   gradient:new LineGradientDecoration(
+  //     {
+  //       colors:["white",'black','red'],
+  //       begin:Alignment.bottomLeft,
+  //       end:Alignment.centerRight,
+  //     }
+  //   )
+  // }
 });
-doCenter(rect)
-const drag=new DragButton({
-  buttonOption:{
-    alignment:Alignment.bottomRight
-  }
+doCenter(rect);
+const drag = new DragButton({
+  buttonOption: {
+    alignment: Alignment.bottomRight,
+  },
 });
 rect.installButton(drag);
-const align:Alignment=Alignment.bottomCenter.copyWithOffset({
-  offsetX:0,
-  offsetY:30,
-})
-console.log("卧槽",align)
-rect.installButton(new RotateButton(
-  {
-    alignment:align
-  }
-))
-console.log(drag)
-loadToGesti(rect)
+const align: Alignment = Alignment.bottomCenter.copyWithOffset({
+  offsetX: 0,
+  offsetY: 30,
+});
+console.log("卧槽", align);
+rect.installButton(
+  new RotateButton({
+    alignment: align,
+  })
+);
+console.log(drag);
+loadToGesti(rect);
 
 // const [close, onAddition] = controller.addWrite({
 //   type: "write",
