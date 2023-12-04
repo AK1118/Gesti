@@ -61,10 +61,7 @@ class Rect extends ObserverObj {
   private _deltaScale: number;
   private _absoluteScale: number = 1;
   public readonly key: string = Math.random().toString(16).substring(2);
-  constructor(
-    params?: RectParams,
-    key?: string,
-  ) {
+  constructor(params?: RectParams, key?: string) {
     super();
     const { width, height, x, y } = params || {
       x: 0,
@@ -81,14 +78,21 @@ class Rect extends ObserverObj {
       this.setAngle(params?.angle);
     }
   }
+  public get halfWidth(): number {
+    return this.size.width * 0.5;
+  }
+  public get halfHeight(): number {
+    return this.size.height * 0.5;
+  }
   public updateVertex(): void {
-    const half_w = this._size.width * 0.5,
-      half_h = this._size.height * 0.5;
-    this._vertex = new Vertex([
+    const half_w = this.halfWidth,
+      half_h = this.halfHeight;
+    if (!this._vertex) this._vertex = new Vertex();
+    this._vertex.updatePoints([
       [-half_w, -half_h],
-      [+half_w, -half_h],
-      [+half_w, +half_h],
-      [-half_w, +half_h],
+      [half_w, -half_h],
+      [half_w, half_h],
+      [-half_w, half_h],
     ]);
     this._vertex.rotate(this.getAngle, this);
   }

@@ -22,7 +22,7 @@ abstract class GraphicsBase<
 > extends ViewObject {
   constructor(option: T) {
     super();
-    this.option=option;
+    this.option = option;
     this.decoration = option?.decoration;
     // this.borderDecoration = option?.borderDecoration;
   }
@@ -33,46 +33,22 @@ abstract class GraphicsBase<
   protected borderDecoration: BorderDecoration;
   //渲染边框
   protected abstract renderGraphicsBorder(paint: Painter): void;
-  protected abstract renderGraphics(paint:Painter):void;
-  protected mountDecoration(paint: Painter): void {
-    
-  }
+  protected abstract renderGraphics(paint: Painter): void;
+  protected mountDecoration(paint: Painter): void {}
 
   protected mountBorderDecoration(paint: Painter): void {}
 }
 
-class Rectangle extends GraphicsBase<GenerateRectAngleOption>  {
-  
-  
+class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   family: ViewObjectFamily;
   constructor(option: GenerateRectAngleOption) {
     super(option);
     const { width, height } = option;
     this.rect.setSize(width, height);
+    this.useCache();
   }
   get value(): any {
     throw new Error("Method not implemented.");
-  }
-  private handlePaintingGradient(paint:Painter) {
-    const { backgroundColor, gradient } = this.decoration;
-    paint.beginPath();
-    paint.save();
-    paint.translate(this.width * 0.5, this.height * 0.5);
-    paint.fillStyle = backgroundColor ?? "black";
-    if (gradient) {
-      paint.fillStyle = gradient.getGradient(
-        paint,
-        this.size
-      );
-    }
-    paint.fillRect(
-      this.width * -0.5,
-      this.height * -0.5,
-      this.width,
-      this.height
-    );
-    paint.closePath();
-    paint.restore();
   }
   setDecoration(args: any): void {
     throw new Error("Method not implemented.");
@@ -85,7 +61,22 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption>  {
     throw new Error("Method not implemented.");
   }
   protected renderGraphics(paint: Painter): void {
-    
+    const { backgroundColor, gradient } = this.decoration;
+    paint.beginPath();
+    paint.save();
+    paint.translate(this.width * 0.5, this.height * 0.5);
+    paint.fillStyle = backgroundColor ?? "black";
+    if (gradient) {
+      paint.fillStyle = gradient.getGradient(paint, this.size);
+    }
+    paint.fillRect(
+      this.width * -0.5,
+      this.height * -0.5,
+      this.width,
+      this.height
+    );
+    paint.closePath();
+    paint.restore();
   }
   // protected renderBorder(paint: Painter): void {
   //   if (!this.borderDecoration) return;

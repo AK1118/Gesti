@@ -3,7 +3,7 @@ import ViewObject from "@/core/abstract/view-object";
 import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
 import Alignment from "@/core/lib/painting/alignment";
-import OffScreenCanvasFactory from "@/core/lib/plugins/offscreenCanvasFactory";
+import OffScreenCanvasGenerator from "@/core/lib/plugins/offScreenCanvasGenerator";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
 import SizeButton from "@/core/viewObject/buttons/sizeButton";
@@ -43,14 +43,17 @@ offScreenCanvas.height = 500;
 const g = canvas.getContext("2d", {
   willReadFrequently: true,
 });
-Gesti.installPlugin("offScreenCanvasFactory",new OffScreenCanvasFactory({
-  generateOffScreenCanvas:(width, height)=>{
-      return new OffscreenCanvas(width,height);
-  },
-  generateOffScreenContext:(offScreenCanvas)=>{
+Gesti.installPlugin(
+  "offScreenBuilder",
+  new OffScreenCanvasGenerator({
+    offScreenCanvasBuilder: (width, height) => {
+      return new OffscreenCanvas(width, height);
+    },
+    offScreenContextBuilder: (offScreenCanvas) => {
       return offScreenCanvas.getContext("2d");
-  },
-}))
+    },
+  })
+);
 const offScreenPainter = offScreenCanvas.getContext("2d");
 const gesti = createGesti({
   dashedLine: false,
@@ -75,7 +78,10 @@ const ximage = new XImage({
   url: img2.src,
 });
 
-const imageBox = new ImageBox(ximage);
+for (let i = 0; i < 1000; i++) {
+  const imageBox = new ImageBox(ximage);
+  loadToGesti(imageBox);
+}
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show 
  to explain how we recommend using Redux today. The show includes
@@ -105,7 +111,7 @@ const textBox = new TextBox(str1, {
   fontStyle: "italic",
   fontFamily: "楷体",
 });
-// loadToGesti(imageBox);
+
 // loadToGesti(textBox2);
 // loadToGesti(textBox);
 
@@ -141,6 +147,7 @@ const rect: Rectangle = new Rectangle({
   //   )
   // }
 });
+
 doCenter(rect);
 const drag = new DragButton({
   buttonOption: {

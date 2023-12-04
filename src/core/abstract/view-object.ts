@@ -7,7 +7,7 @@ import Button, { BaseButton } from "./baseButton";
 import OperationObserver from "./operation-observer";
 import AuxiliaryLine from "../../tools/auxiliary-lines";
 import GestiConfig from "../../config/gestiConfig";
-import {  ViewObjectFamily } from "../enums";
+import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
 import BaseViewObject from "./view-object-base";
@@ -20,14 +20,16 @@ import {
   ViewObjectImportImageBox,
 } from "@/types/serialization";
 import Platform from "../viewObject/tools/platform";
-//转换为json的类型
-// export type toJsonType = "image" | "text" | "write";
-
-// export interface toJSONInterface {
-//   viewObjType: toJsonType;
-//   options: Object;
-// }
-
+/**
+ *
+ * 缓存要做到 数据层缓存，渲染层缓存
+ * 如果没有缓存 =》 新建缓存  =》渲染缓存
+ * 如果有缓存 =》 渲染缓存
+ *
+ * 缓存包括数据有   rect,渲染层图片
+ *
+ *
+ */
 abstract class ViewObject extends BaseViewObject implements RenderObject {
   //辅助线
   private auxiliary: AuxiliaryLine;
@@ -69,7 +71,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.funcButton.push(button);
   }
   //安装多个按钮
-  public installMultipleButtons(buttons: Array<Button>):void {
+  public installMultipleButtons(buttons: Array<Button>): void {
     if (!Array.isArray(buttons))
       throw new Error("Must be a class Button Array.");
     buttons.forEach((_) => _.initialization(this));
@@ -79,43 +81,55 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.isMirror = !this.isMirror;
     return this.isMirror;
   }
-  public render(paint: Painter, isCache?: boolean) {
-    if (!this.mounted) return;
-    this.draw(paint, isCache);
-  }
 
   abstract setDecoration(args: any): void;
 
-  private renderCache(paint: Painter) {
-    this.drawImage(paint);
+  public render(paint: Painter, isCache?: boolean) {
+    if (!this.mounted) return;
+    /*更新顶点数据*/
+    if(this.didChanged){
+      this.rect.updateVertex();
+      this.reBuild();
+    }
+    //使用缓存
+    if (this.isUseRenderCache) {
+      //没有初始化
+      if (!this.offScreenCreated) {
+        const created = this.generateOffScreenCanvas();
+        //创建离屏失败，关闭缓存渲染
+        if (!created) this.unUseCache();
+        this.drawImage(this.offScreenPainter);
+      }
+    }
+    this.draw(paint, isCache);
   }
 
+  /**
+   * @description 实时渲染或者渲染缓存
+   * @param paint
+   */
+  private renderImageOrCache(paint: Painter) {
+    if (this.canRenderCache)
+      paint.drawImage(this.offScreenCanvas, 0, 0, this.width, this.height);
+    else this.drawImage(paint);
+  }
   public draw(paint: Painter, isCache?: boolean): void {
     //渲染缓存不需要设置或渲染其他属性
-    if (isCache) return this.renderCache(paint);
     paint.beginPath();
     paint.save();
     //缓存不需要这两个
-    paint.translate(this.rect.position.x, this.rect.position.y);
+    paint.translate(this.positionX, this.positionY);
     paint.rotate(this.rect.getAngle);
     if (this.isMirror) paint.scale(-1, 1);
     paint.globalAlpha = this.opacity;
-    this.drawImage(paint);
-    paint.globalAlpha = 1;
-    if (this.isMirror) paint.scale(-1, 1);
+    this.renderImageOrCache(paint);
     if (this.selected) {
       //边框
       this.drawSelectedBorder(paint, this.size);
       //按钮
       this.updateFuncButton(paint);
-    } else {
-      //根据配置开关虚线框
-      // if (GestiConfig.dashedLine) this.strokeDashBorder(paint);
     }
     paint.restore();
-    paint.translate(0, 0);
-    /*更新顶点数据*/
-    this.rect.updateVertex();
     paint.closePath();
   }
   /**
@@ -129,13 +143,13 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    */
   private readonly borderColor: string = "#b2ccff";
   public drawSelectedBorder(paint: Painter, size: Size): void {
-    const padding =3;
+    const padding = 3;
     paint.beginPath();
     paint.lineWidth = 1;
     paint.strokeStyle = this.borderColor;
     paint.strokeRect(
-      (this.width + padding)*-.5,
-      (this.height + padding)*-.5,
+      (this.width + padding) * -0.5,
+      (this.height + padding) * -0.5,
       this.width + padding,
       this.height + padding
     );

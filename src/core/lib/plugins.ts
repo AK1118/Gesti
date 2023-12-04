@@ -7,7 +7,7 @@ import { PluginKeys } from "@/types/index";
 class Plugins{
     private static plugins:Record<PluginKeys,any>={
         "pako":null,
-        "offScreenCanvasFactory":null,
+        "offScreenBuilder":null,
     };
     public static getPluginByKey(key:PluginKeys){
         return this.plugins[key];

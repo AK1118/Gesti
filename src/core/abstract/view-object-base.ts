@@ -11,30 +11,61 @@ import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
 import { ViewObjectExportEntity } from "@/types/serialization";
+import {
+  getOffscreenCanvasContext,
+  getOffscreenCanvasWidthPlatform,
+} from "@/utils/canvas";
 // import { ViewObjectExportEntity } from "@/types/index";
 
 /**
  * 图层基类
  */
 abstract class BaseViewObject extends OperationObserver {
-  // protected offScreenCanvas;
-  // protected offScreenPainter: Painter;
-  // private _isCache: boolean;
-  // protected get isUseCache(): boolean {
-  //   return (
-  //     this._isCache &&
-  //     this.offScreenCanvas != null &&
-  //     this.offScreenPainter != null
-  //   );
-  // }
-  // public useCache(): void {
-  //   this._isCache = true;
-  // }
-  // public unUseCache(): void {
-  //   this._isCache = false;
-  //   this.offScreenCanvas = null;
-  //   this.offScreenPainter = null;
-  // }
+  protected offScreenCanvas;
+  protected offScreenPainter: Painter;
+  private _isCache: boolean = false;
+  private _didChanged: boolean = false;
+  protected get canRenderCache(): boolean {
+    return this._isCache && this.offScreenCreated;
+  }
+  protected get offScreenCreated(): boolean {
+    return this.offScreenCanvas != null && this.offScreenPainter != null;
+  }
+  protected get isUseRenderCache(): boolean {
+    return this._isCache;
+  }
+  protected get didChanged(): boolean {
+    return this._didChanged;
+  }
+  protected _didChangedAll(): void {
+    this._didChanged = true;
+  }
+  protected reBuild(): void {
+    this._didChanged = false;
+  }
+  public useCache(): void {
+    this._isCache = true;
+  }
+  public generateOffScreenCanvas(): boolean {
+    this.offScreenCanvas = getOffscreenCanvasWidthPlatform(
+      this.width,
+      this.height
+    );
+    this.offScreenPainter = getOffscreenCanvasContext(this.offScreenCanvas);
+    return this.offScreenCanvas != null && this.offScreenPainter != null;
+  }
+  public unUseCache(): void {
+    this._isCache = false;
+    this.offScreenCanvas = null;
+    this.offScreenPainter = null;
+  }
+  public get halfWidth(): number {
+    return this.rect.halfWidth;
+  }
+  public get halfHeight(): number {
+    return this.rect.halfHeight;
+  }
+  // protected renderCache(painter: Painter): void {}
 
   //是否挂载到Gesti
   private _mounted: boolean = false;

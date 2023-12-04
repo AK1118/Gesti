@@ -1,17 +1,17 @@
 import Painter from "@/core/lib/painter";
 import Plugins from "@/core/lib/plugins";
-import OffScreenCanvasFactory from "@/core/lib/plugins/offscreenCanvasFactory";
+import OffScreenCanvasGenerator from "@/core/lib/plugins/offScreenCanvasGenerator";
 import Platform from "@/core/viewObject/tools/platform";
 
-const offScreenCanvasFactory: OffScreenCanvasFactory = Plugins.getPluginByKey(
-  "offScreenCanvasFactory"
+const offScreenContextBuilder: OffScreenCanvasGenerator = Plugins.getPluginByKey(
+  "offScreenBuilder"
 );
 const getOffscreenCanvasWidthPlatform = (
   width: number,
   height: number
 ): any => {
-  if (offScreenCanvasFactory)
-    return offScreenCanvasFactory.getOffScreenCanvas(width, height);
+  if (offScreenContextBuilder)
+    return offScreenContextBuilder.buildOffScreenCanvas(width, height);
   if (Platform.isBrowser) return new OffscreenCanvas(width, height);
   if (Platform.isWeChatMiniProgram)
     return wx.createOffscreenCanvas({
@@ -34,15 +34,15 @@ const getOffscreenCanvasWidthPlatform = (
     !Platform.isTikTok
   ) {
     throw new Error(
-      "Regrettably, your platform lacks support for OffscreenCanvas in [Gesti]. To remedy this, consider utilizing the Gesti.installPlugin method and installing the OffScreenCanvasFactory plugin. This will enable the custom generation of OffscreenCanvas, enhancing functionality on your platform."
+      "Regrettably, your platform lacks support for OffscreenCanvas in [Gesti]. To remedy this, consider utilizing the Gesti.installPlugin method and installing the offScreenContextBuilder plugin. This will enable the custom generation of OffscreenCanvas, enhancing functionality on your platform."
     );
   }
   return null;
 };
 
 const getOffscreenCanvasContext = (offCanvas): Painter => {
-  if (offScreenCanvasFactory)
-    return offScreenCanvasFactory.getOffScreenContext(OffscreenCanvas);
+  if (offScreenContextBuilder)
+    return offScreenContextBuilder.buildOffScreenContext(OffscreenCanvas);
   const paint = offCanvas.getContext("2d");
   return new Painter(paint);
 };
@@ -53,8 +53,18 @@ const waitingLoadImg = (img): Promise<void> => {
   });
 };
 
+
+const getImage=(offScreenCanvas:any):HTMLImageElement|any=>{
+  if(offScreenContextBuilder){
+    return offScreenContextBuilder.buildImage(offScreenCanvas);
+  }
+  if(Platform.isBrowser)return new Image();
+  return null;
+}
+
 export {
   getOffscreenCanvasWidthPlatform,
   getOffscreenCanvasContext,
+  getImage,
   waitingLoadImg,
 };

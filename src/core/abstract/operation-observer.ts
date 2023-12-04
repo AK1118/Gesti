@@ -213,6 +213,7 @@ abstract class OperationObserver {
       default: {
       }
     }
+    this._didChangedAll();
   }
   //移除观察者
   public removeObserver() {
@@ -233,6 +234,8 @@ abstract class OperationObserver {
   protected didAddPosition(delta: Vector): void {}
   protected beforeAddPosition(delta: Vector): void {}
   protected _didAddPosition(delta: Vector): void {}
+  //改变任意数据时
+  protected _didChangedAll():void{}
 }
 
 export default OperationObserver;

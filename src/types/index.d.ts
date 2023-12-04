@@ -7,10 +7,11 @@
 
 import { ViewObjectExportBaseInfo } from "Serialization";
 
-export declare type PluginKeys = "pako"|"offScreenCanvasFactory";
-export declare interface OffScreenCanvasFactoryOption{
-  generateOffScreenCanvas:(width:number,height:number)=>any;
-  generateOffScreenContext:(offScreenCanvas:any)=>any;
+export declare type PluginKeys = "pako"|"offScreenBuilder";
+export declare interface OffScreenCanvasBuilderOption{
+  offScreenCanvasBuilder:(width:number,height:number)=>any;
+  offScreenContextBuilder:(offScreenCanvas:any)=>any;
+  imageBuilder?:(offScreenCanvas:any)=>HTMLImageElement|any;
 }
 declare class Vector {
   x: number;
