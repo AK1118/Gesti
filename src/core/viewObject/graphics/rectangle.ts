@@ -1,4 +1,5 @@
 import ViewObject from "@/core/abstract/view-object";
+import GraphicsBase from "@/core/bases/graphics-base";
 import Painter from "@/core/lib/painter";
 import { ViewObjectFamily } from "@/index";
 import {
@@ -13,31 +14,6 @@ import {
   BoxDecoration,
 } from "Graphics";
 import { ViewObjectExportEntity } from "Serialization";
-
-/**
- *
- */
-abstract class GraphicsBase<
-  T extends GenerateGraphicsOption
-> extends ViewObject {
-  constructor(option: T) {
-    super();
-    this.option = option;
-    this.decoration = option?.decoration;
-    // this.borderDecoration = option?.borderDecoration;
-  }
-  protected option: T;
-  //主题装饰
-  protected decoration: BoxDecoration;
-  //边框装饰
-  protected borderDecoration: BorderDecoration;
-  //渲染边框
-  protected abstract renderGraphicsBorder(paint: Painter): void;
-  protected abstract renderGraphics(paint: Painter): void;
-  protected mountDecoration(paint: Painter): void {}
-
-  protected mountBorderDecoration(paint: Painter): void {}
-}
 
 class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   family: ViewObjectFamily;
@@ -64,17 +40,26 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
     const { backgroundColor, gradient } = this.decoration;
     paint.beginPath();
     paint.save();
-    paint.translate(this.width * 0.5, this.height * 0.5);
     paint.fillStyle = backgroundColor ?? "black";
-    if (gradient) {
-      paint.fillStyle = gradient.getGradient(paint, this.size);
+    if (this.canRenderCache) {
+      if (gradient) {
+        paint.fillStyle = gradient.getGradient(paint, this.size);
+      }
+      paint.translate(this.width * 0.5, this.height * 0.5);
+      paint.fillRect(
+        this.width * -0.5,
+        this.height * -0.5,
+        this.width,
+        this.height
+      );
+    } else {
+      paint.fillRect(
+        this.width * -0.5,
+        this.height * -0.5,
+        this.width,
+        this.height
+      );
     }
-    paint.fillRect(
-      this.width * -0.5,
-      this.height * -0.5,
-      this.width,
-      this.height
-    );
     paint.closePath();
     paint.restore();
   }

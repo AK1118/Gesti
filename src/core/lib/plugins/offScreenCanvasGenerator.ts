@@ -5,7 +5,9 @@ class OffScreenCanvasBuilder {
   private offScreenCanvasBuilder: (width: number, height: number) => any;
   private offScreenContextBuilder: (offScreenCanvas: any) => any;
   private imageBuilder: (offScreenCanvas: any) => HTMLImageElement | any;
-  private paintBuilder:()=>Painter;
+  private paintBuilder: () =>
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D;
   constructor(option: OffScreenCanvasBuilderOption) {
     this.offScreenCanvasBuilder =
       option?.offScreenCanvasBuilder ||
@@ -14,7 +16,7 @@ class OffScreenCanvasBuilder {
       option?.offScreenContextBuilder || (() => null);
     this.imageBuilder =
       option?.imageBuilder || ((offScreenCanvas: any) => null);
-    this.paintBuilder=option.paintBuilder||(()=>null);
+    this.paintBuilder = option.paintBuilder || (() => null);
   }
   public buildOffScreenCanvas(width: number, height: number): any {
     return this.offScreenCanvasBuilder?.(width, height);
@@ -27,8 +29,10 @@ class OffScreenCanvasBuilder {
     if (!paint) return null;
     return new Painter(paint as any);
   }
-  public buildPaintContext():Painter{
-    return this.paintBuilder();
+  public buildPaintContext(): Painter {
+    const paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D =
+      this.paintBuilder();
+    return new Painter(paint);
   }
 }
 

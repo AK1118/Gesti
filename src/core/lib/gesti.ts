@@ -40,7 +40,7 @@ class Gesti {
     if (!option) throw Error("The option is should not undefined.");
     if (!option.renderContext)
       throw Error("RenderContext must not be undefined.");
-    if (option.rect.canvasWidth === 0 || option.rect.canvasHeight) throw Error("Both 'canvasWidth' and 'canvasHeight' must be non-zero.");
+    if (option.rect.canvasWidth === 0 || option.rect.canvasHeight===0) throw Error("Both 'canvasWidth' and 'canvasHeight' must be non-zero.");
     this._controller && this.dispose();
     if (option.rect) this.kit = new ImageToolkit(option);
     return this.controller;

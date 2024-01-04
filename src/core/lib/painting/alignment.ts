@@ -1,17 +1,17 @@
-class Alignment{
+class Alignment {
   private x: number;
   private y: number;
-  private offset:Offset={
-    offsetX:0,
-    offsetY:0,
+  private offset: Offset = {
+    offsetX: 0,
+    offsetY: 0,
   };
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
 
-  public copyWithOffset(offset:Offset){
-    this.offset=offset;
+  public copyWithOffset(offset: Offset) {
+    this.offset = offset;
     return this;
   }
 
@@ -32,11 +32,11 @@ class Alignment{
    * @return Size
    */
   public compute(size: Size): Offset {
-    const halfWidthDelta=size.width*.5;
-    const halfHeighDelta=size.width*.5;
+    const halfWidthDelta = size.width * 0.5;
+    const halfHeighDelta = size.height * 0.5;
     return {
-      offsetX:halfWidthDelta * this.x+this.offset.offsetX, 
-      offsetY:halfHeighDelta * this.y+this.offset.offsetY,
+      offsetX: halfWidthDelta * this.x + this.offset.offsetX,
+      offsetY: halfHeighDelta * this.y + this.offset.offsetY,
     };
   }
 }

@@ -44,7 +44,7 @@ const getOffscreenCanvasContext = (offCanvas): Painter => {
   const offScreenContextBuilder: OffScreenCanvasGenerator =
   Plugins.getPluginByKey("offScreenBuilder");
   if (offScreenContextBuilder)
-    return offScreenContextBuilder.buildOffScreenContext(OffscreenCanvas);
+    return offScreenContextBuilder.buildOffScreenContext(offCanvas);
   const paint = offCanvas.getContext("2d");
   return new Painter(paint);
 };

@@ -1,4 +1,4 @@
-import {  FuncButtonTrigger } from "@/core/enums";
+import { FuncButtonTrigger } from "@/core/enums";
 import RenderObject from "../interfaces/render-object";
 import Painter from "@/core/lib/painter";
 import CatchPointUtil from "../../utils/event/catchPointUtil";
@@ -19,7 +19,7 @@ export abstract class BaseButton implements RenderObject {
     color: "#c1c1c1",
     size: 10,
   });
-  public iconColor:string="#c1c1c1";
+  public iconColor: string = "#c1c1c1";
   //自定义位置
   private customAlignment: Alignment;
   /**
@@ -35,7 +35,6 @@ export abstract class BaseButton implements RenderObject {
   constructor(option?: ButtonOption) {
     if (!option) return;
     this.customAlignment = option?.alignment;
-    console.log(this.customAlignment);
     this.customIcon = option?.icon;
   }
   protected abstract buttonAlignment: Alignment;
@@ -178,9 +177,11 @@ export abstract class BaseButton implements RenderObject {
     //如果没有自定义位置，就使用自己的位置
     const location = _location ?? this.buttonAlignment;
     this.buttonAlignment = location;
-    const {offsetX,offsetY}:Offset=this.buttonAlignment.compute(this.master.size);
-    console.log(offsetX,offsetY);
-    return [offsetX,offsetY];
+    const { offsetX, offsetY }: Offset = this.buttonAlignment.compute(
+      this.master.size
+    );
+    // console.log(offsetX,offsetY);
+    return [offsetX, offsetY];
   }
   /**
    * @description 根据父Box的大小宽度比作为基础定位
@@ -188,7 +189,7 @@ export abstract class BaseButton implements RenderObject {
    */
   private computeRelativePositionByLocation() {
     const { width, height } = this.master.rect.size;
-    const {offsetX,offsetY}= this.buttonAlignment.compute(this.master.size);
+    const { offsetX, offsetY } = this.buttonAlignment.compute(this.master.size);
     // const [cx, cy] = this.getFixedLocationPosition(
     //   this.buttonAlignment,
     //   width,
@@ -238,10 +239,10 @@ export abstract class BaseButton implements RenderObject {
     this.icon.setSize(this.radius);
     this.reset();
   }
-  
+
   //设置Icon颜色
   public setIconColor(color: string) {
-    this.iconColor=color;
+    this.iconColor = color;
     this.icon.setColor(color);
   }
   /**

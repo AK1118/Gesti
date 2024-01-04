@@ -107,9 +107,9 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * @param paint
    */
   private renderImageOrCache(paint: Painter) {
-    if (this.canRenderCache)
+    if (this.canRenderCache) {
       paint.drawImage(this.offScreenCanvas, 0, 0, this.width, this.height);
-    else this.drawImage(paint);
+    } else this.drawImage(paint);
   }
   public draw(paint: Painter, isCache?: boolean): void {
     //渲染缓存不需要设置或渲染其他属性

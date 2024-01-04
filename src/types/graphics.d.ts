@@ -50,4 +50,8 @@ declare module "Graphics" {
     width: number;
     height: number;
   }
+
+  interface GenerateCircleOption extends GenerateGraphicsOption {
+    radius: number;
+  }
 }

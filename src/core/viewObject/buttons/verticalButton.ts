@@ -14,6 +14,9 @@ class VerticalButton extends SizeButton {
     const _location=location==="top"?Alignment.topCenter:Alignment.bottomCenter;
     super(_location||Alignment.bottomCenter,option);
   }
+  public onUpWithInner(): void {
+    this.computeSelfLocation();
+  }
   protected icon: Icon=new DefaultIcon();
   // effect(currentButtonRect?: Rect): void {
   //   const mag = this.getButtonWidthMasterMag(currentButtonRect);
