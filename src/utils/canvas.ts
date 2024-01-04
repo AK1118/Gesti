@@ -3,13 +3,13 @@ import Plugins from "@/core/lib/plugins";
 import OffScreenCanvasGenerator from "@/core/lib/plugins/offScreenCanvasGenerator";
 import Platform from "@/core/viewObject/tools/platform";
 
-const offScreenContextBuilder: OffScreenCanvasGenerator = Plugins.getPluginByKey(
-  "offScreenBuilder"
-);
+
 const getOffscreenCanvasWidthPlatform = (
   width: number,
   height: number
 ): any => {
+  const offScreenContextBuilder: OffScreenCanvasGenerator =
+  Plugins.getPluginByKey("offScreenBuilder");
   if (offScreenContextBuilder)
     return offScreenContextBuilder.buildOffScreenCanvas(width, height);
   if (Platform.isBrowser) return new OffscreenCanvas(width, height);
@@ -41,6 +41,8 @@ const getOffscreenCanvasWidthPlatform = (
 };
 
 const getOffscreenCanvasContext = (offCanvas): Painter => {
+  const offScreenContextBuilder: OffScreenCanvasGenerator =
+  Plugins.getPluginByKey("offScreenBuilder");
   if (offScreenContextBuilder)
     return offScreenContextBuilder.buildOffScreenContext(OffscreenCanvas);
   const paint = offCanvas.getContext("2d");
@@ -53,18 +55,26 @@ const waitingLoadImg = (img): Promise<void> => {
   });
 };
 
-
-const getImage=(offScreenCanvas:any):HTMLImageElement|any=>{
-  if(offScreenContextBuilder){
+const getImage = (offScreenCanvas: any): HTMLImageElement | any => {
+  const offScreenContextBuilder: OffScreenCanvasGenerator =
+  Plugins.getPluginByKey("offScreenBuilder");
+  if (offScreenContextBuilder) {
     return offScreenContextBuilder.buildImage(offScreenCanvas);
   }
-  if(Platform.isBrowser)return new Image();
+  if (Platform.isBrowser) return new Image();
   return null;
-}
+};
+
+const getPaintContext = (): Painter => {
+  const offScreenContextBuilder: OffScreenCanvasGenerator =
+  Plugins.getPluginByKey("offScreenBuilder");
+  return offScreenContextBuilder.buildPaintContext();
+};
 
 export {
   getOffscreenCanvasWidthPlatform,
   getOffscreenCanvasContext,
   getImage,
   waitingLoadImg,
+  getPaintContext,
 };

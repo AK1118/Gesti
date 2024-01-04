@@ -1,5 +1,4 @@
 import Button, { BaseButton } from "../abstract/baseButton";
-import { RecordNode } from "../abstract/operation-observer";
 import ViewObject from "../abstract/view-object";
 import CatchPointUtil from "../../utils/event/catchPointUtil";
 import Drag from "../../utils/event/drag";
@@ -7,7 +6,6 @@ import { FuncButtonTrigger, ViewObjectFamily } from "../enums";
 import GestiEventManager, { GestiEvent } from "../../utils/event/event";
 import Gesture from "../../utils/event/gesture";
 import GestiController from "../interfaces/gesticontroller";
-import RecorderInterface from "../interfaces/recorder";
 import Painter from "./painter";
 import GestiReaderH5 from "../../utils/reader/reader-H5";
 import Rect from "./rect";
@@ -928,39 +926,39 @@ class _Tools {
    * @param kit
    * @returns
    */
-  public fallbackViewObject(
-    ViewObjectList: Array<ViewObject>,
-    node: RecordNode,
-    kit: ImageToolkit
-  ) {
-    if (node == null) return;
-    const obj: ViewObject = ViewObjectList.find((item: ViewObject) => {
-      return item.key == node.key;
-    });
-    if (obj) {
-      switch (node.type) {
-        case "position":
-          obj.rect.position = node.data;
-          break;
-        case "angle":
-          obj.setAngle(node.data);
-          break;
-        case "scale":
-          obj.setDeltaScale(node.data);
-          break;
-        case "size":
-          obj.rect.setSize(node.data.width, node.data.height);
-          break;
-        case "drag":
-          {
-            obj.rect.setSize(node.data.size.width, node.data.size.height);
-            obj.rect.setAngle(node.data.angle);
-          }
-          break;
-      }
-      obj.didFallback();
-    }
-    kit.render();
-  }
+  // public fallbackViewObject(
+  //   ViewObjectList: Array<ViewObject>,
+  //   node: ab,
+  //   kit: ImageToolkit
+  // ) {
+  //   if (node == null) return;
+  //   const obj: ViewObject = ViewObjectList.find((item: ViewObject) => {
+  //     return item.key == node.key;
+  //   });
+  //   if (obj) {
+  //     switch (node.type) {
+  //       case "position":
+  //         obj.rect.position = node.data;
+  //         break;
+  //       case "angle":
+  //         obj.setAngle(node.data);
+  //         break;
+  //       case "scale":
+  //         obj.setDeltaScale(node.data);
+  //         break;
+  //       case "size":
+  //         obj.rect.setSize(node.data.width, node.data.height);
+  //         break;
+  //       case "drag":
+  //         {
+  //           obj.rect.setSize(node.data.size.width, node.data.size.height);
+  //           obj.rect.setAngle(node.data.angle);
+  //         }
+  //         break;
+  //     }
+  //     obj.didFallback();
+  //   }
+  //   kit.render();
+  // }
 }
 export default ImageToolkit;

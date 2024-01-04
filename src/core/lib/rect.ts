@@ -1,5 +1,4 @@
 import { ObserverObj, OperationType } from "../abstract/operation-observer";
-import RecorderInterface from "../interfaces/recorder";
 import Vector from "./vector";
 import Vertex from "./vertex";
 
@@ -60,6 +59,11 @@ class Rect extends ObserverObj {
   private _size: Size;
   private _deltaScale: number;
   private _absoluteScale: number = 1;
+  //宽度的绝对增长倍数
+  private _scaleWidth: number = 1;
+  private _scaleHeight: number = 1;
+  private _preScaleWidth: number = 1;
+  private _preScaleHeight: number = 1;
   public readonly key: string = Math.random().toString(16).substring(2);
   constructor(params?: RectParams, key?: string) {
     super();
@@ -116,6 +120,28 @@ class Rect extends ObserverObj {
   }
   public get getAngle(): number {
     return this._angle;
+  }
+  get scaleWidth(): number {
+    return this._scaleWidth;
+  }
+  get scaleHeight(): number {
+    return this._scaleHeight;
+  }
+  public setScaleWidth(scale: number): void {
+    if (this._preScaleWidth.toFixed(2) === scale.toFixed(2)) return;
+    this._scaleWidth = scale;
+    // this._didChangeScaleWidth();
+    // this.didChangeScaleWidth();
+    this.report(scale,"sizeScaleWidth");
+    this._preScaleWidth = scale;
+  }
+  public setScaleHeight(scale: number): void {
+    if (this._preScaleHeight.toFixed(2) === scale.toFixed(2)) return;
+    this._scaleHeight = scale;
+    // this._didChangeScaleHeight();
+    // this.didChangeScaleHeight();
+    this.report(scale,"sizeScaleHeight");
+    this._preScaleHeight = scale;
   }
   public set position(position: Vector) {
     if (position.equals(this.position)) return;

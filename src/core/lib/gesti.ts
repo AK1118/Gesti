@@ -31,10 +31,16 @@ class Gesti {
     return [gesti, controller];
   }
 
+  /**
+   *
+   * @param option
+   * @returns
+   */
   public initialization(option: InitializationOption): GestiController {
     if (!option) throw Error("The option is should not undefined.");
     if (!option.renderContext)
       throw Error("RenderContext must not be undefined.");
+    if (option.rect.canvasWidth === 0 || option.rect.canvasHeight) throw Error("Both 'canvasWidth' and 'canvasHeight' must be non-zero.");
     this._controller && this.dispose();
     if (option.rect) this.kit = new ImageToolkit(option);
     return this.controller;
@@ -89,8 +95,8 @@ class Gesti {
 
   /**
    * @description 安装预设插件
-   * @param key 
-   * @param plugin 
+   * @param key
+   * @param plugin
    */
   public static installPlugin(key: PluginKeys, plugin: any): void {
     Plugins.installPlugin(key, plugin);

@@ -37,8 +37,6 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
 
   constructor() {
     super();
-    this.rect = Rect.zero;
-    this.relativeRect = Rect.zero;
   }
 
   //获取对象值
@@ -49,7 +47,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     //初始化一些数据，准备挂载
     this.ready(kit);
     //添加监听
-    this.addObserver(this);
+    this.addObserver(this.renderBox);
     //初始化矩阵点
     this.rect.updateVertex();
     //挂载
@@ -87,7 +85,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   public render(paint: Painter, isCache?: boolean) {
     if (!this.mounted) return;
     /*更新顶点数据*/
-    if(this.didChanged){
+    if (this.didChanged) {
       this.rect.updateVertex();
       this.reBuild();
     }
@@ -299,7 +297,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    */
     const deltaWidth = this.width / this.absoluteScale,
       deltaHeight = this.height / this.absoluteScale;
-    this.setScaleWidth(deltaWidth / this.fixedSize.width);
+    this.renderBox.setScaleWidth(deltaWidth / this.fixedSize.width);
     this.setScaleHeight(deltaHeight / this.fixedSize.height);
   }
   protected _didChangePosition(position: Vector): void {
@@ -366,17 +364,8 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    */
   public custom() {}
 
-  public setPosition(x: number, y: number): void {
-    this.rect.setPosition(new Vector(x, y));
-  }
-  public addPosition(deltaX: number, deltaY: number) {
-    this.rect.addPosition(new Vector(deltaX, deltaY));
-  }
   public setOpacity(opacity: number): void {
     this.opacity = opacity;
-  }
-  public setAngle(angle: number) {
-    this.rect.setAngle(angle);
   }
 }
 

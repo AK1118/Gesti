@@ -5,8 +5,6 @@ import Vector from "../lib/vector";
 import { Point } from "../lib/vertex";
 import Button from "./baseButton";
 import OperationObserver from "./operation-observer";
-import AuxiliaryLine from "../../tools/auxiliary-lines";
-import GestiConfig from "../../config/gestiConfig";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
@@ -15,12 +13,17 @@ import {
   getOffscreenCanvasContext,
   getOffscreenCanvasWidthPlatform,
 } from "@/utils/canvas";
-// import { ViewObjectExportEntity } from "@/types/index";
+import RenderBox from "../lib/rendering/renderbox";
+
+class ViewObjectRenderBox extends RenderBox{
+  
+}
 
 /**
  * 图层基类
  */
-abstract class BaseViewObject extends OperationObserver {
+abstract class BaseViewObject extends OperationObserver  {
+  public renderBox: RenderBox = new ViewObjectRenderBox();
   protected offScreenCanvas;
   protected offScreenPainter: Painter;
   private _isCache: boolean = false;
@@ -48,8 +51,8 @@ abstract class BaseViewObject extends OperationObserver {
   }
   public generateOffScreenCanvas(): boolean {
     this.offScreenCanvas = getOffscreenCanvasWidthPlatform(
-      this.width,
-      this.height
+      this.renderBox.width,
+      this.renderBox.height,
     );
     this.offScreenPainter = getOffscreenCanvasContext(this.offScreenCanvas);
     return this.offScreenCanvas != null && this.offScreenPainter != null;
@@ -59,13 +62,7 @@ abstract class BaseViewObject extends OperationObserver {
     this.offScreenCanvas = null;
     this.offScreenPainter = null;
   }
-  public get halfWidth(): number {
-    return this.rect.halfWidth;
-  }
-  public get halfHeight(): number {
-    return this.rect.halfHeight;
-  }
-  // protected renderCache(painter: Painter): void {}
+ 
 
   //是否挂载到Gesti
   private _mounted: boolean = false;
@@ -79,10 +76,6 @@ abstract class BaseViewObject extends OperationObserver {
   protected isMirror: boolean = false;
   //是否隐藏
   public disabled: boolean = false;
-  //描述对象在二维坐标中的平面信息数据
-  private _rect: Rect;
-  //相对于自身描述对象在二维坐标中的平面信息数据
-  private _relativeRect: Rect;
   //不透明度
   public opacity: number = 1;
   //按钮数组，所安装的按钮都在里面
@@ -108,9 +101,7 @@ abstract class BaseViewObject extends OperationObserver {
   protected kit: ImageToolkit;
   //对象层级 => 对象在数组中的位置
   private layer: number = 0;
-  //宽度的绝对增长倍数
-  private _scaleWidth: number = 1;
-  private _scaleHeight: number = 1;
+
   //初始化时的尺寸，用于计算scaleWidth,和scaleHeight
   private _fixedSize: Size = Size.zero;
   get fixedSize(): Size {
@@ -156,19 +147,6 @@ abstract class BaseViewObject extends OperationObserver {
     return this._mounted;
   }
 
-  set relativeRect(value: Rect) {
-    this._relativeRect = value;
-  }
-  get relativeRect(): Rect {
-    return this._relativeRect;
-  }
-  set rect(value: Rect) {
-    this._rect = value;
-    this.relativeRect = value;
-  }
-  get rect(): Rect {
-    return this._rect;
-  }
   public toBackground(): void {
     this._background = true;
   }
@@ -209,46 +187,7 @@ abstract class BaseViewObject extends OperationObserver {
       button.disabled = button.isFree;
     });
   }
-  get size(): Size {
-    return this.rect.size;
-  }
-  public get position(): Vector {
-    return this.rect.position;
-  }
-  get width(): number {
-    return this.size.width;
-  }
-  get height(): number {
-    return this.size.height;
-  }
-  get positionX(): number {
-    return this.position.x;
-  }
-  get positionY(): number {
-    return this.position.y;
-  }
-  get scaleWidth(): number {
-    return this._scaleWidth;
-  }
-  get scaleHeight(): number {
-    return this._scaleHeight;
-  }
-  private preScaleWidth: number = 1;
-  private preScaleHeight: number = 1;
-  public setScaleWidth(scale: number): void {
-    if (this.preScaleWidth.toFixed(2) === scale.toFixed(2)) return;
-    this._scaleWidth = scale;
-    this._didChangeScaleWidth();
-    this.didChangeScaleWidth();
-    this.preScaleWidth = scale;
-  }
-  public setScaleHeight(scale: number): void {
-    if (this.preScaleHeight.toFixed(2) === scale.toFixed(2)) return;
-    this._scaleHeight = scale;
-    this._didChangeScaleHeight();
-    this.didChangeScaleHeight();
-    this.preScaleHeight = scale;
-  }
+
   protected preWhRatio: number = 0;
   protected preHwRatio: number = 0;
   //设置大小
@@ -257,10 +196,10 @@ abstract class BaseViewObject extends OperationObserver {
     if (this._fixedSize.equals(Size.zero)) {
       this.setFixedSize(size);
     }
-    this.rect.setSize(width ?? this.width, height ?? this.height);
+    this.renderBox.rect.setSize(width ?? this.renderBox.width, height ?? this.renderBox.height);
   }
   public get absoluteScale(): number {
-    return this.rect.absoluteScale;
+    return this.renderBox.absoluteScale;
   }
   /**
    * 被加入gesti内时调用
@@ -301,14 +240,65 @@ abstract class BaseViewObject extends OperationObserver {
   protected didEventUpWithInner(): void {}
   //手指抬起在范围外时调用
   protected didEventUpWithOuter(): void {}
+    
+  set rect(newRect:Rect){
+    this.renderBox.rect=newRect;
+  }
 
-  protected didChangeScaleWidth(): void {}
-
-  protected didChangeScaleHeight(): void {}
-
-  protected _didChangeScaleWidth(): void {}
-
-  protected _didChangeScaleHeight(): void {}
+  get rect(): Rect {
+    return this.renderBox.rect;
+  }
+  set relativeRect(value: Rect) {
+    this.renderBox.relativeRect = value;
+  }
+  get relativeRect(): Rect {
+    return this.renderBox.relativeRect;
+  }
+  get size(): Size {
+    return this.rect.size;
+  }
+  public get position(): Vector {
+    return this.rect.position;
+  }
+  get width(): number {
+    return this.size.width;
+  }
+  get height(): number {
+    return this.size.height;
+  }
+  get positionX(): number {
+    return this.position.x;
+  }
+  get positionY(): number {
+    return this.position.y;
+  }
+  public get halfWidth(): number {
+    return this.rect.halfWidth;
+  }
+  public get halfHeight(): number {
+    return this.rect.halfHeight;
+  }
+  get scaleWidth():number{
+    return this.rect.scaleWidth;
+  }
+  get scaleHeight():number{
+    return this.rect.scaleHeight;
+  }
+  public setScaleWidth(scale:number){
+    this.rect.setScaleWidth(scale);
+  }
+  public setScaleHeight(scale:number){
+    this.rect.setScaleHeight(scale);
+  }
+  public setPosition(x: number, y: number): void {
+    this.rect.setPosition(new Vector(x, y));
+  }
+  public addPosition(deltaX: number, deltaY: number) {
+    this.rect.addPosition(new Vector(deltaX, deltaY));
+  }
+  public setAngle(angle: number) {
+    this.rect.setAngle(angle);
+  }
 }
 
 export default BaseViewObject;

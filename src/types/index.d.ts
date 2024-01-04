@@ -7,11 +7,12 @@
 
 import { ViewObjectExportBaseInfo } from "Serialization";
 
-export declare type PluginKeys = "pako"|"offScreenBuilder";
-export declare interface OffScreenCanvasBuilderOption{
-  offScreenCanvasBuilder:(width:number,height:number)=>any;
-  offScreenContextBuilder:(offScreenCanvas:any)=>any;
-  imageBuilder?:(offScreenCanvas:any)=>HTMLImageElement|any;
+export declare type PluginKeys = "pako" | "offScreenBuilder";
+export declare interface OffScreenCanvasBuilderOption {
+  offScreenCanvasBuilder: (width: number, height: number) => any;
+  offScreenContextBuilder: (offScreenCanvas: any) => any;
+  imageBuilder?: (offScreenCanvas: any) => HTMLImageElement | any;
+  paintBuilder?: () => Painter;
 }
 declare class Vector {
   x: number;
@@ -401,14 +402,8 @@ export declare type CenterAxis = "vertical" | "horizon";
  * @description 初始化传入参数
  */
 export declare interface InitializationOption {
-  //canvas
-  // canvas?: HTMLCanvasElement;
   //画笔
   renderContext: CanvasRenderingContext2D | null;
-  //离屏画布
-  // offScreenCanvas?: HTMLCanvasElement;
-  //离屏画笔
-  // offScreenCanvasRenderContext?: CanvasRenderingContext2D | null;
   //画布矩形
   rect: {
     x?: number;
@@ -444,6 +439,23 @@ export declare class Gesti {
   /**
    * @description 初始化Gesti
    * @param option 传入一个对象
+   * 
+   * ### 初始化Gesti
+   * - 必须传入画布的高宽，即rect内的canvasWidth和canvasHeight
+   * 
+   * ```
+   * InitializationOption {
+      //画笔
+      renderContext: CanvasRenderingContext2D | null;
+      //画布矩形
+      rect: {
+        x?: number;
+        y?: number;
+        canvasWidth: number;
+        canvasHeight: number;
+      };
+    }
+   * ```
    */
   public initialization(option: InitializationOption): void;
   public static DPR: number;
