@@ -1,4 +1,4 @@
-import {  FuncButtonTrigger } from "../../enums";
+import { FuncButtonTrigger } from "../../enums";
 import Alignment from "@/core/lib/painting/alignment";
 import BaseButton, { ButtonOption } from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
@@ -13,15 +13,15 @@ import { DefaultIcon } from "@/composite/icons";
 import SizeButton from "./sizeButton";
 
 class HorizonButton extends SizeButton {
-  readonly name: ButtonNames="HorizonButton";
-  protected buttonLocation:Alignment;
-  protected icon: Icon=new DefaultIcon();
-  constructor(location?:'left'|'right',option?:ButtonOption){
-    const _location=location==="right"?Alignment.centerRight:Alignment.centerLeft;
-    super(_location||Alignment.centerRight,option);
+  readonly name: ButtonNames = "HorizonButton";
+  protected icon: Icon = new DefaultIcon();
+  constructor(location?: "left" | "right", option?: ButtonOption) {
+    const _location =
+      location === "right" ? Alignment.centerRight : Alignment.centerLeft;
+    super(_location || Alignment.centerRight, option);
   }
   public onUpWithInner(): void {
-      this.computeSelfLocation();
+    this.computeSelfLocation();
   }
   // effect(currentButtonRect?: Rect): void {
   //   const mag = this.getButtonWidthMasterMag(currentButtonRect);
@@ -45,23 +45,23 @@ class HorizonButton extends SizeButton {
     const deltaScale: number = mag / this.preMag;
     const rScale: number = deltaScale + (1 - deltaScale) / 2;
     this.master.setSize({
-      width:this.master.width*rScale,
+      width: this.master.width * rScale,
     });
     const currentMasterSize: Size = this.master.size.copy();
-    
+
     let delta = currentMasterSize
       .toVector()
       .sub(preMasterSize.toVector())
       .half();
 
     this.manipulateDelta(delta);
-    
+
     //获取Widget对象的弧度制的角度
     const angleInRadians = this.master.rect.getAngle;
-    
+
     // 假设 delta 是旧的 delta 向量
     const [x, y] = delta.toArray();
-    
+
     /**
      * 使用矩阵旋转计算新的 delta.x 和 delta.y
      * R = | cos(angle)  -sin(angle) |
@@ -75,7 +75,7 @@ class HorizonButton extends SizeButton {
       Math.sin(angleInRadians) * x + Math.cos(angleInRadians) * y;
 
     // 现在 newDelta 包含了根据给定角度 angle 重新计算的移动速度
-    this.master.addPosition(newDeltaX,newDeltaY);
+    this.master.addPosition(newDeltaX, newDeltaY);
     this.preMag = deltaScale < 1 ? mag + delta.mag() : mag - delta.mag();
   }
 }

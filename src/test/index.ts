@@ -40,6 +40,7 @@ import Gesti, {
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const offScreenCanvas: HTMLCanvasElement =
   document.querySelector("#offScreenCanvas");
+const offScreenPainter = offScreenCanvas.getContext("2d");
 const img2: HTMLImageElement = document.querySelector("#bg");
 canvas.width = Math.min(window.innerWidth, 500);
 canvas.height = 500;
@@ -59,9 +60,6 @@ Gesti.installPlugin(
     },
     offScreenContextBuilder: (offScreenCanvas) => {
       return offScreenCanvas.getContext("2d");
-    },
-    paintBuilder: () => {
-      return new Painter(g);
     },
   })
 );
@@ -120,13 +118,17 @@ const ximage = new XImage({
 for (let i = 0; i < 1; i++) {
   const imageBox = new ImageBox(ximage);
   imageBox.installMultipleButtons([
-    new HorizonButton("right"),
+    new HorizonButton("left"),
     new VerticalButton("top"),
+    new VerticalButton("bottom"),
+    new HorizonButton("right"),
     new DragButton(),
     new CloseButton(),
+    new SizeButton(Alignment.topLeft),
   ]);
+
   doCenter(imageBox);
-  loadToGesti(imageBox);
+  // loadToGesti(imageBox);
 }
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
@@ -171,16 +173,18 @@ const textBox = new TextBox(str1, {
 // controller.layerLower(textBox);
 // group.add(imageBox);
 // group.add(textBox2);
+const gradient = new LineGradientDecoration({
+  colors: ["white", "black", "red"],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+});
+console.log("序列", JSON.stringify(gradient));
 const rect: Rectangle = new Rectangle({
   width: canvas.width,
   height: canvas.height,
   decoration: {
     backgroundColor: "skyblue",
-    // gradient: new LineGradientDecoration({
-    //   colors: ["white", "black", "red"],
-    //   begin: Alignment.topLeft,
-    //   end: Alignment.bottomRight,
-    // }),
+    gradient: gradient,
   },
   // borderDecoration:{
   //   borderWidth:10,
@@ -194,18 +198,21 @@ const rect: Rectangle = new Rectangle({
   // }
 });
 const circle = new Circle({
-  radius: 10,
+  radius: 100,
   decoration: {
     backgroundColor: "skyblue",
-    // gradient: new LineGradientDecoration({
-    //   colors: ["white", "black", "red"],
-    //   begin: Alignment.topLeft,
-    //   end: Alignment.bottomRight,
-    // }),
+    gradient: new LineGradientDecoration({
+      colors: ["white", "black", "red"],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    }),
   },
 });
-
-//loadToGesti(circle);
+circle.installMultipleButtons([
+  new HorizonButton("left"),
+  new VerticalButton("top"),
+]);
+// loadToGesti(circle);
 doCenter(circle);
 
 console.log(rect);
@@ -228,9 +235,14 @@ rect.installButton(drag);
 rect.installMultipleButtons([
   new HorizonButton("left"),
   new VerticalButton("top"),
+  new VerticalButton("bottom"),
+  new HorizonButton("right"),
+  new DragButton(),
+  new CloseButton(),
+  new SizeButton(Alignment.topLeft),
 ]);
 console.log(drag);
-//loadToGesti(rect);
+loadToGesti(rect);
 
 // const [close, onAddition] = controller.addWrite({
 //   type: "write",
@@ -277,18 +289,19 @@ console.log(drag);
 //   controller.updateText(value);
 // };
 
-// document.getElementById("import").addEventListener("click", () => {
-//   console.log("导入");
-//   const a = window.localStorage.getItem("aa");
-//   importAll(a).then((e) => {
-//     console.log("导入成功");
-//   });
-// });
+document.getElementById("import").addEventListener("click", () => {
+  console.log("导入");
+  const a = window.localStorage.getItem("aa");
+  importAll(a).then((e) => {
+    console.log("导入成功");
+  });
+});
 
-// document.getElementById("export").addEventListener("click", () => {
-//   console.log("导出");
-//   exportAll(offScreenPainter).then((json) => {
-//     window.localStorage.setItem("aa", json);
-//     console.log("导出成功");
-//   });
-// });
+document.getElementById("export").addEventListener("click", () => {
+  console.log("导出");
+  exportAll(offScreenPainter).then((json) => {
+    console.log(json);
+    window.localStorage.setItem("aa", json);
+    console.log("导出成功");
+  });
+});

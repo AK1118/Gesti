@@ -11,15 +11,21 @@ import {
   FetchXImageForImportCallback,
   ViewObjectExportEntity,
   ViewObjectExportGraffiti,
+  ViewObjectExportGraphics,
   ViewObjectExportImageBox,
   ViewObjectExportTextBox,
   ViewObjectExportTypes,
   ViewObjectImportBaseInfo,
   ViewObjectImportEntity,
   ViewObjectImportGraffiti,
+  ViewObjectImportGraphics,
   ViewObjectImportImageBox,
   ViewObjectImportTextBox,
 } from "@/types/serialization";
+import GraphicsBase from "./graphics-base";
+import Alignment from "../lib/painting/alignment";
+import Rectangle from "../viewObject/graphics/rectangle";
+import { GenerateRectAngleOption } from "Graphics";
 //import { ExportButton, FetchXImageForImportCallback, ViewObjectExportImageBox, ViewObjectExportTypes, ViewObjectImportBaseInfo, ViewObjectImportEntity, ViewObjectImportImageBox } from "Serialization";
 abstract class ReaderBase {
   constructor() {}
@@ -35,12 +41,13 @@ abstract class ReaderBase {
     VerticalButton: Buttons.VerticalButton,
   };
 
-  private readonly viewObjectMap: Record<ViewObjectExportTypes, any> = {
-    group: Group,
-    image: ImageBox,
-    text: TextBox,
-    write: WriteViewObj,
-  };
+  // private readonly viewObjectMap: Record<ViewObjectExportTypes, any> = {
+  //   group: Group,
+  //   image: ImageBox,
+  //   text: TextBox,
+  //   write: WriteViewObj,
+  //   graphicsRectangle: Rectangle,
+  // };
 
   /**
    * @description 根据实体获取对象实体
@@ -62,6 +69,12 @@ abstract class ReaderBase {
       const textWrite: ViewObjectImportGraffiti =
         this.formatEntity<ViewObjectExportGraffiti>(entity);
       return WriteViewObj.reserve(textWrite);
+    } else if (type == "graphicsRectangle") {
+      const graphics: ViewObjectImportGraphics<GenerateRectAngleOption> =
+        this.formatEntity<ViewObjectExportGraphics<GenerateRectAngleOption>>(
+          entity
+        );
+      return Rectangle.reserve(graphics);
     }
     return null;
   }
@@ -113,7 +126,8 @@ abstract class ReaderBase {
       button.setIconColor(item.iconColor);
 
       viewObject.installButton(button);
-      button.setLocation(item.location);
+      const location: { x: number; y: number } = item.location as any;
+      button.setLocation(Alignment.format(location.x, location.y));
     });
   }
 }

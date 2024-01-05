@@ -7,6 +7,7 @@ import { ViewObjectExportEntity } from "Serialization";
 class Circle extends GraphicsBase<GenerateCircleOption> {
   constructor(option: GenerateCircleOption) {
     super(option);
+    this.option.type = "circle";
     this.rect.setSize(option.radius * 2, option.radius * 2);
   }
   protected renderGraphicsBorder(paint: Painter): void {

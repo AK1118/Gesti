@@ -2,9 +2,16 @@ import {
   BorderDecoration,
   BoxDecoration,
   GenerateGraphicsOption,
+  GenerateRectAngleOption,
+  GraphicsTypes,
 } from "Graphics";
 import ViewObject from "../abstract/view-object";
 import Painter from "../lib/painter";
+import {
+  ViewObjectImportEntity,
+  ViewObjectImportGraphics,
+} from "Serialization";
+import Rectangle from "../viewObject/graphics/rectangle";
 
 /**
  *
@@ -19,8 +26,8 @@ abstract class GraphicsBase<
 
     //如果使用渐变，默认使用缓存
     if (this.option.decoration.gradient) {
-        this.useCache();
-      }
+      this.useCache();
+    }
     // this.borderDecoration = option?.borderDecoration;
   }
   protected option: T;
@@ -34,6 +41,8 @@ abstract class GraphicsBase<
   protected mountDecoration(paint: Painter): void {}
 
   protected mountBorderDecoration(paint: Painter): void {}
+
+  
 }
 
 export default GraphicsBase;

@@ -177,6 +177,7 @@ export abstract class BaseButton implements RenderObject {
     //如果没有自定义位置，就使用自己的位置
     const location = _location ?? this.buttonAlignment;
     this.buttonAlignment = location;
+    if (!this.buttonAlignment) return;
     const { offsetX, offsetY }: Offset = this.buttonAlignment.compute(
       this.master.size
     );
@@ -188,7 +189,7 @@ export abstract class BaseButton implements RenderObject {
    * @param location ,占比值，四个点坐标
    */
   private computeRelativePositionByLocation() {
-    const { width, height } = this.master.rect.size;
+    if (!this.buttonAlignment) return;
     const { offsetX, offsetY } = this.buttonAlignment.compute(this.master.size);
     // const [cx, cy] = this.getFixedLocationPosition(
     //   this.buttonAlignment,

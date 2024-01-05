@@ -30,6 +30,8 @@ enum ViewObjectFamily {
   rect,
   text,
   group,
+  graphicsRectangle,
+  graphicsCircle,
 }
 
 // enum Alignment {

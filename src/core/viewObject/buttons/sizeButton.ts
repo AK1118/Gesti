@@ -14,60 +14,32 @@ import { DefaultIcon } from "@/composite/icons";
 import Alignment from "@/core/lib/painting/alignment";
 
 class SizeButton extends DragButton {
-  readonly name: ButtonNames="SizeButton";
-  protected buttonAlignment:Alignment=Alignment.bottomRight;
-  protected icon: Icon=new DefaultIcon();
-  constructor(location:Alignment,option?:ButtonOption){
+  readonly name: ButtonNames = "SizeButton";
+  protected buttonAlignment: Alignment = Alignment.bottomRight;
+  protected icon: Icon = new DefaultIcon();
+  constructor(location: Alignment, option?: ButtonOption) {
     super({
-      angleDisabled:true,
-      buttonOption:option,
-    },);
-    this.buttonAlignment=location;
-    this.beforeMounted(location);
+      angleDisabled: true,
+      buttonOption: option,
+    });
+    this.buttonAlignment = location;
+    //this.beforeMounted(location);
   }
   /**
    * @description 在按钮挂载前设置位置
-   * @param location 
+   * @param location
    */
-  protected beforeMounted(location:Alignment): void {
+  protected beforeMounted(location: Alignment): void {
     //按钮功能原因.按钮必须设置枚举位置,不允许设置position位置,这是强制的.
-    // this.setLocationByAlignment(location);   
+    // this.setLocationByAlignment(location);
   }
-  
-  protected manipulateDelta(delta:Vector):void{
-    switch(this.buttonAlignment){
-      case Alignment.topLeft:{
-        delta.y*=-1;
-        delta.x*=-1;
-      };break;
-      case Alignment.bottomLeft:{
-        delta.x*=-1;
-      };break;
-      case Alignment.topRight:{
-        delta.y*=-1;
-      };break;
-      case Alignment.bottomRight:{
-       
-      };break;
-      case Alignment.centerRight:{
-        delta.y=0;
-      };break
-      case Alignment.bottomCenter:{
-        delta.x=0;
-      };break
-      case Alignment.centerLeft:{
-        delta.x*=-1;
-        delta.y=0;
-      };break;
-      case Alignment.topCenter:{
-        delta.x=0;
-        delta.y*=-1;
-      };break;
-    }
+
+  protected manipulateDelta(delta: Vector): void {
+    this.buttonAlignment.computeWithVector(delta);
   }
   public setLocation(location: Alignment): void {
-      this.buttonAlignment=location;
-      if(this.mounted)this.initialization(this.master);
+    this.buttonAlignment = location;
+    if (this.mounted) this.initialization(this.master);
   }
   effect(currentButtonRect?: Rect): void {
     const mag = this.getButtonWidthMasterMag(currentButtonRect);
@@ -80,20 +52,20 @@ class SizeButton extends DragButton {
     const rScale: number = deltaScale + (1 - deltaScale) / 2;
     this.master.setDeltaScale(rScale);
     const currentMasterSize: Size = this.master.size.copy();
-    
+
     let delta = currentMasterSize
       .toVector()
       .sub(preMasterSize.toVector())
       .half();
 
     this.manipulateDelta(delta);
-    
+
     //获取Widget对象的弧度制的角度
     const angleInRadians = this.master.rect.getAngle;
-    
+
     // 假设 delta 是旧的 delta 向量
     const [x, y] = delta.toArray();
-    
+
     /**
      * 使用矩阵旋转计算新的 delta.x 和 delta.y
      * R = | cos(angle)  -sin(angle) |
@@ -107,10 +79,9 @@ class SizeButton extends DragButton {
       Math.sin(angleInRadians) * x + Math.cos(angleInRadians) * y;
 
     // 现在 newDelta 包含了根据给定角度 angle 重新计算的移动速度
-    this.master.addPosition(newDeltaX,newDeltaY);
+    this.master.addPosition(newDeltaX, newDeltaY);
     this.preMag = deltaScale < 1 ? mag + delta.mag() : mag - delta.mag();
   }
 }
-
 
 export default SizeButton;

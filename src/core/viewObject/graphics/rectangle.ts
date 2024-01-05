@@ -1,24 +1,35 @@
 import ViewObject from "@/core/abstract/view-object";
 import GraphicsBase from "@/core/bases/graphics-base";
+import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
 import { ViewObjectFamily } from "@/index";
 import {
-  getOffscreenCanvasContext,
-  getOffscreenCanvasWidthPlatform,
-} from "@/utils/canvas";
-import {
   GenerateRectAngleOption,
-  BorderDecoration,
-  LineGradientDecoration,
-  GenerateGraphicsOption,
-  BoxDecoration,
+  GradientTypes,
+  GraphicsTypes,
+  LineGradientDecorationOption,
 } from "Graphics";
-import { ViewObjectExportEntity } from "Serialization";
+
+// import {
+//   GenerateRectAngleOption,
+//   BorderDecoration,
+//   LineGradientDecoration,
+//   GenerateGraphicsOption,
+//   BoxDecoration,
+//   GraphicsTypes,
+//   LineGradientDecorationOption,
+// } from "Graphics";
+import {
+  ViewObjectExportEntity,
+  ViewObjectExportGraphics,
+  ViewObjectImportGraphics,
+} from "Serialization";
 
 class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
-  family: ViewObjectFamily;
+  family: ViewObjectFamily = ViewObjectFamily.graphicsRectangle;
   constructor(option: GenerateRectAngleOption) {
     super(option);
+    this.option.type = "rectangle";
     const { width, height } = option;
     this.rect.setSize(width, height);
     this.useCache();
@@ -87,13 +98,36 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   //   paint.closePath();
   // }
   export(painter?: Painter): Promise<ViewObjectExportEntity> {
-    throw new Error("Method not implemented.");
+    const exportEntity: ViewObjectExportGraphics<GenerateRectAngleOption> = {
+      option: this.option,
+      base: this.getBaseInfo(),
+      type: "graphicsRectangle",
+    };
+    return Promise.resolve(exportEntity);
   }
   exportWeChat(
     painter?: Painter,
     canvas?: any
   ): Promise<ViewObjectExportEntity> {
     return this.export();
+  }
+  public static reserve(
+    entity: ViewObjectImportGraphics<GenerateRectAngleOption>
+  ): Promise<GraphicsBase<GenerateRectAngleOption>> {
+    const gradientType: GradientTypes = entity.option.decoration.gradient.type;
+    const option = entity.option;
+    if (option.decoration.gradient) {
+      if (gradientType== "lineGradient") {
+        option.decoration.gradient = LineGradientDecoration.format(
+          option.decoration.gradient as any as LineGradientDecorationOption
+        );
+      }
+    }
+
+    const rectAngle: Rectangle = new Rectangle(option);
+
+    console.log("解析实体", rectAngle);
+    return Promise.resolve(rectAngle);
   }
 }
 

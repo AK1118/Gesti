@@ -1,5 +1,6 @@
-import { Alignment } from "@/core/enums";
+import Alignment from "@/core/lib/painting/alignment";
 import { GraffitiTypes, TextOptions, ViewObject, XImage } from "./index";
+import { GenerateGraphicsOption } from "Graphics";
 
 declare module "Serialization" {
   type FetchXImageForImportCallback = (
@@ -44,7 +45,13 @@ declare module "Serialization" {
     platform: PlatformType;
   }
 
-  type ViewObjectExportTypes = "image" | "text" | "write" | "group";
+  type ViewObjectExportTypes =
+    | "image"
+    | "text"
+    | "write"
+    | "group"
+    | "graphicsRectangle"
+    | "graphicsCircle";
 
   interface ViewObjectExportEntity {
     base: ViewObjectExportBaseInfo;
@@ -72,7 +79,14 @@ declare module "Serialization" {
       type: GraffitiTypes;
       isFill?: boolean;
     };
-    points:Array<Vector>
+    points: Array<Vector>;
+  }
+
+  //图形导出
+  interface ViewObjectExportGraphics<
+    T extends GenerateGraphicsOption | any = {}
+  > extends ViewObjectExportEntity {
+    option: T;
   }
 
   interface ViewObjectImportBaseInfo extends ViewObjectExportBaseInfo {}
@@ -83,7 +97,9 @@ declare module "Serialization" {
 
   interface ViewObjectImportTextBox extends ViewObjectExportTextBox {}
 
-  interface ViewObjectImportGraffiti extends ViewObjectExportGraffiti{}
+  interface ViewObjectImportGraffiti extends ViewObjectExportGraffiti {}
+
+  interface ViewObjectImportGraphics<T> extends ViewObjectExportGraphics<T> {}
   interface Reverse<Entity extends ViewObjectExportEntity> {
     reverse(entity: Entity): Promise<ViewObject>;
   }
