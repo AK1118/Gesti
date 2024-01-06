@@ -4,7 +4,7 @@ import ImageToolkit from "./image-toolkit";
 import GestiController from "../interfaces/gesticontroller";
 import Vector from "./vector";
 import XImage from "./ximage";
-import { GraffitiCloser, TextOptions } from "@/types/index";
+import { GraffitiCloser, TextOptions } from "@/types/gesti";
 
 declare type CenterAxis = "vertical" | "horizon";
 

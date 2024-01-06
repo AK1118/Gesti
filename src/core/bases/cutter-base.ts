@@ -1,4 +1,4 @@
-import { ImageChunk } from "@/types/index";
+import { ImageChunk } from "@/types/gesti";
 import CutterInterface from "../interfaces/cutter";
 import Painter from "../lib/painter";
 import XImage from "../lib/ximage";

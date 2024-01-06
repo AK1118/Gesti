@@ -1,4 +1,4 @@
-import { OffScreenCanvasBuilderOption } from "@/types/index";
+import { OffScreenCanvasBuilderOption } from "@/types/gesti";
 import Painter from "../painter";
 
 class OffScreenCanvasBuilder {

@@ -1,6 +1,6 @@
 import Plugins from "@/core/lib/plugins";
 import ImageChunkConverter from "../../core/abstract/image-chunk-converter";
-import { ImageChunk } from "../../types/index";
+import { ImageChunk } from "../../types/gesti";
 
 /**
  * 切片解析器--H5

@@ -19,7 +19,7 @@ import {
   GraffitiCloser,
   InitializationOption,
   TextOptions,
-} from "@/types/index";
+} from "@/types/gesti";
 import WriteViewObj from "../viewObject/write";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 enum EventHandlerState {

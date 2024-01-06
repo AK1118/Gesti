@@ -7,7 +7,7 @@ import {
   ViewObjectExportEntity,
   ViewObjectExportTextBox,
 } from "Serialization";
-import { ViewObject } from "@/types/index";
+import { ViewObject } from "@/types/gesti";
 
 /**
  * 1.改变大小时文字大小不会发生变化，只会被挤压拉伸

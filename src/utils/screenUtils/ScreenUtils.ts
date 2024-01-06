@@ -1,5 +1,5 @@
 import Serializable from "@/core/interfaces/Serialization";
-import { ScreenUtilOption } from "@/types/index";
+import { ScreenUtilOption } from "@/types/gesti";
 import { ScreenUtilExportEntity } from "Serialization";
 
 /**

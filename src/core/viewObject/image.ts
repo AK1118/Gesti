@@ -16,7 +16,7 @@ import {
   ViewObjectImportBaseInfo,
   ViewObjectImportImageBox,
 } from "@/types/serialization";
-import { ImageChunk } from "@/types/index";
+import { ImageChunk } from "@/types/gesti";
 import {
   getOffscreenCanvasContext,
   getOffscreenCanvasWidthPlatform,

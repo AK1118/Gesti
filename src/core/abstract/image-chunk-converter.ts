@@ -1,4 +1,4 @@
-import { ImageChunk } from "../../types/index";
+import { ImageChunk } from "../../types/gesti";
 /**
  * 解析器基类
  */

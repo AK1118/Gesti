@@ -1,6 +1,6 @@
 import CutterInterface from "../../core/interfaces/cutter";
 import Painter from "../../core/lib/painter";
-import { ImageChunk } from "../../types/index";
+import { ImageChunk } from "../../types/gesti";
 import Vector from "../../core/lib/vector";
 import ImageChunkConverter from "../converters/image-chunk-converter-H5";
 import XImage from "../../core/lib/ximage";

@@ -1,4 +1,4 @@
-import { gesticonfig } from "../config/gestiConfig";
+import { GestiConfigOption } from "../config/gestiConfig";
 import Gesti from "../core/lib/gesti";
 import GestiReader from "../core/bases/reader-base";
 import TextBox from "../core/viewObject/text/text";
@@ -10,7 +10,6 @@ import {
   createXImageFun,
 } from "./create";
 import GestiReaderH5 from "../utils/reader/reader-H5";
-// import GestiReaderWechat from "../utils/reader/reader-WeChat";
 import Painter from "../core/lib/painter";
 import DragButton from "../core/viewObject/buttons/dragbutton";
 import CloseButton from "../core/viewObject/buttons/closeButton";
@@ -22,7 +21,7 @@ import UnLockButton from "../core/viewObject/buttons/delockButton";
 import HorizonButton from "../core/viewObject/buttons/horizonButton";
 import LockButton from "../core/viewObject/buttons/lockbutton";
 import VerticalButton from "../core/viewObject/buttons/verticalButton";
-import { GraffitiCloser, TextOptions } from "@/types/index";
+import { GraffitiCloser, TextOptions } from "@/types/gesti";
 
 let currentInstance: Gesti = null;
 
@@ -39,7 +38,7 @@ const setCurrentInstance = (instance: Gesti) => {
   currentInstance = instance;
 };
 const getCurrentController = () => useController();
-const createGesti = (config?: gesticonfig) => {
+const createGesti = (config?: GestiConfigOption) => {
   const gesti: Gesti = new Gesti(config);
   setCurrentInstance(gesti);
   return currentInstance;

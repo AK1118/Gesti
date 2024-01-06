@@ -1,5 +1,5 @@
 import Alignment from "@/core/lib/painting/alignment";
-import { GraffitiTypes, ScreenUtilOption, TextOptions, ViewObject, XImage } from "./index";
+import { GraffitiTypes, ScreenUtilOption, TextOptions, ViewObject, XImage } from "./gesti";
 import { GenerateGraphicsOption } from "Graphics";
 
 declare module "Serialization" {

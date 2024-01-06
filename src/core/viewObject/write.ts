@@ -12,7 +12,7 @@ import {
   ViewObjectImportGraffiti,
   ViewObjectImportImageBox,
 } from "@/types/serialization";
-import { GraffitiTypes } from "@/types/index";
+import { GraffitiTypes } from "@/types/gesti";
 /**
  * 实现逻辑
  * 新建一个 canvas等宽高的矩阵,锁定它，

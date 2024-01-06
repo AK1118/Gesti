@@ -1,4 +1,4 @@
-import { GraffitiCloser, TextOptions } from "@/types/index";
+import { GraffitiCloser, TextOptions } from "@/types/gesti";
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import XImage from "../lib/ximage";

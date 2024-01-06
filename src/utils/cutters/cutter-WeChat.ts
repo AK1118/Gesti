@@ -1,6 +1,6 @@
 import CutterInterface from "../../core/interfaces/cutter";
 import Painter from "../../core/lib/painter";
-import { ImageChunk } from "../../types/index";
+import { ImageChunk } from "../../types/gesti";
 import ImageChunkConverterWeChat from "../converters/image-chunk-converter-WeChat";
 import XImage from "../../core/lib/ximage";
 import {

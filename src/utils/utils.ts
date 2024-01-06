@@ -1,4 +1,4 @@
-import { ImageChunk } from "../types/index";
+import { ImageChunk } from "../types/gesti";
 import ImageChunkConverterWeChat from "./converters/image-chunk-converter-WeChat";
 
 /**

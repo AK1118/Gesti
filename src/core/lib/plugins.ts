@@ -1,4 +1,4 @@
-import { PluginKeys } from "@/types/index";
+import { PluginKeys } from "@/types/gesti";
 
 
 

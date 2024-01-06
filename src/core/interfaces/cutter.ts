@@ -1,5 +1,5 @@
 import Painter from "../lib/painter";
-import { ImageChunk } from "../../types/index";
+import { ImageChunk } from "../../types/gesti";
 import XImage from "../lib/ximage";
 
 interface CutterInterface {

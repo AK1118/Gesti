@@ -8,7 +8,7 @@ import {
   FontWeight,
   TextHandler,
   TextOptions,
-} from "../../../types/index";
+} from "../../../types/gesti";
 import Vector from "../../lib/vector";
 import { Point } from "../../lib/vertex";
 import Platform from "../tools/platform";
