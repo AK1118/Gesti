@@ -123,10 +123,7 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
         );
       }
     }
-
     const rectAngle: Rectangle = new Rectangle(option);
-
-    console.log("解析实体", rectAngle);
     return Promise.resolve(rectAngle);
   }
 }

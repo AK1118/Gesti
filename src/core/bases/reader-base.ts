@@ -8,7 +8,6 @@ import Group from "../viewObject/group";
 import * as Buttons from "@/composite/buttons";
 import {
   ExportButton,
-  FetchXImageForImportCallback,
   ViewObjectExportEntity,
   ViewObjectExportGraffiti,
   ViewObjectExportGraphics,
@@ -17,19 +16,18 @@ import {
   ViewObjectExportTypes,
   ViewObjectImportBaseInfo,
   ViewObjectImportEntity,
-  ViewObjectImportGraffiti,
-  ViewObjectImportGraphics,
-  ViewObjectImportImageBox,
-  ViewObjectImportTextBox,
 } from "@/types/serialization";
 import GraphicsBase from "./graphics-base";
 import Alignment from "../lib/painting/alignment";
 import Rectangle from "../viewObject/graphics/rectangle";
-import { GenerateRectAngleOption } from "Graphics";
-//import { ExportButton, FetchXImageForImportCallback, ViewObjectExportImageBox, ViewObjectExportTypes, ViewObjectImportBaseInfo, ViewObjectImportEntity, ViewObjectImportImageBox } from "Serialization";
+import { GenerateCircleOption, GenerateRectAngleOption } from "Graphics";
+import Circle from "../viewObject/graphics/circle";
+
+type ViewObjectHandler<T> = (entity: ViewObjectImportEntity) => T;
+
 abstract class ReaderBase {
   constructor() {}
-  private readonly buttonClazzList = {
+  private readonly buttonMap = {
     DragButton: Buttons.DragButton,
     MirrorButton: Buttons.MirrorButton,
     CloseButton: Buttons.CloseButton,
@@ -41,48 +39,61 @@ abstract class ReaderBase {
     VerticalButton: Buttons.VerticalButton,
   };
 
-  // private readonly viewObjectMap: Record<ViewObjectExportTypes, any> = {
-  //   group: Group,
-  //   image: ImageBox,
-  //   text: TextBox,
-  //   write: WriteViewObj,
-  //   graphicsRectangle: Rectangle,
-  // };
-
-  /**
-   * @description 根据实体获取对象实体
-   * @param entity
-   */
-  protected getViewObjectByEntity(
-    entity: ViewObjectImportEntity
-  ): Promise<ViewObject> {
-    const type: ViewObjectExportTypes = entity.type;
-    if (type == "image") {
-      const imgEntity: ViewObjectImportImageBox =
-        this.formatEntity<ViewObjectExportImageBox>(entity);
+  //entity转换为对应实体ViewObject对象映射器
+  private readonly typeHandlers: Record<
+    ViewObjectExportTypes,
+    ViewObjectHandler<Promise<ViewObject>>
+  > = {
+    image: (entity) => {
+      const imgEntity = this.formatEntity<ViewObjectExportImageBox>(entity);
       return ImageBox.reverse(imgEntity);
-    } else if (type == "text") {
-      const textEntity: ViewObjectImportTextBox =
-        this.formatEntity<ViewObjectExportTextBox>(entity);
+    },
+    text: (entity) => {
+      const textEntity = this.formatEntity<ViewObjectExportTextBox>(entity);
       return TextBox.reverse(textEntity);
-    } else if (type == "write") {
-      const textWrite: ViewObjectImportGraffiti =
-        this.formatEntity<ViewObjectExportGraffiti>(entity);
+    },
+    write: (entity) => {
+      const textWrite = this.formatEntity<ViewObjectExportGraffiti>(entity);
       return WriteViewObj.reserve(textWrite);
-    } else if (type == "graphicsRectangle") {
-      const graphics: ViewObjectImportGraphics<GenerateRectAngleOption> =
+    },
+    graphicsRectangle: (entity) => {
+      const graphics =
         this.formatEntity<ViewObjectExportGraphics<GenerateRectAngleOption>>(
           entity
         );
       return Rectangle.reserve(graphics);
+    },
+    graphicsCircle: (entity) => {
+      const graphics =
+        this.formatEntity<ViewObjectExportGraphics<GenerateCircleOption>>(
+          entity
+        );
+      return Circle.reserve(graphics);
+    },
+    group: (entity) => {
+      throw Error("Method has not implemented.");
+    },
+  };
+
+  protected getViewObjectByEntity(
+    entity: ViewObjectImportEntity
+  ): Promise<ViewObject> {
+    const type: ViewObjectExportTypes = entity.type;
+    const handler = this.typeHandlers[type];
+
+    if (handler) {
+      return handler(entity);
     }
+
     return null;
   }
+
   private formatEntity<T extends ViewObjectImportEntity>(
     entity: ViewObjectExportEntity
   ): T {
     return entity as T;
   }
+
   public async getObjectByJson(importEntity: ViewObjectImportEntity) {
     const base: ViewObjectImportBaseInfo = importEntity.base;
     const rect: Rect = Rect.format(base.rect);
@@ -112,12 +123,12 @@ abstract class ReaderBase {
   //安装按钮
   private installButton(viewObject: ViewObject, buttons: ExportButton[]) {
     buttons.forEach((item: ExportButton) => {
-      const buttonConstructor = this.buttonClazzList[item.type];
+      const buttonConstructor = this.buttonMap[item.type];
       if (!buttonConstructor)
         return console.error(
-          "This buttonConstructor is not a constructor.",
+          `This buttonConstructor can not construct button.`,
           buttonConstructor,
-          this.buttonClazzList[item.type]
+          this.buttonMap[item.type]
         );
       const button: BaseButton = new buttonConstructor();
 

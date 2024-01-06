@@ -212,7 +212,7 @@ circle.installMultipleButtons([
   new HorizonButton("left"),
   new VerticalButton("top"),
 ]);
-// loadToGesti(circle);
+ loadToGesti(circle);
 doCenter(circle);
 
 console.log(rect);

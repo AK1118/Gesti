@@ -1,8 +1,13 @@
 import GraphicsBase from "@/core/bases/graphics-base";
+import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
 import { ViewObjectFamily } from "@/index";
-import { GenerateCircleOption } from "Graphics";
-import { ViewObjectExportEntity } from "Serialization";
+import { GenerateCircleOption, GradientTypes, LineGradientDecorationOption } from "Graphics";
+import {
+  ViewObjectExportEntity,
+  ViewObjectExportGraphics,
+  ViewObjectImportGraphics,
+} from "Serialization";
 
 class Circle extends GraphicsBase<GenerateCircleOption> {
   constructor(option: GenerateCircleOption) {
@@ -41,13 +46,33 @@ class Circle extends GraphicsBase<GenerateCircleOption> {
   }
   family: ViewObjectFamily;
   export(painter?: Painter): Promise<ViewObjectExportEntity> {
-    throw new Error("Method not implemented.");
+    const exportEntity: ViewObjectExportGraphics<GenerateCircleOption> = {
+      option: this.option,
+      base: this.getBaseInfo(),
+      type: "graphicsCircle",
+    };
+    return Promise.resolve(exportEntity);
   }
   exportWeChat(
     painter?: Painter,
     canvas?: any
   ): Promise<ViewObjectExportEntity> {
-    throw new Error("Method not implemented.");
+    return this.export();
+  }
+  public static reserve(
+    entity: ViewObjectImportGraphics<GenerateCircleOption>
+  ): Promise<GraphicsBase<GenerateCircleOption>> {
+    const gradientType: GradientTypes = entity.option.decoration.gradient.type;
+    const option = entity.option;
+    if (option.decoration.gradient) {
+      if (gradientType== "lineGradient") {
+        option.decoration.gradient = LineGradientDecoration.format(
+          option.decoration.gradient as any as LineGradientDecorationOption
+        );
+      }
+    }
+    const circle: Circle = new Circle(option);
+    return Promise.resolve(circle);
   }
 }
 
