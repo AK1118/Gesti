@@ -14,8 +14,6 @@ import ImageBox from "../viewObject/image";
 import TextBox from "../viewObject/text/text";
 import WriteFactory from "../viewObject/write/write-factory";
 import XImage from "./ximage";
-// import GestiReaderWechat from "../../utils/reader/reader-WeChat";
-import { classTypeIs } from "../../utils/utils";
 import { ViewObjectImportEntity } from "@/types/serialization";
 import {
   GraffitiCloser,
@@ -23,6 +21,7 @@ import {
   TextOptions,
 } from "@/types/index";
 import WriteViewObj from "../viewObject/write";
+import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 enum EventHandlerState {
   down,
   up,
@@ -74,6 +73,8 @@ class Listeners {
   }
 }
 abstract class ImageToolkitBase {
+  //屏幕适配  默认不适配
+  protected screenUtils: ScreenUtils;
   //所有图层集合
   protected _viewObjectList: Array<ViewObject> = new Array<ViewObject>();
   //手势监听器
@@ -184,7 +185,12 @@ abstract class ImageToolkitBase {
 class ImageToolkit extends ImageToolkitBase implements GestiController {
   constructor(option: InitializationOption) {
     super();
-    const { x: offsetX, y: offsetY, canvasWidth, canvasHeight } = option?.rect || {};
+    const {
+      x: offsetX,
+      y: offsetY,
+      canvasWidth,
+      canvasHeight,
+    } = option?.rect || {};
     this.offset = new Vector(offsetX || 0, offsetY || 0);
     this.canvasRect = new Rect({
       x: this.offset.x,
@@ -197,10 +203,12 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.bindEvent();
   }
   remove(view?: ViewObject): boolean {
-    const _view=this.selectedViewObject||view;
-    if(!_view)return false;
-    this.setViewObjectList(this.ViewObjectList.filter(_=>_.key!=_view.key));
-    this.callHook("onRemove",null);
+    const _view = this.selectedViewObject || view;
+    if (!_view) return false;
+    this.setViewObjectList(
+      this.ViewObjectList.filter((_) => _.key != _view.key)
+    );
+    this.callHook("onRemove", null);
     this.render();
     return true;
   }
@@ -208,7 +216,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     return this.ViewObjectList;
   }
   getAllViewObjectSync(): Promise<ViewObject[]> {
-      return Promise.resolve(this.ViewObjectList);
+    return Promise.resolve(this.ViewObjectList);
   }
 
   mount(view: ViewObject): void {
@@ -396,8 +404,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
    * @returns
    */
   importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
-    return new Promise(async (r, j) => {
-    });
+    return new Promise(async (r, j) => {});
   }
   addListener(
     listenType: GestiControllerListenerTypes,
@@ -425,9 +432,13 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         const viewObjectList: Array<Object> = [];
         for await (const item of this.ViewObjectList) {
           if (item.disabled) continue;
-          if (type == "H5") viewObjectList.push(await item.export(offPainter));
-          else if (type == "WeChat")
-            viewObjectList.push(await item.exportWeChat(offPainter));
+          if (type == "H5") {
+            const exportEntity = await item.export(offPainter);
+            viewObjectList.push(exportEntity);
+          } else if (type == "WeChat") {
+            const exportEntity = await item.exportWeChat(offPainter);
+            viewObjectList.push(exportEntity);
+          }
         }
         r(JSON.stringify(viewObjectList));
       } catch (error) {
@@ -445,13 +456,14 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   }
   updateText(text: string, options?: TextOptions): void {
     //const isTextBox = classTypeIs(this.selectedViewObject, TextBox);
-    const isTextBox:boolean=this.selectedViewObject?.family===ViewObjectFamily.text;
+    const isTextBox: boolean =
+      this.selectedViewObject?.family === ViewObjectFamily.text;
     if (isTextBox) {
-      const view:TextBox=this.selectedViewObject as TextBox;
-      view.setDecoration(options??{});
+      const view: TextBox = this.selectedViewObject as TextBox;
+      view.setDecoration(options ?? {});
       view.setText(text);
       this.render();
-      this.callHook("onUpdateText",view)
+      this.callHook("onUpdateText", view);
     }
   }
   center(view?: ViewObject, axis?: CenterAxis): void {
@@ -876,7 +888,7 @@ class _Tools {
     );
     if (ndx === -1) return;
     const len = ViewObjectList.length - 1;
-  
+
     switch (operationType) {
       case LayerOperationType.top:
         if (ndx === len) break;
@@ -911,13 +923,13 @@ class _Tools {
     }
     this.sortByLayer(ViewObjectList);
   }
-  
+
   public sortByLayer(ViewObjectList: Array<ViewObject>): void {
     ViewObjectList.sort(
       (a: ViewObject, b: ViewObject) => a.getLayer() - b.getLayer()
     );
   }
-  
+
   /**
    * @deprecated
    * @deprecated 废弃

@@ -114,14 +114,13 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   public static reserve(
     entity: ViewObjectImportGraphics<GenerateRectAngleOption>
   ): Promise<GraphicsBase<GenerateRectAngleOption>> {
-    const gradientType: GradientTypes = entity.option.decoration.gradient.type;
+    const gradientType: GradientTypes =
+      entity.option.decoration?.gradient?.type;
     const option = entity.option;
-    if (option.decoration.gradient) {
-      if (gradientType== "lineGradient") {
-        option.decoration.gradient = LineGradientDecoration.format(
-          option.decoration.gradient as any as LineGradientDecorationOption
-        );
-      }
+    if (gradientType == "lineGradient") {
+      option.decoration.gradient = LineGradientDecoration.format(
+        option.decoration.gradient as any as LineGradientDecorationOption
+      );
     }
     const rectAngle: Rectangle = new Rectangle(option);
     return Promise.resolve(rectAngle);

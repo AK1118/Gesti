@@ -2,7 +2,7 @@
  * @Author: AK1118
  * @Date: 2023-11-15 16:08:39
  * @Last Modified by: AK1118
- * @Last Modified time: 2023-11-21 17:15:58
+ * @Last Modified time: 2024-01-06 15:55:46
  */
 
 import { ViewObjectExportBaseInfo } from "Serialization";
@@ -397,6 +397,19 @@ export declare class WriteViewObj extends ViewObject {
 }
 
 export declare type CenterAxis = "vertical" | "horizon";
+
+export declare interface DesignSizeOption {
+  designWidth?: number;
+  designHeight?: number;
+}
+export declare interface CanvasSizeOption {
+  canvasWidth: number; 
+  canvasHeight: number;
+}
+export declare interface ScreenUtilOption extends DesignSizeOption, CanvasSizeOption {
+  devicePixelRatio?: number;
+  minTextAdapt?: boolean;
+}
 
 /**
  * @description 初始化传入参数

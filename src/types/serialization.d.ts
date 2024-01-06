@@ -1,5 +1,5 @@
 import Alignment from "@/core/lib/painting/alignment";
-import { GraffitiTypes, TextOptions, ViewObject, XImage } from "./index";
+import { GraffitiTypes, ScreenUtilOption, TextOptions, ViewObject, XImage } from "./index";
 import { GenerateGraphicsOption } from "Graphics";
 
 declare module "Serialization" {
@@ -102,5 +102,16 @@ declare module "Serialization" {
   interface ViewObjectImportGraphics<T> extends ViewObjectExportGraphics<T> {}
   interface Reverse<Entity extends ViewObjectExportEntity> {
     reverse(entity: Entity): Promise<ViewObject>;
+  }
+
+  interface ScreenUtilExportEntity extends ScreenUtilOption {}
+
+  interface ViewObjectExportWrapperBaseInfo {
+    platform: PlatformType;
+    screen: ScreenUtilExportEntity;
+  }
+  interface ViewObjectExportWrapper {
+    entities: Array<ViewObjectExportEntity>;
+    info: ViewObjectExportWrapperBaseInfo;
   }
 }

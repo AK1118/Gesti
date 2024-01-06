@@ -34,6 +34,7 @@ import Gesti, {
   VerticalButton,
   XImage,
 } from "@/index";
+import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
 // Gesti.installPlugin("pako", require("pako"));
 
@@ -42,8 +43,8 @@ const offScreenCanvas: HTMLCanvasElement =
   document.querySelector("#offScreenCanvas");
 const offScreenPainter = offScreenCanvas.getContext("2d");
 const img2: HTMLImageElement = document.querySelector("#bg");
-canvas.width = Math.min(window.innerWidth, 500);
-canvas.height = 500;
+canvas.width = 300;
+canvas.height = 300;
 offScreenCanvas.width = 10000;
 offScreenCanvas.height = 500;
 
@@ -179,23 +180,17 @@ const gradient = new LineGradientDecoration({
   end: Alignment.bottomRight,
 });
 console.log("序列", JSON.stringify(gradient));
+const screenUtil1 = new ScreenUtils({
+  canvasHeight: canvas.height,
+  canvasWidth: canvas.width,
+});
 const rect: Rectangle = new Rectangle({
-  width: canvas.width,
-  height: canvas.height,
+  width: screenUtil1.setWidth(500),
+  height: screenUtil1.setWidth(500),
   decoration: {
     backgroundColor: "skyblue",
-    gradient: gradient,
+    //  gradient: gradient,
   },
-  // borderDecoration:{
-  //   borderWidth:10,
-  //   gradient:new LineGradientDecoration(
-  //     {
-  //       colors:["white",'black','red'],
-  //       begin:Alignment.bottomLeft,
-  //       end:Alignment.centerRight,
-  //     }
-  //   )
-  // }
 });
 const circle = new Circle({
   radius: 100,
@@ -212,7 +207,7 @@ circle.installMultipleButtons([
   new HorizonButton("left"),
   new VerticalButton("top"),
 ]);
- loadToGesti(circle);
+// loadToGesti(circle);
 doCenter(circle);
 
 console.log(rect);
@@ -244,62 +239,37 @@ rect.installMultipleButtons([
 console.log(drag);
 loadToGesti(rect);
 
-// const [close, onAddition] = controller.addWrite({
-//   type: "write",
-// });
-// close();
-// onAddition((textBox2) => {
-//   console.log(textBox2.installButton);
-//   textBox2.installButton(new HorizonButton("left"));
-//   textBox2.installButton(new HorizonButton("right"));
-//   textBox2.installButton(new VerticalButton());
-//   textBox2.installButton(new VerticalButton("bottom"));
-//   textBox2.installButton(new SizeButton(Alignment.topLeft));
-//   textBox2.installButton(
-//     new MirrorButton({
-//       location: Alignment.topLeft,
-//     })
-//   );
-// });
-// // setTimeout(()=>{
-// //   closer();
-// // },3000);
-// // loadToGesti(group);
-// textBox2.installButton(new HorizonButton("left"));
-// textBox2.installButton(new HorizonButton("right"));
-// textBox2.installButton(new VerticalButton());
-// textBox2.installButton(new VerticalButton("bottom"));
-// textBox2.installButton(new SizeButton(Alignment.topLeft));
-// textBox2.installButton(
-//   new MirrorButton({
-//     location: Alignment.topLeft,
-//   })
-// );
-// textBox2.installButton(
-//   new LockButton({
-//     location: Alignment.topRight,
-//   })
-// );
-// imageBox.installButton(new DragButton());
-// imageBox.installButton(new RotateButton());
-
-// (document.querySelector("#input") as any).value = textBox2.value;
-// (document.querySelector("#input") as HTMLElement).oninput = (e: any) => {
-//   const value = e.target.value;
-//   controller.updateText(value);
-// };
+const canvas2: HTMLCanvasElement = document.querySelector("#canvas2");
+const g2 = canvas2.getContext("2d", {
+  willReadFrequently: true,
+});
+canvas2.width = 300;
+canvas2.height = 300;
+const gesti2 = createGesti();
+const screenUtil2 = new ScreenUtils({
+  canvasHeight: canvas2.height,
+  canvasWidth: canvas2.width,
+});
+const controller2 = gesti2.initialization({
+  renderContext: g2,
+  rect: {
+    canvasWidth: canvas2.width,
+    canvasHeight: canvas2.height,
+  },
+});
+controller2.cancelEvent();
 
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");
   const a = window.localStorage.getItem("aa");
-  importAll(a).then((e) => {
+  importAll(a, gesti2).then((e) => {
     console.log("导入成功");
   });
 });
 
 document.getElementById("export").addEventListener("click", () => {
   console.log("导出");
-  exportAll(offScreenPainter).then((json) => {
+  exportAll(offScreenPainter, gesti).then((json) => {
     console.log(json);
     window.localStorage.setItem("aa", json);
     console.log("导出成功");
