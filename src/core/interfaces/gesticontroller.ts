@@ -1,7 +1,8 @@
-import { GraffitiCloser, TextOptions } from "@/types/gesti";
+import { GraffitiCloser, ScreenUtilOption, TextOptions } from "@/types/gesti";
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import XImage from "../lib/ximage";
+import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 //图层控制器
 interface LayerController {
   /**
@@ -39,7 +40,7 @@ interface LayerController {
   /**
    * 被选中对象居中画布
    */
-  center( view?: ViewObject,axis?: CenterAxis): void;
+  center(view?: ViewObject, axis?: CenterAxis): void;
   /**
      * 更新文字图层内容
      * @param text:String
@@ -95,21 +96,20 @@ interface LayerController {
    */
   cleanAll(): Promise<void>;
 
-  position(x:number,y:number,view?:ViewObject):void;
+  position(x: number, y: number, view?: ViewObject): void;
   /**
    * @description 关闭某个图层
-   * @param view 
+   * @param view
    */
-  close(view?:ViewObject):void;
+  close(view?: ViewObject): void;
   /**
    * @description 镜像
-   * @param view 
+   * @param view
    * @returns {boolean} 返回是否处于镜像
    */
-  mirror(view?:ViewObject):boolean;
+  mirror(view?: ViewObject): boolean;
 
-  remove(view?:ViewObject):void;
-
+  remove(view?: ViewObject): void;
 }
 
 type ListenerCallback = (object: any) => void;
@@ -118,14 +118,14 @@ type ListenerCallback = (object: any) => void;
 interface ImageToolKitController {
   /**
    * @description 挂载一个对象进入gesti内
-   * @param view 
+   * @param view
    */
-  mount(view:ViewObject):void;
+  mount(view: ViewObject): void;
   /**
    * @description 卸载一个对象在gesti内
-   * @param view 
+   * @param view
    */
-  unMount(view:ViewObject):void;
+  unMount(view: ViewObject): void;
   /**
    *
    * @param view 将可操作对象载入gesti内
@@ -145,10 +145,10 @@ interface ImageToolKitController {
    * 刷新画布
    */
   render(): void;
-    /**
+  /**
    * @deprecated 即将废弃，请使用 render()
    */
-  update():void;
+  update(): void;
   /**
    * 新增图片
    * @param @XImage
@@ -228,19 +228,25 @@ interface ImageToolKitController {
    */
   destroyGesti(): void;
 
-  querySelector(select:string|ViewObjectFamily):Promise<ViewObject|ViewObject[]>;
+  querySelector(
+    select: string | ViewObjectFamily
+  ): Promise<ViewObject | ViewObject[]>;
 
-  getViewObjectById<T extends ViewObject>(id:string):Promise<T>;
+  getViewObjectById<T extends ViewObject>(id: string): Promise<T>;
 
   /**
    * 获取所有的视图对象
    */
-  getAllViewObject():Array<ViewObject>;
+  getAllViewObject(): Array<ViewObject>;
 
   /**
    * 异步，获取所有的视图对象
    */
-  getAllViewObjectSync():Promise<Array<ViewObject>>;
+  getAllViewObjectSync(): Promise<Array<ViewObject>>;
+  /**
+   * 设置屏幕适配器
+   */
+  generateScreenUtils(option: ScreenUtilOption): ScreenUtils;
 }
 /**
  * 控制器类，提供接口供给用户使用

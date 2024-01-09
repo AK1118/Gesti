@@ -1,5 +1,11 @@
 import Alignment from "@/core/lib/painting/alignment";
-import { GraffitiTypes, ScreenUtilOption, TextOptions, ViewObject, XImage } from "./gesti";
+import {
+  GraffitiTypes,
+  ScreenUtilOption,
+  TextOptions,
+  ViewObject,
+  XImage,
+} from "./gesti";
 import { GenerateGraphicsOption } from "Graphics";
 
 declare module "Serialization" {
@@ -104,7 +110,15 @@ declare module "Serialization" {
     reverse(entity: Entity): Promise<ViewObject>;
   }
 
-  interface ScreenUtilExportEntity extends ScreenUtilOption {}
+  /**
+   * 屏幕适配导出
+   * 适配因子，设计稿大小，画布大小
+   */
+  interface ScreenUtilExportEntity extends ScreenUtilOption {
+    scaleWidth: number;
+    scaleHeight: number;
+    scaleText: number;
+  }
 
   interface ViewObjectExportWrapperBaseInfo {
     platform: PlatformType;

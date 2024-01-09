@@ -22,11 +22,20 @@ import Alignment from "../lib/painting/alignment";
 import Rectangle from "../viewObject/graphics/rectangle";
 import { GenerateCircleOption, GenerateRectAngleOption } from "Graphics";
 import Circle from "../viewObject/graphics/circle";
+import ImageToolkit from "../lib/image-toolkit";
+import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
 type ViewObjectHandler<T> = (entity: ViewObjectImportEntity) => T;
 
-abstract class ReaderBase {
-  constructor() {}
+abstract class DeserializerBase {
+  protected readonly kit: ImageToolkit;
+  protected readonly otherScreenUtils: ScreenUtils;
+  protected readonly screenUtils: ScreenUtils;
+  constructor(kit: ImageToolkit, otherScreenUtils: ScreenUtils) {
+    this.kit = kit;
+    this.otherScreenUtils = otherScreenUtils;
+    this.screenUtils = this.kit.getScreenUtil();
+  }
   private readonly buttonMap = {
     DragButton: Buttons.DragButton,
     MirrorButton: Buttons.MirrorButton,
@@ -50,6 +59,9 @@ abstract class ReaderBase {
     },
     text: (entity) => {
       const textEntity = this.formatEntity<ViewObjectExportTextBox>(entity);
+      textEntity.option.fontSize = this.adaptScreenFontSize(
+        textEntity.option.fontSize
+      );
       return TextBox.reverse(textEntity);
     },
     write: (entity) => {
@@ -76,7 +88,9 @@ abstract class ReaderBase {
   };
 
   protected getViewObjectByEntity(
-    entity: ViewObjectImportEntity
+    entity: ViewObjectImportEntity,
+    otherScreenUtils: ScreenUtils,
+    screenUtil: ScreenUtils
   ): Promise<ViewObject> {
     const type: ViewObjectExportTypes = entity.type;
     const handler = this.typeHandlers[type];
@@ -93,15 +107,51 @@ abstract class ReaderBase {
   ): T {
     return entity as T;
   }
-
+  private adaptScreenSizeWidth(number: number): number {
+    if (!this.screenUtils) return number;
+    return this.screenUtils.setWidth(
+      this.otherScreenUtils.restoreFromFactorWidthWidth(number)
+    );
+  }
+  private adaptScreenSizeHeight(number: number): number {
+    if (!this.screenUtils) return number;
+    return this.screenUtils.setHeight(
+      this.otherScreenUtils.restoreFromFactorWidthHeight(number)
+    );
+  }
+  private adaptScreenFontSize(fontSize: number): number {
+    if (!this.screenUtils) return fontSize;
+    return this.screenUtils.setSp(
+      this.otherScreenUtils.restoreFromFactorWidthText(fontSize)
+    );
+  }
   public async getObjectByJson(importEntity: ViewObjectImportEntity) {
     const base: ViewObjectImportBaseInfo = importEntity.base;
     const rect: Rect = Rect.format(base.rect);
     const relativeRect: Rect = Rect.format(base.relativeRect);
     const buttons: ExportButton[] = base.buttons;
 
+    //还原另一端的屏幕适配器
+    const otherScreenUtils = this.otherScreenUtils;
+    const screenUtil = this.kit.getScreenUtil();
+
+    console.log(otherScreenUtils, screenUtil);
     //根据实体获取对象
-    const view: ViewObject = await this.getViewObjectByEntity(importEntity);
+    let view: ViewObject = await this.getViewObjectByEntity(
+      importEntity,
+      otherScreenUtils,
+      screenUtil
+    );
+
+    const adaptScreenSize = (size: {
+      width: number;
+      height: number;
+    }): { width: number; height: number } => {
+      return {
+        width: this.adaptScreenSizeWidth(size.width),
+        height: this.adaptScreenSizeHeight(size.height),
+      };
+    };
 
     //设置对象属性
     view.rect = rect;
@@ -113,9 +163,16 @@ abstract class ReaderBase {
     view.custom();
     base.locked && view.lock();
     base.mirror && view.mirror();
-    view.setFixedSize(base.fixedSize);
+    //屏幕适配包括   宽高 坐标
+    view.setPosition(
+      this.adaptScreenSizeWidth(view.positionX),
+      this.adaptScreenSizeHeight(view.positionY)
+    );
+    view.setFixedSize(adaptScreenSize(base.fixedSize));
     view.setScaleWidth(base.sizeScale.scaleWidth);
     view.setScaleHeight(base.sizeScale.scaleHeight);
+    view.setSize(adaptScreenSize(view.size));
+    console.log("解析", view.size);
     this.installButton(view, buttons);
     return view;
   }
@@ -143,4 +200,4 @@ abstract class ReaderBase {
   }
 }
 
-export default ReaderBase;
+export default DeserializerBase;

@@ -106,8 +106,15 @@ gesti.initialization({
 });
 // gesti.debug=true;
 const controller = gesti.controller;
+const screenUtil1 = controller.generateScreenUtils({
+  canvasHeight: canvas.height,
+  canvasWidth: canvas.width,
+  designWidth:750,
+  designHeight:750,
+  // devicePixelRatio:2,
+});
 const img: HTMLImageElement = document.querySelector("#dog");
-
+// controller.setScreenUtil();
 const ximage = new XImage({
   data: img2,
   width: img2.width,
@@ -146,7 +153,7 @@ const str1 = `你好你好，
 34567890`;
 const textBox2 = new TextBox(str, {
   color: "red",
-  fontSize: 10,
+  fontSize: screenUtil1.setSp(20),
   // backgroundColor:'white',
   maxWidth: 300,
   weight: 100,
@@ -161,13 +168,13 @@ const textBox = new TextBox(str1, {
   fontFamily: "楷体",
 });
 
-// loadToGesti(textBox2);
+loadToGesti(textBox2);
 //loadToGesti(textBox);
 
 // const group: Group = new Group();
 
 // textBox2.setPosition(0, 0);
-// doCenter(textBox2);
+doCenter(textBox2);
 // doCenter(imageBox);
 // textBox2.toBackground();
 // controller.layerBottom(textBox2);
@@ -180,13 +187,10 @@ const gradient = new LineGradientDecoration({
   end: Alignment.bottomRight,
 });
 console.log("序列", JSON.stringify(gradient));
-const screenUtil1 = new ScreenUtils({
-  canvasHeight: canvas.height,
-  canvasWidth: canvas.width,
-});
+
 const rect: Rectangle = new Rectangle({
-  width: screenUtil1.setWidth(500),
-  height: screenUtil1.setWidth(500),
+  width:screenUtil1.setWidth(100),
+  height: screenUtil1.setWidth(100),
   decoration: {
     backgroundColor: "skyblue",
     //  gradient: gradient,
@@ -211,7 +215,11 @@ circle.installMultipleButtons([
 doCenter(circle);
 
 console.log(rect);
-doCenter(rect);
+doCenter(rect,"horizon");
+rect.setPosition(
+  canvas.width/2,
+  rect.height/2,
+);
 const drag = new DragButton({
   buttonOption: {
     alignment: Alignment.bottomRight,
@@ -243,8 +251,8 @@ const canvas2: HTMLCanvasElement = document.querySelector("#canvas2");
 const g2 = canvas2.getContext("2d", {
   willReadFrequently: true,
 });
-canvas2.width = 300;
-canvas2.height = 300;
+canvas2.width = 200;
+canvas2.height = 200;
 const gesti2 = createGesti();
 const screenUtil2 = new ScreenUtils({
   canvasHeight: canvas2.height,

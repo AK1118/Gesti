@@ -2,7 +2,7 @@
  * @Author: AK1118
  * @Date: 2023-11-03 18:14:02
  * @Last Modified by: AK1118
- * @Last Modified time: 2023-11-21 14:58:59
+ * @Last Modified time: 2024-01-06 16:50:27
  */
 import SizeButton from "./core/viewObject/buttons/sizeButton";
 import { ViewObjectFamily } from "./core/enums";
@@ -18,10 +18,6 @@ import {
   onHide /*隐藏可操作对象时 */,
   onUpdate /*刷新画布时 */,
   onLoad /**载入新的对象到画布内时 */,
-  addVerticalLine /**新增预设垂直线到画布内 */,
-  addHorizonLine /**新增预设水平线到画布内 */,
-  addRect /**新增预设矩形到画布内 */,
-  addCircle /**新增预设圆形到画布内 */,
   useTextHandler /**得到一个可操控文字对象控制器 */,
   createTextBox /**创建文字对象 */,
   loadToGesti /**加载某个可操作对象到画布内 */,
@@ -58,7 +54,6 @@ import {
   doRightward,
   doCenter,
   doUpdate,
-  useReader,
   currentViewObject,
   doCancel,
   driveMove,
@@ -75,7 +70,6 @@ import {
   // exportAllWithWeChat,
   // importAllWithWeChat,
   doPosition,
-  useReaderH5,
   // useReaderWeChat,
   useGetViewObjectById,
 } from "./hooks/index";
@@ -137,10 +131,6 @@ export {
   onBeforeDestroy /*销毁实例前回调 */,
   doDestroyGesti /*销毁实例 */,
   onLoad /**载入新的对象到画布内时 */,
-  addVerticalLine /**新增预设垂直线到画布内 */,
-  addHorizonLine /**新增预设水平线到画布内 */,
-  addRect /**新增预设矩形到画布内 */,
-  addCircle /**新增预设圆形到画布内 */,
   createTextBox /**创建文字对象 */,
   createXImage /**创建一个XImage对象 */,
   createImageBox /**创建一个ImageBox对象 */,
@@ -181,7 +171,6 @@ export {
   doUpdate,
   doCancelEvent,
   doCancelAll,
-  useReader,
   currentViewObject,
   doCancel,
   doCleanAll,
@@ -195,7 +184,6 @@ export {
   ptToPx,
   doPosition,
   // useReaderWeChat,
-  useReaderH5,
   useGetViewObjectById,
   parseUint8Array,
   uint8ArrayConvert,

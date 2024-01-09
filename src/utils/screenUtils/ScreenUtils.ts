@@ -17,6 +17,8 @@ import { ScreenUtilExportEntity } from "Serialization";
  *
  *
  * 需要考虑动态改变屏幕大小
+ * 
+
  */
 
 class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
@@ -41,7 +43,12 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
       : this.scaleWidth;
   }
   toJSON(): ScreenUtilExportEntity {
-    return this.option; 
+    return {
+      scaleHeight: this.scaleHeight,
+      scaleText: this.scaleText,
+      scaleWidth: this.scaleWidth,
+      ...this.option,
+    };
   }
 
   public setSp(fontSize: number): number {
@@ -52,6 +59,18 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
   }
   public setHeight(height: number): number {
     return this.scaleHeight * height;
+  }
+  public static format(entity: ScreenUtilExportEntity): ScreenUtils {
+    return new ScreenUtils(entity);
+  }
+  public restoreFromFactorWidthWidth(width: number): number {
+    return width / this.scaleWidth;
+  }
+  public restoreFromFactorWidthHeight(height: number): number {
+    return height / this.scaleHeight;
+  }
+  public restoreFromFactorWidthText(fontSize: number): number {
+    return fontSize / this.scaleText;
   }
 }
 

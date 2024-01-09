@@ -7,14 +7,17 @@ import GestiEventManager, { GestiEvent } from "../../utils/event/event";
 import Gesture from "../../utils/event/gesture";
 import GestiController from "../interfaces/gesticontroller";
 import Painter from "./painter";
-import GestiReaderH5 from "../../utils/reader/reader-H5";
 import Rect from "./rect";
 import Vector from "./vector";
 import ImageBox from "../viewObject/image";
 import TextBox from "../viewObject/text/text";
 import WriteFactory from "../viewObject/write/write-factory";
 import XImage from "./ximage";
-import { ViewObjectImportEntity } from "@/types/serialization";
+import {
+  ViewObjectExportEntity,
+  ViewObjectExportWrapper,
+  ViewObjectImportEntity,
+} from "@/types/serialization";
 import {
   GraffitiCloser,
   InitializationOption,
@@ -22,6 +25,9 @@ import {
 } from "@/types/gesti";
 import WriteViewObj from "../viewObject/write";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
+import { ScreenUtilOption } from "Gesti";
+import Platform from "../viewObject/tools/platform";
+import Deserializer from "@/utils/deserializer/Deserializer";
 enum EventHandlerState {
   down,
   up,
@@ -180,6 +186,9 @@ abstract class ImageToolkitBase {
       }
     });
   }
+  public getScreenUtil(): ScreenUtils {
+    return this.screenUtils;
+  }
 }
 
 class ImageToolkit extends ImageToolkitBase implements GestiController {
@@ -202,6 +211,12 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  generateScreenUtils(option: ScreenUtilOption): ScreenUtils {
+    //只要生成了必须使用屏幕适配器
+    this.screenUtils = new ScreenUtils(option);
+    return this.screenUtils;
+  }
+
   remove(view?: ViewObject): boolean {
     const _view = this.selectedViewObject || view;
     if (!_view) return false;
@@ -380,12 +395,33 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   async importAll(json: string): Promise<void> {
     return new Promise(async (r, j) => {
       try {
-        if (json == "[]" || !json) throw Error("Import Json is Empty");
-        const str = JSON.parse(json);
-        const reader = new GestiReaderH5();
-        for await (const item of str) {
+        if (!json)
+          throw Error("Can not deserialization,because Json is empty.");
+        const jsonObj = JSON.parse(json);
+        const wrapperEntity: ViewObjectExportWrapper = jsonObj;
+        const info = wrapperEntity.info;
+        const entities: Array<ViewObjectExportEntity> = wrapperEntity.entities;
+        if (info.screen) {
+          //屏幕适配器大小需要变为自己的大小
+          /**
+           * - 双方设计稿大小必须一致
+           * - 计算新的屏幕适配尺寸之前必须根据适配因子还原绝对大小
+           */
+          this.screenUtils = this.generateScreenUtils({
+            ...info.screen,
+            canvasWidth: this.canvasRect.size.width,
+            canvasHeight: this.canvasRect.size.height,
+          });
+        }
+        //还原另一端的屏幕适配器
+        const otherScreenUtils = ScreenUtils.format(info.screen);
+        //反序列化
+        const deserializer = new Deserializer(this, otherScreenUtils);
+        for await (const item of entities) {
           const importEntity: ViewObjectImportEntity = item;
-          const obj: ViewObject = await reader.getObjectByJson(importEntity);
+          const obj: ViewObject = await deserializer.getObjectByJson(
+            importEntity
+          );
           if (obj) this.load(obj);
         }
         this.render();
@@ -429,7 +465,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     const offPainter = new Painter(offScreenPainter);
     return new Promise(async (r, j) => {
       try {
-        const viewObjectList: Array<Object> = [];
+        const viewObjectList: Array<ViewObjectExportEntity> = [];
         for await (const item of this.ViewObjectList) {
           if (item.disabled) continue;
           if (type == "H5") {
@@ -440,7 +476,14 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
             viewObjectList.push(exportEntity);
           }
         }
-        r(JSON.stringify(viewObjectList));
+        const exportWrapper: ViewObjectExportWrapper = {
+          entities: viewObjectList,
+          info: {
+            platform: Platform.platform,
+            screen: this.screenUtils?.toJSON(),
+          },
+        };
+        r(JSON.stringify(exportWrapper));
       } catch (error) {
         j(error);
       }

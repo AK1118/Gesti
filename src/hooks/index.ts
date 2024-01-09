@@ -1,6 +1,6 @@
 import { GestiConfigOption } from "../config/gestiConfig";
 import Gesti from "../core/lib/gesti";
-import GestiReader from "../core/bases/reader-base";
+import GestiReader from "../core/bases/deserializer-base";
 import TextBox from "../core/viewObject/text/text";
 import Widgets from "../static/widgets";
 import XImage from "../core/lib/ximage";
@@ -9,8 +9,6 @@ import {
   createTextBoxView,
   createXImageFun,
 } from "./create";
-import GestiReaderH5 from "../utils/reader/reader-H5";
-import Painter from "../core/lib/painter";
 import DragButton from "../core/viewObject/buttons/dragbutton";
 import CloseButton from "../core/viewObject/buttons/closeButton";
 import RotateButton from "../core/viewObject/buttons/rotateButton";
@@ -102,44 +100,6 @@ const useController = (target: Gesti = currentInstance) => {
   if (!target) return null;
   return currentInstance.controller;
 };
-
-/**
- * @description 预设对象加载,本质上调用importAll
- * @param type
- * @returns
- */
-function createPresets(
-  type: "rect" | "circle" | "verticalLine" | "horizonLine"
-) {
-  return (target: Gesti = currentInstance): Promise<ViewObject> => {
-    if (!target) {
-      error("Target is empty");
-      return Promise.reject("Target is empty");
-    }
-    setCurrentInstance(target);
-    const controller = getCurrentController();
-    const map = {
-      rect: Widgets.rect,
-      circle: Widgets.circle,
-      verticalLine: Widgets.verticalLine,
-      horizonLine: Widgets.horizonLine,
-    };
-    const shape: string = map[type];
-    if (!shape) {
-      warn("Preset object not found");
-      return Promise.reject("Preset object not found");
-    }
-    return useReader(shape);
-  };
-}
-
-/**
- * 添加预设图形
- */
-const addVerticalLine = createPresets("verticalLine");
-const addHorizonLine = createPresets("horizonLine");
-const addRect = createPresets("rect");
-const addCircle = createPresets("circle");
 
 /**
  * 创建可操作对象
@@ -511,45 +471,6 @@ const doRotate = (
 };
 
 /**
- * 已弃用，请使用 useReaderH5 或者useReaderWeChat
- * 转换json成可读取对象
- * @param json
- * @deprecated
- * @returns
- */
-const useReader = (json: string): Promise<ViewObject> => {
-  // const reader = new GestiReader();
-  // return reader.getObjectByJson(json);
-  return null;
-};
-/**
- * @description 转换json为可读对象 H5专用
- * @param json 特定格式json
- * @returns
- */
-const useReaderH5 = (json: string): Promise<ViewObject> => {
-  const reader: GestiReader = new GestiReaderH5();
-  return null; //reader.getObjectByJson(json);
-};
-/**
- * @description 转换json为可读对象 微信小程序专用
- * @param json 特定格式json
- * @param painter 画笔
- * @param weChatCanvas 画布
- * @deprecated
- * @returns
- */
-// const useReaderWeChat = (
-//   json: string,
-//   painter: CanvasRenderingContext2D,
-//   weChatCanvas: any
-// ): Promise<ViewObject> => {
-//   const reader: GestiReaderWechat = new GestiReaderWechat();
-//   const _painter = new Painter(painter);
-//   return null; //reader.getObjectByJson(json,_painter,weChatCanvas);
-// };
-
-/**
  * @description 获取当前选中对象
  * @param target
  * @returns
@@ -607,10 +528,6 @@ export {
   onDestroy /*销毁Gesti实例后调用 */,
   onBeforeDestroy /*销毁Gesti实例前调用 */,
   onLoad /**载入新的对象到画布内时 */,
-  addVerticalLine /**新增预设垂直线到画布内 */,
-  addHorizonLine /**新增预设水平线到画布内 */,
-  addRect /**新增预设矩形到画布内 */,
-  addCircle /**新增预设圆形到画布内 */,
   useTextHandler /**得到一个可操控文字对象控制器 */,
   createTextBox /**创建文字对象 */,
   loadToGesti /**加载某个可操作对象到画布内 */,
@@ -651,7 +568,6 @@ export {
   doCenter,
   doUpdate,
   doDestroyGesti,
-  useReader,
   currentViewObject,
   doCancel,
   driveMove,
@@ -662,7 +578,6 @@ export {
   doCancelAll,
   doCleanAll,
   removeListener,
-  useReaderH5,
   // useReaderWeChat,
   useGetViewObjectById /* 通过id获取对象 */,
 };

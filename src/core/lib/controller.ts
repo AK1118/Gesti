@@ -4,7 +4,8 @@ import ImageToolkit from "./image-toolkit";
 import GestiController from "../interfaces/gesticontroller";
 import Vector from "./vector";
 import XImage from "./ximage";
-import { GraffitiCloser, TextOptions } from "@/types/gesti";
+import { GraffitiCloser, ScreenUtilOption, TextOptions } from "@/types/gesti";
+import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
 declare type CenterAxis = "vertical" | "horizon";
 
@@ -18,11 +19,15 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  generateScreenUtils(option: ScreenUtilOption): ScreenUtils {
+    return this.kit.generateScreenUtils(option);
+  }
+ 
   remove(view?: ViewObject): boolean {
     return this.kit.remove(view);
   }
   getAllViewObject(): ViewObject[] {
-   return this.kit.getAllViewObject();
+    return this.kit.getAllViewObject();
   }
   getAllViewObjectSync(): Promise<ViewObject[]> {
     return this.kit.getAllViewObjectSync();
@@ -33,7 +38,7 @@ class GesteControllerImpl implements GestiController {
   unMount(view: ViewObject): void {
     this.kit.unMount(view);
   }
-  
+
   close(view?: ViewObject): void {
     this.kit.close(view);
   }
@@ -140,8 +145,8 @@ class GesteControllerImpl implements GestiController {
   updateText(text: string, options?: TextOptions): void {
     this.kit.updateText(text, options);
   }
-  center(view?: ViewObject,axis?: CenterAxis): void {
-    this.kit.center( view,axis);
+  center(view?: ViewObject, axis?: CenterAxis): void {
+    this.kit.center(view, axis);
   }
   addText(text: string, options?: TextOptions): Promise<ViewObject> {
     return this.kit.addText(text, options);
