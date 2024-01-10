@@ -453,12 +453,11 @@ export abstract class TextBoxBase extends ViewObject {
   }
   protected doCache(): void {
     //是否使用缓存  该平台是否存在离屏画布
-    if (!this.isUseCache || !this.getCacheCanvasByPlatform()) {
+    if (!this.isUseCache) {
       return;
     }
     //没变过大小就不缓存
     if (!this.isDirty) return;
-    // this.updateFontSizeByRectSizeHeight();
     this.flushCache();
     this.cache();
     this.updateCache();
@@ -468,62 +467,17 @@ export abstract class TextBoxBase extends ViewObject {
   //最终渲染缓存图像  OffscreenCanvas | Image
   protected renderedCacheImage = null;
   private async cache(): Promise<void> {
-    const painter: Painter = this.getCacheCanvasPainter();
+    //必须新建canvas重置画布大小
+    const created = this.generateOffScreenCanvas();
+    if (!created) return this.unUseCache();
+    const painter = this.offScreenPainter;
     this.setFontDecorations(painter);
     painter.clearRect(0, 0, this.width, this.height);
+    painter.save();
     painter.translate(this.width * 0.5, this.height * 0.5);
     this.render(painter, true);
-    painter.translate(-this.width * 0.5, -this.height * 0.5);
-
-    if (Platform.isBrowser) {
-      this.renderedCacheImage = this.cacheCanvas;
-    } else if (Platform.isWeChatMiniProgram) {
-      if (Platform.isWeChatMiniProgram) {
-        const img = (this.cacheCanvas as any)?.createImage();
-        img.src = (this.cacheCanvas as any)?.toDataURL();
-        await waitingLoadImg(img);
-        this.renderedCacheImage = img;
-      }
-    }
-  }
-  /**
-   * @description 获取平台的离屏画布
-   * @test
-   * @returns
-   */
-  private getCacheCanvasByPlatform(): any {
-    if (this.cacheCanvas) return this.cacheCanvas;
-    const offScreenCanvas = getOffscreenCanvasWidthPlatform(
-      this.width,
-      this.height
-    );
-    this.cacheCanvas = offScreenCanvas;
-    if (!offScreenCanvas) {
-      this.unUseCache();
-      return null;
-      // throw new Error(
-      //   "Your platform does not support OffscreenCanvas in [Gesti]. Please run textBox.unUseCache() to resolve this error."
-      // );
-    }
-    return this.cacheCanvas;
-  }
-  //创建时,刷新缓存时调用
-  private createCacheCanvas(): HTMLCanvasElement | OffscreenCanvas {
-    this.cacheCanvas = this.getCacheCanvasByPlatform();
-
-    this.cacheCanvas.width = this.width;
-    this.cacheCanvas.height = this.height;
-
-    return this.cacheCanvas;
-  }
-  //渲染时调用
-  private getCacheCanvas() {
-    return this.createCacheCanvas();
-  }
-  //获取画笔
-  private getCacheCanvasPainter(): Painter {
-    const cacheCanvas = this.getCacheCanvas();
-    return new Painter(cacheCanvas.getContext("2d") as any);
+    painter.restore();
+    this.renderedCacheImage = this.offScreenCanvas;
   }
   protected onInput(value: string): void {}
 }
@@ -578,8 +532,8 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     ) {
       paint.drawImage(
         this.renderedCacheImage,
-        -this.width * 0.5,
-        -this.height * 0.5,
+        -this.width / 2,
+        -this.height / 2,
         this.width,
         this.height
       );

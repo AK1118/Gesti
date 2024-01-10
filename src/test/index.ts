@@ -22,6 +22,7 @@ import {
   exportAll,
   doCenter,
   loadToGesti,
+  useGraffitiWrite,
 } from "@/hooks/index";
 import Gesti, {
   CloseButton,
@@ -109,8 +110,8 @@ const controller = gesti.controller;
 const screenUtil1 = controller.generateScreenUtils({
   canvasHeight: canvas.height,
   canvasWidth: canvas.width,
-  designWidth:750,
-  designHeight:750,
+  designWidth: 750,
+  designHeight: 750,
   // devicePixelRatio:2,
 });
 const img: HTMLImageElement = document.querySelector("#dog");
@@ -136,7 +137,7 @@ for (let i = 0; i < 1; i++) {
   ]);
 
   doCenter(imageBox);
-  // loadToGesti(imageBox);
+   loadToGesti(imageBox);
 }
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
@@ -189,7 +190,7 @@ const gradient = new LineGradientDecoration({
 console.log("序列", JSON.stringify(gradient));
 
 const rect: Rectangle = new Rectangle({
-  width:screenUtil1.setWidth(100),
+  width: screenUtil1.setWidth(100),
   height: screenUtil1.setWidth(100),
   decoration: {
     backgroundColor: "skyblue",
@@ -215,11 +216,8 @@ circle.installMultipleButtons([
 doCenter(circle);
 
 console.log(rect);
-doCenter(rect,"horizon");
-rect.setPosition(
-  canvas.width/2,
-  rect.height/2,
-);
+doCenter(rect, "horizon");
+rect.setPosition(canvas.width / 2, rect.height / 2);
 const drag = new DragButton({
   buttonOption: {
     alignment: Alignment.bottomRight,
@@ -265,10 +263,11 @@ const controller2 = gesti2.initialization({
     canvasHeight: canvas2.height,
   },
 });
-controller2.cancelEvent();
-
+// controller2.cancelEvent();
+useGraffitiWrite({},gesti);
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");
+  gesti2.controller.cleanAll();
   const a = window.localStorage.getItem("aa");
   importAll(a, gesti2).then((e) => {
     console.log("导入成功");
@@ -282,4 +281,9 @@ document.getElementById("export").addEventListener("click", () => {
     window.localStorage.setItem("aa", json);
     console.log("导出成功");
   });
+});
+
+document.getElementById("input").addEventListener("input", (e: any) => {
+  textBox2.setText(e.target?.value);
+  console.log(e.target?.value);
 });

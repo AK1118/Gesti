@@ -240,8 +240,11 @@ class TextBox extends TextBase {
     };
     return Promise.resolve(entity);
   }
-  exportWeChat(painter?: Painter, canvas?: any): Promise<ViewObjectExportEntity> {
-      return this.export();
+  exportWeChat(
+    painter?: Painter,
+    canvas?: any
+  ): Promise<ViewObjectExportEntity> {
+    return this.export();
   }
 }
 

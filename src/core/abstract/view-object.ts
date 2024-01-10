@@ -91,17 +91,19 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     }
     //使用缓存
     if (this.isUseRenderCache) {
-      //没有初始化
-      if (!this.offScreenCreated) {
-        const created = this.generateOffScreenCanvas();
-        //创建离屏失败，关闭缓存渲染
-        if (!created) this.unUseCache();
-        this.drawImage(this.offScreenPainter);
-      }
+      this.performCache();
     }
     this.draw(paint, isCache);
   }
-
+  public performCache() {
+    //没有初始化
+    if (!this.offScreenCreated) {
+      const created = this.generateOffScreenCanvas();
+      //创建离屏失败，关闭缓存渲染
+      if (!created) this.unUseCache();
+      this.drawImage(this.offScreenPainter);
+    }
+  }
   /**
    * @description 实时渲染或者渲染缓存
    * @param paint
@@ -116,8 +118,10 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     paint.beginPath();
     paint.save();
     //缓存不需要这两个
-    paint.translate(this.positionX, this.positionY);
-    paint.rotate(this.rect.getAngle);
+    if (!isCache) {
+      paint.translate(this.positionX, this.positionY);
+      paint.rotate(this.rect.getAngle);
+    }
     if (this.isMirror) paint.scale(-1, 1);
     paint.globalAlpha = this.opacity;
     this.renderImageOrCache(paint);
