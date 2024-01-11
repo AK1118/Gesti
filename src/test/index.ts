@@ -198,7 +198,7 @@ const rect: Rectangle = new Rectangle({
   },
 });
 const circle = new Circle({
-  radius: 100,
+  radius: screenUtil1.setSp(100),
   decoration: {
     backgroundColor: "skyblue",
     gradient: new LineGradientDecoration({
@@ -212,7 +212,7 @@ circle.installMultipleButtons([
   new HorizonButton("left"),
   new VerticalButton("top"),
 ]);
-// loadToGesti(circle);
+loadToGesti(circle);
 doCenter(circle);
 
 console.log(rect);
@@ -246,12 +246,20 @@ console.log(drag);
 loadToGesti(rect);
 
 const canvas2: HTMLCanvasElement = document.querySelector("#canvas2");
+const canvas3: HTMLCanvasElement = document.querySelector("#canvas3");
+const g3 = canvas3.getContext("2d", {
+  willReadFrequently: true,
+});
 const g2 = canvas2.getContext("2d", {
   willReadFrequently: true,
 });
+
 canvas2.width = 200;
 canvas2.height = 200;
+canvas3.width = 100;
+canvas3.height = 100;
 const gesti2 = createGesti();
+const gesti3= createGesti();
 const screenUtil2 = new ScreenUtils({
   canvasHeight: canvas2.height,
   canvasWidth: canvas2.width,
@@ -263,13 +271,24 @@ const controller2 = gesti2.initialization({
     canvasHeight: canvas2.height,
   },
 });
+gesti3.initialization({
+  renderContext: g3,
+  rect: {
+    canvasWidth: canvas3.width,
+    canvasHeight: canvas3.height,
+  },
+});
 // controller2.cancelEvent();
 useGraffitiWrite({},gesti);
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");
   gesti2.controller.cleanAll();
+  gesti3.controller.cleanAll();
   const a = window.localStorage.getItem("aa");
   importAll(a, gesti2).then((e) => {
+    console.log("导入成功");
+  });
+  importAll(a, gesti3).then((e) => {
     console.log("导入成功");
   });
 });

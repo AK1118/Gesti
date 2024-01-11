@@ -40,6 +40,7 @@ class ImageBox extends ViewObject {
     this.ximage = ximage;
     this.image = ximage.data;
     this.rect = new Rect(ximage.toJson());
+    this.useCache();
   }
   setDecoration(xImage: XImage): void {
     this.ximage = xImage;
@@ -213,8 +214,8 @@ class ImageBox extends ViewObject {
       offCanvas
     );
     offPainter.putImageData(source, 0, 0);
-    const image=offCanvas.createImage();
-    image.src=offCanvas.toDataURL();
+    const image = offCanvas.createImage();
+    image.src = offCanvas.toDataURL();
     await waitingLoadImg(image);
     const ximage = new XImage({
       data: image,

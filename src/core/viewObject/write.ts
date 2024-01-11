@@ -20,25 +20,8 @@ import { GraffitiTypes } from "@/types/gesti";
  */
 class WriteViewObj extends ViewObject {
   family: ViewObjectFamily = ViewObjectFamily.write;
-  async export(): Promise<ViewObjectExportGraffiti> {
-    // this.points.forEach((item) => {
-    //   item.x = ~~item.x;
-    //   item.y = ~~item.y;
-    // });
-    // const json = {
-    //   viewObjType: "write",
-    //   options: {
-    //     config: {
-    //       ...this.config,
-    //       scaleX: this._scalex,
-    //       scaleY: this._scaley,
-    //     },
-    //     points: this.points,
 
-    //     ...this.getBaseInfo(),
-    //   },
-    // };
-    // return json;
+  async export(): Promise<ViewObjectExportGraffiti> {
     return {
       type: "write",
       base: this.getBaseInfo(),
@@ -95,6 +78,7 @@ class WriteViewObj extends ViewObject {
     this._scalex = config.scaleX ?? 1;
     this._scaley = config.scaleY ?? 1;
     this.config = config;
+    this.useCache();
   }
   public setDecoration(decoration: {
     //strokeColor?: string;

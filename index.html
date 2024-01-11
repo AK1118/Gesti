@@ -1,60 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0,user-scalable=no"
+    />
     <title>Document</title>
-    <script  src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.15.0/vconsole.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.15.0/vconsole.min.js"></script>
     <style>
-        html,body{
-            width:100%;
-            height: 100%;
-            display: block;
-        }
-        *{
-            padding:0px;
-            margin: 0px;
-        }
-        canvas {
-            /* position: fixed;
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      * {
+        padding: 0px;
+        margin: 0px;
+      }
+      canvas {
+        /* position: fixed;
             top: 0px;
             left: 100px; */
-            /* pointer-events: none; */
-            background-color: #f8f8f8;
-            /* margin: 0px auto; */
-            display: block;
-            /* background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%),
+        /* pointer-events: none; */
+        background-color: #f8f8f8;
+        /* margin: 0px auto; */
+        display: block;
+        /* background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%),
                 linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%);
             background-size: 16px 16px;
             background-position: 0 0, 8px 8px;
             background-repeat: repeat; */
-            box-shadow: 0 0 10px #ccc;
-        }
+        box-shadow: 0 0 10px #ccc;
+      }
 
-        img {
-            display: none;
-        }
+      img {
+        display: none;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-    <canvas id="canvas" width="300" height="300"></canvas>
-    <!-- <canvas id="canvas2" width="300" height="300"></canvas> -->
-    <canvas id="offScreenCanvas" style="display: none;"></canvas>
-    <canvas id="canvas2"></canvas>
+  <body>
+    <div style="display: flex">
+      <div>
+        <canvas id="canvas" width="300" height="300"></canvas>
+      </div>
+      <!-- <canvas id="canvas2" width="300" height="300"></canvas> -->
+      <div>
+        <canvas id="offScreenCanvas" style="display: none"></canvas>
+      </div>
+      <div>
+        <canvas id="canvas2"></canvas>
+      </div>
+      <div>
+        <canvas id="canvas3"></canvas>
+      </div>
+    </div>
     <!-- <img id="dog" alt="" crossorigin="anonymous" src="https://s.cn.bing.net/th?id=OJ.ctIMyEUgdeHZwQ&w=120&h=160&c=8&rs=1&pid=academic" /> -->
-    <img  id="dog" src="../img/op.jfif"/>
-    <img  id="bg" src="https://images.pexels.com/photos/1496373/pexels-photo-1496373.jpeg?auto=compress&cs=tinysrgb&w=100&h=100" crossOrigin="anonymous"/>
-    <img id="result"/>
+    <img id="dog" src="../img/op.jfif" />
+    <img
+      id="bg"
+      src="https://images.pexels.com/photos/1496373/pexels-photo-1496373.jpeg?auto=compress&cs=tinysrgb&w=100&h=100"
+      crossorigin="anonymous"
+    />
+    <img id="result" />
     <button id="import">导入</button>
     <textarea id="input"></textarea>
     <button id="export">导出</button>
     <button id="addSize">字体增大</button>
-    <input type="file" id="file"/>
-</body>
-<script>
+    <input type="file" id="file" />
+  </body>
+  <script>
     //  new VConsole()
-</script>
+  </script>
 </html>

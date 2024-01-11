@@ -2,7 +2,11 @@ import GraphicsBase from "@/core/bases/graphics-base";
 import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
 import { ViewObjectFamily } from "@/index";
-import { GenerateCircleOption, GradientTypes, LineGradientDecorationOption } from "Graphics";
+import {
+  GenerateCircleOption,
+  GradientTypes,
+  LineGradientDecorationOption,
+} from "Graphics";
 import {
   ViewObjectExportEntity,
   ViewObjectExportGraphics,
@@ -19,17 +23,18 @@ class Circle extends GraphicsBase<GenerateCircleOption> {
     throw new Error("Method not implemented.");
   }
   protected renderGraphics(paint: Painter): void {
+    const radius: number = this.option.radius;
     const { backgroundColor, gradient } = this.decoration;
     paint.beginPath();
     paint.save();
     paint.fillStyle = backgroundColor ?? "black";
-
     if (this.canRenderCache) {
-      paint.translate(this.width * 0.5, this.height * 0.5);
       if (gradient) paint.fillStyle = gradient.getGradient(paint, this.size);
-      paint.arc(0, 0, this.width * 0.5, 0, Math.PI * 2);
+      paint.scale((this.width / radius) * 0.5, (this.height / radius) * 0.5);
+      paint.arc(0, 0, this.option.radius, 0, Math.PI * 2);
     } else {
-      paint.arc(0, 0, this.width * 0.5, 0, Math.PI * 2);
+      paint.scale((this.width / radius) * 0.5, (this.height / radius) * 0.5);
+      paint.arc(0, 0, this.option.radius, 0, Math.PI * 2);
     }
     paint.fill();
     paint.restore();
@@ -65,7 +70,7 @@ class Circle extends GraphicsBase<GenerateCircleOption> {
     const gradientType: GradientTypes = entity.option.decoration.gradient.type;
     const option = entity.option;
     if (option.decoration.gradient) {
-      if (gradientType== "lineGradient") {
+      if (gradientType == "lineGradient") {
         option.decoration.gradient = LineGradientDecoration.format(
           option.decoration.gradient as any as LineGradientDecorationOption
         );

@@ -64,8 +64,19 @@ abstract class DeserializerBase {
       );
       return TextBox.reverse(textEntity);
     },
-    write: (entity) => {
+    write: (entity: ViewObjectExportGraffiti) => {
+      if (entity.points)
+        entity.points = entity.points.map<Vector>((_) => {
+          _.x = this.adaptScreenSizeWidth(_.x);
+          _.y = this.adaptScreenSizeHeight(_.y);
+          return _;
+        });
+      if (entity.config.lineWidth)
+        entity.config.lineWidth = this.adaptScreenFontSize(
+          entity.config.lineWidth
+        );
       const textWrite = this.formatEntity<ViewObjectExportGraffiti>(entity);
+
       return WriteViewObj.reserve(textWrite);
     },
     graphicsRectangle: (entity) => {
@@ -75,7 +86,10 @@ abstract class DeserializerBase {
         );
       return Rectangle.reserve(graphics);
     },
-    graphicsCircle: (entity) => {
+    graphicsCircle: (
+      entity: ViewObjectExportGraphics<GenerateCircleOption>
+    ) => {
+      entity.option.radius = this.adaptScreenFontSize(entity.option.radius);
       const graphics =
         this.formatEntity<ViewObjectExportGraphics<GenerateCircleOption>>(
           entity
@@ -172,7 +186,6 @@ abstract class DeserializerBase {
     view.setScaleWidth(base.sizeScale.scaleWidth);
     view.setScaleHeight(base.sizeScale.scaleHeight);
     view.setSize(adaptScreenSize(view.size));
-    console.log("解析", view.size);
     this.installButton(view, buttons);
     return view;
   }

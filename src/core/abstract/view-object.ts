@@ -101,7 +101,11 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       const created = this.generateOffScreenCanvas();
       //创建离屏失败，关闭缓存渲染
       if (!created) this.unUseCache();
+      this.draw(this.offScreenPainter,true);
+      this.offScreenPainter.save();
+      this.offScreenPainter.translate(this.width*.5,this.height*.5);
       this.drawImage(this.offScreenPainter);
+      this.offScreenPainter.restore()
     }
   }
   /**

@@ -56,7 +56,6 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
       if (gradient) {
         paint.fillStyle = gradient.getGradient(paint, this.size);
       }
-      paint.translate(this.width * 0.5, this.height * 0.5);
       paint.fillRect(
         this.width * -0.5,
         this.height * -0.5,

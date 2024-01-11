@@ -3,13 +3,20 @@ import Plugins from "@/core/lib/plugins";
 import OffScreenCanvasGenerator from "@/core/lib/plugins/offScreenCanvasGenerator";
 import Platform from "@/core/viewObject/tools/platform";
 
-
+/**
+ * ### 获取设置大小的离屏画布
+ * - 设置大小不能为0
+ * @param width
+ * @param height
+ * @returns
+ */
 const getOffscreenCanvasWidthPlatform = (
   width: number,
   height: number
 ): any => {
+  if(width===0||height===0)return null;
   const offScreenContextBuilder: OffScreenCanvasGenerator =
-  Plugins.getPluginByKey("offScreenBuilder");
+    Plugins.getPluginByKey("offScreenBuilder");
   if (offScreenContextBuilder)
     return offScreenContextBuilder.buildOffScreenCanvas(width, height);
   if (Platform.isBrowser) return new OffscreenCanvas(width, height);
@@ -40,9 +47,9 @@ const getOffscreenCanvasWidthPlatform = (
   return null;
 };
 
-const getOffscreenCanvasContext = (offCanvas): Painter => {
+const getOffscreenCanvasContext = (offCanvas: any): Painter => {
   const offScreenContextBuilder: OffScreenCanvasGenerator =
-  Plugins.getPluginByKey("offScreenBuilder");
+    Plugins.getPluginByKey("offScreenBuilder");
   if (offScreenContextBuilder)
     return offScreenContextBuilder.buildOffScreenContext(offCanvas);
   const paint = offCanvas.getContext("2d");
@@ -57,7 +64,7 @@ const waitingLoadImg = (img): Promise<void> => {
 
 const getImage = (offScreenCanvas: any): HTMLImageElement | any => {
   const offScreenContextBuilder: OffScreenCanvasGenerator =
-  Plugins.getPluginByKey("offScreenBuilder");
+    Plugins.getPluginByKey("offScreenBuilder");
   if (offScreenContextBuilder) {
     return offScreenContextBuilder.buildImage(offScreenCanvas);
   }
@@ -67,7 +74,7 @@ const getImage = (offScreenCanvas: any): HTMLImageElement | any => {
 
 const getPaintContext = (): Painter => {
   const offScreenContextBuilder: OffScreenCanvasGenerator =
-  Plugins.getPluginByKey("offScreenBuilder");
+    Plugins.getPluginByKey("offScreenBuilder");
   return offScreenContextBuilder.buildPaintContext();
 };
 

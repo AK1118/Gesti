@@ -39,9 +39,8 @@ abstract class GraphicsBase<
   protected abstract renderGraphicsBorder(paint: Painter): void;
   protected abstract renderGraphics(paint: Painter): void;
   protected mountDecoration(paint: Painter): void {}
-
   protected mountBorderDecoration(paint: Painter): void {}
-
+  
   
 }
 
