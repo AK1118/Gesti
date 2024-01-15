@@ -5,6 +5,16 @@ import Alignment from "@/core/lib/painting/alignment";
 declare module "Graphics" {
   type GradientTypes = "lineGradient" | "radiusGradient";
   type GraphicsTypes = "rectangle" | "circle";
+  type BorderRadiusAll = number;
+  // type  = number | Iterable<number>;
+
+  interface BorderRadius {
+    topLeft?: number;
+    topRight?: number;
+    bottomLeft?: number;
+    bottomRight?: number;
+  }
+
   interface ColorStop {
     // [0,1]
     step: number;
@@ -32,36 +42,34 @@ declare module "Graphics" {
     public getGradient(paint: Painter, size: Size): CanvasGradient;
   }
   class LineGradientDecoration extends GradientDecorationBase {
-    static format(option:LineGradientDecorationOption): LineGradientDecoration;
+    static format(option: LineGradientDecorationOption): LineGradientDecoration;
     constructor(option: LineGradientDecorationOption);
   }
+  //装饰器
+  interface DecorationOption {}
 
-  // interface RadiusGradientDecoration extends GradientDecoration {}
+  //盒子装饰器
+  interface BoxDecorationOption extends DecorationOption {
+    //背景颜色
+    backgroundColor?: string;
+    //背景图片
+    backgroundImage?: XImage;
+    //不透明度
+    opacity?: number;
+    //渐变
+    gradient?: GradientDecorationBase;
+    //圆角矩形
+    borderRadius?: BorderRadius | BorderRadiusAll;
+  }
 
   interface GenerateGraphicsOption {
     //隐式
     type?: GraphicsTypes;
-    decoration: BoxDecoration;
+    decoration: BoxDecorationOption;
     // borderDecoration?: BorderDecoration;
     x?: number;
     y?: number;
   }
-
-  interface BorderDecoration {
-    borderColor?: string;
-    lineDash?: number[];
-    innerBorder?: boolean;
-    borderWidth?: number;
-    gradient?: GradientDecorationBase;
-  }
-
-  interface BoxDecoration {
-    backgroundColor?: string;
-    backgroundImage?: XImage;
-    opacity?: number;
-    gradient?: GradientDecorationBase;
-  }
-
   interface GenerateRectAngleOption extends GenerateGraphicsOption {
     width: number;
     height: number;

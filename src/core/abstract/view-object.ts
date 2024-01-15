@@ -89,24 +89,22 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       this.rect.updateVertex();
       this.reBuild();
     }
-    //使用缓存
-    if (this.isUseRenderCache) {
+    //执行缓存画布生成
+    if (this.isUseRenderCache && !this.offScreenCreated) {
       this.performCache();
     }
     this.draw(paint, isCache);
   }
-  public performCache() {
-    //没有初始化
-    if (!this.offScreenCreated) {
-      const created = this.generateOffScreenCanvas();
-      //创建离屏失败，关闭缓存渲染
-      if (!created) this.unUseCache();
-      this.draw(this.offScreenPainter,true);
-      this.offScreenPainter.save();
-      this.offScreenPainter.translate(this.width*.5,this.height*.5);
-      this.drawImage(this.offScreenPainter);
-      this.offScreenPainter.restore()
-    }
+  protected performCache() {
+    //生成画布会返回布尔值判断是否生成成功，生成失败关闭缓存功能
+    const created = this.generateOffScreenCanvas();
+    //创建离屏失败，关闭缓存渲染
+    if (!created) this.unUseCache();
+    this.draw(this.offScreenPainter, true);
+    this.offScreenPainter.save();
+    this.offScreenPainter.translate(this.width * 0.5, this.height * 0.5);
+    this.drawImage(this.offScreenPainter);
+    this.offScreenPainter.restore();
   }
   /**
    * @description 实时渲染或者渲染缓存

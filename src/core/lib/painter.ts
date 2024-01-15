@@ -27,10 +27,10 @@ class Painter implements Painter {
   set lineWidth(width: number) {
     this.paint.lineWidth = width;
   }
-  set fillStyle(style: string|CanvasGradient) {
+  set fillStyle(style: string | CanvasGradient) {
     this.paint.fillStyle = style;
   }
-  set strokeStyle(style: string|CanvasGradient) {
+  set strokeStyle(style: string | CanvasGradient) {
     this.paint.strokeStyle = style;
   }
   set textBaseLine(
@@ -80,6 +80,9 @@ class Painter implements Painter {
   }
   fill() {
     this.paint.fill();
+  }
+  clip() {
+    this.paint?.clip();
   }
   arc(
     x: number,
@@ -209,14 +212,73 @@ class Painter implements Painter {
   putImageData(imagedata: ImageData, dx: number, dy: number): void {
     this.paint.putImageData(imagedata, dx, dy);
   }
-  createLinearGradient(x0: number, y0: number, x1: number, y1: number):CanvasGradient{
+  createLinearGradient(
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number
+  ): CanvasGradient {
     return this.paint?.createLinearGradient?.(x0, y0, x1, y1);
   }
-  createRadialGradient(x0: number, y0: number, r0: number, x1: number, y1: number, r1: number):CanvasGradient{
+  createRadialGradient(
+    x0: number,
+    y0: number,
+    r0: number,
+    x1: number,
+    y1: number,
+    r1: number
+  ): CanvasGradient {
     return this.paint.createRadialGradient(x0, y0, r0, x1, y1, r1);
   }
-  createConicGradient(){
-    
+  createConicGradient() {}
+  // roundRect(
+  //   x: number,
+  //   y: number,
+  //   width: number,
+  //   height: number,
+  //   radii?: number | DOMPointInit | Iterable<number | DOMPointInit>
+  // ) {
+  //   if (this.paint.roundRect) this.paint.roundRect(x, y, width, height, radii);
+  //   else {
+  //     if (!(radii instanceof Number)) {
+  //       throw Error("Radius value must a number.");
+  //     }
+  //     const radius: number = radii as unknown as number;
+  //     const paint = this.paint;
+  //     paint.beginPath();
+  //     paint.moveTo(x + radius, y);
+  //     paint.arcTo(x + width, y, x + width, y + height, radius);
+  //     paint.arcTo(x + width, y + height, x, y + height, radius);
+  //     paint.arcTo(x, y + height, x, y, radius);
+  //     paint.arcTo(x, y, x + width, y, radius);
+  //     paint.closePath();
+  //   }
+  // }
+  roundRect(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radii?: number | DOMPointInit | Iterable<number | DOMPointInit>
+  ) {
+    if (this.paint.roundRect) {
+      this.paint.roundRect(x, y, width, height, radii);
+    } else {
+      const getRadius = (index: number): number => {
+        if (typeof radii === "number") return radii;
+        if (Array.isArray(radii)) {
+          return radii[index] ?? 0;
+        }
+      };
+      const paint = this.paint;
+      paint.beginPath();
+      paint.moveTo(x + getRadius(0), y);
+      paint.arcTo(x + width, y, x + width, y + height, getRadius(1));
+      paint.arcTo(x + width, y + height, x, y + height, getRadius(2));
+      paint.arcTo(x, y + height, x, y, getRadius(3));
+      paint.arcTo(x, y, x + width, y, getRadius(0));
+      paint.closePath();
+    }
   }
   /*清空画布|刷新画布*/
   update() {}

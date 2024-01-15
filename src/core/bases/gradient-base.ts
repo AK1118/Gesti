@@ -1,12 +1,17 @@
-import { ColorStop, GradientDecorationOptionBase, GradientTypes } from "Graphics";
+import {
+  ColorStop,
+  GradientDecorationOptionBase,
+  GradientTypes,
+} from "Graphics";
 import Painter from "../lib/painter";
 import Serializable from "../interfaces/Serialization";
 
 /**
  * S 为渐变参数option类型，同时也为导出JSON时的类型
  */
-abstract class GradientDecorationBase<S extends GradientDecorationOptionBase>
-  implements Serializable<S>
+abstract class GradientDecorationBase<
+  S extends GradientDecorationOptionBase = null
+> implements Serializable<S>
 {
   type: GradientTypes;
   private readonly colors: Array<string>;

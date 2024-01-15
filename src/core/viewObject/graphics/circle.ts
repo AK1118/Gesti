@@ -23,22 +23,22 @@ class Circle extends GraphicsBase<GenerateCircleOption> {
     throw new Error("Method not implemented.");
   }
   protected renderGraphics(paint: Painter): void {
-    const radius: number = this.option.radius;
-    const { backgroundColor, gradient } = this.decoration;
-    paint.beginPath();
-    paint.save();
-    paint.fillStyle = backgroundColor ?? "black";
-    if (this.canRenderCache) {
-      if (gradient) paint.fillStyle = gradient.getGradient(paint, this.size);
-      paint.scale((this.width / radius) * 0.5, (this.height / radius) * 0.5);
-      paint.arc(0, 0, this.option.radius, 0, Math.PI * 2);
-    } else {
-      paint.scale((this.width / radius) * 0.5, (this.height / radius) * 0.5);
-      paint.arc(0, 0, this.option.radius, 0, Math.PI * 2);
-    }
-    paint.fill();
-    paint.restore();
-    paint.closePath();
+    // const radius: number = this.option.radius;
+    // const { backgroundColor, gradient } = this.decoration;
+    // paint.beginPath();
+    // paint.save();
+    // paint.fillStyle = backgroundColor ?? "black";
+    // if (this.canRenderCache) {
+    //   if (gradient) paint.fillStyle = gradient.getGradient(paint, this.size);
+    //   paint.scale((this.width / radius) * 0.5, (this.height / radius) * 0.5);
+    //   paint.arc(0, 0, this.option.radius, 0, Math.PI * 2);
+    // } else {
+    //   paint.scale((this.width / radius) * 0.5, (this.height / radius) * 0.5);
+    //   paint.arc(0, 0, this.option.radius, 0, Math.PI * 2);
+    // }
+    // paint.fill();
+    // paint.restore();
+    // paint.closePath();
   }
   get value(): any {
     throw new Error("Method not implemented.");

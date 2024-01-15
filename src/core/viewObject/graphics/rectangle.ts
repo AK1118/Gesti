@@ -48,30 +48,31 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
     throw new Error("Method not implemented.");
   }
   protected renderGraphics(paint: Painter): void {
-    const { backgroundColor, gradient } = this.decoration;
-    paint.beginPath();
-    paint.save();
-    paint.fillStyle = backgroundColor ?? "black";
-    if (this.canRenderCache) {
-      if (gradient) {
-        paint.fillStyle = gradient.getGradient(paint, this.size);
-      }
-      paint.fillRect(
-        this.width * -0.5,
-        this.height * -0.5,
-        this.width,
-        this.height
-      );
-    } else {
-      paint.fillRect(
-        this.width * -0.5,
-        this.height * -0.5,
-        this.width,
-        this.height
-      );
-    }
-    paint.closePath();
-    paint.restore();
+    this.decoration.render(paint, this.rect);
+    // const { backgroundColor, gradient } = this.decoration;
+    // paint.beginPath();
+    // paint.save();
+    // paint.fillStyle = backgroundColor ?? "black";
+    // if (this.canRenderCache) {
+    //   if (gradient) {
+    //     paint.fillStyle = gradient.getGradient(paint, this.size);
+    //   }
+    //   paint.fillRect(
+    //     this.width * -0.5,
+    //     this.height * -0.5,
+    //     this.width,
+    //     this.height
+    //   );
+    // } else {
+    //   paint.fillRect(
+    //     this.width * -0.5,
+    //     this.height * -0.5,
+    //     this.width,
+    //     this.height
+    //   );
+    // }
+    // paint.closePath();
+    // paint.restore();
   }
   // protected renderBorder(paint: Painter): void {
   //   if (!this.borderDecoration) return;

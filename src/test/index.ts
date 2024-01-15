@@ -120,7 +120,7 @@ const ximage = new XImage({
   data: img2,
   width: img2.width,
   height: img2.height,
-  scale: 0.5,
+  scale: 1,
   url: img2.src,
 });
 
@@ -137,7 +137,7 @@ for (let i = 0; i < 1; i++) {
   ]);
 
   doCenter(imageBox);
-   loadToGesti(imageBox);
+  loadToGesti(imageBox);
 }
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
@@ -190,11 +190,13 @@ const gradient = new LineGradientDecoration({
 console.log("序列", JSON.stringify(gradient));
 
 const rect: Rectangle = new Rectangle({
-  width: screenUtil1.setWidth(100),
-  height: screenUtil1.setWidth(100),
+  width: screenUtil1.setWidth(300),
+  height: screenUtil1.setWidth(300),
   decoration: {
+    borderRadius: screenUtil1.setWidth(50),
     backgroundColor: "skyblue",
-    //  gradient: gradient,
+    gradient: gradient,
+    // backgroundImage:ximage
   },
 });
 const circle = new Circle({
@@ -259,7 +261,7 @@ canvas2.height = 200;
 canvas3.width = 100;
 canvas3.height = 100;
 const gesti2 = createGesti();
-const gesti3= createGesti();
+const gesti3 = createGesti();
 const screenUtil2 = new ScreenUtils({
   canvasHeight: canvas2.height,
   canvasWidth: canvas2.width,
@@ -279,7 +281,7 @@ gesti3.initialization({
   },
 });
 // controller2.cancelEvent();
-useGraffitiWrite({},gesti);
+useGraffitiWrite({}, gesti);
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");
   gesti2.controller.cleanAll();
