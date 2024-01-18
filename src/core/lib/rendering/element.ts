@@ -67,7 +67,7 @@ abstract class ElementNode implements BuildContext {
     slot?: any
   );
   protected inflateWidget(newWidget: Widget, newSlot?: any): ElementNode {
-    if (newWidget === null) {
+    if (!newWidget) {
       return null;
     }
     let newChild: ElementNode;
@@ -197,6 +197,7 @@ abstract class ComponentElement extends ElementNode {
   }
   protected performRebuild(): void {
     const built: Widget = this.build();
+
     this.child = this.inflateWidget(built);
     // this.child = this.updateChild(null, built);
     // if (this.child) {

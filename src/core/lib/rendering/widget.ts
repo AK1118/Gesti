@@ -140,8 +140,6 @@ class Container extends StatelessWidget {
         ? constraints?.tighten(this.width, this.height) ??
           BoxConstraints.tightFor(this.width, this.height)
         : constraints;
-
-    console.log(this.constraints);
   }
   build(context: BuildContext): Widget {
     let current: Widget = this.child;
@@ -169,12 +167,12 @@ class RenderViewWidget extends SingleChildRenderObjectWidget {
   createRenderObject(context: BuildContext): RenderObjectBase {
     return new RenderViewBox(this.width, this.height);
   }
-  public mount() {
+  public mount(paint?: Painter) {
     const element = this.createElement();
     element.mount();
     const renderObject = element.findRenderObject();
     renderObject.performLayout();
-    renderObject.paintWithContext(new PaintingContext(), Vector.zero);
+    renderObject.paintWithContext(new PaintingContext(paint), Vector.zero);
     console.log(renderObject);
   }
 }

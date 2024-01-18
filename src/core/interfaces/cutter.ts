@@ -6,13 +6,13 @@ interface CutterInterface {
   painter: Painter;
   canvas:any;
   chunkSize:number;
-  getChunks(ximage: XImage): Promise<ImageChunk[]>;
+  getChunks(ximage: XImage):ImageChunk[];
   merge(
     width: number,
     height: number,
     chunks: ImageChunk[],
     canvas?: any
-  ): Promise<ImageData>;
+  ): ImageData;
 }
 
 export default CutterInterface;

@@ -10,9 +10,13 @@ abstract class ClipContext {
 }
 
 class PaintingContext extends ClipContext {
+  constructor(paint?: Painter) {
+    super();
+    this._paint = paint;
+  }
   private _paint: Painter;
   get paint(): Painter {
-    if (!this._paint) this._paint = getPaintContext();
+    // if (!this._paint) this._paint = getPaintContext();
     return this._paint;
   }
   paintChild(child: RenderObjectBase, offset: Vector): void {
@@ -61,11 +65,6 @@ abstract class RenderObjectBase {
     this.parentData = parentData as ParentDataType;
   }
 }
-
-
-
-
-
 
 export { PaintingContext };
 export { FlexBoxParentData };

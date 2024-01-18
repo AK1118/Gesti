@@ -11,8 +11,10 @@ import { Container, RenderViewWidget } from "@/core/lib/rendering/widget";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
 import SizeButton from "@/core/viewObject/buttons/sizeButton";
-import Circle from "@/core/viewObject/graphics/circle";
-import Rectangle from "@/core/viewObject/graphics/rectangle";
+// import Circle from "@/core/viewObject/graphics/circle";
+import Rectangle, {
+  InteractiveImage,
+} from "@/core/viewObject/graphics/rectangle";
 import Group from "@/core/viewObject/group";
 import TextArea from "@/core/viewObject/text/text-area";
 import WriteRect from "@/core/viewObject/write/rect";
@@ -23,6 +25,7 @@ import {
   doCenter,
   loadToGesti,
   useGraffitiWrite,
+  doUpdate,
 } from "@/hooks/index";
 import Gesti, {
   CloseButton,
@@ -97,6 +100,7 @@ const gesti = createGesti({
   dashedLine: false,
   auxiliary: false,
 });
+Gesti.installPlugin("pako", require("pako"));
 console.log(canvas.width, canvas.height);
 gesti.initialization({
   renderContext: g,
@@ -117,28 +121,28 @@ const screenUtil1 = controller.generateScreenUtils({
 const img: HTMLImageElement = document.querySelector("#dog");
 // controller.setScreenUtil();
 const ximage = new XImage({
-  data: img2,
-  width: img2.width,
-  height: img2.height,
+  data: img,
+  width: img.width,
+  height: img.height,
   scale: 1,
-  url: img2.src,
+  // url: img.src,
 });
 
-for (let i = 0; i < 1; i++) {
-  const imageBox = new ImageBox(ximage);
-  imageBox.installMultipleButtons([
-    new HorizonButton("left"),
-    new VerticalButton("top"),
-    new VerticalButton("bottom"),
-    new HorizonButton("right"),
-    new DragButton(),
-    new CloseButton(),
-    new SizeButton(Alignment.topLeft),
-  ]);
+// for (let i = 0; i < 1; i++) {
+const imageBox = new ImageBox(ximage);
+//   imageBox.installMultipleButtons([
+//     new HorizonButton("left"),
+//     new VerticalButton("top"),
+//     new VerticalButton("bottom"),
+//     new HorizonButton("right"),
+//     new DragButton(),
+//     new CloseButton(),
+//     new SizeButton(Alignment.topLeft),
+//   ]);
 
-  doCenter(imageBox);
-  loadToGesti(imageBox);
-}
+doCenter(imageBox);
+// loadToGesti(imageBox);
+// }
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
  to explain how we recommend using Redux today. The show includes
@@ -169,13 +173,13 @@ const textBox = new TextBox(str1, {
   fontFamily: "楷体",
 });
 
-loadToGesti(textBox2);
+// loadToGesti(textBox2);
 //loadToGesti(textBox);
 
 // const group: Group = new Group();
 
 // textBox2.setPosition(0, 0);
-doCenter(textBox2);
+// doCenter(textBox2);
 // doCenter(imageBox);
 // textBox2.toBackground();
 // controller.layerBottom(textBox2);
@@ -196,26 +200,26 @@ const rect: Rectangle = new Rectangle({
     borderRadius: screenUtil1.setWidth(50),
     backgroundColor: "skyblue",
     gradient: gradient,
-    // backgroundImage:ximage
+    backgroundImage: ximage,
   },
 });
-const circle = new Circle({
-  radius: screenUtil1.setSp(100),
-  decoration: {
-    backgroundColor: "skyblue",
-    gradient: new LineGradientDecoration({
-      colors: ["white", "black", "red"],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    }),
-  },
-});
-circle.installMultipleButtons([
-  new HorizonButton("left"),
-  new VerticalButton("top"),
-]);
-loadToGesti(circle);
-doCenter(circle);
+// const circle = new Circle({
+//   radius: screenUtil1.setSp(100),
+//   decoration: {
+//     backgroundColor: "skyblue",
+//     gradient: new LineGradientDecoration({
+//       colors: ["white", "black", "red"],
+//       begin: Alignment.topLeft,
+//       end: Alignment.bottomRight,
+//     }),
+//   },
+// });
+// circle.installMultipleButtons([
+//   new HorizonButton("left"),
+//   new VerticalButton("top"),
+// ]);
+
+// doCenter(circle);
 
 console.log(rect);
 doCenter(rect, "horizon");
@@ -245,8 +249,12 @@ rect.installMultipleButtons([
   new SizeButton(Alignment.topLeft),
 ]);
 console.log(drag);
-loadToGesti(rect);
+// loadToGesti(rect);
 
+const aa = new InteractiveImage(ximage, {
+  borderRadius: screenUtil1.setSp(90),
+});
+// loadToGesti(aa);
 const canvas2: HTMLCanvasElement = document.querySelector("#canvas2");
 const canvas3: HTMLCanvasElement = document.querySelector("#canvas3");
 const g3 = canvas3.getContext("2d", {
@@ -288,11 +296,12 @@ document.getElementById("import").addEventListener("click", () => {
   gesti3.controller.cleanAll();
   const a = window.localStorage.getItem("aa");
   importAll(a, gesti2).then((e) => {
+    main();
     console.log("导入成功");
   });
-  importAll(a, gesti3).then((e) => {
-    console.log("导入成功");
-  });
+  // importAll(a, gesti3).then((e) => {
+  //   console.log("导入成功");
+  // });
 });
 
 document.getElementById("export").addEventListener("click", () => {
@@ -308,3 +317,33 @@ document.getElementById("input").addEventListener("input", (e: any) => {
   textBox2.setText(e.target?.value);
   console.log(e.target?.value);
 });
+
+const box1 = new Rectangle({
+  width: screenUtil1.setWidth(300),
+  height: screenUtil1.setHeight(300),
+  decoration: {
+    backgroundColor: "skyblue",
+    borderRadius: screenUtil1.setSp(50),
+  },
+});
+box1.setId("box1");
+
+const box2 = new InteractiveImage(ximage, {
+  borderRadius: screenUtil1.setSp(50),
+});
+box2.setId("box2");
+
+loadToGesti(box1, gesti);
+loadToGesti(box2, gesti);
+
+const main = async () => {
+  const b1 = await controller2.getViewObjectById<Rectangle>("box1");
+  const b2 = await controller2.getViewObjectById<InteractiveImage>("box2");
+
+  b2.setSize(b1.size.copy());
+
+  b1.setPosition(100, 100);
+  b2.setPosition(100, 100);
+
+  doUpdate(null, gesti2);
+};

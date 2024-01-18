@@ -8,17 +8,23 @@ import XImage from "../../ximage";
 import GradientDecorationBase from "@/core/bases/gradient-base";
 import Painter from "../../painter";
 import Rect from "../../rect";
-import { RenderWidgetBase } from "../base";
+import { ClipRRect, RenderColoredRRect, RenderWidgetBase } from "../base";
+import Serializable from "@/core/interfaces/Serialization";
 
-abstract class Decoration<
-  O extends DecorationOption = DecorationOption
-> extends RenderWidgetBase {
+abstract class Decoration<O extends DecorationOption = DecorationOption>
+  extends RenderWidgetBase
+  implements Serializable<O>
+{
   protected option: O;
   constructor(option: O) {
     super();
     this.option = option;
   }
+  toJSON(): O {
+    return this.option;
+  }
   abstract render(paint: Painter, rect: Rect): void;
+  protected performRender(paint: Painter, rect: Rect): void {}
 }
 
 class BoxDecoration extends Decoration<BoxDecorationOption> {
@@ -28,8 +34,6 @@ class BoxDecoration extends Decoration<BoxDecorationOption> {
   render(paint: Painter, rect: Rect): void {
     const { width, height } = rect.size;
     const { gradient, backgroundColor, backgroundImage } = this.option;
-    paint.beginPath();
-    paint.save();
     //如果没有渐变，普通矩形
     if (!gradient) {
       paint.fillStyle = backgroundColor ?? "black";
@@ -47,7 +51,10 @@ class BoxDecoration extends Decoration<BoxDecorationOption> {
     paint.fill();
     if (backgroundImage) {
       const image = backgroundImage.data;
-      paint.clip();
+      //圆角时需要裁剪
+      if (borderRadius) {
+        paint.clip();
+      }
       paint.drawImage(image, 0, 0, width, height);
     }
     paint.closePath();

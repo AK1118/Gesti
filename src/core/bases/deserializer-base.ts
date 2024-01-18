@@ -21,9 +21,11 @@ import GraphicsBase from "./graphics-base";
 import Alignment from "../lib/painting/alignment";
 import Rectangle from "../viewObject/graphics/rectangle";
 import { GenerateCircleOption, GenerateRectAngleOption } from "Graphics";
-import Circle from "../viewObject/graphics/circle";
+// import Circle from "../viewObject/graphics/circle";
 import ImageToolkit from "../lib/image-toolkit";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
+import { ImageChunk } from "Gesti";
+import BoxDecoration from "../lib/rendering/decorations/decoration";
 
 type ViewObjectHandler<T> = (entity: ViewObjectImportEntity) => T;
 
@@ -84,18 +86,24 @@ abstract class DeserializerBase {
         this.formatEntity<ViewObjectExportGraphics<GenerateRectAngleOption>>(
           entity
         );
+      if (graphics.option.decoration.borderRadius) {
+        graphics.option.decoration.borderRadius = this.adaptScreenFontSize(
+          graphics.option.decoration.borderRadius as number
+        );
+      }
       return Rectangle.reserve(graphics);
     },
-    graphicsCircle: (
-      entity: ViewObjectExportGraphics<GenerateCircleOption>
-    ) => {
-      entity.option.radius = this.adaptScreenFontSize(entity.option.radius);
-      const graphics =
-        this.formatEntity<ViewObjectExportGraphics<GenerateCircleOption>>(
-          entity
-        );
-      return Circle.reserve(graphics);
-    },
+    // graphicsCircle: (
+    //   entity: ViewObjectExportGraphics<GenerateCircleOption>
+    // ) => {
+    //   entity.option.radius = this.adaptScreenFontSize(entity.option.radius);
+
+    //   const graphics =
+    //     this.formatEntity<ViewObjectExportGraphics<GenerateCircleOption>>(
+    //       entity
+    //     );
+    //   return Circle.reserve(graphics);
+    // },
     group: (entity) => {
       throw Error("Method has not implemented.");
     },
@@ -149,7 +157,7 @@ abstract class DeserializerBase {
     const otherScreenUtils = this.otherScreenUtils;
     const screenUtil = this.kit.getScreenUtil();
 
-    console.log(otherScreenUtils, screenUtil);
+    // console.log(otherScreenUtils, screenUtil);
     //根据实体获取对象
     let view: ViewObject = await this.getViewObjectByEntity(
       importEntity,

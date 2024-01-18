@@ -1,5 +1,20 @@
+import { XImage } from "@/index";
 import { ImageChunk } from "../types/gesti";
 import ImageChunkConverterWeChat from "./converters/image-chunk-converter-WeChat";
+import {
+  FetchXImageForImportCallback,
+  ViewObjectImportBaseInfo,
+  ViewObjectImportImageBox,
+} from "Serialization";
+import Platform from "@/core/viewObject/tools/platform";
+import {
+  getOffscreenCanvasContext,
+  getOffscreenCanvasWidthPlatform,
+  waitingLoadImg,
+} from "./canvas";
+import Painter from "@/core/lib/painter";
+import CutterWeChat from "./cutters/cutter-WeChat";
+import CutterH5 from "./cutters/cutter-H5";
 
 /**
  * @description uint8Array 序列化
@@ -31,12 +46,12 @@ const uint8ArrayToChunks = (
   // //当切块过小时合并
   if (width - chunkSize < 20) chunkSize = width;
   if (height - chunkSize < 20) chunkSize = height;
- 
+
   for (let y = 0; y < height; y += chunkSize) {
     for (let x = 0; x < width; x += chunkSize) {
       const chunkWidth = Math.min(chunkSize, width - x);
       const chunkHeight = Math.min(chunkSize, height - y);
-      
+
       const chunkData = [];
       for (let cy = 0; cy < chunkHeight; cy++) {
         for (let cx = 0; cx < chunkWidth; cx++) {
@@ -50,23 +65,24 @@ const uint8ArrayToChunks = (
         }
       }
       const imageData: {
-        width:number,
-        height:number,
-        data:Uint8Array,
-      } ={
-        width:chunkWidth, height:chunkHeight,data:new Uint8Array(chunkData),
+        width: number;
+        height: number;
+        data: Uint8Array;
+      } = {
+        width: chunkWidth,
+        height: chunkHeight,
+        data: new Uint8Array(chunkData),
       };
       // imageData.data.set(chunkData);
-      
+
       chunks.push({
         x,
         y,
         width: chunkWidth,
         height: chunkHeight,
-        imageData:imageData as unknown as ImageData,
+        imageData: imageData as unknown as ImageData,
         base64: "",
       });
-      
     }
   }
   const coverter: ImageChunkConverterWeChat = new ImageChunkConverterWeChat();
@@ -121,7 +137,7 @@ export const inToPx = (inch: number): number => {
  * @returns
  */
 export const mmToIn = (mm: number): number => {
-  return (mm / 25.4);
+  return mm / 25.4;
 };
 /**
  * @description 1pt是一英镑=1/72(inch)英寸   取dpi=96
@@ -142,5 +158,109 @@ export const coverUnit = (value: number): number => {
   else if (type == "pt") return +ptToPx(value).toFixed(2);
 };
 
+interface ReverseXImageOption {
+  url?: string;
+  data?: ImageChunk[];
+  fixedWidth: number;
+  fixedHeight: number;
+}
+const reverseXImage = async (option: ReverseXImageOption): Promise<XImage> => {
+  const { url, data, fixedHeight, fixedWidth } = option;
+  const chunks: Array<ImageChunk> = data;
+  if (url) {
+    //网络路径存在，不负责请求，任务交由开发者，通过回调函数获取用户传入的XImage
+    const xImage: XImage = await fetchXImageCallback(option);
+    if (!xImage)
+      throw Error(
+        "Your platform does not support fetching this URL for ximage; you could run 'ImageBox.setFetchXImageCallback' to customize the fetch method and resolve this error."
+      );
+    return xImage;
+  } /*使用数据切片合并图片*/ else if (chunks && chunks?.length != 0) {
+    //微信小程序
+    if (Platform.isWeChatMiniProgram) return reverseWeChat(option);
+    const cutter = new CutterH5();
+    const source: ImageData = await cutter.merge(
+      fixedWidth,
+      fixedHeight,
+      chunks
+    );
+    const imageBitmap: ImageBitmap = await createImageBitmap(source);
+    const ximage = new XImage({
+      data: imageBitmap,
+      width: imageBitmap.width,
+      height: imageBitmap.height,
+    });
+    return ximage;
+  }
+  return null;
+};
 
-export { uint8ArrayConvert, parseUint8Array, uint8ArrayToChunks };
+const reverseWeChat = async (option: ReverseXImageOption): Promise<XImage> => {
+  const { url, data, fixedHeight, fixedWidth } = option;
+  const chunks: ImageChunk[] = data;
+  const offCanvas = getOffscreenCanvasWidthPlatform(fixedWidth, fixedHeight);
+  const offPainter: Painter = getOffscreenCanvasContext(offCanvas);
+  //使用数据切片合并图片
+  const cutter = new CutterWeChat();
+  const source: ImageData = await cutter.merge(
+    fixedWidth,
+    fixedHeight,
+    chunks,
+    offCanvas
+  );
+  offPainter.putImageData(source, 0, 0);
+  const image = offCanvas.createImage();
+  image.src = offCanvas.toDataURL();
+  await waitingLoadImg(image);
+  const ximage = new XImage({
+    data: image,
+    width: fixedWidth,
+    height: fixedHeight,
+  });
+
+  return ximage;
+};
+
+const fetchXImageCallback = async (
+  option: ReverseXImageOption
+): Promise<XImage> => {
+  const { url, data, fixedHeight, fixedWidth } = option;
+  const platform: PlatformType = Platform.platform;
+  if (platform == "Browser") {
+    const img = new Image();
+    img.src = url;
+    img.crossOrigin = "anonymous";
+    await waitingLoadImg(img);
+    return new XImage({
+      data: img,
+      height: fixedHeight,
+      width: fixedWidth,
+      url,
+    });
+  } else if (platform == "WeChat") {
+    const offCanvas = getOffscreenCanvasWidthPlatform(fixedWidth, fixedHeight);
+
+    // wx.createOffscreenCanvas({
+    //   type: "2d",
+    //   width: fixedWidth,
+    //   height: fixedHeight,
+    // });
+    const img = offCanvas.createImage();
+    img.src = url;
+    if (img?.crossOrigin) img.crossOrigin = "anonymous";
+    await waitingLoadImg(img);
+    return new XImage({
+      data: img,
+      height: fixedHeight,
+      width: fixedWidth,
+      url,
+    });
+  }
+  return null;
+};
+export {
+  uint8ArrayConvert,
+  parseUint8Array,
+  uint8ArrayToChunks,
+  reverseXImage,
+};

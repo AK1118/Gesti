@@ -12,7 +12,7 @@ import CutterBase from "@/core/bases/cutter-base";
  * 微信分割器
  */
 class CutterWeChat extends CutterBase {
-  async getChunks(ximage: XImage): Promise<ImageChunk[]> {
+  getChunks(ximage: XImage): ImageChunk[] {
     let chunkSize: number = this.chunkSize;
     const imgWidth: number = ximage.fixedWidth,
       imgHeight: number = ximage.fixedHeight;
@@ -30,7 +30,7 @@ class CutterWeChat extends CutterBase {
         const endX = Math.min(x + chunkSize, imgWidth);
         const width = endX - x;
         g.paint.drawImage(image, x, y, width, height, 0, 0, width, height);
-        const imageData = await g.getImageData(0, 0, width, height);
+        const imageData = g.getImageData(0, 0, width, height);
         g.clearRect(0, 0, width, height);
         chunks.push({
           x,
@@ -49,7 +49,7 @@ class CutterWeChat extends CutterBase {
     height: number,
     chunks: ImageChunk[],
     canvas?: any
-  ): Promise<ImageData> {
+  ): ImageData {
     const converter: ImageChunkConverterWeChat =
       new ImageChunkConverterWeChat();
     const imageData = canvas.createImageData(

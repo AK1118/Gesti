@@ -4,6 +4,7 @@ import RenderObjectBase, { FlexBoxParentData, PaintingContext } from "./object";
 import Constraints, { BoxConstraints } from "./constraints";
 import Painter from "../painter";
 import Flex from "./flex";
+import Alignment from "../painting/alignment";
 
 abstract class RenderBox extends RenderObjectBase {
   protected constraints: BoxConstraints = BoxConstraints.zero;
@@ -151,7 +152,12 @@ class RenderColoredBox extends RenderProxyBox {
   protected paint(context: PaintingContext, offset: Vector): void {
     const paint: Painter = context.paint;
     paint.fillStyle = this.color;
-    paint.fillRect(offset.x, offset.y, this.width, this.height);
+    paint.fillRect(
+      this.width * -0.5,
+      this.height * -0.5,
+      this.width,
+      this.height
+    );
     if (this.child != null) {
       context.paintChild(this.child, offset);
     }
@@ -171,7 +177,6 @@ class RenderViewBox extends RenderProxyBox {
         // this.child.layout()
       }
     }
-    // super.layout(constraints);
   }
   public performLayout(): void {
     if (this.child != null) {

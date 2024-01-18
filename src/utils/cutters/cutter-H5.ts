@@ -10,7 +10,7 @@ import CutterBase from "@/core/bases/cutter-base";
  * 图片切割
  * 只做图片切割工作，其他不管
  */
-class CutterH5  extends CutterBase{
+class CutterH5 extends CutterBase {
   /**
    * @description 切割图片成小块
    * @param chunkSize
@@ -18,15 +18,13 @@ class CutterH5  extends CutterBase{
    * @param offset
    * @returns
    */
-  public async getChunks(
-    ximage: XImage
-  ): Promise<ImageChunk[]> {
-    let chunkSize:number=this.chunkSize;
+  public getChunks(ximage: XImage): ImageChunk[] {
+    let chunkSize: number = this.chunkSize;
     const imgWidth: number = ximage.fixedWidth,
       imgHeight: number = ximage.fixedHeight;
-      //当切块过小时合并
-      if(imgWidth-chunkSize<20)chunkSize=imgWidth;
-      if(imgHeight-chunkSize<20)chunkSize=imgHeight;
+    //当切块过小时合并
+    if (imgWidth - chunkSize < 20) chunkSize = imgWidth;
+    if (imgHeight - chunkSize < 20) chunkSize = imgHeight;
     const g: Painter = this.painter;
     const chunks: ImageChunk[] = [];
     const image = ximage.data;
@@ -37,18 +35,8 @@ class CutterH5  extends CutterBase{
       for (let x: number = 0; x < imgWidth; x += chunkSize) {
         const endX = Math.min(x + chunkSize, imgWidth);
         const width = endX - x;
-        g.paint.drawImage(
-          image,
-          x,
-          y,
-          width,
-          height,
-          0,
-          0,
-          width,
-          height
-        );
-        const imageData = await g.getImageData(0, 0, width, height);
+        g.paint.drawImage(image, x, y, width, height, 0, 0, width, height);
+        const imageData = g.getImageData(0, 0, width, height);
         g.clearRect(0, 0, width, height);
         chunks.push({
           x,
@@ -63,11 +51,11 @@ class CutterH5  extends CutterBase{
     return chunks;
   }
 
-  public async merge(
+  public merge(
     width: number,
     height: number,
     chunks: ImageChunk[]
-  ): Promise<ImageData> {
+  ): ImageData {
     const g: any = this.painter;
     const converter: ImageChunkConverter = new ImageChunkConverter();
     const imageData: ImageData = new ImageData(width, height, {

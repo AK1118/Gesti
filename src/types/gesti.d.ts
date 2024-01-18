@@ -3,8 +3,8 @@ declare module "Gesti" {
   /*
    * @Author: AK1118
    * @Date: 2023-11-15 16:08:39
- * @Last Modified by: AK1118
- * @Last Modified time: 2024-01-06 16:12:45
+   * @Last Modified by: AK1118
+   * @Last Modified time: 2024-01-06 16:12:45
    */
   type PluginKeys = "pako" | "offScreenBuilder";
   interface OffScreenCanvasBuilderOption {
@@ -331,6 +331,7 @@ declare module "Gesti" {
     url: string;
     //矩形位置大小信息
     toJson(): RectParams;
+    toJSON(): any;
   }
   class Group {
     remove(id: string): void;
@@ -422,7 +423,6 @@ declare module "Gesti" {
     };
   }
 
- 
   type EventHandle = null;
   type GraffitiTypes = "circle" | "write" | "line" | "rect" | "none";
   /**
@@ -594,5 +594,4 @@ declare module "Gesti" {
   class HorizonButton extends Button {
     constructor(location?: HorizonAlignmentType, option?: ButtonOption);
   }
- 
 }

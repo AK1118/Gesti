@@ -95,8 +95,17 @@ import VerticalButton from "./core/viewObject/buttons/verticalButton";
 import HorizonButton from "./core/viewObject/buttons/horizonButton";
 import { createTextBoxView } from "./hooks/create";
 import GestiConfig from "./config/gestiConfig";
-import {  MirrorIcon,CloseIcon,DelateIcon,ImageIcon,LockIcon,UnLockIcon,DefaultIcon } from "./composite/icons";
+import {
+  MirrorIcon,
+  CloseIcon,
+  DelateIcon,
+  ImageIcon,
+  LockIcon,
+  UnLockIcon,
+  DefaultIcon,
+} from "./composite/icons";
 import Alignment from "./core/lib/painting/alignment";
+import Rectangle from "./core/viewObject/graphics/rectangle";
 
 //按钮
 export {
@@ -111,12 +120,20 @@ export {
   SizeButton,
 };
 //Icons
-export { MirrorIcon,CloseIcon,DelateIcon,ImageIcon,LockIcon,UnLockIcon,DefaultIcon};
+export {
+  MirrorIcon,
+  CloseIcon,
+  DelateIcon,
+  ImageIcon,
+  LockIcon,
+  UnLockIcon,
+  DefaultIcon,
+};
 export { Alignment };
-export { ImageBox, XImage, TextBox, WriteViewObj };
+export { Rectangle, ImageBox, XImage, TextBox, WriteViewObj };
 //枚举
 export { ViewObjectFamily };
-export {GestiConfig};
+export { GestiConfig };
 //Hooks
 export {
   createGesti /**创建Gesti实例 */,
@@ -188,6 +205,5 @@ export {
   parseUint8Array,
   uint8ArrayConvert,
   uint8ArrayToChunks,
-  
 };
 export default Gesti;

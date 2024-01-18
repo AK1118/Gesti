@@ -2,8 +2,10 @@ import ViewObject from "@/core/abstract/view-object";
 import GraphicsBase from "@/core/bases/graphics-base";
 import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
-import { ViewObjectFamily } from "@/index";
+import { ViewObjectFamily, XImage } from "@/index";
+import { reverseXImage } from "@/utils/utils";
 import {
+  BoxDecorationOption,
   GenerateRectAngleOption,
   GradientTypes,
   GraphicsTypes,
@@ -97,7 +99,7 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   //   paint.stroke();
   //   paint.closePath();
   // }
-  export(painter?: Painter): Promise<ViewObjectExportEntity> {
+  export(painter?: Painter): Promise<ViewObjectExportGraphics> {
     const exportEntity: ViewObjectExportGraphics<GenerateRectAngleOption> = {
       option: this.option,
       base: this.getBaseInfo(),
@@ -111,7 +113,7 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   ): Promise<ViewObjectExportEntity> {
     return this.export();
   }
-  public static reserve(
+  public static async reserve(
     entity: ViewObjectImportGraphics<GenerateRectAngleOption>
   ): Promise<GraphicsBase<GenerateRectAngleOption>> {
     const gradientType: GradientTypes =
@@ -122,9 +124,34 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
         option.decoration.gradient as any as LineGradientDecorationOption
       );
     }
+    if (entity.option.decoration.backgroundImage) {
+      const ximage: XImage = await reverseXImage({
+        url: option.decoration.backgroundImage.url,
+        data: option.decoration.backgroundImage.data,
+        fixedHeight: option.decoration.backgroundImage.height,
+        fixedWidth: option.decoration.backgroundImage.width,
+      });
+      console.log("图片", ximage);
+      option.decoration.backgroundImage = ximage;
+      // ximage.width = option.decoration.backgroundImage.width;
+      // ximage.height = option.decoration.backgroundImage.height;
+    }
     const rectAngle: Rectangle = new Rectangle(option);
     return Promise.resolve(rectAngle);
   }
 }
 
+class InteractiveImage extends Rectangle {
+  constructor(xImage: XImage, decoration: BoxDecorationOption = {}) {
+    super({
+      width: xImage.width,
+      height: xImage.height,
+      decoration: {
+        ...decoration,
+        backgroundImage: xImage,
+      },
+    });
+  }
+}
 export default Rectangle;
+export { InteractiveImage };

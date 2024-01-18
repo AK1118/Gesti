@@ -56,8 +56,7 @@ declare module "Serialization" {
     | "text"
     | "write"
     | "group"
-    | "graphicsRectangle"
-    | "graphicsCircle";
+    | "graphicsRectangle";
 
   interface ViewObjectExportEntity {
     base: ViewObjectExportBaseInfo;
