@@ -43,14 +43,9 @@ import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 // Gesti.installPlugin("pako", require("pako"));
 
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
-const offScreenCanvas: HTMLCanvasElement =
-  document.querySelector("#offScreenCanvas");
-const offScreenPainter = offScreenCanvas.getContext("2d");
 const img2: HTMLImageElement = document.querySelector("#bg");
 canvas.width = 300;
 canvas.height = 300;
-offScreenCanvas.width = 10000;
-offScreenCanvas.height = 500;
 
 const g = canvas.getContext("2d", {
   willReadFrequently: true,
@@ -59,43 +54,26 @@ const g = canvas.getContext("2d", {
 Gesti.installPlugin(
   "offScreenBuilder",
   new OffScreenCanvasGenerator({
+    //离屏画布构造器
     offScreenCanvasBuilder: (width, height) => {
       const a = new OffscreenCanvas(width, height);
       return a;
     },
+    //离屏画笔构造器
     offScreenContextBuilder: (offScreenCanvas) => {
       return offScreenCanvas.getContext("2d");
+    },
+    //图片构造器
+    imageBuilder: (OffscreenCanvas: OffscreenCanvas, url: string) => {
+      console.log("图片", url);
+      const img = new Image();
+      img.src = url;
+      img.crossOrigin = "anonymous";
+      return img;
     },
   })
 );
 
-// (Plugins.getPluginByKey("offScreenBuilder") as OffScreenCanvasGenerator).buildPaintContext().fillRect(0,0,100,100);
-/**
- * Widget -> createElement -> element.mount -> createRenderObject
- */
-// const container = new Container({
-//   width: 100,
-//   height: 100,
-//   color: "red",
-//   child: new Row({
-//     children: [
-//       new Container({
-//         width: 10,
-//         height: 10,
-//         color: "orange",
-//       }),
-//     ],
-//   }),
-// });
-
-// const renderView = new RenderViewWidget(container);
-// renderView.mount();
-// renderView.mount();
-
-// console.log(renderView.findChildRenderObject().performLayout());
-// renderView.firstPerformLayout();
-// console.log(renderView);
-// const offScreenPainter = offScreenCanvas.getContext("2d");
 const gesti = createGesti({
   dashedLine: false,
   auxiliary: false,
@@ -125,24 +103,28 @@ const ximage = new XImage({
   width: img.width,
   height: img.height,
   scale: 1,
-  // url: img.src,
+  url: img.src,
 });
 
-// for (let i = 0; i < 1; i++) {
 const imageBox = new ImageBox(ximage);
-//   imageBox.installMultipleButtons([
-//     new HorizonButton("left"),
-//     new VerticalButton("top"),
-//     new VerticalButton("bottom"),
-//     new HorizonButton("right"),
-//     new DragButton(),
-//     new CloseButton(),
-//     new SizeButton(Alignment.topLeft),
-//   ]);
+
+setTimeout(() => {
+  const ximage2 = new XImage({
+    data: img2,
+    width: img2.width,
+    height: img2.height,
+    scale: 1,
+    url: img2.src,
+  });
+  imageBox.replaceXImage(ximage2);
+  imageBox.setDecoration({
+    borderRadius: screenUtil1.setSp(90),
+  });
+}, 3000);
 
 doCenter(imageBox);
-// loadToGesti(imageBox);
-// }
+loadToGesti(imageBox);
+
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
  to explain how we recommend using Redux today. The show includes
@@ -203,25 +185,6 @@ const rect: Rectangle = new Rectangle({
     backgroundImage: ximage,
   },
 });
-// const circle = new Circle({
-//   radius: screenUtil1.setSp(100),
-//   decoration: {
-//     backgroundColor: "skyblue",
-//     gradient: new LineGradientDecoration({
-//       colors: ["white", "black", "red"],
-//       begin: Alignment.topLeft,
-//       end: Alignment.bottomRight,
-//     }),
-//   },
-// });
-// circle.installMultipleButtons([
-//   new HorizonButton("left"),
-//   new VerticalButton("top"),
-// ]);
-
-// doCenter(circle);
-
-console.log(rect);
 doCenter(rect, "horizon");
 rect.setPosition(canvas.width / 2, rect.height / 2);
 const drag = new DragButton({
@@ -230,15 +193,6 @@ const drag = new DragButton({
   },
 });
 rect.installButton(drag);
-// const align: Alignment = Alignment.bottomCenter.copyWithOffset({
-//   offsetX: 0,
-//   offsetY: 30,
-// });
-// rect.installButton(
-//   new RotateButton({
-//     alignment: align,
-//   })
-// );
 rect.installMultipleButtons([
   new HorizonButton("left"),
   new VerticalButton("top"),
@@ -248,8 +202,7 @@ rect.installMultipleButtons([
   new CloseButton(),
   new SizeButton(Alignment.topLeft),
 ]);
-console.log(drag);
-// loadToGesti(rect);
+loadToGesti(rect);
 
 const aa = new InteractiveImage(ximage, {
   borderRadius: screenUtil1.setSp(90),
@@ -288,25 +241,37 @@ gesti3.initialization({
     canvasHeight: canvas3.height,
   },
 });
+// const offScreenBuilder =
+// Plugins.getPluginByKey<OffScreenCanvasBuilder>("offScreenBuilder");
+// const offScreenCanvas = offScreenBuilder.buildOffScreenCanvas(1000, 1000);
+// const offPainter = offScreenBuilder.buildOffScreenContext(offScreenCanvas);
 // controller2.cancelEvent();
-useGraffitiWrite({}, gesti);
 document.getElementById("import").addEventListener("click", () => {
   console.log("导入");
   gesti2.controller.cleanAll();
   gesti3.controller.cleanAll();
   const a = window.localStorage.getItem("aa");
-  importAll(a, gesti2).then((e) => {
-    main();
+  importAll(
+    a,
+    async (arr) => {
+      return new Promise((r) => {
+        setTimeout(() => {
+          r(arr);
+        }, 100);
+      });
+    },
+    gesti2
+  ).then((e) => {
     console.log("导入成功");
   });
-  // importAll(a, gesti3).then((e) => {
+  // importAll(a,null, gesti3).then((e) => {
   //   console.log("导入成功");
   // });
 });
 
 document.getElementById("export").addEventListener("click", () => {
   console.log("导出");
-  exportAll(offScreenPainter, gesti).then((json) => {
+  exportAll(gesti).then((json) => {
     console.log(json);
     window.localStorage.setItem("aa", json);
     console.log("导出成功");
@@ -318,32 +283,32 @@ document.getElementById("input").addEventListener("input", (e: any) => {
   console.log(e.target?.value);
 });
 
-const box1 = new Rectangle({
-  width: screenUtil1.setWidth(300),
-  height: screenUtil1.setHeight(300),
-  decoration: {
-    backgroundColor: "skyblue",
-    borderRadius: screenUtil1.setSp(50),
-  },
-});
-box1.setId("box1");
+// const box1 = new Rectangle({
+//   width: screenUtil1.setWidth(300),
+//   height: screenUtil1.setHeight(300),
+//   decoration: {
+//     backgroundColor: "skyblue",
+//     borderRadius: screenUtil1.setSp(50),
+//   },
+// });
+// box1.setId("box1");
 
-const box2 = new InteractiveImage(ximage, {
-  borderRadius: screenUtil1.setSp(50),
-});
-box2.setId("box2");
+// const box2 = new InteractiveImage(ximage, {
+//   borderRadius: screenUtil1.setSp(50),
+// });
+// box2.setId("box2");
 
-loadToGesti(box1, gesti);
-loadToGesti(box2, gesti);
+// loadToGesti(box1, gesti);
+// loadToGesti(box2, gesti);
 
-const main = async () => {
-  const b1 = await controller2.getViewObjectById<Rectangle>("box1");
-  const b2 = await controller2.getViewObjectById<InteractiveImage>("box2");
+// const main = async () => {
+//   const b1 = await controller2.getViewObjectById<Rectangle>("box1");
+//   const b2 = await controller2.getViewObjectById<InteractiveImage>("box2");
 
-  b2.setSize(b1.size.copy());
+//   b2.setSize(b1.size.copy());
 
-  b1.setPosition(100, 100);
-  b2.setPosition(100, 100);
+//   b1.setPosition(100, 100);
+//   b2.setPosition(100, 100);
 
-  doUpdate(null, gesti2);
-};
+//   doUpdate(null, gesti2);
+// };

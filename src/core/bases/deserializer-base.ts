@@ -20,7 +20,12 @@ import {
 import GraphicsBase from "./graphics-base";
 import Alignment from "../lib/painting/alignment";
 import Rectangle from "../viewObject/graphics/rectangle";
-import { GenerateCircleOption, GenerateRectAngleOption } from "Graphics";
+import {
+  BoxDecorationOption,
+  DecorationOption,
+  GenerateCircleOption,
+  GenerateRectAngleOption,
+} from "Graphics";
 // import Circle from "../viewObject/graphics/circle";
 import ImageToolkit from "../lib/image-toolkit";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
@@ -86,11 +91,6 @@ abstract class DeserializerBase {
         this.formatEntity<ViewObjectExportGraphics<GenerateRectAngleOption>>(
           entity
         );
-      if (graphics.option.decoration.borderRadius) {
-        graphics.option.decoration.borderRadius = this.adaptScreenFontSize(
-          graphics.option.decoration.borderRadius as number
-        );
-      }
       return Rectangle.reserve(graphics);
     },
     // graphicsCircle: (
@@ -147,6 +147,15 @@ abstract class DeserializerBase {
       this.otherScreenUtils.restoreFromFactorWidthText(fontSize)
     );
   }
+  private adaptScreenSize(size: { width: number; height: number }): {
+    width: number;
+    height: number;
+  } {
+    return {
+      width: this.adaptScreenSizeWidth(size.width),
+      height: this.adaptScreenSizeHeight(size.height),
+    };
+  }
   public async getObjectByJson(importEntity: ViewObjectImportEntity) {
     const base: ViewObjectImportBaseInfo = importEntity.base;
     const rect: Rect = Rect.format(base.rect);
@@ -157,7 +166,6 @@ abstract class DeserializerBase {
     const otherScreenUtils = this.otherScreenUtils;
     const screenUtil = this.kit.getScreenUtil();
 
-    // console.log(otherScreenUtils, screenUtil);
     //根据实体获取对象
     let view: ViewObject = await this.getViewObjectByEntity(
       importEntity,
@@ -165,39 +173,45 @@ abstract class DeserializerBase {
       screenUtil
     );
 
-    const adaptScreenSize = (size: {
-      width: number;
-      height: number;
-    }): { width: number; height: number } => {
-      return {
-        width: this.adaptScreenSizeWidth(size.width),
-        height: this.adaptScreenSizeHeight(size.height),
-      };
-    };
-
     //设置对象属性
     view.rect = rect;
     view.relativeRect = relativeRect;
     view.setId(base.id);
     view.setLayer(base.layer);
     base.isBackground && view.toBackground();
-    view.relativeRect.setAngle(relativeRect.getAngle);
     view.custom();
     base.locked && view.lock();
     base.mirror && view.mirror();
+    //设置2D矢量数据
+    this.setVectorData(view, base);
+    //设置盒子装饰器
+    view.setDecorationEntity(await this.formatBoxDecoration(base?.decoration));
+    this.installButton(view, buttons);
+    return view;
+  }
+  private setVectorData(view: ViewObject, base): void {
     //屏幕适配包括   宽高 坐标
     view.setPosition(
       this.adaptScreenSizeWidth(view.positionX),
       this.adaptScreenSizeHeight(view.positionY)
     );
-    view.setFixedSize(adaptScreenSize(base.fixedSize));
+    view.setFixedSize(this.adaptScreenSize(base.fixedSize));
     view.setScaleWidth(base.sizeScale.scaleWidth);
     view.setScaleHeight(base.sizeScale.scaleHeight);
-    view.setSize(adaptScreenSize(view.size));
-    this.installButton(view, buttons);
-    return view;
+    view.setSize(this.adaptScreenSize(view.size));
+    view.relativeRect.setAngle(view.relativeRect.getAngle);
   }
-
+  private async formatBoxDecoration(
+    _decoration: BoxDecorationOption
+  ): Promise<BoxDecoration> {
+    const decoration: BoxDecoration = new BoxDecoration();
+    if (_decoration?.borderRadius) {
+      _decoration.borderRadius = this.adaptScreenFontSize(
+        _decoration.borderRadius as number
+      );
+    }
+    return await decoration.format(_decoration);
+  }
   //安装按钮
   private installButton(viewObject: ViewObject, buttons: ExportButton[]) {
     buttons.forEach((item: ExportButton) => {

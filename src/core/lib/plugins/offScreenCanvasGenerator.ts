@@ -4,7 +4,10 @@ import Painter from "../painter";
 class OffScreenCanvasBuilder {
   private offScreenCanvasBuilder: (width: number, height: number) => any;
   private offScreenContextBuilder: (offScreenCanvas: any) => any;
-  private imageBuilder: (offScreenCanvas: any) => HTMLImageElement | any;
+  private imageBuilder: (
+    offScreenCanvas: any,
+    url: string
+  ) => HTMLImageElement | any;
   private paintBuilder: () =>
     | CanvasRenderingContext2D
     | OffscreenCanvasRenderingContext2D;
@@ -15,14 +18,14 @@ class OffScreenCanvasBuilder {
     this.offScreenContextBuilder =
       option?.offScreenContextBuilder || (() => null);
     this.imageBuilder =
-      option?.imageBuilder || ((offScreenCanvas: any) => null);
+      option?.imageBuilder || ((offScreenCanvas: any, url: string) => null);
     this.paintBuilder = option.paintBuilder || (() => null);
   }
   public buildOffScreenCanvas(width: number, height: number): any {
     return this.offScreenCanvasBuilder?.(width, height);
   }
-  public buildImage(offScreenCanvas: any) {
-    return this.imageBuilder(offScreenCanvas);
+  public buildImage(offScreenCanvas: any, url: string) {
+    return this.imageBuilder?.(offScreenCanvas, url);
   }
   public buildOffScreenContext(offScreenCanvas): Painter {
     const paint = this.offScreenContextBuilder?.(offScreenCanvas);

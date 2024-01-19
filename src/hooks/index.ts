@@ -19,7 +19,11 @@ import UnLockButton from "../core/viewObject/buttons/delockButton";
 import HorizonButton from "../core/viewObject/buttons/horizonButton";
 import LockButton from "../core/viewObject/buttons/lockbutton";
 import VerticalButton from "../core/viewObject/buttons/verticalButton";
-import { GraffitiCloser, TextOptions } from "@/types/gesti";
+import {
+  GraffitiCloser,
+  ImportAllInterceptor,
+  TextOptions,
+} from "@/types/gesti";
 
 let currentInstance: Gesti = null;
 
@@ -204,6 +208,7 @@ const useCloseGraffiti = createGraffiti("none");
  */
 const importAll = (
   json: string,
+  interceptor: ImportAllInterceptor,
   target: Gesti = currentInstance
 ): Promise<void> => {
   if (!target) {
@@ -216,7 +221,7 @@ const importAll = (
   }
   setCurrentInstance(target);
   const controller = getCurrentController();
-  return controller.importAll(json);
+  return controller.importAll(json, interceptor);
 };
 /**
  * @description 导入json到画布内,该json数据格式必须由 exportAll Hook导出
@@ -249,17 +254,14 @@ const importAll = (
  * @param target
  * @returns
  */
-const exportAll = (
-  offscreenPainter: CanvasRenderingContext2D,
-  target: Gesti = currentInstance
-): Promise<string> => {
+const exportAll = (target: Gesti = currentInstance): Promise<string> => {
   if (!target) {
     error("Target is empty");
     return Promise.reject("Target is empty");
   }
   setCurrentInstance(target);
   const controller = getCurrentController();
-  return controller.exportAll(offscreenPainter);
+  return controller.exportAll();
 };
 
 /**

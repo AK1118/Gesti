@@ -14,15 +14,16 @@ import {
   getOffscreenCanvasWidthPlatform,
 } from "@/utils/canvas";
 import RenderBox from "../lib/rendering/renderbox";
+import BoxDecoration from "../lib/rendering/decorations/decoration";
+import { BoxDecorationOption } from "Graphics";
 
-class ViewObjectRenderBox extends RenderBox{
-  
-}
+class ViewObjectRenderBox extends RenderBox {}
 
 /**
  * 图层基类
  */
-abstract class BaseViewObject extends OperationObserver  {
+abstract class BaseViewObject extends OperationObserver {
+  protected decoration: BoxDecoration;
   public renderBox: RenderBox = new ViewObjectRenderBox();
   protected offScreenCanvas;
   protected offScreenPainter: Painter;
@@ -52,7 +53,7 @@ abstract class BaseViewObject extends OperationObserver  {
   public generateOffScreenCanvas(): boolean {
     this.offScreenCanvas = getOffscreenCanvasWidthPlatform(
       this.renderBox.width,
-      this.renderBox.height,
+      this.renderBox.height
     );
     this.offScreenPainter = getOffscreenCanvasContext(this.offScreenCanvas);
     return this.offScreenCanvas != null && this.offScreenPainter != null;
@@ -62,8 +63,14 @@ abstract class BaseViewObject extends OperationObserver  {
     this.offScreenCanvas = null;
     this.offScreenPainter = null;
   }
- 
-
+  public setDecoration(decoration: BoxDecorationOption): void {
+    this.decoration = new BoxDecoration(decoration);
+    this.forceUpdate();
+  }
+  public setDecorationEntity(decorationEntity: BoxDecoration) {
+    this.decoration = decorationEntity;
+    this.forceUpdate();
+  }
   //是否挂载到Gesti
   private _mounted: boolean = false;
   //瞬时缩放倍数
@@ -196,7 +203,10 @@ abstract class BaseViewObject extends OperationObserver  {
     if (this._fixedSize.equals(Size.zero)) {
       this.setFixedSize(size);
     }
-    this.renderBox.rect.setSize(width ?? this.renderBox.width, height ?? this.renderBox.height);
+    this.renderBox.rect.setSize(
+      width ?? this.renderBox.width,
+      height ?? this.renderBox.height
+    );
   }
   public get absoluteScale(): number {
     return this.renderBox.absoluteScale;
@@ -224,7 +234,9 @@ abstract class BaseViewObject extends OperationObserver  {
    * @description 强制刷新画布
    */
   protected forceUpdate() {
-    this.kit.render();
+    if (this.mounted) {
+      this.kit.render();
+    }
   }
   //导出为JSON
   abstract export(painter?: Painter): Promise<ViewObjectExportEntity>;
@@ -240,9 +252,9 @@ abstract class BaseViewObject extends OperationObserver  {
   protected didEventUpWithInner(): void {}
   //手指抬起在范围外时调用
   protected didEventUpWithOuter(): void {}
-    
-  set rect(newRect:Rect){
-    this.renderBox.rect=newRect;
+
+  set rect(newRect: Rect) {
+    this.renderBox.rect = newRect;
   }
 
   get rect(): Rect {
@@ -278,16 +290,16 @@ abstract class BaseViewObject extends OperationObserver  {
   public get halfHeight(): number {
     return this.rect.halfHeight;
   }
-  get scaleWidth():number{
+  get scaleWidth(): number {
     return this.rect.scaleWidth;
   }
-  get scaleHeight():number{
+  get scaleHeight(): number {
     return this.rect.scaleHeight;
   }
-  public setScaleWidth(scale:number){
+  public setScaleWidth(scale: number) {
     this.rect.setScaleWidth(scale);
   }
-  public setScaleHeight(scale:number){
+  public setScaleHeight(scale: number) {
     this.rect.setScaleHeight(scale);
   }
   public setPosition(x: number, y: number): void {

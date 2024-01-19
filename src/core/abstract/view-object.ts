@@ -20,6 +20,8 @@ import {
   ViewObjectImportImageBox,
 } from "@/types/serialization";
 import Platform from "../viewObject/tools/platform";
+import BoxDecoration from "../lib/rendering/decorations/decoration";
+import { BoxDecorationOption } from "Graphics";
 /**
  *
  * 缓存要做到 数据层缓存，渲染层缓存
@@ -80,8 +82,6 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     return this.isMirror;
   }
 
-  abstract setDecoration(args: any): void;
-
   public render(paint: Painter, isCache?: boolean) {
     if (!this.mounted) return;
     /*更新顶点数据*/
@@ -112,8 +112,12 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    */
   private renderImageOrCache(paint: Painter) {
     if (this.canRenderCache) {
+      //渲染缓存
       paint.drawImage(this.offScreenCanvas, 0, 0, this.width, this.height);
-    } else this.drawImage(paint);
+    } else {
+      this.decoration?.render(paint, this.rect);
+      this.drawImage(paint);
+    }
   }
   public draw(paint: Painter, isCache?: boolean): void {
     //渲染缓存不需要设置或渲染其他属性
@@ -363,6 +367,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       isBackground: this.isBackground,
       opacity: this.opacity,
       platform: Platform.platform,
+      decoration: this.decoration,
     };
   }
   /**

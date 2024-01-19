@@ -1,4 +1,9 @@
-import { ViewObjectExportBaseInfo } from "Serialization";
+import { ViewObjectFamily } from "@/core/enums";
+import ViewObjectBase from "@/core/abstract/view-object";
+import {
+  ViewObjectExportBaseInfo,
+  ViewObjectExportEntity,
+} from "Serialization";
 declare module "Gesti" {
   /*
    * @Author: AK1118
@@ -7,10 +12,22 @@ declare module "Gesti" {
    * @Last Modified time: 2024-01-06 16:12:45
    */
   type PluginKeys = "pako" | "offScreenBuilder";
+
+  type ImportAllInterceptor = (
+    views: Array<ViewObjectBase>
+  ) => Promise<Array<ViewObjectBase>>;
+
+  type ExportAllInterceptor = (
+    views: Array<ViewObjectExportEntity>
+  ) => Promise<Array<ViewObjectExportEntity>>;
+
   interface OffScreenCanvasBuilderOption {
     offScreenCanvasBuilder: (width: number, height: number) => any;
     offScreenContextBuilder: (offScreenCanvas: any) => any;
-    imageBuilder?: (offScreenCanvas: any) => HTMLImageElement | any;
+    imageBuilder?: (
+      offScreenCanvas: any,
+      url: string
+    ) => HTMLImageElement | any;
     paintBuilder?: () => Painter;
   }
   class Vector {
@@ -226,24 +243,15 @@ declare module "Gesti" {
     minScale?: number;
   }
 
-  enum ViewObjectFamily {
-    image,
-    write,
-    line,
-    circle,
-    rect,
-    text,
-  }
-
   interface Rect {
     readonly key: string;
     get position(): Vector;
     get getAngle(): number;
-    get scale(): number;
+    // get scale(): number;
     get size(): Size;
     setPosition(position: Vector): void;
     setSize(width: number, height: number): void;
-    setScale(scale: number): void;
+    // setScale(scale: number): void;
     setSize(width: number, height: number): void;
     setAngle(angle: number, isDrag?: boolean): void;
     copy(key?: string): Rect;
@@ -254,8 +262,8 @@ declare module "Gesti" {
     y: number;
     width: number;
     height: number;
-    imageData: ImageData;
-    base64: string;
+    imageData?: ImageData;
+    base64?: string;
   }
   abstract class ViewObject {
     public getBaseInfo(): ViewObjectExportBaseInfo;
@@ -275,7 +283,7 @@ declare module "Gesti" {
     get absoluteScale(): number;
     get mounted(): boolean;
     get id(): string;
-    readonly key: string;
+    readonly key: string | number;
     readonly selected: boolean;
     public disabled: boolean;
     get isLock(): boolean;
@@ -568,6 +576,7 @@ declare module "Gesti" {
     public hideBackground(): void;
     public setIconColor(color: string): void;
     public setSenseRadius(senseRadius: number): void;
+    // icon, iconColor, customAlignment, customIcon
   }
 
   class CloseButton extends Button {}

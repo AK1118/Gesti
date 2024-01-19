@@ -1,8 +1,8 @@
+import { ViewObjectFamily } from "@/core/enums";
 import {
   GestiController,
   InitializationOption,
   PluginKeys,
-  ViewObjectFamily,
   XImage,
   GestiConfigOption,
 } from "Gesti";

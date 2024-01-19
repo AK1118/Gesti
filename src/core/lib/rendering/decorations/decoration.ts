@@ -3,6 +3,7 @@ import {
   BorderRadiusAll,
   BoxDecorationOption,
   DecorationOption,
+  LineGradientDecorationOption,
 } from "Graphics";
 import XImage from "../../ximage";
 import GradientDecorationBase from "@/core/bases/gradient-base";
@@ -10,6 +11,8 @@ import Painter from "../../painter";
 import Rect from "../../rect";
 import { ClipRRect, RenderColoredRRect, RenderWidgetBase } from "../base";
 import Serializable from "@/core/interfaces/Serialization";
+import LineGradientDecoration from "../../graphics/gradients/lineGradientDecoration";
+import { reverseXImage } from "@/utils/utils";
 
 abstract class Decoration<O extends DecorationOption = DecorationOption>
   extends RenderWidgetBase
@@ -28,7 +31,7 @@ abstract class Decoration<O extends DecorationOption = DecorationOption>
 }
 
 class BoxDecoration extends Decoration<BoxDecorationOption> {
-  constructor(option: BoxDecorationOption) {
+  constructor(option?: BoxDecorationOption) {
     super(option);
   }
   render(paint: Painter, rect: Rect): void {
@@ -80,6 +83,26 @@ class BoxDecoration extends Decoration<BoxDecorationOption> {
       ];
     }
     paint.roundRect(width * -0.5, height * -0.5, width, height, radiusArr);
+  }
+  public async format(entity: BoxDecorationOption): Promise<BoxDecoration> {
+    this.option = {};
+    const { gradient, backgroundImage } = entity;
+    if (gradient?.type == "lineGradient") {
+      entity.gradient = LineGradientDecoration.format(gradient as any);
+    }
+    if (backgroundImage) {
+      const ximage: XImage = await reverseXImage({
+        url: backgroundImage.url,
+        data: backgroundImage.data,
+        fixedHeight: backgroundImage.height,
+        fixedWidth: backgroundImage.width,
+      });
+      entity.backgroundImage = ximage;
+    }
+
+    this.option = entity;
+
+    return Promise.resolve(this);
   }
 }
 

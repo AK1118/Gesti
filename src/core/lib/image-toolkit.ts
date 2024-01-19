@@ -19,7 +19,9 @@ import {
   ViewObjectImportEntity,
 } from "@/types/serialization";
 import {
+  ExportAllInterceptor,
   GraffitiCloser,
+  ImportAllInterceptor,
   InitializationOption,
   TextOptions,
 } from "@/types/gesti";
@@ -28,6 +30,8 @@ import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 import { ScreenUtilOption } from "Gesti";
 import Platform from "../viewObject/tools/platform";
 import Deserializer from "@/utils/deserializer/Deserializer";
+import Plugins from "./plugins";
+import OffScreenCanvasBuilder from "./plugins/offScreenCanvasGenerator";
 enum EventHandlerState {
   down,
   up,
@@ -211,6 +215,11 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  getViewObjectByIdSync<T extends ViewObject>(id: string): T {
+    const arr = this.ViewObjectList;
+    const obj: T | null = arr.find((item) => item.id === id) as T;
+    return obj;
+  }
   generateScreenUtils(option: ScreenUtilOption): ScreenUtils {
     //只要生成了必须使用屏幕适配器
     this.screenUtils = new ScreenUtils(option);
@@ -392,7 +401,11 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
    * @param json
    * @returns
    */
-  async importAll(json: string): Promise<void> {
+  async importAll(
+    json: string,
+    interceptor: ImportAllInterceptor = (views: Array<ViewObject>) =>
+      Promise.resolve(views)
+  ): Promise<void> {
     return new Promise(async (r, j) => {
       try {
         if (!json)
@@ -417,13 +430,17 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         const otherScreenUtils = ScreenUtils.format(info.screen);
         //反序列化
         const deserializer = new Deserializer(this, otherScreenUtils);
+        const temp: Array<ViewObject> = [];
         for await (const item of entities) {
           const importEntity: ViewObjectImportEntity = item;
           const obj: ViewObject = await deserializer.getObjectByJson(
             importEntity
           );
-          if (obj) this.load(obj);
+          if (obj) temp.push(obj);
         }
+        //携所有解析数据调用拦截器
+        await interceptor?.(temp);
+        temp.forEach((_) => this.load(_));
         this.render();
         r();
       } catch (error) {
@@ -432,16 +449,6 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     });
   }
 
-  /**
-   * @description 微信专用导入
-   * @param json
-   * @param weChatCanvas
-   * @deprecated
-   * @returns
-   */
-  importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
-    return new Promise(async (r, j) => {});
-  }
   addListener(
     listenType: GestiControllerListenerTypes,
     hook: ListenerHook,
@@ -459,25 +466,20 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
    * @description 导出画布内所有对象成json字符串
    */
   exportAll(
-    offScreenPainter: CanvasRenderingContext2D,
-    type: "H5" | "WeChat" = "H5"
+    exportAllInterceptor: ExportAllInterceptor = (
+      _: Array<ViewObjectExportEntity>
+    ): Promise<Array<ViewObjectExportEntity>> => Promise.resolve(_)
   ): Promise<string> {
-    const offPainter = new Painter(offScreenPainter);
     return new Promise(async (r, j) => {
       try {
         const viewObjectList: Array<ViewObjectExportEntity> = [];
         for await (const item of this.ViewObjectList) {
           if (item.disabled) continue;
-          if (type == "H5") {
-            const exportEntity = await item.export(offPainter);
-            viewObjectList.push(exportEntity);
-          } else if (type == "WeChat") {
-            const exportEntity = await item.exportWeChat(offPainter);
-            viewObjectList.push(exportEntity);
-          }
+          const exportEntity = await item.export();
+          viewObjectList.push(exportEntity);
         }
         const exportWrapper: ViewObjectExportWrapper = {
-          entities: viewObjectList,
+          entities: await exportAllInterceptor?.(viewObjectList),
           info: {
             platform: Platform.platform,
             screen: this.screenUtils?.toJSON(),
@@ -488,14 +490,6 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         j(error);
       }
     });
-  }
-  /**
-   * @description 导出画布内所有对象成json字符串  微信
-   */
-  exportAllWithWeChat(
-    offScreenPainter: CanvasRenderingContext2D
-  ): Promise<string> {
-    return this.exportAll(offScreenPainter, "WeChat");
   }
   updateText(text: string, options?: TextOptions): void {
     //const isTextBox = classTypeIs(this.selectedViewObject, TextBox);

@@ -6,7 +6,7 @@ import {
   ViewObject,
   XImage,
 } from "./gesti";
-import { GenerateGraphicsOption } from "Graphics";
+import { BoxDecoration, Decoration, GenerateGraphicsOption } from "Graphics";
 
 declare module "Serialization" {
   type FetchXImageForImportCallback = (
@@ -49,6 +49,7 @@ declare module "Serialization" {
     isBackground: boolean;
     opacity: number;
     platform: PlatformType;
+    decoration:BoxDecoration
   }
 
   type ViewObjectExportTypes =

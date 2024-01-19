@@ -80,7 +80,7 @@ class WriteViewObj extends ViewObject {
     this.config = config;
     this.useCache();
   }
-  public setDecoration(decoration: {
+  public setStyle(decoration: {
     //strokeColor?: string;
     color?: string;
     isFill?: boolean;
@@ -90,6 +90,7 @@ class WriteViewObj extends ViewObject {
     this.isFill = decoration?.isFill;
     this.lineWidth = decoration?.lineWidth;
   }
+
   //供外部设置数据
   public setParams(config: {
     color?: string;

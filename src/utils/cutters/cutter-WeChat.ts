@@ -38,7 +38,6 @@ class CutterWeChat extends CutterBase {
           width,
           height,
           imageData,
-          base64: "",
         });
       }
     }

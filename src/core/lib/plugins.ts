@@ -9,8 +9,8 @@ class Plugins{
         "pako":null,
         "offScreenBuilder":null,
     };
-    public static getPluginByKey(key:PluginKeys){
-        return this.plugins[key];
+    public static getPluginByKey<T=any>(key:PluginKeys){
+        return this.plugins[key] as T;
     }
     public static installPlugin(key:PluginKeys,plugin:any){
         this.plugins[key]=plugin;

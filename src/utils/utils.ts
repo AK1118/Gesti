@@ -1,13 +1,8 @@
-import { XImage } from "@/index";
 import { ImageChunk } from "../types/gesti";
 import ImageChunkConverterWeChat from "./converters/image-chunk-converter-WeChat";
-import {
-  FetchXImageForImportCallback,
-  ViewObjectImportBaseInfo,
-  ViewObjectImportImageBox,
-} from "Serialization";
 import Platform from "@/core/viewObject/tools/platform";
 import {
+  getImage,
   getOffscreenCanvasContext,
   getOffscreenCanvasWidthPlatform,
   waitingLoadImg,
@@ -15,6 +10,7 @@ import {
 import Painter from "@/core/lib/painter";
 import CutterWeChat from "./cutters/cutter-WeChat";
 import CutterH5 from "./cutters/cutter-H5";
+import XImage from "@/core/lib/ximage";
 
 /**
  * @description uint8Array 序列化
@@ -169,7 +165,7 @@ const reverseXImage = async (option: ReverseXImageOption): Promise<XImage> => {
   const chunks: Array<ImageChunk> = data;
   if (url) {
     //网络路径存在，不负责请求，任务交由开发者，通过回调函数获取用户传入的XImage
-    const xImage: XImage = await fetchXImageCallback(option);
+    const xImage: XImage = await fetchXImage(option);
     if (!xImage)
       throw Error(
         "Your platform does not support fetching this URL for ximage; you could run 'ImageBox.setFetchXImageCallback' to customize the fetch method and resolve this error."
@@ -221,36 +217,15 @@ const reverseWeChat = async (option: ReverseXImageOption): Promise<XImage> => {
   return ximage;
 };
 
-const fetchXImageCallback = async (
-  option: ReverseXImageOption
-): Promise<XImage> => {
+const fetchXImage = async (option: ReverseXImageOption): Promise<XImage> => {
   const { url, data, fixedHeight, fixedWidth } = option;
   const platform: PlatformType = Platform.platform;
-  if (platform == "Browser") {
-    const img = new Image();
-    img.src = url;
-    img.crossOrigin = "anonymous";
-    await waitingLoadImg(img);
+  const offCanvas = getOffscreenCanvasWidthPlatform(fixedWidth, fixedHeight);
+  const image = getImage(offCanvas, url);
+  if (image) {
+    await waitingLoadImg(image);
     return new XImage({
-      data: img,
-      height: fixedHeight,
-      width: fixedWidth,
-      url,
-    });
-  } else if (platform == "WeChat") {
-    const offCanvas = getOffscreenCanvasWidthPlatform(fixedWidth, fixedHeight);
-
-    // wx.createOffscreenCanvas({
-    //   type: "2d",
-    //   width: fixedWidth,
-    //   height: fixedHeight,
-    // });
-    const img = offCanvas.createImage();
-    img.src = url;
-    if (img?.crossOrigin) img.crossOrigin = "anonymous";
-    await waitingLoadImg(img);
-    return new XImage({
-      data: img,
+      data: image,
       height: fixedHeight,
       width: fixedWidth,
       url,
@@ -258,6 +233,7 @@ const fetchXImageCallback = async (
   }
   return null;
 };
+
 export {
   uint8ArrayConvert,
   parseUint8Array,

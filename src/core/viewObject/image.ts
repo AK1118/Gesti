@@ -24,6 +24,7 @@ import {
   waitingLoadImg,
 } from "@/utils/canvas";
 import { reverseXImage } from "@/utils/utils";
+import { BoxDecorationOption } from "Graphics";
 class ImageBox extends ViewObject {
   family: ViewObjectFamily = ViewObjectFamily.image;
   get value(): any {
@@ -37,33 +38,40 @@ class ImageBox extends ViewObject {
     | ImageBitmap
     | OffscreenCanvas;
   public originFamily: ViewObjectFamily = ViewObjectFamily.image;
+
   constructor(ximage: XImage) {
     super();
     this.ximage = ximage;
     this.image = ximage.data;
     this.rect = new Rect(ximage.toJson());
+    this.setDecoration({
+      backgroundImage: ximage,
+      borderRadius: 10,
+    });
     this.useCache();
   }
 
-  setDecoration(xImage: XImage): void {
+  public replaceXImage(xImage: XImage): void {
     this.ximage = xImage;
     this.image = xImage.data;
     const { width, height } = xImage.toJson();
     const oldPosition: Vector = this.rect.position.copy();
     this.rect.setPosition(oldPosition);
     this.rect.setSize(width, height);
+    this.forceUpdate();
   }
+
   //@Override
   public drawImage(paint: Painter): void {
-    paint.drawImage(
-      this.image,
-      this.rect.position.x >> 0,
-      this.rect.position.y >> 0,
-      this.rect.size.width >> 0,
-      this.rect.size.height >> 0
-    );
+    // paint.drawImage(
+    //   this.image,
+    //   this.rect.position.x >> 0,
+    //   this.rect.position.y >> 0,
+    //   this.rect.size.width >> 0,
+    //   this.rect.size.height >> 0
+    // );
   }
-  
+
   async export(): Promise<ViewObjectExportImageBox> {
     const cutter: Cutter = new Cutter();
     const url: string = this.ximage.url;

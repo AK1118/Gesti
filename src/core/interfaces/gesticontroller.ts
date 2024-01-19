@@ -1,4 +1,10 @@
-import { GraffitiCloser, ScreenUtilOption, TextOptions } from "@/types/gesti";
+import {
+  ExportAllInterceptor,
+  GraffitiCloser,
+  ImportAllInterceptor,
+  ScreenUtilOption,
+  TextOptions,
+} from "@/types/gesti";
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import XImage from "../lib/ximage";
@@ -205,7 +211,7 @@ interface ImageToolKitController {
    * @description 导出所有对象成JSON字符串
    * @param offScreenPainter  离屏渲染对象
    */
-  exportAll(offScreenPainter: CanvasRenderingContext2D): Promise<string>;
+  exportAll(interceptor?: ExportAllInterceptor): Promise<string>;
   /**
    * @description 导出所有对象成JSON字符串
    * @param offScreenPainter  离屏渲染对象
@@ -215,7 +221,7 @@ interface ImageToolKitController {
    * @description 导入Json字符串解析成canvas对象
    * @param json
    */
-  importAll(json: string): Promise<void>;
+  importAll(json: string, interceptor?: ImportAllInterceptor): Promise<void>;
   /**
    * 在微信小程序内导入
    * @param json 导入JSON
@@ -233,6 +239,8 @@ interface ImageToolKitController {
   ): Promise<ViewObject | ViewObject[]>;
 
   getViewObjectById<T extends ViewObject>(id: string): Promise<T>;
+
+  getViewObjectByIdSync<T extends ViewObject>(id: string): T;
 
   /**
    * 获取所有的视图对象

@@ -44,18 +44,13 @@ class CutterH5 extends CutterBase {
           width,
           height,
           imageData,
-          base64: "",
         });
       }
     }
     return chunks;
   }
 
-  public merge(
-    width: number,
-    height: number,
-    chunks: ImageChunk[]
-  ): ImageData {
+  public merge(width: number, height: number, chunks: ImageChunk[]): ImageData {
     const g: any = this.painter;
     const converter: ImageChunkConverter = new ImageChunkConverter();
     const imageData: ImageData = new ImageData(width, height, {

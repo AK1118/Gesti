@@ -1,8 +1,9 @@
 import ViewObject from "@/core/abstract/view-object";
 import GraphicsBase from "@/core/bases/graphics-base";
+import { ViewObjectFamily } from "@/core/enums";
 import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
-import { ViewObjectFamily, XImage } from "@/index";
+import XImage from "@/core/lib/ximage";
 import { reverseXImage } from "@/utils/utils";
 import {
   BoxDecorationOption,
@@ -39,9 +40,7 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   get value(): any {
     throw new Error("Method not implemented.");
   }
-  setDecoration(args: any): void {
-    throw new Error("Method not implemented.");
-  }
+  setDecoration(option: BoxDecorationOption): void {}
   drawImage(paint: Painter): void {
     this.renderGraphics(paint);
     //paint.drawImage(this.cachedOffscreenCanvas, 0, 0, this.width, this.height);
@@ -51,54 +50,7 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   }
   protected renderGraphics(paint: Painter): void {
     this.decoration.render(paint, this.rect);
-    // const { backgroundColor, gradient } = this.decoration;
-    // paint.beginPath();
-    // paint.save();
-    // paint.fillStyle = backgroundColor ?? "black";
-    // if (this.canRenderCache) {
-    //   if (gradient) {
-    //     paint.fillStyle = gradient.getGradient(paint, this.size);
-    //   }
-    //   paint.fillRect(
-    //     this.width * -0.5,
-    //     this.height * -0.5,
-    //     this.width,
-    //     this.height
-    //   );
-    // } else {
-    //   paint.fillRect(
-    //     this.width * -0.5,
-    //     this.height * -0.5,
-    //     this.width,
-    //     this.height
-    //   );
-    // }
-    // paint.closePath();
-    // paint.restore();
   }
-  // protected renderBorder(paint: Painter): void {
-  //   if (!this.borderDecoration) return;
-  //   const {
-  //     borderColor = "black",
-  //     lineDash = [],
-  //     borderWidth = 1,
-  //     innerBorder = false,
-  //     gradient = null,
-  //   } = this.borderDecoration;
-  //   paint.beginPath();
-  //   paint.strokeStyle = borderColor;
-  //   if (gradient) {
-  //     paint.strokeStyle = gradient.getGradient(paint, this.size);
-  //   }
-  //   paint.lineWidth = borderWidth;
-  //   paint.setLineDash(lineDash);
-  //   const factor: number = innerBorder ? -1 : 1;
-  //   const bw = this.width + borderWidth * factor,
-  //     bh = this.height + borderWidth * factor;
-  //   paint.strokeRect(bw * -0.5, bh * -0.5, bw, bh);
-  //   paint.stroke();
-  //   paint.closePath();
-  // }
   export(painter?: Painter): Promise<ViewObjectExportGraphics> {
     const exportEntity: ViewObjectExportGraphics<GenerateRectAngleOption> = {
       option: this.option,
@@ -116,26 +68,7 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   public static async reserve(
     entity: ViewObjectImportGraphics<GenerateRectAngleOption>
   ): Promise<GraphicsBase<GenerateRectAngleOption>> {
-    const gradientType: GradientTypes =
-      entity.option.decoration?.gradient?.type;
     const option = entity.option;
-    if (gradientType == "lineGradient") {
-      option.decoration.gradient = LineGradientDecoration.format(
-        option.decoration.gradient as any as LineGradientDecorationOption
-      );
-    }
-    if (entity.option.decoration.backgroundImage) {
-      const ximage: XImage = await reverseXImage({
-        url: option.decoration.backgroundImage.url,
-        data: option.decoration.backgroundImage.data,
-        fixedHeight: option.decoration.backgroundImage.height,
-        fixedWidth: option.decoration.backgroundImage.width,
-      });
-      console.log("图片", ximage);
-      option.decoration.backgroundImage = ximage;
-      // ximage.width = option.decoration.backgroundImage.width;
-      // ximage.height = option.decoration.backgroundImage.height;
-    }
     const rectAngle: Rectangle = new Rectangle(option);
     return Promise.resolve(rectAngle);
   }

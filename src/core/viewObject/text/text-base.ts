@@ -24,6 +24,7 @@ import {
   getOffscreenCanvasWidthPlatform,
   waitingLoadImg,
 } from "@/utils/canvas";
+import { BoxDecorationOption } from "Graphics";
 /**
  * 普通模式，矩形根据文字而定
  * 拖拽模式，文字根据缩放倍数而定
@@ -521,7 +522,7 @@ class TextViewBase extends TextBoxBase implements TextHandler {
   get value(): string {
     return this.fixedText;
   }
-  setDecoration(args: TextOptions): void {
+  setTextStyle(args: TextOptions): void {
     this.textOptions = Object.assign(this.textOptions, args);
   }
   async drawImage(paint: Painter): Promise<void> {

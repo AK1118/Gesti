@@ -78,4 +78,8 @@ declare module "Graphics" {
   interface GenerateCircleOption extends GenerateGraphicsOption {
     radius: number;
   }
+
+  class Decoration {}
+
+  class BoxDecoration extends Decoration {}
 }

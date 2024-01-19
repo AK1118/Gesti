@@ -8,9 +8,15 @@
 ### 新增
 
 - 新增屏幕适配,可根据设置设计稿大小适配屏幕
-- 新增 Graphics 系列，可新增图形为可操作对象 Rectangle & Circle，支持设置颜色渐变
+- 新增导入/导出拦截函数
+- 新增 BoxDecoration
+- 新增 Graphics 系列，可新增图形为可操作对象 Rectangle & InteractiveImage,支持设置 decoration
 - 新增插件插槽 OffScreenBuilder,用于自定义离屏画布生成
 - 新增 Alignment 类，替换 LocationButton
+
+### 修复
+
+- 修复导出图片为 url 时强制为 base64 问题
 
 ### 优化
 

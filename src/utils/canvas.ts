@@ -14,9 +14,9 @@ const getOffscreenCanvasWidthPlatform = (
   width: number,
   height: number
 ): any => {
-  if(width===0||height===0)return null;
+  if (width === 0 || height === 0) return null;
   const offScreenContextBuilder: OffScreenCanvasGenerator =
-    Plugins.getPluginByKey("offScreenBuilder");
+    Plugins.getPluginByKey<OffScreenCanvasGenerator>("offScreenBuilder");
   if (offScreenContextBuilder)
     return offScreenContextBuilder.buildOffScreenCanvas(width, height);
   if (Platform.isBrowser) return new OffscreenCanvas(width, height);
@@ -59,14 +59,21 @@ const getOffscreenCanvasContext = (offCanvas: any): Painter => {
 const waitingLoadImg = (img): Promise<void> => {
   return new Promise((r) => {
     img.onload = () => r();
+    //最慢加载10秒
+    setTimeout(() => {
+      r();
+    }, 1000 * 10);
   });
 };
 
-const getImage = (offScreenCanvas: any): HTMLImageElement | any => {
+const getImage = (
+  offScreenCanvas: any,
+  url: string
+): HTMLImageElement | any => {
   const offScreenContextBuilder: OffScreenCanvasGenerator =
     Plugins.getPluginByKey("offScreenBuilder");
   if (offScreenContextBuilder) {
-    return offScreenContextBuilder.buildImage(offScreenCanvas);
+    return offScreenContextBuilder.buildImage(offScreenCanvas, url);
   }
   if (Platform.isBrowser) return new Image();
   return null;

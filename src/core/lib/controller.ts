@@ -4,7 +4,13 @@ import ImageToolkit from "./image-toolkit";
 import GestiController from "../interfaces/gesticontroller";
 import Vector from "./vector";
 import XImage from "./ximage";
-import { GraffitiCloser, ScreenUtilOption, TextOptions } from "@/types/gesti";
+import {
+  ExportAllInterceptor,
+  GraffitiCloser,
+  ImportAllInterceptor,
+  ScreenUtilOption,
+  TextOptions,
+} from "@/types/gesti";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
 declare type CenterAxis = "vertical" | "horizon";
@@ -19,10 +25,7 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
-  generateScreenUtils(option: ScreenUtilOption): ScreenUtils {
-    return this.kit.generateScreenUtils(option);
-  }
- 
+
   remove(view?: ViewObject): boolean {
     return this.kit.remove(view);
   }
@@ -57,6 +60,12 @@ class GesteControllerImpl implements GestiController {
     if (!id) throw Error("Invalid id");
     return this.kit.getViewObjectById<T>(id);
   }
+  getViewObjectByIdSync<T extends ViewObject>(id: string): T {
+    return this.kit.getViewObjectByIdSync<T>(id);
+  }
+  generateScreenUtils(option: ScreenUtilOption): ScreenUtils {
+    return this.kit.generateScreenUtils(option);
+  }
   /**
    * @description 设置某个对象的位置
    * @param x
@@ -71,19 +80,19 @@ class GesteControllerImpl implements GestiController {
    * @param offScreenPainter 离屏画笔
    * @returns
    */
-  exportAllWithWeChat(
-    offScreenPainter: CanvasRenderingContext2D
-  ): Promise<string> {
-    return this.kit.exportAllWithWeChat(offScreenPainter);
-  }
-  /**
-   * @description 微信小程序导入
-   * @param offScreenPainter 离屏画布
-   * @returns
-   */
-  importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
-    return this.kit.importAllWithWeChat(json, weChatCanvas);
-  }
+  // exportAllWithWeChat(
+  //   offScreenPainter: CanvasRenderingContext2D
+  // ): Promise<string> {
+  //   return this.kit.exportAllWithWeChat(offScreenPainter);
+  // }
+  // /**
+  //  * @description 微信小程序导入
+  //  * @param offScreenPainter 离屏画布
+  //  * @returns
+  //  */
+  // importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
+  //   return this.kit.importAllWithWeChat(json, weChatCanvas);
+  // }
   cleanAll(): Promise<void> {
     return this.kit.cleanAll();
   }
@@ -120,11 +129,11 @@ class GesteControllerImpl implements GestiController {
   rightward(viewObject?: ViewObject): number {
     return this.kit.rightward(viewObject);
   }
-  importAll(json: string): Promise<void> {
-    return this.kit.importAll(json);
+  importAll(json: string, interceptor: ImportAllInterceptor): Promise<void> {
+    return this.kit.importAll(json, interceptor);
   }
-  exportAll(offScreenPainter: CanvasRenderingContext2D): Promise<string> {
-    return this.kit.exportAll(offScreenPainter);
+  exportAll(exportAllInterceptor?: ExportAllInterceptor): Promise<string> {
+    return this.kit.exportAll(exportAllInterceptor);
   }
   addWrite(options: {
     type: "circle" | "write" | "line" | "rect" | "none";
