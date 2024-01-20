@@ -103,6 +103,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.draw(this.offScreenPainter, true);
     this.offScreenPainter.save();
     this.offScreenPainter.translate(this.width * 0.5, this.height * 0.5);
+    this.decoration?.render(this.offScreenPainter, this.rect);
     this.drawImage(this.offScreenPainter);
     this.offScreenPainter.restore();
   }

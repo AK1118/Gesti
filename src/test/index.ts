@@ -116,9 +116,14 @@ setTimeout(() => {
     scale: 1,
     url: img2.src,
   });
-  imageBox.replaceXImage(ximage2);
+  // imageBox.replaceXImage(ximage2);
   imageBox.setDecoration({
-    borderRadius: screenUtil1.setSp(90),
+    // borderRadius: screenUtil1.setSp(10),
+    gradient: new LineGradientDecoration({
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: ["red", "white", "yellow"],
+    }),
   });
 }, 3000);
 
@@ -154,8 +159,17 @@ const textBox = new TextBox(str1, {
   fontStyle: "italic",
   fontFamily: "楷体",
 });
+textBox2.setDecoration({
+  backgroundImage: ximage,
+  gradient: new LineGradientDecoration({
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: ["orange", "white", "yellow"],
+  }),
+});
+textBox2.setOpacity(0.1)
+loadToGesti(textBox2);
 
-// loadToGesti(textBox2);
 //loadToGesti(textBox);
 
 // const group: Group = new Group();

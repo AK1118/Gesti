@@ -37,6 +37,8 @@ class BoxDecoration extends Decoration<BoxDecorationOption> {
   render(paint: Painter, rect: Rect): void {
     const { width, height } = rect.size;
     const { gradient, backgroundColor, backgroundImage } = this.option;
+    paint.save();
+    paint.beginPath();
     //如果没有渐变，普通矩形
     if (!gradient) {
       paint.fillStyle = backgroundColor ?? "black";
@@ -47,7 +49,7 @@ class BoxDecoration extends Decoration<BoxDecorationOption> {
     const borderRadius = this.option.borderRadius;
     if (borderRadius) {
       this.renderRoundRect(paint, borderRadius, width, height);
-    } else if (backgroundColor) {
+    } else if (backgroundColor||gradient) {
       //渲染普通矩形
       paint.fillRect(width * -0.5, height * -0.5, width, height);
     }

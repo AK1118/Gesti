@@ -62,9 +62,28 @@ abstract class BaseViewObject extends OperationObserver {
     this._isCache = false;
     this.offScreenCanvas = null;
     this.offScreenPainter = null;
+
   }
-  public setDecoration(decoration: BoxDecorationOption): void {
-    this.decoration = new BoxDecoration(decoration);
+  private decorationOption: BoxDecorationOption = {};
+  /**
+   * ## 设置View盒子装饰
+   * - decoration 装饰参数，包括背景颜色，背景图片，圆角，背景渐变，描边等详情见 [BoxDecorationOption]
+   * - extension 是否在原来的基础上扩展，默认true
+   * @param decoration 
+   * @param extension 
+   */
+  public setDecoration(
+    decoration: BoxDecorationOption,
+    extension: boolean = true
+  ): void {
+    let _d = {
+      ...decoration,
+    };
+    if (extension) {
+      _d = Object.assign(this.decorationOption, _d);
+    }
+    this.decoration = new BoxDecoration(_d);
+    this.decorationOption = decoration;
     this.forceUpdate();
   }
   public setDecorationEntity(decorationEntity: BoxDecoration) {
@@ -235,6 +254,7 @@ abstract class BaseViewObject extends OperationObserver {
    */
   protected forceUpdate() {
     if (this.mounted) {
+      this.offScreenCanvas = null;
       this.kit.render();
     }
   }

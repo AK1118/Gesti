@@ -38,7 +38,6 @@ class ImageBox extends ViewObject {
     | ImageBitmap
     | OffscreenCanvas;
   public originFamily: ViewObjectFamily = ViewObjectFamily.image;
-
   constructor(ximage: XImage) {
     super();
     this.ximage = ximage;
@@ -46,7 +45,6 @@ class ImageBox extends ViewObject {
     this.rect = new Rect(ximage.toJson());
     this.setDecoration({
       backgroundImage: ximage,
-      borderRadius: 10,
     });
     this.useCache();
   }
@@ -63,13 +61,13 @@ class ImageBox extends ViewObject {
 
   //@Override
   public drawImage(paint: Painter): void {
-    // paint.drawImage(
-    //   this.image,
-    //   this.rect.position.x >> 0,
-    //   this.rect.position.y >> 0,
-    //   this.rect.size.width >> 0,
-    //   this.rect.size.height >> 0
-    // );
+    paint.drawImage(
+      this.image,
+      this.rect.position.x >> 0,
+      this.rect.position.y >> 0,
+      this.rect.size.width >> 0,
+      this.rect.size.height >> 0
+    );
   }
 
   async export(): Promise<ViewObjectExportImageBox> {

@@ -182,6 +182,7 @@ abstract class DeserializerBase {
     view.custom();
     base.locked && view.lock();
     base.mirror && view.mirror();
+    view.setOpacity(base.opacity);
     //设置2D矢量数据
     this.setVectorData(view, base);
     //设置盒子装饰器
