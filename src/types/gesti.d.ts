@@ -1,21 +1,31 @@
-import { ViewObjectFamily } from "@/core/enums";
-import ViewObjectBase from "@/core/abstract/view-object";
+import { BoxDecoration } from "./graphics";
 import {
   ViewObjectExportBaseInfo,
   ViewObjectExportEntity,
-} from "Serialization";
+} from "./serialization";
 declare module "Gesti" {
+  enum ViewObjectFamily {
+    image,
+    write,
+    line,
+    circle,
+    rect,
+    text,
+    group,
+    graphicsRectangle,
+    graphicsCircle,
+  }
   /*
    * @Author: AK1118
    * @Date: 2023-11-15 16:08:39
-   * @Last Modified by: AK1118
-   * @Last Modified time: 2024-01-06 16:12:45
+ * @Last Modified by: AK1118
+ * @Last Modified time: 2024-01-20 18:04:55
    */
   type PluginKeys = "pako" | "offScreenBuilder";
 
   type ImportAllInterceptor = (
-    views: Array<ViewObjectBase>
-  ) => Promise<Array<ViewObjectBase>>;
+    views: Array<ViewObject>
+  ) => Promise<Array<ViewObject>>;
 
   type ExportAllInterceptor = (
     views: Array<ViewObjectExportEntity>
@@ -114,7 +124,7 @@ declare module "Gesti" {
 
   class DefaultIcon extends IconBase {}
 
-  interface GestiConfigOption {
+  export interface GestiConfigOption {
     auxiliary?: boolean;
     dashedLine?: boolean;
   }
@@ -130,8 +140,9 @@ declare module "Gesti" {
     height: number;
   }
 
-  class Alignment {
+  export class Alignment {
     constructor(x: number, y: number);
+    static format(x: number, y: number): Alignment;
     public copyWithOffset(offset: Offset): Alignment;
     static readonly center: Alignment;
     static readonly topLeft: Alignment;
@@ -142,9 +153,10 @@ declare module "Gesti" {
     static readonly bottomCenter: Alignment;
     static readonly centerLeft: Alignment;
     static readonly topCenter: Alignment;
+    public compute(size: Size): Offset;
   }
 
-  interface TextOptions {
+  export interface TextOptions {
     /**
      * @description 字体风格，可以浏览器搜索 canvas自定义字体
      */
@@ -257,7 +269,7 @@ declare module "Gesti" {
     copy(key?: string): Rect;
   }
   class ImageToolkit {}
-  interface ImageChunk {
+  export interface ImageChunk {
     x: number;
     y: number;
     width: number;
@@ -265,7 +277,7 @@ declare module "Gesti" {
     imageData?: ImageData;
     base64?: string;
   }
-  abstract class ViewObject {
+  export abstract class ViewObject {
     public getBaseInfo(): ViewObjectExportBaseInfo;
     readonly rect: Rect;
     get value(): any;
@@ -288,6 +300,7 @@ declare module "Gesti" {
     public disabled: boolean;
     get isLock(): boolean;
     setName(name: string): void;
+    //设置名称
     public setId(id: string): void;
     //上锁
     lock(): void;
@@ -297,12 +310,12 @@ declare module "Gesti" {
     hide(): void;
     //安装按钮
     installButton(button: Button): void;
-
+    //安装多个按钮
     installMultipleButtons(buttons: Array<Button>): void;
     //卸载按钮
     unInstallButton(buttons: Array<Button>): void;
     //设置样式
-    setDecoration(args: any): void;
+    setDecoration(decoration: BoxDecoration): void;
     //设置矩形大小
     setSize(size: { width?: number; height?: number }): void;
     //设置位置
@@ -321,8 +334,10 @@ declare module "Gesti" {
      */
     public unBackground(): void;
     public getLayer(): number;
+    //强制刷新画布
+    public forceUpdate(): void;
   }
-  class XImage {
+  export class XImage {
     constructor(params: createImageOptions);
     originData: any;
     data: any;
@@ -370,7 +385,7 @@ declare module "Gesti" {
     setWeight(weight: FontWeight): void;
   }
 
-  class TextBox extends ViewObject implements TextHandler {
+  export class TextBox extends ViewObject implements TextHandler {
     constructor(text: string, options?: TextOptions);
     setWeight(weight: FontWeight): void;
     setFontStyle(style: FontStyleType): void;
@@ -450,7 +465,7 @@ declare module "Gesti" {
     | "onCreateGraffiti"
     | "onUpdateText"
     | "onRemove";
-  abstract class GestiController {
+  export abstract class GestiController {
     /**
      * @ImageToolkit
      * @private
@@ -563,7 +578,7 @@ declare module "Gesti" {
     constructor(option?: ButtonOption);
   }
 
-  abstract class Button extends BaseButton {
+  export abstract class Button extends BaseButton {
     get btnLocation(): Alignment;
     protected drawButton(
       position: Vector,

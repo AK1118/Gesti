@@ -1,23 +1,24 @@
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
+import { glob, globSync } from "glob";
 import cleanupPlugin from "rollup-plugin-cleanup";
 import copy from "rollup-plugin-copy";
 
+//获取所有数据
+const allTypes = globSync("./src/types/*.d.ts");
+const DEST_PATH = "dist/types/";
+const copyAllTargets = [
+  {
+    src: "LICENSE",
+    dest: "dist",
+  },
+  ...allTypes.map((_) => ({
+    src: _.replace(/\\/g, "/"),
+    dest: DEST_PATH,
+  })),
+];
 const copyConfig = {
-  targets: [
-    {
-      src: "./src/types/index.d.ts",
-      dest: "dist/types/",
-    },
-    {
-      src: "./src/types/serialization.d.ts",
-      dest: "dist/types/",
-    },
-    {
-        src:"LICENSE",
-        dest:"dist"
-    }
-  ],
+  targets: copyAllTargets,
 };
 
 const plugins = [

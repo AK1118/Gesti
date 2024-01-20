@@ -1,12 +1,13 @@
-import Alignment from "@/core/lib/painting/alignment";
 import {
+  Alignment,
   GraffitiTypes,
   ScreenUtilOption,
   TextOptions,
   ViewObject,
   XImage,
 } from "./gesti";
-import { BoxDecoration, Decoration, GenerateGraphicsOption } from "Graphics";
+
+import { BoxDecoration, Decoration, GenerateGraphicsOption } from "./graphics";
 
 declare module "Serialization" {
   type FetchXImageForImportCallback = (
@@ -30,7 +31,7 @@ declare module "Serialization" {
     displayBackground?: boolean;
   }
 
-  interface ViewObjectExportBaseInfo {
+  export interface ViewObjectExportBaseInfo {
     rect: ExportRect;
     fixedSize: {
       width: number;
@@ -49,7 +50,7 @@ declare module "Serialization" {
     isBackground: boolean;
     opacity: number;
     platform: PlatformType;
-    decoration:BoxDecoration
+    decoration: BoxDecoration;
   }
 
   type ViewObjectExportTypes =
@@ -59,7 +60,7 @@ declare module "Serialization" {
     | "group"
     | "graphicsRectangle";
 
-  interface ViewObjectExportEntity {
+  export interface ViewObjectExportEntity {
     base: ViewObjectExportBaseInfo;
     type: ViewObjectExportTypes;
   }
@@ -129,3 +130,4 @@ declare module "Serialization" {
     info: ViewObjectExportWrapperBaseInfo;
   }
 }
+

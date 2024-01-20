@@ -2,7 +2,7 @@
  * @Author: AK1118
  * @Date: 2023-11-03 18:14:02
  * @Last Modified by: AK1118
- * @Last Modified time: 2024-01-06 16:50:27
+ * @Last Modified time: 2024-01-20 16:33:37
  */
 import SizeButton from "./core/viewObject/buttons/sizeButton";
 import { ViewObjectFamily } from "./core/enums";
@@ -73,14 +73,7 @@ import {
   // useReaderWeChat,
   useGetViewObjectById,
 } from "./hooks/index";
-import {
-  parseUint8Array,
-  uint8ArrayConvert,
-  uint8ArrayToChunks,
-  inToPx,
-  mmToIn,
-  ptToPx,
-} from "./utils/utils";
+import { uint8ArrayToChunks, inToPx, mmToIn, ptToPx } from "./utils/utils";
 import ImageBox from "./core/viewObject/image";
 import TextBox from "./core/viewObject/text/text";
 import WriteViewObj from "./core/viewObject/write";
@@ -93,7 +86,6 @@ import LockButton from "./core/viewObject/buttons/lockbutton";
 import UnLockButton from "./core/viewObject/buttons/delockButton";
 import VerticalButton from "./core/viewObject/buttons/verticalButton";
 import HorizonButton from "./core/viewObject/buttons/horizonButton";
-import { createTextBoxView } from "./hooks/create";
 import GestiConfig from "./config/gestiConfig";
 import {
   MirrorIcon,
@@ -105,7 +97,12 @@ import {
   DefaultIcon,
 } from "./composite/icons";
 import Alignment from "./core/lib/painting/alignment";
-import Rectangle from "./core/viewObject/graphics/rectangle";
+import Rectangle, {
+  InteractiveImage,
+} from "./core/viewObject/graphics/rectangle";
+import LineGradientDecoration from "./core/lib/graphics/gradients/lineGradientDecoration";
+import OffScreenCanvasBuilder from "./core/lib/plugins/offScreenCanvasGenerator";
+import ScreenUtils from "./utils/screenUtils/ScreenUtils";
 
 //按钮
 export {
@@ -202,8 +199,6 @@ export {
   doPosition,
   // useReaderWeChat,
   useGetViewObjectById,
-  parseUint8Array,
-  uint8ArrayConvert,
   uint8ArrayToChunks,
 };
 export default Gesti;

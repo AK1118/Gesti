@@ -40,7 +40,7 @@ import Gesti, {
 } from "@/index";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
-// Gesti.installPlugin("pako", require("pako"));
+ Gesti.installPlugin("pako", require("pako"));
 
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const img2: HTMLImageElement = document.querySelector("#bg");
@@ -78,7 +78,7 @@ const gesti = createGesti({
   dashedLine: false,
   auxiliary: false,
 });
-Gesti.installPlugin("pako", require("pako"));
+// Gesti.installPlugin("pako", require("pako"));
 console.log(canvas.width, canvas.height);
 gesti.initialization({
   renderContext: g,

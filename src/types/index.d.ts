@@ -1,11 +1,12 @@
-import { ViewObjectFamily } from "@/core/enums";
 import {
   GestiController,
   InitializationOption,
   PluginKeys,
   XImage,
   GestiConfigOption,
-} from "Gesti";
+  ViewObjectFamily,
+  Alignment,
+} from "./gesti";
 
 declare class Gesti {
   constructor(config?: GestiConfigOption);
@@ -37,7 +38,7 @@ declare class Gesti {
    * ### 初始化Gesti
    * - 必须传入画布的高宽，即rect内的canvasWidth和canvasHeight
    * 
-   * ```
+   * ``` TypeScript
    * InitializationOption {
       //画笔
       renderContext: CanvasRenderingContext2D | null;
@@ -52,7 +53,7 @@ declare class Gesti {
    * ```
    */
   public initialization(option: InitializationOption): void;
-  public static DPR: number;
+  public static mount(option: InitializationOption): [Gesti, GestiController];
   /**
    * @description 安装预设插件
    * @param key
@@ -60,4 +61,6 @@ declare class Gesti {
    */
   public static installPlugin(key: PluginKeys, plugin: any);
 }
-
+export * from "./gesti";
+export * from "./hooks";
+export default Gesti;

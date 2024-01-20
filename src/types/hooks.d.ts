@@ -1,7 +1,8 @@
-import { Button, GestiController, ImageChunk, TextBox, TextOptions, ViewObject, XImage, GestiConfigOption } from "Gesti";
-import { Gesti } from "./index";
+import { Button, GestiController, ImageChunk, TextBox, TextOptions, ViewObject, XImage, GestiConfigOption } from "./gesti";
+import Gesti from "./index";
+
 declare module "GestiHooks" {
-  const createGesti: (config?: GestiConfigOption) => Gesti;
+  export const createGesti: (config?: GestiConfigOption) => Gesti;
   /**
    * Hook 分发
    */

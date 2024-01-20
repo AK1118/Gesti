@@ -12,6 +12,7 @@ import Vector from "./vector";
 import ImageBox from "../viewObject/image";
 import TextBox from "../viewObject/text/text";
 import WriteFactory from "../viewObject/write/write-factory";
+import { ViewObject as ViewObjectD } from "@/types/gesti";
 import XImage from "./ximage";
 import {
   ViewObjectExportEntity,
@@ -403,8 +404,8 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
    */
   async importAll(
     json: string,
-    interceptor: ImportAllInterceptor = (views: Array<ViewObject>) =>
-      Promise.resolve(views)
+    interceptor: ImportAllInterceptor = (views: Array<any>) =>
+      Promise.resolve(views as Array<ViewObjectD>)
   ): Promise<void> {
     return new Promise(async (r, j) => {
       try {
@@ -439,7 +440,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
           if (obj) temp.push(obj);
         }
         //携所有解析数据调用拦截器
-        await interceptor?.(temp);
+        await interceptor?.(temp as any);
         temp.forEach((_) => this.load(_));
         this.render();
         r();

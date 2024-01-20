@@ -1,7 +1,5 @@
-import Painter from "@/core/lib/painter";
-import XImage from "@/core/lib/ximage";
-import ImageBox from "@/core/viewObject/image";
-import Alignment from "@/core/lib/painting/alignment";
+import { Alignment, Painter, XImage } from "Gesti";
+
 declare module "Graphics" {
   type GradientTypes = "lineGradient" | "radiusGradient";
   type GraphicsTypes = "rectangle" | "circle";
@@ -49,7 +47,7 @@ declare module "Graphics" {
   interface DecorationOption {}
 
   //盒子装饰器
-  interface BoxDecorationOption extends DecorationOption {
+  export interface BoxDecorationOption extends DecorationOption {
     //背景颜色
     backgroundColor?: string;
     //背景图片
@@ -79,7 +77,7 @@ declare module "Graphics" {
     radius: number;
   }
 
-  class Decoration {}
+  export class Decoration {}
 
-  class BoxDecoration extends Decoration {}
+  export class BoxDecoration extends Decoration {}
 }
