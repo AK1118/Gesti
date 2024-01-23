@@ -25,6 +25,10 @@ class GesteControllerImpl implements GestiController {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  //取消手势(二指)
+  cancelGesture(): void {
+    this.kit.cancelGesture();
+  }
 
   remove(view?: ViewObject): boolean {
     return this.kit.remove(view);

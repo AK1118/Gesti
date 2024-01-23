@@ -66,7 +66,7 @@ interface GestiEvent {
 class GestiEventManager {
   getEvent(kit: ImageToolkit): GestiEvent {
     if (typeof window != "undefined") {
-      const isMobile = /Mobile/.test(navigator.userAgent);
+      const isMobile = /Mobile/.test(navigator?.userAgent);
       if (isMobile) return new GestiTouchEvent(kit);
       return new GestiMouseEvent(kit);
     } else if (typeof wx != "undefined") {
@@ -75,7 +75,9 @@ class GestiEventManager {
     return new GestiTouchEvent(kit);
   }
 }
-
+/**
+ * 手机端
+ */
 class GestiTouchEvent implements GestiEvent {
   kit: ImageToolkit;
   constructor(kit: ImageToolkit) {
@@ -133,7 +135,9 @@ class GestiTouchEvent implements GestiEvent {
     //手机端不用适配
   }
 }
-
+/**
+ * 电脑端
+ */
 class GestiMouseEvent implements GestiEvent {
   constructor(kit: ImageToolkit) {
     this.kit = kit;

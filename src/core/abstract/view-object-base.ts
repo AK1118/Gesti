@@ -62,15 +62,14 @@ abstract class BaseViewObject extends OperationObserver {
     this._isCache = false;
     this.offScreenCanvas = null;
     this.offScreenPainter = null;
-
   }
   private decorationOption: BoxDecorationOption = {};
   /**
    * ## 设置View盒子装饰
    * - decoration 装饰参数，包括背景颜色，背景图片，圆角，背景渐变，描边等详情见 [BoxDecorationOption]
    * - extension 是否在原来的基础上扩展，默认true
-   * @param decoration 
-   * @param extension 
+   * @param decoration
+   * @param extension
    */
   public setDecoration(
     decoration: BoxDecorationOption,
@@ -126,7 +125,7 @@ abstract class BaseViewObject extends OperationObserver {
   //image kit 对象
   protected kit: ImageToolkit;
   //对象层级 => 对象在数组中的位置
-  private layer: number = 0;
+  private layer: number = null;
 
   //初始化时的尺寸，用于计算scaleWidth,和scaleHeight
   private _fixedSize: Size = Size.zero;

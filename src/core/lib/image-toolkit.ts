@@ -216,6 +216,9 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  cancelGesture(): void {
+    this.gesture.disable();
+  }
   getViewObjectByIdSync<T extends ViewObject>(id: string): T {
     const arr = this.ViewObjectList;
     const obj: T | null = arr.find((item) => item.id === id) as T;
@@ -363,39 +366,39 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   }
   upward(viewObject?: ViewObject): number {
     if (viewObject) {
-      viewObject.rect.position.y -= 1;
-      return viewObject.rect.position.y;
+      viewObject.position.y -= 1;
+      return viewObject.position.y;
     }
     if (!this.selectedViewObject) return null;
-    this.selectedViewObject.rect.position.y -= 1;
-    return this.selectedViewObject.rect.position.y;
+    this.selectedViewObject.position.y -= 1;
+    return this.selectedViewObject.position.y;
   }
   downward(viewObject?: ViewObject): number {
     if (viewObject) {
-      viewObject.rect.position.y += 1;
-      return viewObject.rect.position.y;
+      viewObject.position.y += 1;
+      return viewObject.position.y;
     }
     if (!this.selectedViewObject) return null;
-    this.selectedViewObject.rect.position.y += 1;
-    return this.selectedViewObject.rect.position.y;
+    this.selectedViewObject.position.y += 1;
+    return this.selectedViewObject.position.y;
   }
   leftward(viewObject?: ViewObject): number {
     if (viewObject) {
-      viewObject.rect.position.x -= 1;
-      return viewObject.rect.position.x;
+      viewObject.position.x -= 1;
+      return viewObject.position.x;
     }
     if (!this.selectedViewObject) return null;
-    this.selectedViewObject.rect.position.x -= 1;
-    return this.selectedViewObject.rect.position.x;
+    this.selectedViewObject.position.x -= 1;
+    return this.selectedViewObject.position.x;
   }
   rightward(viewObject?: ViewObject): number {
     if (viewObject) {
-      viewObject.rect.position.x += 1;
-      return viewObject.rect.position.x;
+      viewObject.position.x += 1;
+      return viewObject.position.x;
     }
     if (!this.selectedViewObject) return null;
-    this.selectedViewObject.rect.position.x += 1;
-    return this.selectedViewObject.rect.position.x;
+    this.selectedViewObject.position.x += 1;
+    return this.selectedViewObject.position.x;
   }
   /**
    * @description 导入json解析成对象  H5
@@ -854,9 +857,10 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   private addViewObject(obj: ViewObject): void {
     this.ViewObjectList.push(obj);
     obj.initialization(this);
-    obj.setLayer(this.getViewObjectCount() - 1);
+    if (obj.getLayer() === null) obj.setLayer(this.getViewObjectCount() - 1);
     this.callHook("onLoad", obj);
     this.render();
+    this.tool.sortByLayer(this.ViewObjectList);
   }
 
   /**
@@ -921,42 +925,75 @@ class _Tools {
     selectedViewObject: ViewObject,
     operationType: LayerOperationType
   ): void {
+    //对象是否在数组中
     const ndx = ViewObjectList.findIndex(
       (item: ViewObject) => item.key === selectedViewObject.key
     );
     if (ndx === -1) return;
+
+    //所有对象数量
     const len = ViewObjectList.length - 1;
 
+    /**
+     * 排序规则，layer越大，数组下标越大
+     * 向上一级操作 => layer设置为 i+i 的layer+1
+     */
     switch (operationType) {
+      //图层向上移，layer增大,下标增大
+      // current = next+1
       case LayerOperationType.top:
-        if (ndx === len) break;
-        for (let i = ndx + 1; i <= len; i++) {
-          ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() - 1);
+        {
+          if (ndx === len) break;
+          const current = selectedViewObject,
+            next = ViewObjectList[ndx + 1];
+          current.setLayer(next.getLayer() + 1);
+          // for (let i = ndx + 1; i <= len; i++) {
+          //   ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() - 1);
+          // }
+          // selectedViewObject.setLayer(len);
         }
-        selectedViewObject.setLayer(len);
         break;
+      //图层向下移动，layer减小,下标减小
+      // current=pre-1
       case LayerOperationType.bottom:
-        if (ndx === 0) break;
-        for (let i = ndx - 1; i >= 0; i--) {
-          ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() + 1);
+        {
+          if (ndx === 0) break;
+          const current = selectedViewObject,
+            next = ViewObjectList[ndx - 1];
+          current.setLayer(next.getLayer() - 1);
+          // for (let i = ndx - 1; i >= 0; i--) {
+          //   ViewObjectList[i].setLayer(ViewObjectList[i].getLayer() + 1);
+          // }
+          // selectedViewObject.setLayer(0);
         }
-        selectedViewObject.setLayer(0);
         break;
+      //最高图层   current=max +1
       case LayerOperationType.rise:
-        if (ndx === len) break;
-        // 交换图层
-        const tempLayer = ViewObjectList[ndx].getLayer();
-        ViewObjectList[ndx].setLayer(ViewObjectList[ndx + 1].getLayer());
-        ViewObjectList[ndx + 1].setLayer(tempLayer);
-        selectedViewObject.setLayer(ndx + 1);
+        {
+          // if (ndx === len) break;//
+          const max = ViewObjectList[len];
+          const current = selectedViewObject;
+          current.setLayer(max.getLayer() + 1);
+          // 交换图层
+          // const tempLayer = ViewObjectList[ndx].getLayer();
+          // ViewObjectList[ndx].setLayer(ViewObjectList[ndx + 1].getLayer());
+          // ViewObjectList[ndx + 1].setLayer(tempLayer);
+          // selectedViewObject.setLayer(ndx + 1);
+        }
         break;
+      //最低图层   current=min-1
       case LayerOperationType.lower:
-        if (ndx === 0) break;
-        // 交换图层
-        const tempLayerLower = ViewObjectList[ndx].getLayer();
-        ViewObjectList[ndx].setLayer(ViewObjectList[ndx - 1].getLayer());
-        ViewObjectList[ndx - 1].setLayer(tempLayerLower);
-        selectedViewObject.setLayer(ndx - 1);
+        {
+          const min = ViewObjectList[0];
+          const current = selectedViewObject;
+          current.setLayer(min.getLayer() - 1);
+          // if (ndx === 0) break;
+          // 交换图层
+          // const tempLayerLower = ViewObjectList[ndx].getLayer();
+          // ViewObjectList[ndx].setLayer(ViewObjectList[ndx - 1].getLayer());
+          // ViewObjectList[ndx - 1].setLayer(tempLayerLower);
+          // selectedViewObject.setLayer(ndx - 1);
+        }
         break;
     }
     this.sortByLayer(ViewObjectList);
@@ -967,48 +1004,5 @@ class _Tools {
       (a: ViewObject, b: ViewObject) => a.getLayer() - b.getLayer()
     );
   }
-
-  /**
-   * @deprecated
-   * @deprecated 废弃
-   * @param ViewObjectList
-   * @param node
-   * @param kit
-   * @returns
-   */
-  // public fallbackViewObject(
-  //   ViewObjectList: Array<ViewObject>,
-  //   node: ab,
-  //   kit: ImageToolkit
-  // ) {
-  //   if (node == null) return;
-  //   const obj: ViewObject = ViewObjectList.find((item: ViewObject) => {
-  //     return item.key == node.key;
-  //   });
-  //   if (obj) {
-  //     switch (node.type) {
-  //       case "position":
-  //         obj.rect.position = node.data;
-  //         break;
-  //       case "angle":
-  //         obj.setAngle(node.data);
-  //         break;
-  //       case "scale":
-  //         obj.setDeltaScale(node.data);
-  //         break;
-  //       case "size":
-  //         obj.rect.setSize(node.data.width, node.data.height);
-  //         break;
-  //       case "drag":
-  //         {
-  //           obj.rect.setSize(node.data.size.width, node.data.size.height);
-  //           obj.rect.setAngle(node.data.angle);
-  //         }
-  //         break;
-  //     }
-  //     obj.didFallback();
-  //   }
-  //   kit.render();
-  // }
 }
 export default ImageToolkit;

@@ -126,7 +126,7 @@ setTimeout(() => {
     }),
   });
 }, 3000);
-
+imageBox.setId("第一")
 doCenter(imageBox);
 loadToGesti(imageBox);
 
@@ -167,6 +167,7 @@ textBox2.setDecoration({
     colors: ["orange", "white", "yellow"],
   }),
 });
+textBox2.setId("第二")
 textBox2.setOpacity(0.1)
 loadToGesti(textBox2);
 
@@ -206,6 +207,8 @@ const drag = new DragButton({
     alignment: Alignment.bottomRight,
   },
 });
+rect.setId("第三")
+rect.setLayer(9)
 rect.installButton(drag);
 rect.installMultipleButtons([
   new HorizonButton("left"),
@@ -217,7 +220,7 @@ rect.installMultipleButtons([
   new SizeButton(Alignment.topLeft),
 ]);
 loadToGesti(rect);
-
+controller.cancelGesture()
 const aa = new InteractiveImage(ximage, {
   borderRadius: screenUtil1.setSp(90),
 });
@@ -296,7 +299,7 @@ document.getElementById("input").addEventListener("input", (e: any) => {
   textBox2.setText(e.target?.value);
   console.log(e.target?.value);
 });
-
+console.log(controller.getAllViewObject())
 // const box1 = new Rectangle({
 //   width: screenUtil1.setWidth(300),
 //   height: screenUtil1.setHeight(300),

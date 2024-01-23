@@ -311,6 +311,8 @@ interface GestiController extends LayerController, ImageToolKitController {
             })
       */
   cancelEvent(): void;
+
+  cancelGesture(): void;
 }
 
 export default GestiController;

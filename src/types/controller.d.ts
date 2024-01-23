@@ -259,7 +259,9 @@ interface ImageToolKitController {
 /**
  * 控制器类，提供接口供给用户使用
  */
-declare interface GestiController extends LayerController, ImageToolKitController {
+declare interface GestiController
+  extends LayerController,
+    ImageToolKitController {
   /**
    * @description 鼠标/手指按下时调用
    * @param e
@@ -281,11 +283,11 @@ declare interface GestiController extends LayerController, ImageToolKitControlle
    */
   wheel(e: Event): void;
   /**
-      * 取消原有事件控制权
-      * 值得注意: 当调用该方法后，画布所有的手势监听都会消失。也就是说您不能再点击选取画布，除非您主动调用控制器的down/up/move/wheel方法恢复功能。
-      * 栗子：
-      * 
-      *     window.addEventListener('touchstart',(e)=>{
+   *  ### 取消原有事件控制权
+      * - 值得注意: 当调用该方法后，画布所有的手势监听都会消失。也就是说您不能再点击选取画布，除非您主动调用控制器的down/up/move/wheel方法恢复功能。
+      * - 栗子：
+      ```
+        window.addEventListener('touchstart',(e)=>{
                 controller.down(e);
             })
             window.addEventListener('touchmove',(e)=>{
@@ -309,8 +311,14 @@ declare interface GestiController extends LayerController, ImageToolKitControlle
             window.addEventListener('wheel',(e)=>{
                 controller.wheel(e);
             })
-      */
+      ```
+   */
   cancelEvent(): void;
+  /**
+   * ### 取消手势
+   * - 调用后将没有二指缩放功能
+   */
+  cancelGesture(): void;
 }
 
 export default GestiController;
