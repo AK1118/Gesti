@@ -26,6 +26,8 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
   private readonly scaleWidth: number;
   private readonly scaleHeight: number;
   private readonly scaleText: number;
+  private readonly designWidth: number;
+  private readonly designHeight: number;
   constructor(option: ScreenUtilOption) {
     this.option = option;
     const {
@@ -38,6 +40,8 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
     } = option;
     this.scaleWidth = (canvasWidth / designWidth) * devicePixelRatio;
     this.scaleHeight = (canvasHeight / designHeight) * devicePixelRatio;
+    this.designWidth = designWidth;
+    this.designHeight = designHeight;
     this.scaleText = minTextAdapt
       ? Math.min(this.scaleWidth, this.scaleHeight)
       : this.scaleWidth;
@@ -59,6 +63,12 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
   }
   public setHeight(height: number): number {
     return this.scaleHeight * height;
+  }
+  public get fullWidth(): number {
+    return this.designWidth;
+  }
+  public get fullHeight(): number {
+    return this.designHeight;
   }
   public static format(entity: ScreenUtilExportEntity): ScreenUtils {
     return new ScreenUtils(entity);

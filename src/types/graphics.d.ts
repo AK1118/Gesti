@@ -1,83 +1,111 @@
-import { Alignment, Painter, XImage } from "Gesti";
+import { Alignment, Painter, XImage } from "./gesti";
 
-declare module "Graphics" {
-  type GradientTypes = "lineGradient" | "radiusGradient";
-  type GraphicsTypes = "rectangle" | "circle";
-  type BorderRadiusAll = number;
-  // type  = number | Iterable<number>;
+export type GradientTypes = "lineGradient" | "radiusGradient";
+export type GraphicsTypes = "rectangle" | "circle";
+type BorderRadiusAll = number;
+// type  = number | Iterable<number>;
 
-  interface BorderRadius {
-    topLeft?: number;
-    topRight?: number;
-    bottomLeft?: number;
-    bottomRight?: number;
-  }
-
-  interface ColorStop {
-    // [0,1]
-    step: number;
-    color: string;
-  }
-  //渐变参数基类
-  interface GradientDecorationOptionBase {
-    colors: Array<string>;
-    //渐变类型，隐式，类内部必须实现，用于导入时判断渐变类型
-    type?: GradientTypes;
-  }
-
-  //线性渐变
-  interface LineGradientDecorationOption extends GradientDecorationOptionBase {
-    begin: Alignment;
-    end: Alignment;
-  }
-
-  //径向渐变
-  interface RadiusGradientDecorationOption
-    extends GradientDecorationOptionBase {}
-
-  abstract class GradientDecorationBase {
-    type: GradientTypes;
-    public getGradient(paint: Painter, size: Size): CanvasGradient;
-  }
-  class LineGradientDecoration extends GradientDecorationBase {
-    static format(option: LineGradientDecorationOption): LineGradientDecoration;
-    constructor(option: LineGradientDecorationOption);
-  }
-  //装饰器
-  interface DecorationOption {}
-
-  //盒子装饰器
-  export interface BoxDecorationOption extends DecorationOption {
-    //背景颜色
-    backgroundColor?: string;
-    //背景图片
-    backgroundImage?: XImage;
-    //不透明度
-    opacity?: number;
-    //渐变
-    gradient?: GradientDecorationBase;
-    //圆角矩形
-    borderRadius?: BorderRadius | BorderRadiusAll;
-  }
-
-  interface GenerateGraphicsOption {
-    //隐式
-    type?: GraphicsTypes;
-    decoration: BoxDecorationOption;
-    // borderDecoration?: BorderDecoration;
-    x?: number;
-    y?: number;
-  }
-  interface GenerateRectAngleOption extends GenerateGraphicsOption {
-    width: number;
-    height: number;
-  }
-
-  interface GenerateCircleOption extends GenerateGraphicsOption {
-    radius: number;
-  }
-
-  export class Decoration {}
-
-  export class BoxDecoration extends Decoration {}
+export interface BorderRadius {
+  topLeft?: number;
+  topRight?: number;
+  bottomLeft?: number;
+  bottomRight?: number;
 }
+
+export interface ColorStop {
+  // [0,1]
+  step: number;
+  color: string;
+}
+//渐变参数基类
+export interface GradientDecorationOptionBase {
+  /**
+   * ### 传入颜色数组
+   * - 例如 [red,orange,yellow]
+   */
+  colors: Array<string>;
+  //渐变类型，隐式，类内部必须实现，用于导入时判断渐变类型
+  type?: GradientTypes;
+}
+
+//线性渐变
+export interface LineGradientDecorationOption
+  extends GradientDecorationOptionBase {
+  /**
+   * ### 确定渐变开始的位置
+   * - 传入一个Alignment
+   */
+  begin: Alignment;
+  /**
+   * ### 确定渐变结束位置
+   * - 传入一个Alignment
+   */
+  end: Alignment;
+}
+
+//径向渐变
+interface RadiusGradientDecorationOption extends GradientDecorationOptionBase {}
+
+declare abstract class GradientDecorationBase {
+  type: GradientTypes;
+  public getGradient(paint: Painter, size: Size): CanvasGradient;
+}
+
+/**
+ * ### 线性渐变
+ * - 在BoxDecoration创建中使用
+ */
+export class LineGradientDecoration extends GradientDecorationBase {
+  static format(option: LineGradientDecorationOption): LineGradientDecoration;
+  constructor(option: LineGradientDecorationOption);
+}
+//装饰器
+interface DecorationOption {}
+
+//盒子装饰器
+export interface BoxDecorationOption extends DecorationOption {
+  /**
+   * - 背景颜色
+   */
+  backgroundColor?: string;
+  /**
+   * - 背景图片
+   */
+  backgroundImage?: XImage;
+  /**
+   * - 样式的不透明度
+   */
+  opacity?: number;
+  /**
+   * ### 渐变
+   * -传入一个 GradientDecorationBase 类
+   */
+  gradient?: GradientDecorationBase;
+  /**
+   * ### 圆角
+   * - 传入一个数字或者一个数组
+   * - 如传入数组，四个角对应数组顺序为 [TopLeft,TopRight,BottomRight,BottomLeft]
+   */
+  borderRadius?: BorderRadius | BorderRadiusAll;
+}
+
+export interface GenerateGraphicsOption {
+  //隐式
+  type?: GraphicsTypes;
+  decoration: BoxDecorationOption;
+  // borderDecoration?: BorderDecoration;
+  x?: number;
+  y?: number;
+}
+export interface GenerateRectAngleOption extends GenerateGraphicsOption {
+  width: number;
+  height: number;
+}
+
+interface GenerateCircleOption extends GenerateGraphicsOption {
+  radius: number;
+}
+
+export class Decoration {}
+
+export class BoxDecoration extends Decoration {}

@@ -1,11 +1,10 @@
+import GestiController from "./controller";
 import {
-  GestiController,
   InitializationOption,
   PluginKeys,
   XImage,
   GestiConfigOption,
   ViewObjectFamily,
-  Alignment,
 } from "./gesti";
 
 declare class Gesti {
@@ -60,7 +59,12 @@ declare class Gesti {
    * @param plugin
    */
   public static installPlugin(key: PluginKeys, plugin: any);
+  /**
+   * ### 销毁gesti实例
+   */
+  dispose(): void;
 }
 export * from "./gesti";
 export * from "./hooks";
+export * from "./graphics";
 export default Gesti;

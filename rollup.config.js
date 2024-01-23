@@ -36,12 +36,12 @@ const config = [
       {
         file: "./dist/index.amd.js",
         format: "amd",
-        exports: "named",
+        exports:"named"
       },
       {
         file: "./dist/index.esm.js",
         format: "es",
-        exports: "named",
+        exports:"named"
       },
     ],
     plugins,

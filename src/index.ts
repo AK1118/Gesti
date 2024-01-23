@@ -126,6 +126,12 @@ export {
   UnLockIcon,
   DefaultIcon,
 };
+export{
+  LineGradientDecoration,
+  OffScreenCanvasBuilder,
+  InteractiveImage,
+  ScreenUtils,
+}
 export { Alignment };
 export { Rectangle, ImageBox, XImage, TextBox, WriteViewObj };
 //枚举
@@ -200,5 +206,6 @@ export {
   // useReaderWeChat,
   useGetViewObjectById,
   uint8ArrayToChunks,
+
 };
 export default Gesti;
