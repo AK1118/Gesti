@@ -28,7 +28,8 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
   private readonly scaleText: number;
   private readonly designWidth: number;
   private readonly designHeight: number;
-  constructor(option: ScreenUtilOption) {
+  constructor(option?: ScreenUtilOption) {
+    if(!option)return;
     this.option = option;
     const {
       designWidth = 750,
@@ -65,10 +66,10 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
     return this.scaleHeight * height;
   }
   public get fullWidth(): number {
-    return this.designWidth;
+    return this.setWidth(this.designWidth);
   }
   public get fullHeight(): number {
-    return this.designHeight;
+    return this.setHeight(this.designHeight);
   }
   public static format(entity: ScreenUtilExportEntity): ScreenUtils {
     return new ScreenUtils(entity);

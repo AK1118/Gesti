@@ -1,5 +1,6 @@
 import {
   ExportAllInterceptor,
+  Gesti,
   GraffitiCloser,
   ImportAllInterceptor,
   ScreenUtilOption,
@@ -9,6 +10,28 @@ import {
   ViewObjectFamily,
   XImage,
 } from "./gesti";
+export declare type GraffitiType =
+  | "circle"
+  | "write"
+  | "line"
+  | "rect"
+  | "none";
+export declare type CenterAxis = "vertical" | "horizon";
+
+export declare type GestiControllerListenerTypes =
+  | "onSelect"
+  | "onHide"
+  | "onCancel"
+  | "onHover"
+  | "onLeave"
+  | "onUpdate"
+  | "onLoad"
+  | "onDestroy"
+  | "onMirror"
+  | "onBeforeDestroy"
+  | "onCreateGraffiti"
+  | "onUpdateText"
+  | "onRemove";
 //图层控制器
 interface LayerController {
   /**
@@ -152,6 +175,12 @@ interface ImageToolKitController {
    */
   render(): void;
   /**
+   * ### 强制刷新画布
+   * - 下一帧不会是缓存
+   */
+  forceRender(): void;
+  forceRender(): void;
+  /**
    * @deprecated 即将废弃，请使用 render()
    */
   update(): void;
@@ -255,11 +284,15 @@ interface ImageToolKitController {
    * 设置屏幕适配器
    */
   generateScreenUtils(option: ScreenUtilOption): ScreenUtils;
+  /**
+   * 获取该控制器的屏幕适配器
+   */
+  getScreenUtil(): ScreenUtils;
 }
 /**
  * 控制器类，提供接口供给用户使用
  */
-declare interface GestiController
+declare interface GestiControllerInterface
   extends LayerController,
     ImageToolKitController {
   /**
@@ -319,6 +352,88 @@ declare interface GestiController
    * - 调用后将没有二指缩放功能
    */
   cancelGesture(): void;
+}
+
+declare class GestiController implements GestiControllerInterface {
+  getScreenUtil(): ScreenUtils;
+  forceRender(): void;
+  initialized: boolean;
+  bindGesti(gesti: Gesti): void;
+  down(e: Event): void;
+  up(e: Event): void;
+  move(e: Event): void;
+  wheel(e: Event): void;
+  cancelEvent(): void;
+  cancelGesture(): void;
+  layerLower(view?: ViewObject): void;
+  layerRise(view?: ViewObject): void;
+  layerTop(view?: ViewObject): void;
+  layerBottom(view?: ViewObject): void;
+  unLock(view?: ViewObject): void;
+  lock(view?: ViewObject): void;
+  cancelAll(): void;
+  cancel(view?: ViewObject): void;
+  center(view?: ViewObject, axis?: CenterAxis): void;
+  updateText(text: string, options?: TextOptions): void;
+  upward(viewObject?: ViewObject): number;
+  downward(viewObject?: ViewObject): number;
+  leftward(viewObject?: ViewObject): number;
+  rightward(viewObject?: ViewObject): number;
+  rotate(angle: number, existing?: boolean, view?: ViewObject): Promise<void>;
+  get currentViewObject(): ViewObject;
+  select(select: ViewObject): Promise<void>;
+  cleanAll(): Promise<void>;
+  position(x: number, y: number, view?: ViewObject): void;
+  close(view?: ViewObject): void;
+  mirror(view?: ViewObject): boolean;
+  remove(view?: ViewObject): void;
+  mount(view: ViewObject): void;
+  unMount(view: ViewObject): void;
+  load(view: ViewObject): void;
+  fallback(): void;
+  cancelFallback(): void;
+  render(): void;
+  update(): void;
+  addImage(ximage: XImage | Promise<XImage>): Promise<ViewObject>;
+  createImage(
+    image:
+      | HTMLImageElement
+      | SVGImageElement
+      | HTMLVideoElement
+      | HTMLCanvasElement
+      | Blob
+      | ImageData
+      | ImageBitmap
+      | OffscreenCanvas,
+    options?: createImageOptions
+  ): Promise<XImage>;
+  addText(text: string, options?: TextOptions): Promise<ViewObject>;
+  addListener(
+    listenType: GestiControllerListenerTypes,
+    callback: ListenerCallback,
+    prepend?: boolean
+  );
+  removeListener(
+    listenType: GestiControllerListenerTypes,
+    hook: ListenerCallback
+  ): void;
+  addWrite(options: {
+    type: GraffitiType;
+    lineWidth?: number;
+    color?: string;
+    isFill?: boolean;
+  }): GraffitiCloser;
+  exportAll(interceptor?: ExportAllInterceptor): Promise<string>;
+  importAll(json: string, interceptor?: ImportAllInterceptor): Promise<void>;
+  destroyGesti(): void;
+  querySelector(
+    select: string | ViewObjectFamily
+  ): Promise<ViewObject | ViewObject[]>;
+  getViewObjectById<T extends ViewObject>(id: string): Promise<T>;
+  getViewObjectByIdSync<T extends ViewObject>(id: string): T;
+  getAllViewObject(): ViewObject[];
+  getAllViewObjectSync(): Promise<ViewObject[]>;
+  generateScreenUtils(option: ScreenUtilOption): ScreenUtils;
 }
 
 export default GestiController;

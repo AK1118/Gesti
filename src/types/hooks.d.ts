@@ -7,7 +7,7 @@ import {
   XImage,
   GestiConfigOption,
 } from "./gesti";
-import GestiController from "./controller";
+import GestiController, { CenterAxis, GestiControllerListenerTypes } from "./controller";
 import Gesti from "./index";
 
 export const createGesti: (config?: GestiConfigOption) => Gesti;
@@ -56,10 +56,10 @@ export const useController: (target?: Gesti) => GestiController;
 /**
  * 添加预设图形
  */
-export const addVerticalLine: (target?: Gesti) => Promise<ViewObject>;
-export const addHorizonLine: (target?: Gesti) => Promise<ViewObject>;
-export const addRect: (target?: Gesti) => Promise<ViewObject>;
-export const addCircle: (target?: Gesti) => Promise<ViewObject>;
+// export const addVerticalLine: (target?: Gesti) => Promise<ViewObject>;
+// export const addHorizonLine: (target?: Gesti) => Promise<ViewObject>;
+// export const addRect: (target?: Gesti) => Promise<ViewObject>;
+// export const addCircle: (target?: Gesti) => Promise<ViewObject>;
 /**
  * 创建可操作对象
  */

@@ -9,6 +9,19 @@ import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import XImage from "../lib/ximage";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
+import Gesti from "../lib/gesti";
+import {
+  CenterAxis,
+  GestiControllerListenerTypes,
+  GraffitiType,
+} from "@/types/controller";
+
+export interface BindControllerInterface {
+  initialized: boolean;
+  bindController(controller: GestiControllerInterface): void;
+  bindGesti(gesti: Gesti): void;
+}
+
 //图层控制器
 interface LayerController {
   /**
@@ -152,6 +165,11 @@ interface ImageToolKitController {
    */
   render(): void;
   /**
+   * ### 强制刷新画布
+   * - 下一帧不会是缓存
+   */
+  forceRender(): void;
+  /**
    * @deprecated 即将废弃，请使用 render()
    */
   update(): void;
@@ -255,11 +273,17 @@ interface ImageToolKitController {
    * 设置屏幕适配器
    */
   generateScreenUtils(option: ScreenUtilOption): ScreenUtils;
+  /**
+   * 获取该控制器的屏幕适配器
+   */
+  getScreenUtil(): ScreenUtils;
 }
 /**
  * 控制器类，提供接口供给用户使用
  */
-interface GestiController extends LayerController, ImageToolKitController {
+interface GestiControllerInterface
+  extends LayerController,
+    ImageToolKitController {
   /**
    * @description 鼠标/手指按下时调用
    * @param e
@@ -315,4 +339,4 @@ interface GestiController extends LayerController, ImageToolKitController {
   cancelGesture(): void;
 }
 
-export default GestiController;
+export default GestiControllerInterface;

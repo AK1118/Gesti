@@ -11,13 +11,16 @@ import {
   ViewObjectImportGraphics,
 } from "Serialization";
 import Rectangle from "../viewObject/graphics/rectangle";
-import BoxDecoration from "../lib/rendering/decorations/decoration";
+import BoxDecoration, {
+  DecorationBase,
+} from "../lib/rendering/decorations/decoration";
 
 /**
  *
  */
 abstract class GraphicsBase<
-  T extends GenerateGraphicsOption
+  T extends GenerateGraphicsOption,
+  D extends DecorationBase
 > extends ViewObject {
   constructor(option: T) {
     super();

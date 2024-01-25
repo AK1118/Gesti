@@ -168,25 +168,6 @@ declare interface XImageOptions {
   fixedHeight?: number;
 }
 
-declare type CenterAxis = "vertical" | "horizon";
-
-declare type GestiControllerListenerTypes =
-  | "onSelect"
-  | "onHide"
-  | "onCancel"
-  | "onHover"
-  | "onLeave"
-  | "onUpdate"
-  | "onLoad"
-  | "onDestroy"
-  | "onMirror"
-  | "onBeforeDestroy"
-  | "onCreateGraffiti"
-  | "onUpdateText"
-  | "onRemove";
-
-declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";
-
 declare type Boundary = {
   x: number;
   y: number;

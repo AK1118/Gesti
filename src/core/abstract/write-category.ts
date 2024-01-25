@@ -1,3 +1,4 @@
+import { GraffitiType } from "@/types/controller";
 import Painter from "../../core/lib/painter";
 import Rect from "../../core/lib/rect";
 import WriteViewObj from "../viewObject/write";

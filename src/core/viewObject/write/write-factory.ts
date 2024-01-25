@@ -7,6 +7,7 @@ import WriteLine from "./line";
 import WriteRect from "./rect";
 import Write from "./write";
 import WriteViewObj from "../write";
+import { GraffitiType } from "@/types/controller";
 
 export enum WriteType {
   None,

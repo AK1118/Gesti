@@ -61,9 +61,8 @@ export class LineGradientDecoration extends GradientDecorationBase {
 }
 //装饰器
 interface DecorationOption {}
-
-//盒子装饰器
-export interface BoxDecorationOption extends DecorationOption {
+export interface PolygonDecorationOption extends DecorationOption {
+  points?: Array<Vector>;
   /**
    * - 背景颜色
    */
@@ -81,6 +80,9 @@ export interface BoxDecorationOption extends DecorationOption {
    * -传入一个 GradientDecorationBase 类
    */
   gradient?: GradientDecorationBase;
+}
+//盒子装饰器
+export interface BoxDecorationOption extends PolygonDecorationOption {
   /**
    * ### 圆角
    * - 传入一个数字或者一个数组
@@ -94,12 +96,17 @@ export interface GenerateGraphicsOption {
   type?: GraphicsTypes;
   decoration: BoxDecorationOption;
   // borderDecoration?: BorderDecoration;
-  x?: number;
-  y?: number;
+  // x?: number;
+  // y?: number;
 }
 export interface GenerateRectAngleOption extends GenerateGraphicsOption {
   width: number;
   height: number;
+}
+
+export interface GeneratePolygonOption extends GenerateGraphicsOption {
+  radius: number;
+  count: number;
 }
 
 interface GenerateCircleOption extends GenerateGraphicsOption {

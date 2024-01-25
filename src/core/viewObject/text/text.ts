@@ -219,6 +219,7 @@ abstract class TextBase extends TextViewBase {
     this.computeTextSingle();
   }
   protected onInput(value: string): void {
+    if (!this.mounted) return;
     this.computeTextSingle();
     this.doCache();
     this.forceUpdate();

@@ -33,6 +33,7 @@ import Platform from "../viewObject/tools/platform";
 import Deserializer from "@/utils/deserializer/Deserializer";
 import Plugins from "./plugins";
 import OffScreenCanvasBuilder from "./plugins/offScreenCanvasGenerator";
+import { CenterAxis, GestiControllerListenerTypes } from "@/types/controller";
 enum EventHandlerState {
   down,
   up,
@@ -215,6 +216,9 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.paint = new Painter(option.renderContext);
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
+  }
+  forceRender(): void {
+    this.ViewObjectList.forEach((_) => _.forceUpdate());
   }
   cancelGesture(): void {
     this.gesture.disable();
@@ -941,7 +945,7 @@ class _Tools {
     switch (operationType) {
       //图层向上移，layer增大,下标增大
       // current = next+1
-      case LayerOperationType.top:
+      case LayerOperationType.rise:
         {
           if (ndx === len) break;
           const current = selectedViewObject,
@@ -955,7 +959,7 @@ class _Tools {
         break;
       //图层向下移动，layer减小,下标减小
       // current=pre-1
-      case LayerOperationType.bottom:
+      case LayerOperationType.lower:
         {
           if (ndx === 0) break;
           const current = selectedViewObject,
@@ -968,7 +972,7 @@ class _Tools {
         }
         break;
       //最高图层   current=max +1
-      case LayerOperationType.rise:
+      case LayerOperationType.top:
         {
           // if (ndx === len) break;//
           const max = ViewObjectList[len];
@@ -982,7 +986,7 @@ class _Tools {
         }
         break;
       //最低图层   current=min-1
-      case LayerOperationType.lower:
+      case LayerOperationType.bottom:
         {
           const min = ViewObjectList[0];
           const current = selectedViewObject;

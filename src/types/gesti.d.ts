@@ -1,3 +1,4 @@
+import GestiController from "./controller";
 import {
   BoxDecorationOption,
   GenerateGraphicsOption,
@@ -7,6 +8,66 @@ import {
   ViewObjectExportBaseInfo,
   ViewObjectExportEntity,
 } from "./serialization";
+
+declare class Gesti {
+  constructor(config?: GestiConfigOption);
+  get controller(): GestiController;
+  static Family: ViewObjectFamily;
+  initialized: boolean;
+  public bindController(controller: GestiController):void;
+  /**
+   * canvas必传，在h5端时paint可不传
+   * 关于rect  width 和 height 对应的是canvas的高宽   而 x,y其实对应的是canvas在屏幕的位置，或者可以理解为偏移量
+   * @param canvas
+   * @param paint
+   * @param rect
+   * @deprecated
+   */
+  init(
+    canvas: HTMLCanvasElement | null,
+    paint?: CanvasRenderingContext2D | null,
+    rect?: {
+      x?: number;
+      y?: number;
+      width: number;
+      height: number;
+    }
+  ): void;
+  /**
+   * @description 初始化Gesti
+   * @param option 传入一个对象
+   * 
+   * ### 初始化Gesti
+   * - 必须传入画布的高宽，即rect内的canvasWidth和canvasHeight
+   * 
+   * ``` TypeScript
+   * InitializationOption {
+      //画笔
+      renderContext: CanvasRenderingContext2D | null;
+      //画布矩形
+      rect: {
+        x?: number;
+        y?: number;
+        canvasWidth: number;
+        canvasHeight: number;
+      };
+    }
+   * ```
+   */
+  public initialization(option: InitializationOption): void;
+  public static mount(option: InitializationOption): [Gesti, GestiController];
+  /**
+   * @description 安装预设插件
+   * @param key
+   * @param plugin
+   */
+  public static installPlugin(key: PluginKeys, plugin: any);
+  /**
+   * ### 销毁gesti实例
+   */
+  dispose(): void;
+}
+
 export declare enum ViewObjectFamily {
   image,
   write,
@@ -22,7 +83,7 @@ export declare enum ViewObjectFamily {
  * @Author: AK1118
  * @Date: 2023-11-15 16:08:39
  * @Last Modified by: AK1118
- * @Last Modified time: 2024-01-23 16:16:49
+ * @Last Modified time: 2024-01-23 18:06:57
  */
 export type PluginKeys = "pako" | "offScreenBuilder";
 
@@ -410,14 +471,31 @@ interface TextHandler {
 export class TextBox extends ViewObject implements TextHandler {
   constructor(text: string, options?: TextOptions);
   setWeight(weight: FontWeight): void;
+  /**
+   * ### 设置文字样式，斜体
+   */
   setFontStyle(style: FontStyleType): void;
+  /**
+   * ### 设置文字样式
+   *
+   */
+  setTextStyle(args: TextOptions): void;
+  /**
+   * ### 设置文字
+   * - 会完全替换文本内原有内容
+   */
   setText(text: string): void;
   setFontFamily(family: string): void;
   setSpacing(value: number): void;
   setColor(color: string): void;
   setFontSize(fontSize: number): void;
-  setDecoration(options: TextOptions): void;
+  setDecoration(decoration: BoxDecorationOption): void;
   get fontSize(): number;
+  /**
+   * @deprecated
+   * @param text
+   * @param options
+   */
   updateText(text: string, options?: TextOptions): Promise<void>;
   public useCache(): void;
   public unUseCache(): void;
@@ -427,7 +505,7 @@ export declare class ImageBox extends ViewObject {
   constructor(ximage: XImage);
 }
 
-type GraffitiCloser = [() => void, (callback: (view: any) => void) => void];
+type GraffitiCloser = [() => void, (callback: (view: ViewObject) => void) => void];
 
 export declare class WriteViewObj extends ViewObject {}
 
@@ -456,7 +534,7 @@ export interface ScreenUtilOption extends DesignSizeOption, CanvasSizeOption {
   minTextAdapt?: boolean;
 }
 export class ScreenUtils {
-  constructor(option: ScreenUtilOption);
+  constructor(option?: ScreenUtilOption);
   /**
    * ## 文字大小设置适配
    * - 返回一个根据设计稿与传入值计算得到的数字

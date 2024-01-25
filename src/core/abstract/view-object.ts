@@ -22,6 +22,7 @@ import {
 import Platform from "../viewObject/tools/platform";
 import BoxDecoration from "../lib/rendering/decorations/decoration";
 import { BoxDecorationOption } from "Graphics";
+import { CenterAxis } from "@/types/controller";
 /**
  *
  * 缓存要做到 数据层缓存，渲染层缓存

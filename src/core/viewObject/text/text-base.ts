@@ -36,7 +36,7 @@ export abstract class TextBoxBase extends ViewObject {
   protected textOptions: TextOptions = {
     fontSize: 20,
     color: "black",
-    spacing: 0,
+    spacing: 1,
     lineHeight: 1.5,
     weight: "normal",
     fontStyle: "normal",
@@ -56,12 +56,14 @@ export abstract class TextBoxBase extends ViewObject {
    * @deprecated
    * @param text
    * @param options
+   * @deprecated
    * @returns
    */
   updateText(text: string, options?: TextOptions): Promise<void> {
     return Promise.resolve();
   }
   private getTextSingle = (text: string): TextSingle => {
+    if (!this.paint) return;
     const measureText = this.paint.measureText(text);
     //行高
     const lineHeight: number = this.textOptions.lineHeight || 1;
@@ -96,7 +98,7 @@ export abstract class TextBoxBase extends ViewObject {
     isInitialization: boolean = false
   ): Array<TextSingle> {
     if (isInitialization) this.setFixedOption();
-    this.setFontDecorations(this.paint);
+    if (this.mounted) this.setFontDecorations(this.paint);
     //This viewObject rect size
     const size: Size = Size.zero;
     const splitTexts: Array<string> = this.handleSplitText(this.fixedText);
@@ -557,6 +559,7 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     this.rebuild();
   }
   private rebuild() {
+    if (!this.mounted) return;
     this.isDirty = false;
     this.computeTextSingle(false);
     //强制更新Gesti

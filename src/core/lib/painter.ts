@@ -189,7 +189,9 @@ class Painter implements Painter {
     this.paint.strokeText(text, x, y, maxWidth);
   }
   set font(font: string) {
-    this.paint.font = font;
+    if (this.paint?.font) {
+      this.paint.font = font;
+    }
   }
   set globalAlpha(alpha: number) {
     this.paint.globalAlpha = alpha;

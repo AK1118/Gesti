@@ -1,5 +1,6 @@
 import { ImageIcon, LockIcon } from "@/composite/icons";
 import ViewObject from "@/core/abstract/view-object";
+import GestiController from "@/core/lib/controller";
 import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
 import Alignment from "@/core/lib/painting/alignment";
@@ -40,7 +41,7 @@ import Gesti, {
 } from "@/index";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
- Gesti.installPlugin("pako", require("pako"));
+Gesti.installPlugin("pako", require("pako"));
 
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const img2: HTMLImageElement = document.querySelector("#bg");
@@ -107,7 +108,6 @@ const ximage = new XImage({
 });
 
 const imageBox = new ImageBox(ximage);
-
 setTimeout(() => {
   const ximage2 = new XImage({
     data: img2,
@@ -126,7 +126,7 @@ setTimeout(() => {
     }),
   });
 }, 3000);
-imageBox.setId("第一")
+imageBox.setId("第一");
 doCenter(imageBox);
 loadToGesti(imageBox);
 
@@ -146,9 +146,6 @@ const str1 = `你好你好，
 const textBox2 = new TextBox(str, {
   color: "red",
   fontSize: screenUtil1.setSp(20),
-  // backgroundColor:'white',
-  maxWidth: 300,
-  weight: 100,
 });
 const textBox = new TextBox(str1, {
   color: "red",
@@ -160,15 +157,14 @@ const textBox = new TextBox(str1, {
   fontFamily: "楷体",
 });
 textBox2.setDecoration({
-  backgroundImage: ximage,
-  gradient: new LineGradientDecoration({
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: ["orange", "white", "yellow"],
-  }),
+  // backgroundImage: ximage,
+  // gradient: new LineGradientDecoration({
+  //   begin: Alignment.topLeft,
+  //   end: Alignment.bottomRight,
+  //   colors: ["orange", "white", "yellow"],
+  // }),
 });
-textBox2.setId("第二")
-textBox2.setOpacity(0.1)
+textBox2.setId("第二");
 loadToGesti(textBox2);
 
 //loadToGesti(textBox);
@@ -191,15 +187,16 @@ const gradient = new LineGradientDecoration({
 console.log("序列", JSON.stringify(gradient));
 
 const rect: Rectangle = new Rectangle({
-  width: screenUtil1.setWidth(300),
-  height: screenUtil1.setWidth(300),
+  width: screenUtil1.fullWidth,
+  height:  screenUtil1.fullWidth,
   decoration: {
-    borderRadius: screenUtil1.setWidth(50),
+    borderRadius: screenUtil1.setWidth(750),
     backgroundColor: "skyblue",
     gradient: gradient,
     backgroundImage: ximage,
   },
 });
+
 doCenter(rect, "horizon");
 rect.setPosition(canvas.width / 2, rect.height / 2);
 const drag = new DragButton({
@@ -207,8 +204,8 @@ const drag = new DragButton({
     alignment: Alignment.bottomRight,
   },
 });
-rect.setId("第三")
-rect.setLayer(9)
+rect.setId("第三");
+rect.setLayer(9);
 rect.installButton(drag);
 rect.installMultipleButtons([
   new HorizonButton("left"),
@@ -220,7 +217,7 @@ rect.installMultipleButtons([
   new SizeButton(Alignment.topLeft),
 ]);
 loadToGesti(rect);
-controller.cancelGesture()
+// controller.cancelGesture();
 const aa = new InteractiveImage(ximage, {
   borderRadius: screenUtil1.setSp(90),
 });
@@ -299,7 +296,7 @@ document.getElementById("input").addEventListener("input", (e: any) => {
   textBox2.setText(e.target?.value);
   console.log(e.target?.value);
 });
-console.log(controller.getAllViewObject())
+console.log(controller.getAllViewObject());
 // const box1 = new Rectangle({
 //   width: screenUtil1.setWidth(300),
 //   height: screenUtil1.setHeight(300),

@@ -66,9 +66,15 @@ abstract class DeserializerBase {
     },
     text: (entity) => {
       const textEntity = this.formatEntity<ViewObjectExportTextBox>(entity);
-      textEntity.option.fontSize = this.adaptScreenFontSize(
-        textEntity.option.fontSize
-      );
+      const option = textEntity.option;
+      if (option.fontSize)
+        option.fontSize = this.adaptScreenFontSize(option.fontSize);
+      if (option.spacing&&option.spacing!=1)
+        option.spacing = this.adaptScreenFontSize(option.spacing);
+      if (option.lineWidth)
+        option.lineWidth = this.adaptScreenFontSize(option.lineWidth);
+      if (option.maxFontSize)
+        option.maxFontSize = this.adaptScreenFontSize(option.maxFontSize);
       return TextBox.reverse(textEntity);
     },
     write: (entity: ViewObjectExportGraffiti) => {

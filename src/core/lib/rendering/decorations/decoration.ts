@@ -4,6 +4,7 @@ import {
   BoxDecorationOption,
   DecorationOption,
   LineGradientDecorationOption,
+  PolygonDecorationOption,
 } from "Graphics";
 import XImage from "../../ximage";
 import GradientDecorationBase from "@/core/bases/gradient-base";
@@ -13,24 +14,11 @@ import { ClipRRect, RenderColoredRRect, RenderWidgetBase } from "../base";
 import Serializable from "@/core/interfaces/Serialization";
 import LineGradientDecoration from "../../graphics/gradients/lineGradientDecoration";
 import { reverseXImage } from "@/utils/utils";
+import DecorationBase from "@/core/bases/decoration-base";
 
-abstract class Decoration<O extends DecorationOption = DecorationOption>
-  extends RenderWidgetBase
-  implements Serializable<O>
-{
-  protected option: O;
-  constructor(option: O) {
-    super();
-    this.option = option;
-  }
-  toJSON(): O {
-    return this.option;
-  }
-  abstract render(paint: Painter, rect: Rect): void;
-  protected performRender(paint: Painter, rect: Rect): void {}
-}
 
-class BoxDecoration extends Decoration<BoxDecorationOption> {
+
+class BoxDecoration extends DecorationBase<BoxDecorationOption> {
   constructor(option?: BoxDecorationOption) {
     super(option);
   }
@@ -49,7 +37,7 @@ class BoxDecoration extends Decoration<BoxDecorationOption> {
     const borderRadius = this.option.borderRadius;
     if (borderRadius) {
       this.renderRoundRect(paint, borderRadius, width, height);
-    } else if (backgroundColor||gradient) {
+    } else if (backgroundColor || gradient) {
       //渲染普通矩形
       paint.fillRect(width * -0.5, height * -0.5, width, height);
     }
@@ -108,4 +96,38 @@ class BoxDecoration extends Decoration<BoxDecorationOption> {
   }
 }
 
+class PolygonDecoration extends DecorationBase<PolygonDecorationOption> {
+  private readonly points: Array<Vector> = [];
+  constructor(option: PolygonDecorationOption) {
+    super(option);
+  }
+  render(paint: Painter, rect: Rect): void {
+    this.renderGraphics(paint);
+  }
+  protected renderGraphics(paint: Painter): void {
+    if (this.points.length < 3) {
+      throw new Error("Cannot render a polygon with less than 3 points.");
+    }
+
+    paint.beginPath();
+    paint.moveTo(this.points[0].x, this.points[0].y);
+
+    for (let i = 1; i < this.points.length; i++) {
+      paint.lineTo(this.points[i].x, this.points[i].y);
+    }
+
+    paint.closePath();
+
+    // Fill the polygon with a fill color (you can customize the color)
+    paint.fillStyle = "black";
+    paint.fill();
+
+    // You can also add a stroke (border) if needed
+    // paint.strokeStyle = "your_stroke_color";
+    // paint.stroke();
+  }
+}
+export {
+  DecorationBase,
+}
 export default BoxDecoration;

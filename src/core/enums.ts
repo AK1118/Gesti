@@ -31,6 +31,7 @@ enum ViewObjectFamily {
   text,
   group,
   graphicsRectangle,
+  graphicsPolygon,
   graphicsCircle,
 }
 

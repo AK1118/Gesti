@@ -24,6 +24,7 @@ import {
   ImportAllInterceptor,
   TextOptions,
 } from "@/types/gesti";
+import { CenterAxis, GestiControllerListenerTypes, GraffitiType } from "@/types/controller";
 
 let currentInstance: Gesti = null;
 

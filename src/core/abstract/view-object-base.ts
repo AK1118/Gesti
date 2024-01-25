@@ -251,7 +251,7 @@ abstract class BaseViewObject extends OperationObserver {
   /**
    * @description 强制刷新画布
    */
-  protected forceUpdate() {
+  public forceUpdate() {
     if (this.mounted) {
       this.offScreenCanvas = null;
       this.kit.render();

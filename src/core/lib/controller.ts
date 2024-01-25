@@ -1,7 +1,9 @@
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "./image-toolkit";
-import GestiController from "../interfaces/gesticontroller";
+import GestiControllerInterface, {
+  BindControllerInterface,
+} from "../interfaces/gesticontroller";
 import Vector from "./vector";
 import XImage from "./ximage";
 import {
@@ -12,18 +14,26 @@ import {
   TextOptions,
 } from "@/types/gesti";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
+import Gesti from "./gesti";
+import { GestiControllerListenerTypes } from "@/types/controller";
 
 declare type CenterAxis = "vertical" | "horizon";
 
-class GesteControllerImpl implements GestiController {
+abstract class GesteControllerImpl implements GestiControllerInterface {
   /**
    * @ImageToolkit
    * @private
    */
-  private kit: ImageToolkit;
-  constructor(kit: ImageToolkit) {
+  protected kit: ImageToolkit;
+  constructor(kit?: ImageToolkit) {
     //使用控制器时，取消原有控制
     this.kit = kit;
+  }
+  getScreenUtil(): ScreenUtils {
+    return this.kit.getScreenUtil();
+  }
+  forceRender(): void {
+    this.kit.forceRender();
   }
   //取消手势(二指)
   cancelGesture(): void {
@@ -348,4 +358,25 @@ class GesteControllerImpl implements GestiController {
   }
 }
 
-export default GesteControllerImpl;
+class GestiController
+  extends GesteControllerImpl
+  implements BindControllerInterface
+{
+  constructor(gesti?: Gesti) {
+    super(gesti?.kit);
+  }
+  initialized: boolean = false;
+  bindController(controller: GestiControllerInterface): void {
+    throw new Error("Method not implemented.");
+  }
+  bindGesti(gesti: Gesti): void {
+    this.kit = gesti.kit;
+    this.initialized = gesti.initialized;
+  }
+  destroyGesti(): void {
+    this.initialized = false;
+    this.kit.destroyGesti();
+  }
+}
+
+export default GestiController;

@@ -43,7 +43,6 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   setDecoration(option: BoxDecorationOption): void {}
   drawImage(paint: Painter): void {
     this.renderGraphics(paint);
-    //paint.drawImage(this.cachedOffscreenCanvas, 0, 0, this.width, this.height);
   }
   protected renderGraphicsBorder(paint: Painter): void {
     throw new Error("Method not implemented.");
