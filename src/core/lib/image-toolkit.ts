@@ -179,6 +179,10 @@ abstract class ImageToolkitBase {
      * 当为disabled时不会被清除，只是被隐藏，可以再次显示
      * 当mounted为false时，从kit中删除该对象。
      */
+    this.paint.save();
+    //适配屏幕分辨率
+    if (this.screenUtils)
+      this.paint.scale(this.screenUtils.devScale, this.screenUtils.devScale);
     this.ViewObjectList.forEach((item: ViewObject, ndx: number) => {
       if (!item.disabled) {
         //扫除
@@ -191,6 +195,7 @@ abstract class ImageToolkitBase {
         this.callHook("onHide", item);
       }
     });
+    this.paint.restore();
   }
   public getScreenUtil(): ScreenUtils {
     return this.screenUtils;
@@ -822,9 +827,25 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     let _vector: Vector[] = new Array<Vector>();
     if (Array.isArray(vector)) {
       vector.map((item: Vector) => {
+        /**
+         * ### 适配屏幕，触摸点也需要适配
+         */
+        if (this.screenUtils) {
+          item.x *= this.screenUtils.devicePixelRatio;
+          item.y *= this.screenUtils.devicePixelRatio;
+        }
+
         _vector.push(item.sub(this.offset));
       });
       return _vector;
+    } else if (this.screenUtils) {
+      /**
+       * ### 适配屏幕，触摸点也需要适配
+       */
+      const v = vector as unknown as Vector;
+      v.x *= this.screenUtils.devicePixelRatio;
+      v.y *= this.screenUtils.devicePixelRatio;
+      return v.sub(this.offset);
     }
     return vector.sub(this.offset);
   }

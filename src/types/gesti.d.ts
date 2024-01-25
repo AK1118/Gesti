@@ -422,6 +422,10 @@ export abstract class ViewObject {
    * - 强制刷新画布
    */
   public forceUpdate(): void;
+  /**
+   * - 水平垂直居中，在挂载后生效
+   */
+  public toCenter(axis?: CenterAxis):void;
 }
 export class XImage {
   constructor(params: createImageOptions);

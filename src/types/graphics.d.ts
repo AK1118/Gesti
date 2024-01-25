@@ -94,7 +94,7 @@ export interface BoxDecorationOption extends PolygonDecorationOption {
 export interface GenerateGraphicsOption {
   //隐式
   type?: GraphicsTypes;
-  decoration: BoxDecorationOption;
+  decoration: PolygonDecorationOption;
   // borderDecoration?: BorderDecoration;
   // x?: number;
   // y?: number;
@@ -102,6 +102,7 @@ export interface GenerateGraphicsOption {
 export interface GenerateRectAngleOption extends GenerateGraphicsOption {
   width: number;
   height: number;
+  decoration: BoxDecorationOption;
 }
 
 export interface GeneratePolygonOption extends GenerateGraphicsOption {

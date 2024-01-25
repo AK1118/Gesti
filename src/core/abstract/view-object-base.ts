@@ -14,8 +14,9 @@ import {
   getOffscreenCanvasWidthPlatform,
 } from "@/utils/canvas";
 import RenderBox from "../lib/rendering/renderbox";
-import BoxDecoration from "../lib/rendering/decorations/decoration";
+import BoxDecoration from "../lib/rendering/decorations/box-decoration";
 import { BoxDecorationOption } from "Graphics";
+import DecorationBase from "../bases/decoration-base";
 
 class ViewObjectRenderBox extends RenderBox {}
 
@@ -23,7 +24,7 @@ class ViewObjectRenderBox extends RenderBox {}
  * 图层基类
  */
 abstract class BaseViewObject extends OperationObserver {
-  protected decoration: BoxDecoration;
+  protected decoration: DecorationBase;
   public renderBox: RenderBox = new ViewObjectRenderBox();
   protected offScreenCanvas;
   protected offScreenPainter: Painter;

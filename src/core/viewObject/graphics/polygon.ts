@@ -1,17 +1,21 @@
 import GraphicsBase from "@/core/bases/graphics-base";
 import Painter from "@/core/lib/painter";
+import PolygonDecoration from "@/core/lib/rendering/decorations/polygon-decoration";
 import Vector from "@/core/lib/vector";
 import { ViewObjectFamily } from "@/index";
 import {
   GeneratePolygonOption,
   GenerateRectAngleOption,
+  PolygonDecorationOption,
 } from "@/types/graphics";
 import { ViewObjectExportEntity } from "Serialization";
 
-class Polygon extends GraphicsBase<GeneratePolygonOption> {
+class Polygon extends GraphicsBase<GeneratePolygonOption,PolygonDecorationOption,PolygonDecoration> {
   private points: Array<Vector> = [];
   constructor(option: GeneratePolygonOption) {
-    super(option);
+    super(option,(option)=>{
+        return new PolygonDecoration(option);
+    });
     this.generatePoints();
   }
 

@@ -45,12 +45,18 @@ Gesti.installPlugin("pako", require("pako"));
 
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const img2: HTMLImageElement = document.querySelector("#bg");
-canvas.width = 300;
-canvas.height = 300;
 
+const dev = window.devicePixelRatio;
+console.log(dev);
+canvas.width = 300 * dev;
+canvas.height = 300 * dev;
+canvas.style.width = 300 + "px";
+canvas.style.height = 300 + "px";
 const g = canvas.getContext("2d", {
   willReadFrequently: true,
 });
+// g.imageSmoothingEnabled = false;
+g.scale(dev, dev);
 
 Gesti.installPlugin(
   "offScreenBuilder",
@@ -90,19 +96,20 @@ gesti.initialization({
 });
 // gesti.debug=true;
 const controller = gesti.controller;
+console.log("屏幕1大小",canvas.width,canvas.height)
 const screenUtil1 = controller.generateScreenUtils({
   canvasHeight: canvas.height,
   canvasWidth: canvas.width,
   designWidth: 750,
   designHeight: 750,
-  // devicePixelRatio:2,
+  devicePixelRatio: dev,
 });
 const img: HTMLImageElement = document.querySelector("#dog");
 // controller.setScreenUtil();
 const ximage = new XImage({
   data: img,
-  width: img.width,
-  height: img.height,
+  width: screenUtil1.setWidth(img.width),
+  height: screenUtil1.setHeight(img.height),
   scale: 1,
   url: img.src,
 });
@@ -111,8 +118,8 @@ const imageBox = new ImageBox(ximage);
 setTimeout(() => {
   const ximage2 = new XImage({
     data: img2,
-    width: img2.width,
-    height: img2.height,
+    width: screenUtil1.setWidth(img2.width),
+    height: screenUtil1.setHeight(img2.height),
     scale: 1,
     url: img2.src,
   });
@@ -128,7 +135,7 @@ setTimeout(() => {
 }, 3000);
 imageBox.setId("第一");
 doCenter(imageBox);
-loadToGesti(imageBox);
+// loadToGesti(imageBox);
 
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
@@ -145,25 +152,26 @@ const str1 = `你好你好，
 34567890`;
 const textBox2 = new TextBox(str, {
   color: "red",
-  fontSize: screenUtil1.setSp(20),
+  fontSize: screenUtil1.setSp(10),
 });
 const textBox = new TextBox(str1, {
   color: "red",
   weight: 900,
-  fontSize: 10,
+  fontSize: screenUtil1.setSp(10),
   // backgroundColor:'white',
   maxWidth: 300,
   fontStyle: "italic",
   fontFamily: "楷体",
 });
 textBox2.setDecoration({
-  // backgroundImage: ximage,
-  // gradient: new LineGradientDecoration({
-  //   begin: Alignment.topLeft,
-  //   end: Alignment.bottomRight,
-  //   colors: ["orange", "white", "yellow"],
-  // }),
+  backgroundImage: ximage,
+  gradient: new LineGradientDecoration({
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: ["orange", "white", "yellow"],
+  }),
 });
+
 textBox2.setId("第二");
 loadToGesti(textBox2);
 
@@ -188,7 +196,7 @@ console.log("序列", JSON.stringify(gradient));
 
 const rect: Rectangle = new Rectangle({
   width: screenUtil1.fullWidth,
-  height:  screenUtil1.fullWidth,
+  height: screenUtil1.fullWidth,
   decoration: {
     borderRadius: screenUtil1.setWidth(750),
     backgroundColor: "skyblue",
@@ -196,9 +204,10 @@ const rect: Rectangle = new Rectangle({
     backgroundImage: ximage,
   },
 });
+console.log(gesti);
+console.log(rect.size);
 
-doCenter(rect, "horizon");
-rect.setPosition(canvas.width / 2, rect.height / 2);
+doCenter(rect);
 const drag = new DragButton({
   buttonOption: {
     alignment: Alignment.bottomRight,
@@ -207,7 +216,7 @@ const drag = new DragButton({
 rect.setId("第三");
 rect.setLayer(9);
 rect.installButton(drag);
-rect.installMultipleButtons([
+const buttons = [
   new HorizonButton("left"),
   new VerticalButton("top"),
   new VerticalButton("bottom"),
@@ -215,13 +224,18 @@ rect.installMultipleButtons([
   new DragButton(),
   new CloseButton(),
   new SizeButton(Alignment.topLeft),
-]);
+  new MirrorButton({
+    alignment: Alignment.bottomLeft,
+  }),
+];
+buttons.forEach((_) => _.setSenseRadius(screenUtil1.setSp(50)));
+rect.installMultipleButtons(buttons);
 loadToGesti(rect);
 // controller.cancelGesture();
 const aa = new InteractiveImage(ximage, {
   borderRadius: screenUtil1.setSp(90),
 });
-// loadToGesti(aa);
+loadToGesti(aa);
 const canvas2: HTMLCanvasElement = document.querySelector("#canvas2");
 const canvas3: HTMLCanvasElement = document.querySelector("#canvas3");
 const g3 = canvas3.getContext("2d", {
@@ -231,8 +245,10 @@ const g2 = canvas2.getContext("2d", {
   willReadFrequently: true,
 });
 
-canvas2.width = 200;
-canvas2.height = 200;
+canvas2.width = 200*dev;
+canvas2.height = 200*dev;
+canvas2.style.width=200+'px';
+canvas2.style.height=200+'px';
 canvas3.width = 100;
 canvas3.height = 100;
 const gesti2 = createGesti();
@@ -244,17 +260,18 @@ const screenUtil2 = new ScreenUtils({
 const controller2 = gesti2.initialization({
   renderContext: g2,
   rect: {
-    canvasWidth: canvas2.width,
-    canvasHeight: canvas2.height,
+    canvasWidth: canvas2.width*dev,
+    canvasHeight: canvas2.height*dev,
   },
 });
 gesti3.initialization({
   renderContext: g3,
   rect: {
-    canvasWidth: canvas3.width,
-    canvasHeight: canvas3.height,
+    canvasWidth: canvas3.width*dev,
+    canvasHeight: canvas3.height*dev,
   },
 });
+
 // const offScreenBuilder =
 // Plugins.getPluginByKey<OffScreenCanvasBuilder>("offScreenBuilder");
 // const offScreenCanvas = offScreenBuilder.buildOffScreenCanvas(1000, 1000);
@@ -264,6 +281,7 @@ document.getElementById("import").addEventListener("click", () => {
   console.log("导入");
   gesti2.controller.cleanAll();
   gesti3.controller.cleanAll();
+
   const a = window.localStorage.getItem("aa");
   importAll(
     a,
@@ -276,11 +294,12 @@ document.getElementById("import").addEventListener("click", () => {
     },
     gesti2
   ).then((e) => {
+    console.log(gesti2.controller.getScreenUtil())
     console.log("导入成功");
   });
-  // importAll(a,null, gesti3).then((e) => {
-  //   console.log("导入成功");
-  // });
+  importAll(a,null, gesti3).then((e) => {
+    console.log("导入成功");
+  });
 });
 
 document.getElementById("export").addEventListener("click", () => {

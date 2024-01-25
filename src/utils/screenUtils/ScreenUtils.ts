@@ -14,9 +14,9 @@ import { ScreenUtilExportEntity } from "Serialization";
  * 画布一导出数据携带原始size以及设计稿宽高用于还原大小
  * 注意，精度不可省略
  * 假设导出画布大小1000*1000，设计稿大小750*750,适配因子 1.33，矩形666.6*666.6，P 13.3*13.3计算原矩形大小等于  S= 666.6/1.33=500 P=13.3、13.3
- *
- *
- * 需要考虑动态改变屏幕大小
+ * 
+ * 
+ * 
  * 
 
  */
@@ -28,8 +28,10 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
   private readonly scaleText: number;
   private readonly designWidth: number;
   private readonly designHeight: number;
+  private _devScale: number = 1;
+  private _devicePixelRatio: number = 1;
   constructor(option?: ScreenUtilOption) {
-    if(!option)return;
+    if (!option) return;
     this.option = option;
     const {
       designWidth = 750,
@@ -39,14 +41,27 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
       canvasHeight,
       minTextAdapt = false,
     } = option;
-    this.scaleWidth = (canvasWidth / designWidth) * devicePixelRatio;
-    this.scaleHeight = (canvasHeight / designHeight) * devicePixelRatio;
+    this.scaleWidth = canvasWidth / designWidth;
+    this.scaleHeight = canvasHeight / designHeight;
     this.designWidth = designWidth;
     this.designHeight = designHeight;
     this.scaleText = minTextAdapt
       ? Math.min(this.scaleWidth, this.scaleHeight)
       : this.scaleWidth;
+    this.computeDevicePixelRatio(devicePixelRatio);
   }
+  private computeDevicePixelRatio(devicePixelRatio: number): void {
+    this._devicePixelRatio = devicePixelRatio;
+    this._devScale = 1 / this._devicePixelRatio;
+  }
+
+  public get devScale(): number {
+    return this._devScale;
+  }
+  public get devicePixelRatio(): number {
+    return this._devicePixelRatio;
+  }
+
   toJSON(): ScreenUtilExportEntity {
     return {
       scaleHeight: this.scaleHeight,

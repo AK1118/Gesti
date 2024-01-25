@@ -3,6 +3,7 @@ import GraphicsBase from "@/core/bases/graphics-base";
 import { ViewObjectFamily } from "@/core/enums";
 import LineGradientDecoration from "@/core/lib/graphics/gradients/lineGradientDecoration";
 import Painter from "@/core/lib/painter";
+import BoxDecoration from "@/core/lib/rendering/decorations/box-decoration";
 import XImage from "@/core/lib/ximage";
 import { reverseXImage } from "@/utils/utils";
 import {
@@ -28,10 +29,16 @@ import {
   ViewObjectImportGraphics,
 } from "Serialization";
 
-class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
+class Rectangle extends GraphicsBase<
+  GenerateRectAngleOption,
+  BoxDecorationOption,
+  BoxDecoration
+> {
   family: ViewObjectFamily = ViewObjectFamily.graphicsRectangle;
   constructor(option: GenerateRectAngleOption) {
-    super(option);
+    super(option,(option)=>{
+      return new BoxDecoration(option);
+    });
     this.option.type = "rectangle";
     const { width, height } = option;
     this.rect.setSize(width, height);
@@ -66,7 +73,9 @@ class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   }
   public static async reserve(
     entity: ViewObjectImportGraphics<GenerateRectAngleOption>
-  ): Promise<GraphicsBase<GenerateRectAngleOption>> {
+  ): Promise<
+    GraphicsBase<GenerateRectAngleOption, BoxDecorationOption, BoxDecoration>
+  > {
     const option = entity.option;
     const rectAngle: Rectangle = new Rectangle(option);
     return Promise.resolve(rectAngle);

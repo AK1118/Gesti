@@ -30,7 +30,7 @@ import {
 import ImageToolkit from "../lib/image-toolkit";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 import { ImageChunk } from "Gesti";
-import BoxDecoration from "../lib/rendering/decorations/decoration";
+import BoxDecoration from "../lib/rendering/decorations/box-decoration";
 
 type ViewObjectHandler<T> = (entity: ViewObjectImportEntity) => T;
 

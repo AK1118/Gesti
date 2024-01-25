@@ -20,7 +20,7 @@ import {
   ViewObjectImportImageBox,
 } from "@/types/serialization";
 import Platform from "../viewObject/tools/platform";
-import BoxDecoration from "../lib/rendering/decorations/decoration";
+import BoxDecoration from "../lib/rendering/decorations/box-decoration";
 import { BoxDecorationOption } from "Graphics";
 import { CenterAxis } from "@/types/controller";
 /**
@@ -136,8 +136,15 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     if (this.selected) {
       //边框
       this.drawSelectedBorder(paint, this.size);
+
+      /**
+       * ### 在kit.render方法中使用了scale全局，这里需要矫正回来
+       */
+      paint.save();
+      if (this.isMirror) paint.scale(-1, 1);
       //按钮
       this.updateFuncButton(paint);
+      paint.restore();
     }
     paint.restore();
     paint.closePath();
@@ -158,10 +165,10 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     paint.lineWidth = 1;
     paint.strokeStyle = this.borderColor;
     paint.strokeRect(
-      (this.width + padding) * -0.5,
-      (this.height + padding) * -0.5,
-      this.width + padding,
-      this.height + padding
+      (~~this.width + padding) * -0.5,
+      (~~this.height + padding) * -0.5,
+      ~~this.width + padding,
+      ~~this.height + padding
     );
     paint.closePath();
     paint.stroke();
@@ -292,6 +299,11 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     const x = canvasSize.width >> 1,
       y = canvasSize.height >> 1;
     this.rect.position = new Vector(x, y);
+  }
+
+  public toCenter(axis?: CenterAxis): void {
+    if (!this.mounted) return;
+    this.kit.center(this, axis);
   }
 
   protected _didChangeSize(size: Size): void {

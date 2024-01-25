@@ -1,5 +1,6 @@
 import {
   BoxDecorationOption,
+  DecorationOption,
   GenerateGraphicsOption,
   GenerateRectAngleOption,
   GraphicsTypes,
@@ -11,32 +12,35 @@ import {
   ViewObjectImportGraphics,
 } from "Serialization";
 import Rectangle from "../viewObject/graphics/rectangle";
-import BoxDecoration, {
-  DecorationBase,
-} from "../lib/rendering/decorations/decoration";
+import BoxDecoration from "../lib/rendering/decorations/box-decoration";
+import DecorationBase from "./decoration-base";
 
 /**
  *
  */
 abstract class GraphicsBase<
-  T extends GenerateGraphicsOption,
-  D extends DecorationBase
+  //生成图形参数
+  G extends GenerateGraphicsOption,
+  //生成修饰器参数
+  DP extends DecorationOption,
+  //修饰器类型参数
+  D extends DecorationBase<DP>
 > extends ViewObject {
-  constructor(option: T) {
+  constructor(
+    option: G,
+    buildDecoration: (decorationOption?: DecorationOption) => D
+  ) {
     super();
     this.option = option;
     if (option?.decoration)
-      this.decoration = new BoxDecoration(option?.decoration);
-
+      this.decoration = buildDecoration(option?.decoration);
     //如果使用渐变，默认使用缓存
     if (this.option.decoration.gradient) {
       this.useCache();
     }
     // this.borderDecoration = option?.borderDecoration;
   }
-  protected option: T;
-  //主题装饰
-  protected decoration: BoxDecoration;
+  protected option: G;
   //边框装饰
   // protected borderDecoration: BorderDecoration;
   //渲染边框
