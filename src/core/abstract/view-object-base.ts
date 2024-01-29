@@ -15,16 +15,24 @@ import {
 } from "@/utils/canvas";
 import RenderBox from "../lib/rendering/renderbox";
 import BoxDecoration from "../lib/rendering/decorations/box-decoration";
-import { BoxDecorationOption } from "Graphics";
+import {
+  BoxDecorationOption,
+  Decoration,
+  DecorationOption,
+  DecorationTypes,
+} from "Graphics";
 import DecorationBase from "../bases/decoration-base";
+import PolygonDecoration from "../lib/rendering/decorations/polygon-decoration";
 
 class ViewObjectRenderBox extends RenderBox {}
 
 /**
  * 图层基类
  */
-abstract class BaseViewObject extends OperationObserver {
-  protected decoration: DecorationBase;
+abstract class BaseViewObject<
+  D extends DecorationBase
+> extends OperationObserver {
+  protected decoration: D;
   public renderBox: RenderBox = new ViewObjectRenderBox();
   protected offScreenCanvas;
   protected offScreenPainter: Painter;
@@ -67,27 +75,36 @@ abstract class BaseViewObject extends OperationObserver {
   private decorationOption: BoxDecorationOption = {};
   /**
    * ## 设置View盒子装饰
-   * - decoration 装饰参数，包括背景颜色，背景图片，圆角，背景渐变，描边等详情见 [BoxDecorationOption]
+   * - decoration 装饰参数，包括背景颜色，背景图片，圆角，背景渐变等
    * - extension 是否在原来的基础上扩展，默认true
    * @param decoration
    * @param extension
    */
-  public setDecoration(
-    decoration: BoxDecorationOption,
-    extension: boolean = true
+  public setDecoration<O extends DecorationOption = BoxDecorationOption>(
+    decoration: O,
+    extension: boolean = true,
+    decorationType: DecorationTypes = "box"
   ): void {
     let _d = {
       ...decoration,
     };
+
     if (extension) {
       _d = Object.assign(this.decorationOption, _d);
     }
-    this.decoration = new BoxDecoration(_d);
+    //根据type创建修饰器
+    if (decorationType === "box") {
+      this.decoration = new BoxDecoration(_d) as unknown as D;
+    } else if (decorationType === "polygon") {
+      this.decoration = new PolygonDecoration(_d) as unknown as D;
+    } else {
+      throw Error("Invalid decoration type: " + decorationType);
+    }
     this.decorationOption = decoration;
     this.forceUpdate();
   }
-  public setDecorationEntity(decorationEntity: BoxDecoration) {
-    this.decoration = decorationEntity;
+  public setDecorationEntity(decorationEntity: DecorationBase) {
+    this.decoration = decorationEntity as D;
     this.forceUpdate();
   }
   //是否挂载到Gesti

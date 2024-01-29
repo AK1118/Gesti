@@ -4,34 +4,58 @@ import PolygonDecoration from "@/core/lib/rendering/decorations/polygon-decorati
 import Vector from "@/core/lib/vector";
 import { ViewObjectFamily } from "@/index";
 import {
+  BoxDecorationOption,
+  DecorationOption,
   GeneratePolygonOption,
   GenerateRectAngleOption,
   PolygonDecorationOption,
 } from "@/types/graphics";
-import { ViewObjectExportEntity } from "Serialization";
+import {
+  ViewObjectExportEntity,
+  ViewObjectExportGraphics,
+  ViewObjectImportGraphics,
+} from "Serialization";
 
-class Polygon extends GraphicsBase<GeneratePolygonOption,PolygonDecorationOption,PolygonDecoration> {
+class Polygon extends GraphicsBase<GeneratePolygonOption, PolygonDecoration> {
   private points: Array<Vector> = [];
   constructor(option: GeneratePolygonOption) {
-    super(option,(option)=>{
-        return new PolygonDecoration(option);
+    super(option, (_option: PolygonDecorationOption) => {
+      return new PolygonDecoration(_option);
     });
-    this.generatePoints();
+    const points: Array<Vector> = this.generatePoints(option);
+    this.option.points = points;
+    this.decoration.setPoints(points);
+    const { radius } = option;
+    this.setSize({
+      width: radius,
+      height: radius,
+    });
+    this.option.type = "polygon";
+    //this.unUseCache();
   }
-
-  private generatePoints(): void {
-    const { count, radius } = this.option;
+  protected didChangeDeltaScale(deltaScale: number): void {
+    this.decoration?.updatePoint(deltaScale);
+  }
+  private generatePoints(option: GeneratePolygonOption): Array<Vector> {
+    const { count, radius: _radius, points } = option;
+    const radius = _radius * 0.5;
     if (count < 3 || radius <= 0) {
       throw new Error("Invalid parameters for generating a polygon.");
     }
-    this.points = [];
 
-    const angleIncrement = (2 * Math.PI) / count;
-
-    for (let i = 0; i < count; i++) {
-      const x = radius * Math.cos(i * angleIncrement);
-      const y = radius * Math.sin(i * angleIncrement);
-      this.points.push(new Vector(x, y));
+    if (!points) {
+      const _points = [];
+      const angleIncrement = (2 * Math.PI) / count;
+      const offset = Math.PI * -0.5;
+      const offsetY = (radius / count) * 0.5;
+      for (let i = 0; i < count; i++) {
+        const x = radius * Math.cos(i * angleIncrement + offset);
+        const y = radius * Math.sin(i * angleIncrement + offset) + offsetY;
+        _points.push(new Vector(x, y));
+      }
+      return _points;
+    } else {
+      return points;
     }
   }
 
@@ -54,9 +78,20 @@ class Polygon extends GraphicsBase<GeneratePolygonOption,PolygonDecorationOption
 
   family: ViewObjectFamily = ViewObjectFamily.graphicsPolygon;
 
-  export(painter?: Painter): Promise<ViewObjectExportEntity> {
+  public setDecoration(
+    decoration: PolygonDecorationOption,
+    extension?: boolean
+  ): void {
+    super.setDecoration(decoration, extension, "polygon");
+  }
+  export(painter?: Painter): Promise<ViewObjectExportGraphics> {
     // Implement export logic
-    return null;
+    const exportEntity: ViewObjectExportGraphics<GeneratePolygonOption> = {
+      option: this.option,
+      base: this.getBaseInfo(),
+      type: "graphicsPolygon",
+    };
+    return Promise.resolve(exportEntity);
   }
 
   exportWeChat(
@@ -65,6 +100,13 @@ class Polygon extends GraphicsBase<GeneratePolygonOption,PolygonDecorationOption
   ): Promise<ViewObjectExportEntity> {
     // Implement WeChat export logic
     return null;
+  }
+  public static async reserve(
+    entity: ViewObjectImportGraphics<GeneratePolygonOption>
+  ): Promise<GraphicsBase<GeneratePolygonOption, PolygonDecoration>> {
+    const option = entity.option;
+    const polygon: Polygon = new Polygon(option);
+    return Promise.resolve(polygon);
   }
 }
 

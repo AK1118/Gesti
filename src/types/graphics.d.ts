@@ -1,7 +1,8 @@
 import { Alignment, Painter, XImage } from "./gesti";
 
 export type GradientTypes = "lineGradient" | "radiusGradient";
-export type GraphicsTypes = "rectangle" | "circle";
+export type GraphicsTypes = "rectangle" | "polygon";
+export type DecorationTypes = "box" | "polygon";
 type BorderRadiusAll = number;
 // type  = number | Iterable<number>;
 
@@ -60,9 +61,9 @@ export class LineGradientDecoration extends GradientDecorationBase {
   constructor(option: LineGradientDecorationOption);
 }
 //装饰器
-interface DecorationOption {}
-export interface PolygonDecorationOption extends DecorationOption {
-  points?: Array<Vector>;
+interface DecorationOption {
+  type?: DecorationTypes;
+
   /**
    * - 背景颜色
    */
@@ -81,8 +82,11 @@ export interface PolygonDecorationOption extends DecorationOption {
    */
   gradient?: GradientDecorationBase;
 }
+export interface PolygonDecorationOption extends DecorationOption {
+  points?: Array<Vector>;
+}
 //盒子装饰器
-export interface BoxDecorationOption extends PolygonDecorationOption {
+export interface BoxDecorationOption extends DecorationOption {
   /**
    * ### 圆角
    * - 传入一个数字或者一个数组
@@ -108,6 +112,7 @@ export interface GenerateRectAngleOption extends GenerateGraphicsOption {
 export interface GeneratePolygonOption extends GenerateGraphicsOption {
   radius: number;
   count: number;
+  points?: Array<Vector>;
 }
 
 interface GenerateCircleOption extends GenerateGraphicsOption {

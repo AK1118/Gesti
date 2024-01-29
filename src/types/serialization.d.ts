@@ -58,7 +58,8 @@ declare module "Serialization" {
     | "text"
     | "write"
     | "group"
-    | "graphicsRectangle";
+    | "graphicsRectangle"
+    | "graphicsPolygon";
 
   export interface ViewObjectExportEntity {
     base: ViewObjectExportBaseInfo;
@@ -107,6 +108,7 @@ declare module "Serialization" {
   interface ViewObjectImportGraffiti extends ViewObjectExportGraffiti {}
 
   interface ViewObjectImportGraphics<T> extends ViewObjectExportGraphics<T> {}
+
   interface Reverse<Entity extends ViewObjectExportEntity> {
     reverse(entity: Entity): Promise<ViewObject>;
   }
@@ -130,4 +132,3 @@ declare module "Serialization" {
     info: ViewObjectExportWrapperBaseInfo;
   }
 }
-

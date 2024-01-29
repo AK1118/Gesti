@@ -10,7 +10,6 @@ import XImage from "../../ximage";
 import GradientDecorationBase from "@/core/bases/gradient-base";
 import Painter from "../../painter";
 import Rect from "../../rect";
-import { ClipRRect, RenderColoredRRect, RenderWidgetBase } from "../base";
 import Serializable from "@/core/interfaces/Serialization";
 import LineGradientDecoration from "../../graphics/gradients/lineGradientDecoration";
 import { reverseXImage } from "@/utils/utils";
@@ -21,6 +20,7 @@ import DecorationBase from "@/core/bases/decoration-base";
 class BoxDecoration extends DecorationBase<BoxDecorationOption> {
   constructor(option?: BoxDecorationOption) {
     super(option);
+    this.option.type="box";
   }
   render(paint: Painter, rect: Rect): void {
     const { width, height } = rect.size;

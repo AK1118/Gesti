@@ -21,8 +21,9 @@ import {
 } from "@/types/serialization";
 import Platform from "../viewObject/tools/platform";
 import BoxDecoration from "../lib/rendering/decorations/box-decoration";
-import { BoxDecorationOption } from "Graphics";
+import { BoxDecorationOption, Decoration } from "Graphics";
 import { CenterAxis } from "@/types/controller";
+import DecorationBase from "../bases/decoration-base";
 /**
  *
  * 缓存要做到 数据层缓存，渲染层缓存
@@ -33,7 +34,7 @@ import { CenterAxis } from "@/types/controller";
  *
  *
  */
-abstract class ViewObject extends BaseViewObject implements RenderObject {
+abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseViewObject<D> implements RenderObject {
   //辅助线
   private auxiliary: AuxiliaryLine;
   public originFamily: ViewObjectFamily;

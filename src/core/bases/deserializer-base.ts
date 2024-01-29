@@ -22,15 +22,21 @@ import Alignment from "../lib/painting/alignment";
 import Rectangle from "../viewObject/graphics/rectangle";
 import {
   BoxDecorationOption,
+  Decoration,
   DecorationOption,
   GenerateCircleOption,
+  GeneratePolygonOption,
   GenerateRectAngleOption,
+  PolygonDecorationOption,
 } from "Graphics";
 // import Circle from "../viewObject/graphics/circle";
 import ImageToolkit from "../lib/image-toolkit";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 import { ImageChunk } from "Gesti";
 import BoxDecoration from "../lib/rendering/decorations/box-decoration";
+import DecorationBase from "./decoration-base";
+import Polygon from "../viewObject/graphics/polygon";
+import PolygonDecoration from "../lib/rendering/decorations/polygon-decoration";
 
 type ViewObjectHandler<T> = (entity: ViewObjectImportEntity) => T;
 
@@ -69,7 +75,7 @@ abstract class DeserializerBase {
       const option = textEntity.option;
       if (option.fontSize)
         option.fontSize = this.adaptScreenFontSize(option.fontSize);
-      if (option.spacing&&option.spacing!=1)
+      if (option.spacing && option.spacing != 1)
         option.spacing = this.adaptScreenFontSize(option.spacing);
       if (option.lineWidth)
         option.lineWidth = this.adaptScreenFontSize(option.lineWidth);
@@ -99,17 +105,17 @@ abstract class DeserializerBase {
         );
       return Rectangle.reserve(graphics);
     },
-    // graphicsCircle: (
-    //   entity: ViewObjectExportGraphics<GenerateCircleOption>
-    // ) => {
-    //   entity.option.radius = this.adaptScreenFontSize(entity.option.radius);
-
-    //   const graphics =
-    //     this.formatEntity<ViewObjectExportGraphics<GenerateCircleOption>>(
-    //       entity
-    //     );
-    //   return Circle.reserve(graphics);
-    // },
+    graphicsPolygon: (entity) => {
+      const graphics =
+        this.formatEntity<ViewObjectExportGraphics<GeneratePolygonOption>>(
+          entity
+        );
+      graphics.option.points?.forEach((_) => {
+        _.x = this.adaptScreenSizeWidth(_.x);
+        _.y = this.adaptScreenSizeWidth(_.y);
+      });
+      return Polygon.reserve(graphics);
+    },
     group: (entity) => {
       throw Error("Method has not implemented.");
     },
@@ -209,15 +215,26 @@ abstract class DeserializerBase {
     view.relativeRect.setAngle(view.relativeRect.getAngle);
   }
   private async formatBoxDecoration(
-    _decoration: BoxDecorationOption
-  ): Promise<BoxDecoration> {
-    const decoration: BoxDecoration = new BoxDecoration();
-    if (_decoration?.borderRadius) {
-      _decoration.borderRadius = this.adaptScreenFontSize(
-        _decoration.borderRadius as number
-      );
+    _decoration: DecorationOption
+  ): Promise<DecorationBase> {
+    if (_decoration.type === "box") {
+      let decorationOption: BoxDecorationOption = _decoration;
+      const decoration = new BoxDecoration();
+      if (decorationOption.borderRadius) {
+        decorationOption.borderRadius = this.adaptScreenFontSize(
+          decorationOption.borderRadius as number
+        );
+      }
+      return await decoration.format(decorationOption);
+    }else if(_decoration.type==="polygon"){
+      let d: PolygonDecorationOption = _decoration;
+      d.points.forEach(_=>{
+        _.x=this.adaptScreenSizeWidth(_.x);
+        _.y=this.adaptScreenSizeWidth(_.y);
+      });
+      const decoration = new PolygonDecoration();
+      return await decoration.format(d);
     }
-    return await decoration.format(_decoration);
   }
   //安装按钮
   private installButton(viewObject: ViewObject, buttons: ExportButton[]) {

@@ -510,7 +510,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       this.selectedViewObject?.family === ViewObjectFamily.text;
     if (isTextBox) {
       const view: TextBox = this.selectedViewObject as TextBox;
-      view.setDecoration(options ?? {});
+      view.setTextStyle(options ?? {});
       view.setText(text);
       this.render();
       this.callHook("onUpdateText", view);

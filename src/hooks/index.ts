@@ -134,7 +134,7 @@ function textHandler(
 ) {
   //textBox.updateText(text, options);
   textBox.setText(text);
-  textBox.setDecoration(options);
+  textBox.setTextStyle(options);
   if (!target) {
     error("Target is empty");
     return Promise.reject("Target is empty");

@@ -31,7 +31,6 @@ import {
 
 class Rectangle extends GraphicsBase<
   GenerateRectAngleOption,
-  BoxDecorationOption,
   BoxDecoration
 > {
   family: ViewObjectFamily = ViewObjectFamily.graphicsRectangle;
@@ -74,7 +73,7 @@ class Rectangle extends GraphicsBase<
   public static async reserve(
     entity: ViewObjectImportGraphics<GenerateRectAngleOption>
   ): Promise<
-    GraphicsBase<GenerateRectAngleOption, BoxDecorationOption, BoxDecoration>
+    GraphicsBase<GenerateRectAngleOption, BoxDecoration>
   > {
     const option = entity.option;
     const rectAngle: Rectangle = new Rectangle(option);

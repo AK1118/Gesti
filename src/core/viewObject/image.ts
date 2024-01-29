@@ -43,9 +43,11 @@ class ImageBox extends ViewObject {
     this.ximage = ximage;
     this.image = ximage.data;
     this.rect = new Rect(ximage.toJson());
-    this.setDecoration({
+    const decoration:BoxDecorationOption={
       backgroundImage: ximage,
-    });
+    };
+    
+    this.setDecoration(decoration);
     this.useCache();
   }
 

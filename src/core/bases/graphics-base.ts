@@ -21,11 +21,9 @@ import DecorationBase from "./decoration-base";
 abstract class GraphicsBase<
   //生成图形参数
   G extends GenerateGraphicsOption,
-  //生成修饰器参数
-  DP extends DecorationOption,
   //修饰器类型参数
-  D extends DecorationBase<DP>
-> extends ViewObject {
+  D extends DecorationBase,
+> extends ViewObject<D> {
   constructor(
     option: G,
     buildDecoration: (decorationOption?: DecorationOption) => D

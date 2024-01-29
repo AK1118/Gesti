@@ -12,6 +12,7 @@ import { Container, RenderViewWidget } from "@/core/lib/rendering/widget";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
 import SizeButton from "@/core/viewObject/buttons/sizeButton";
+import Polygon from "@/core/viewObject/graphics/polygon";
 // import Circle from "@/core/viewObject/graphics/circle";
 import Rectangle, {
   InteractiveImage,
@@ -39,6 +40,7 @@ import Gesti, {
   VerticalButton,
   XImage,
 } from "@/index";
+import { BoxDecorationOption } from "@/types/graphics";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
 Gesti.installPlugin("pako", require("pako"));
@@ -96,7 +98,7 @@ gesti.initialization({
 });
 // gesti.debug=true;
 const controller = gesti.controller;
-console.log("屏幕1大小",canvas.width,canvas.height)
+console.log("屏幕1大小", canvas.width, canvas.height);
 const screenUtil1 = controller.generateScreenUtils({
   canvasHeight: canvas.height,
   canvasWidth: canvas.width,
@@ -164,29 +166,19 @@ const textBox = new TextBox(str1, {
   fontFamily: "楷体",
 });
 textBox2.setDecoration({
-  backgroundImage: ximage,
+  // backgroundImage: ximage,
   gradient: new LineGradientDecoration({
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: ["orange", "white", "yellow"],
   }),
 });
-
 textBox2.setId("第二");
-loadToGesti(textBox2);
+// textBox2.setDecoration({
+//   backgroundImage:null,
+// })
+// loadToGesti(textBox2);
 
-//loadToGesti(textBox);
-
-// const group: Group = new Group();
-
-// textBox2.setPosition(0, 0);
-// doCenter(textBox2);
-// doCenter(imageBox);
-// textBox2.toBackground();
-// controller.layerBottom(textBox2);
-// controller.layerLower(textBox);
-// group.add(imageBox);
-// group.add(textBox2);
 const gradient = new LineGradientDecoration({
   colors: ["white", "black", "red"],
   begin: Alignment.topLeft,
@@ -198,7 +190,7 @@ const rect: Rectangle = new Rectangle({
   width: screenUtil1.fullWidth,
   height: screenUtil1.fullWidth,
   decoration: {
-    borderRadius: screenUtil1.setWidth(750),
+    borderRadius: screenUtil1.setWidth(50),
     backgroundColor: "skyblue",
     gradient: gradient,
     backgroundImage: ximage,
@@ -230,12 +222,47 @@ const buttons = [
 ];
 buttons.forEach((_) => _.setSenseRadius(screenUtil1.setSp(50)));
 rect.installMultipleButtons(buttons);
-loadToGesti(rect);
-// controller.cancelGesture();
-const aa = new InteractiveImage(ximage, {
-  borderRadius: screenUtil1.setSp(90),
+// loadToGesti(rect);
+
+const polygon = new Polygon({
+  radius: screenUtil1.setSp(750),
+  count: 5,
+  decoration: {
+    backgroundColor: "orange",
+    gradient: new LineGradientDecoration({
+      colors: ["orange", "orange", "yellow"],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    }),
+    // backgroundImage:ximage
+  },
 });
-loadToGesti(aa);
+polygon.installMultipleButtons(
+  [
+    new HorizonButton("left"),
+    new VerticalButton("top"),
+    new VerticalButton("bottom"),
+    new HorizonButton("right"),
+    new DragButton(),
+    new CloseButton(),
+    new SizeButton(Alignment.topLeft),
+    new MirrorButton({
+      alignment: Alignment.bottomLeft,
+    }),
+    new RotateButton(
+      {
+        alignment:new Alignment(0,1.5),
+      }
+    )
+  ].map((_) => {
+    _.setSenseRadius(screenUtil1.setSp(50));
+    return _;
+  })
+);
+loadToGesti(polygon);
+polygon.toCenter();
+
+// loadToGesti(aa);
 const canvas2: HTMLCanvasElement = document.querySelector("#canvas2");
 const canvas3: HTMLCanvasElement = document.querySelector("#canvas3");
 const g3 = canvas3.getContext("2d", {
@@ -245,10 +272,10 @@ const g2 = canvas2.getContext("2d", {
   willReadFrequently: true,
 });
 
-canvas2.width = 200*dev;
-canvas2.height = 200*dev;
-canvas2.style.width=200+'px';
-canvas2.style.height=200+'px';
+canvas2.width = 200 * dev;
+canvas2.height = 200 * dev;
+canvas2.style.width = 200 + "px";
+canvas2.style.height = 200 + "px";
 canvas3.width = 100;
 canvas3.height = 100;
 const gesti2 = createGesti();
@@ -260,15 +287,15 @@ const screenUtil2 = new ScreenUtils({
 const controller2 = gesti2.initialization({
   renderContext: g2,
   rect: {
-    canvasWidth: canvas2.width*dev,
-    canvasHeight: canvas2.height*dev,
+    canvasWidth: canvas2.width * dev,
+    canvasHeight: canvas2.height * dev,
   },
 });
 gesti3.initialization({
   renderContext: g3,
   rect: {
-    canvasWidth: canvas3.width*dev,
-    canvasHeight: canvas3.height*dev,
+    canvasWidth: canvas3.width * dev,
+    canvasHeight: canvas3.height * dev,
   },
 });
 
@@ -294,10 +321,10 @@ document.getElementById("import").addEventListener("click", () => {
     },
     gesti2
   ).then((e) => {
-    console.log(gesti2.controller.getScreenUtil())
+    console.log(gesti2.controller.getScreenUtil());
     console.log("导入成功");
   });
-  importAll(a,null, gesti3).then((e) => {
+  importAll(a, null, gesti3).then((e) => {
     console.log("导入成功");
   });
 });
