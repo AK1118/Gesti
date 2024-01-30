@@ -131,7 +131,7 @@ export abstract class TextBoxBase extends ViewObject {
   private handleSplitText(text: string): Array<string> {
     const result = [];
     const regex =
-      /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[!\"#\$%&'\(\)\*\+,\-\./:;<=>\?@\[\\\]\^_`{\|}~]|[！？｡。，；：…“”‘’（）&#8203;``【】``&#8203;〔〕｛｝《》〈〉『』「」]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
+      /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[!\"#\$%&'\(\)\*\+,\-\./:;<=>\?@\[\\\]\^_`{\|}~]|[！？｡。，；：…“”‘’（）&#8203;``【】``&#8203;〔〕｛｝《》〈〉『』「」\s]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
     let match: Array<string> = [];
     while ((match = regex.exec(text)) !== null) {
       result.push(match[0]);
