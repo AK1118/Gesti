@@ -25,6 +25,9 @@ import {
 } from "@/utils/canvas";
 import { reverseXImage } from "@/utils/utils";
 import { BoxDecorationOption } from "Graphics";
+/**
+ * 可设置背景，且背景
+ */
 class ImageBox extends ViewObject {
   family: ViewObjectFamily = ViewObjectFamily.image;
   get value(): any {
@@ -43,10 +46,10 @@ class ImageBox extends ViewObject {
     this.ximage = ximage;
     this.image = ximage.data;
     this.rect = new Rect(ximage.toJson());
-    const decoration:BoxDecorationOption={
-      backgroundImage: ximage,
+    const decoration: BoxDecorationOption = {
+      // backgroundImage: ximage,
     };
-    
+
     this.setDecoration(decoration);
     this.useCache();
   }
@@ -63,13 +66,13 @@ class ImageBox extends ViewObject {
 
   //@Override
   public drawImage(paint: Painter): void {
-    paint.drawImage(
-      this.image,
-      this.rect.position.x >> 0,
-      this.rect.position.y >> 0,
-      this.rect.size.width >> 0,
-      this.rect.size.height >> 0
-    );
+      paint.drawImage(
+        this.image,
+        this.rect.position.x >> 0,
+        this.rect.position.y >> 0,
+        this.rect.size.width >> 0,
+        this.rect.size.height >> 0
+      );
   }
 
   async export(): Promise<ViewObjectExportImageBox> {
@@ -84,7 +87,7 @@ class ImageBox extends ViewObject {
 
     const json: ViewObjectExportImageBox = {
       type: "image",
-      base: this.getBaseInfo(),
+      base: await this.getBaseInfo(),
       fixedHeight: this.ximage.fixedHeight,
       fixedWidth: this.ximage.fixedWidth,
       data,

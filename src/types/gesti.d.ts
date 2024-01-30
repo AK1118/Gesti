@@ -2,19 +2,26 @@ import GestiController from "./controller";
 import {
   BoxDecorationOption,
   GenerateGraphicsOption,
+  GeneratePolygonOption,
   GenerateRectAngleOption,
+  PolygonDecorationOption,
 } from "./graphics";
 import {
   ViewObjectExportBaseInfo,
   ViewObjectExportEntity,
 } from "./serialization";
-
+export declare interface SelectedBorderStyle {
+  borderColor?: string;
+  lineDash?: Iterable<number>;
+  lineWidth?: number;
+  padding?: number;
+}
 declare class Gesti {
   constructor(config?: GestiConfigOption);
   get controller(): GestiController;
   static Family: ViewObjectFamily;
   initialized: boolean;
-  public bindController(controller: GestiController):void;
+  public bindController(controller: GestiController): void;
   /**
    * canvas必传，在h5端时paint可不传
    * 关于rect  width 和 height 对应的是canvas的高宽   而 x,y其实对应的是canvas在屏幕的位置，或者可以理解为偏移量
@@ -67,7 +74,7 @@ declare class Gesti {
    */
   dispose(): void;
 }
-
+export type VoidFunctionCallback = () => void;
 export declare enum ViewObjectFamily {
   image,
   write,
@@ -141,7 +148,7 @@ declare class Size {
 }
 
 type ButtonOption = {
-  location?: Alignment;
+  alignment?: Alignment;
   icon?: Icon;
 };
 
@@ -425,7 +432,28 @@ export abstract class ViewObject {
   /**
    * - 水平垂直居中，在挂载后生效
    */
-  public toCenter(axis?: CenterAxis):void;
+  public toCenter(axis?: CenterAxis): void;
+  /**
+   * - 通过id获取该图层上的按钮,返回Promise
+   */
+  public getButtonById<ButtonType extends BaseButton>(
+    id: string
+  ): Promise<ButtonType | undefined>;
+  /**
+   * - 通过id获取该图层上的按钮
+   */
+  public getButtonByIdSync<ButtonType extends BaseButton>(
+    id: string
+  ): ButtonType | undefined;
+  /**
+   * - 获取该图层所有按钮
+   */
+  get allButtons(): Array<BaseButton>;
+  /**
+   * ### 设置被选中时边框的样式
+   * - 颜色，dash,padding，lineWidth
+   */
+  public setSelectedBorder(option: SelectedBorderStyle): void 
 }
 export class XImage {
   constructor(params: createImageOptions);
@@ -509,7 +537,10 @@ export declare class ImageBox extends ViewObject {
   constructor(ximage: XImage);
 }
 
-type GraffitiCloser = [() => void, (callback: (view: ViewObject) => void) => void];
+type GraffitiCloser = [
+  () => void,
+  (callback: (view: ViewObject) => void) => void
+];
 
 export declare class WriteViewObj extends ViewObject {}
 
@@ -617,7 +648,8 @@ export abstract class Button extends BaseButton {
   public hideBackground(): void;
   public setIconColor(color: string): void;
   public setSenseRadius(senseRadius: number): void;
-  // icon, iconColor, customAlignment, customIcon
+  public setId(id: string): void;
+  get id(): string;
 }
 
 export class CloseButton extends Button {}
@@ -630,8 +662,19 @@ export class DragButton extends Button {
 export class MirrorButton extends Button {}
 export class LockButton extends Button {}
 export class RotateButton extends Button {}
+/**
+ * ### 创建一个自定义按钮对象
+ * - 按钮可以自定义child和点击事件，但是点击事件不能被导出
+ */
+export class CustomButton extends Button {
+  constructor(option: {
+    child: ViewObject;
+    onClick?: VoidFunction;
+    option?: ButtonOption;
+  });
+}
 export class SizeButton extends Button {
-  constructor(location: Alignment, option?: ButtonOption);
+  constructor(alignment: Alignment, option?: ButtonOption);
 }
 export class UnLockButton extends Button {
   constructor(option?: ButtonOption);
@@ -655,6 +698,11 @@ declare abstract class GraphicsBase<
  */
 export class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
   constructor(option: GenerateRectAngleOption);
+  setDecoration<BoxDecorationOption>(option: BoxDecorationOption): void;
+}
+export class Polygon extends GraphicsBase<GeneratePolygonOption> {
+  constructor(option: GeneratePolygonOption);
+  setDecoration<PolygonDecorationOption>(option: PolygonDecorationOption): void;
 }
 
 /**

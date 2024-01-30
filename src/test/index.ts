@@ -9,6 +9,7 @@ import OffScreenCanvasGenerator from "@/core/lib/plugins/offScreenCanvasGenerato
 import { RenderViewElement } from "@/core/lib/rendering/element";
 import { Row } from "@/core/lib/rendering/flex";
 import { Container, RenderViewWidget } from "@/core/lib/rendering/widget";
+import CustomButton from "@/core/viewObject/buttons/customButton";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
 import SizeButton from "@/core/viewObject/buttons/sizeButton";
@@ -126,18 +127,14 @@ setTimeout(() => {
     url: img2.src,
   });
   // imageBox.replaceXImage(ximage2);
-  imageBox.setDecoration({
+  imageBox.setDecoration<BoxDecorationOption>({
     // borderRadius: screenUtil1.setSp(10),
-    gradient: new LineGradientDecoration({
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: ["red", "white", "yellow"],
-    }),
+   borderRadius:screenUtil1.setSp(50),
   });
 }, 3000);
 imageBox.setId("第一");
 doCenter(imageBox);
-// loadToGesti(imageBox);
+ loadToGesti(imageBox);
 
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
@@ -207,7 +204,7 @@ const drag = new DragButton({
 });
 rect.setId("第三");
 rect.setLayer(9);
-rect.installButton(drag);
+rect.installButton(drag); 
 const buttons = [
   new HorizonButton("left"),
   new VerticalButton("top"),
@@ -229,14 +226,33 @@ const polygon = new Polygon({
   count: 5,
   decoration: {
     backgroundColor: "orange",
-    gradient: new LineGradientDecoration({
-      colors: ["orange", "orange", "yellow"],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    }),
+    // gradient: new LineGradientDecoration({
+    //   colors: ["orange", "orange", "yellow"],
+    //   begin: Alignment.topLeft,
+    //   end: Alignment.bottomRight,
+    // }),
     // backgroundImage:ximage
   },
 });
+const label:TextBox=new TextBox("你好",{
+  color:'red',
+  fontSize:screenUtil1.setSp(26),
+});
+const customButton=new CustomButton({
+  child:label,onClick:()=>{
+    const duobianx:Polygon=controller.getViewObjectByIdSync("duobianx");
+    duobianx.setDecoration({
+      backgroundColor:['red','orange','skyblue','#ffffff'][~~(Math.random()*3)]
+    });
+    duobianx.setCount(Math.floor(Math.random() * (10 - 3 + 1)) + 3);
+  },
+  option:{
+    alignment:Alignment.topRight
+  }
+},);
+customButton.setId("huanbian");
+label.installButton(new DragButton());
+polygon.setId("duobianx");
 polygon.installMultipleButtons(
   [
     new HorizonButton("left"),
@@ -244,16 +260,11 @@ polygon.installMultipleButtons(
     new VerticalButton("bottom"),
     new HorizonButton("right"),
     new DragButton(),
-    new CloseButton(),
+    customButton,
     new SizeButton(Alignment.topLeft),
     new MirrorButton({
       alignment: Alignment.bottomLeft,
     }),
-    new RotateButton(
-      {
-        alignment:new Alignment(0,1.5),
-      }
-    )
   ].map((_) => {
     _.setSenseRadius(screenUtil1.setSp(50));
     return _;
@@ -287,13 +298,22 @@ const screenUtil2 = new ScreenUtils({
 const controller2 = gesti2.initialization({
   renderContext: g2,
   rect: {
+    x:canvas2.getBoundingClientRect().left,
+    y:canvas2.getBoundingClientRect().top,
     canvasWidth: canvas2.width * dev,
     canvasHeight: canvas2.height * dev,
   },
 });
+controller2.generateScreenUtils({
+  canvasWidth:canvas2.width,
+  canvasHeight:canvas2.height,
+  devicePixelRatio:dev,
+})
 gesti3.initialization({
   renderContext: g3,
   rect: {
+    x:canvas3.getBoundingClientRect().left,
+    y:canvas3.getBoundingClientRect().top,
     canvasWidth: canvas3.width * dev,
     canvasHeight: canvas3.height * dev,
   },
@@ -313,16 +333,21 @@ document.getElementById("import").addEventListener("click", () => {
   importAll(
     a,
     async (arr) => {
-      return new Promise((r) => {
-        setTimeout(() => {
-          r(arr);
-        }, 100);
-      });
+      arr.forEach(_=>{
+       const huanbianButton= _.getButtonByIdSync<CustomButton>("huanbian");
+       if(huanbianButton){
+        huanbianButton.onClick=()=>{
+          alert("哈哈哈");
+        }
+       }
+      })
+      return Promise.resolve(arr);
     },
     gesti2
   ).then((e) => {
     console.log(gesti2.controller.getScreenUtil());
     console.log("导入成功");
+    
   });
   importAll(a, null, gesti3).then((e) => {
     console.log("导入成功");

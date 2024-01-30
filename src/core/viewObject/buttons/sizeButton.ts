@@ -9,27 +9,27 @@ import DragButton from "./dragbutton";
 import Vector from "@/core/lib/vector";
 import { Icon } from "@/core/lib/icon";
 import ScaleIcon from "@/static/icons/scaleIcon";
-import { ButtonOption } from "@/core/abstract/baseButton";
 import { DefaultIcon } from "@/composite/icons";
 import Alignment from "@/core/lib/painting/alignment";
+import { ButtonOption } from "@/core/abstract/baseButton";
 
 class SizeButton extends DragButton {
   readonly name: ButtonNames = "SizeButton";
   protected buttonAlignment: Alignment = Alignment.bottomRight;
   protected icon: Icon = new DefaultIcon();
-  constructor(location: Alignment, option?: ButtonOption) {
+  constructor(location?: Alignment, option?: ButtonOption) {
     super({
       angleDisabled: true,
       buttonOption: option,
     });
-    this.buttonAlignment = location;
+    this.buttonAlignment = location||Alignment.center;
     //this.beforeMounted(location);
   }
   /**
    * @description 在按钮挂载前设置位置
    * @param location
    */
-  protected beforeMounted(location: Alignment): void {
+  protected beforeMounted(alignment: Alignment): void {
     //按钮功能原因.按钮必须设置枚举位置,不允许设置position位置,这是强制的.
     // this.setLocationByAlignment(location);
   }
@@ -37,8 +37,8 @@ class SizeButton extends DragButton {
   protected manipulateDelta(delta: Vector): void {
     this.buttonAlignment.computeWithVector(delta);
   }
-  public setLocation(location: Alignment): void {
-    this.buttonAlignment = location;
+  public setLocation(alignment: Alignment): void {
+    this.buttonAlignment = alignment;
     if (this.mounted) this.initialization(this.master);
   }
   effect(currentButtonRect?: Rect): void {

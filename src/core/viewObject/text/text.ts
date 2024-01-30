@@ -232,12 +232,12 @@ class TextBox extends TextBase {
   ): Promise<TextBox> {
     return new TextBox(entity.text, entity.option);
   }
-  export(painter?: Painter): Promise<ViewObjectExportTextBox> {
+  async export(painter?: Painter): Promise<ViewObjectExportTextBox> {
     const entity: ViewObjectExportTextBox = {
       type: "text",
       text: this.fixedText,
       option: this.textOptions,
-      base: this.getBaseInfo(),
+      base: await this.getBaseInfo(),
     };
     return Promise.resolve(entity);
   }

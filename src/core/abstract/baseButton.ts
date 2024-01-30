@@ -9,6 +9,7 @@ import { Icon } from "../lib/icon";
 import DefaultIcon from "@/static/icons/defaultIcon";
 import GestiConfig from "@/config/gestiConfig";
 import Alignment from "../lib/painting/alignment";
+import { ExportButton } from "Serialization";
 export type ButtonOption = {
   alignment?: Alignment;
   icon?: Icon;
@@ -32,6 +33,7 @@ export abstract class BaseButton implements RenderObject {
   //是否显示背景，按钮默认有一个白色背景
   public displayBackground: boolean = true;
   public background: string = "rgba(255,255,255,.8)";
+  private _id: string = "";
   constructor(option?: ButtonOption) {
     if (!option) return;
     this.customAlignment = option?.alignment;
@@ -59,6 +61,12 @@ export abstract class BaseButton implements RenderObject {
   //与寄主的位置关系，根据寄主的大小获取最初的距离
   private originPositionWithSize: Offset;
   private _mounted: boolean = false;
+  public get id():string{
+    return this._id;
+  }
+  public setId(id:string):void{
+    this._id=id;
+  }
   get mounted(): boolean {
     return this._mounted;
   }
@@ -255,15 +263,26 @@ export abstract class BaseButton implements RenderObject {
   public setBackgroundColor(color: string) {
     this.background = color;
   }
-  public setLocation(location: Alignment): void {
-    this.customAlignment = location;
-    this.buttonAlignment = location;
+  public setLocation(alignment: Alignment): void {
+    this.customAlignment = alignment;
+    this.buttonAlignment = alignment;
     //如果已经被初始化
     if (this.mounted) {
       this.initialization(this.master);
     }
   }
-
+  public async export<O = any>(): Promise<ExportButton<O>> {
+    const entity = {
+      id:this.id,
+      type: this.name,
+      alignment: this.btnLocation,
+      radius: this.senseRadius,
+      backgroundColor: this.background,
+      iconColor: this.iconColor,
+      displayBackground: this.displayBackground,
+    };
+    return Promise.resolve(entity);
+  }
   protected drawButton(
     position: Vector,
     size: Size,

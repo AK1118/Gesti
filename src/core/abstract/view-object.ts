@@ -24,6 +24,7 @@ import BoxDecoration from "../lib/rendering/decorations/box-decoration";
 import { BoxDecorationOption, Decoration } from "Graphics";
 import { CenterAxis } from "@/types/controller";
 import DecorationBase from "../bases/decoration-base";
+import { SelectedBorderStyle } from "@/types/gesti";
 /**
  *
  * 缓存要做到 数据层缓存，渲染层缓存
@@ -34,7 +35,10 @@ import DecorationBase from "../bases/decoration-base";
  *
  *
  */
-abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseViewObject<D> implements RenderObject {
+abstract class ViewObject<D extends DecorationBase = DecorationBase>
+  extends BaseViewObject<D>
+  implements RenderObject
+{
   //辅助线
   private auxiliary: AuxiliaryLine;
   public originFamily: ViewObjectFamily;
@@ -57,6 +61,7 @@ abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseV
     //挂载
     this.mount();
     this.setFixedSize(this.size.toObject());
+    this.initializationButtons();
   }
   //卸载按钮
   public unInstallButton(buttons: Array<Button>) {
@@ -69,15 +74,19 @@ abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseV
   }
   //安装按钮
   public installButton(button: Button) {
-    button.initialization(this);
     this.funcButton.push(button);
+    this.initializationButtons();
   }
   //安装多个按钮
   public installMultipleButtons(buttons: Array<Button>): void {
     if (!Array.isArray(buttons))
       throw new Error("Must be a class Button Array.");
-    buttons.forEach((_) => _.initialization(this));
+    //如果已经挂载，就初始化按钮
     this.funcButton.push(...buttons);
+    this.initializationButtons();
+  }
+  private initializationButtons(): void {
+    if (this.mounted) this.funcButton.forEach((_) => _.initialization(this));
   }
   public mirror(): boolean {
     this.isMirror = !this.isMirror;
@@ -134,10 +143,10 @@ abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseV
     if (this.isMirror) paint.scale(-1, 1);
     paint.globalAlpha = this.opacity;
     this.renderImageOrCache(paint);
-    if (this.selected) {
+    //选中和不是缓存时才渲染
+    if (this.selected && !isCache) {
       //边框
       this.drawSelectedBorder(paint, this.size);
-
       /**
        * ### 在kit.render方法中使用了scale全局，这里需要矫正回来
        */
@@ -159,12 +168,27 @@ abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseV
    * 被选中后外边框
    * @param paint
    */
-  private readonly borderColor: string = "#b2ccff";
+  private selectedBorderColor: string = "#b2ccff";
+  private selectedLineDash: Iterable<number> = [];
+  private selectedLineWidth: number = 2;
+  private selectedBorderPadding: number = 3;
+  //设置被选中时描边颜色
+  public setSelectedBorder(option: SelectedBorderStyle): void {
+    this.selectedBorderColor = option?.borderColor || "#b2ccff";
+    this.selectedLineDash = option?.lineDash || null;
+    this.selectedLineWidth = option?.lineWidth || 2
+    this.selectedBorderPadding = option?.padding || 3;
+  }
   public drawSelectedBorder(paint: Painter, size: Size): void {
-    const padding = 3;
+    const screenUtils = this.getKit().getScreenUtil();
+    const padding = screenUtils.setSp(this.selectedBorderPadding);
+    paint.save();
     paint.beginPath();
-    paint.lineWidth = 1;
-    paint.strokeStyle = this.borderColor;
+    paint.lineWidth = screenUtils.setSp(this.selectedLineWidth);
+    paint.strokeStyle = this.selectedBorderColor;
+    if(this.selectedLineDash){
+      paint.setLineDash(this.selectedLineDash);
+    }
     paint.strokeRect(
       (~~this.width + padding) * -0.5,
       (~~this.height + padding) * -0.5,
@@ -172,7 +196,7 @@ abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseV
       ~~this.height + padding
     );
     paint.closePath();
-    paint.stroke();
+    paint.restore();
   }
   /**
    * 镜像翻转
@@ -344,7 +368,13 @@ abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseV
    * @returns
    */
 
-  public getBaseInfo(): ViewObjectExportBaseInfo {
+  public async getBaseInfo(): Promise<ViewObjectExportBaseInfo> {
+    const buttonPromises: Promise<ExportButton>[] = this.funcButton.map(
+      (button: BaseButton) => {
+        return button.export();
+      }
+    );
+    const buttons: ExportButton[] = await Promise.all(buttonPromises);
     return {
       rect: {
         x: ~~this.rect.position.x,
@@ -367,16 +397,7 @@ abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseV
       },
       mirror: this.isMirror,
       locked: this.isLock,
-      buttons: this.funcButton.map<ExportButton>((button: BaseButton) => {
-        return {
-          type: button.name,
-          location: button.btnLocation,
-          radius: button.senseRadius,
-          backgroundColor: button.background,
-          iconColor: button.iconColor,
-          displayBackground: button.displayBackground,
-        };
-      }),
+      buttons: buttons,
       id: this.id,
       layer: this.getLayer(),
       isBackground: this.isBackground,
@@ -385,6 +406,7 @@ abstract class ViewObject<D extends DecorationBase=DecorationBase> extends BaseV
       decoration: this.decoration,
     };
   }
+
   /**
    * 自定义一些操作
    */

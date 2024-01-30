@@ -19,6 +19,7 @@ import LineGradientDecoration from "./core/lib/graphics/gradients/lineGradientDe
 import OffScreenCanvasBuilder from "./core/lib/plugins/offScreenCanvasGenerator";
 import ScreenUtils from "./utils/screenUtils/ScreenUtils";
 import GestiController from "./core/lib/controller";
+import Polygon from "./core/viewObject/graphics/polygon";
 
 
 //Hooks
@@ -36,7 +37,7 @@ export { OffScreenCanvasBuilder };
 //Vector
 export { Alignment };
 //View
-export { Rectangle, InteractiveImage, ImageBox, XImage, TextBox, WriteViewObj };
+export { Rectangle,Polygon, InteractiveImage, ImageBox, XImage, TextBox, WriteViewObj };
 //Enum
 export { ViewObjectFamily };
 //Config

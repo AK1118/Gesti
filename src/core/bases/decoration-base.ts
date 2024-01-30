@@ -13,6 +13,9 @@ class DecorationBase<O extends DecorationOption = BoxDecorationOption>
   toJSON(): O {
     return this.option;
   }
+  update(option: O) {
+    this.option = option;
+  }
   public render(paint: Painter, rect: Rect): void {}
   protected performRender(paint: Painter, rect: Rect): void {}
 }

@@ -56,10 +56,10 @@ class Rectangle extends GraphicsBase<
   protected renderGraphics(paint: Painter): void {
     this.decoration.render(paint, this.rect);
   }
-  export(painter?: Painter): Promise<ViewObjectExportGraphics> {
+  async export(painter?: Painter): Promise<ViewObjectExportGraphics> {
     const exportEntity: ViewObjectExportGraphics<GenerateRectAngleOption> = {
       option: this.option,
-      base: this.getBaseInfo(),
+      base: await this.getBaseInfo(),
       type: "graphicsRectangle",
     };
     return Promise.resolve(exportEntity);

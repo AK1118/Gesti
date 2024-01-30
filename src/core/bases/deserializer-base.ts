@@ -59,6 +59,7 @@ abstract class DeserializerBase {
     LockButton: Buttons.LockButton,
     SizeButton: Buttons.SizeButton,
     VerticalButton: Buttons.VerticalButton,
+    CustomButton: Buttons.CustomButton,
   };
 
   //entity转换为对应实体ViewObject对象映射器
@@ -217,6 +218,7 @@ abstract class DeserializerBase {
   private async formatBoxDecoration(
     _decoration: DecorationOption
   ): Promise<DecorationBase> {
+    if (!_decoration) return null;
     if (_decoration.type === "box") {
       let decorationOption: BoxDecorationOption = _decoration;
       const decoration = new BoxDecoration();
@@ -226,34 +228,44 @@ abstract class DeserializerBase {
         );
       }
       return await decoration.format(decorationOption);
-    }else if(_decoration.type==="polygon"){
+    } else if (_decoration.type === "polygon") {
       let d: PolygonDecorationOption = _decoration;
-      d.points.forEach(_=>{
-        _.x=this.adaptScreenSizeWidth(_.x);
-        _.y=this.adaptScreenSizeWidth(_.y);
+      d.points.forEach((_) => {
+        _.x = this.adaptScreenSizeWidth(_.x);
+        _.y = this.adaptScreenSizeWidth(_.y);
       });
       const decoration = new PolygonDecoration();
       return await decoration.format(d);
+    } else {
+      throw Error("Invalid decoration");
     }
   }
   //安装按钮
-  private installButton(viewObject: ViewObject, buttons: ExportButton[]) {
-    buttons.forEach((item: ExportButton) => {
-      const buttonConstructor = this.buttonMap[item.type];
+  private async installButton(viewObject: ViewObject, buttons: ExportButton[]) {
+    buttons.forEach(async (item: ExportButton) => {
+      const buttonName: ButtonNames = item.type;
+      const buttonConstructor = this.buttonMap[buttonName];
       if (!buttonConstructor)
         return console.error(
           `This buttonConstructor can not construct button.`,
           buttonConstructor,
           this.buttonMap[item.type]
         );
-      const button: BaseButton = new buttonConstructor();
 
-      button.setSenseRadius(item.radius);
+      let button: BaseButton = new buttonConstructor();
+      if (buttonName === "CustomButton") {
+        const child: ViewObject = await this.getObjectByJson(item.option.child);
+        button = new Buttons.CustomButton({
+          child,
+        });
+      }
+
+      button.setSenseRadius(this.adaptScreenFontSize(item.radius));
       button.setBackgroundColor(item.backgroundColor);
       button.setIconColor(item.iconColor);
-
+      button.setId(item.id);
       viewObject.installButton(button);
-      const location: { x: number; y: number } = item.location as any;
+      const location: { x: number; y: number } = item.alignment as any;
       button.setLocation(Alignment.format(location.x, location.y));
     });
   }

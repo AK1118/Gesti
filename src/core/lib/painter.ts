@@ -208,8 +208,8 @@ class Painter implements Painter {
   quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
     this.paint.quadraticCurveTo(cpx, cpy, x, y);
   }
-  setLineDash(dash: any) {
-    this.paint?.setLineDash(dash);
+  setLineDash(segments: Iterable<number>) {
+    this.paint?.setLineDash(segments);
   }
   putImageData(imagedata: ImageData, dx: number, dy: number): void {
     this.paint.putImageData(imagedata, dx, dy);

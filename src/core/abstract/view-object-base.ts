@@ -3,7 +3,7 @@ import Painter from "../lib/painter";
 import Rect, { Size } from "../lib/rect";
 import Vector from "../lib/vector";
 import { Point } from "../lib/vertex";
-import Button from "./baseButton";
+import Button, { BaseButton } from "./baseButton";
 import OperationObserver from "./operation-observer";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
@@ -88,22 +88,26 @@ abstract class BaseViewObject<
     let _d = {
       ...decoration,
     };
-
     if (extension) {
       _d = Object.assign(this.decorationOption, _d);
     }
-    //根据type创建修饰器
-    if (decorationType === "box") {
-      this.decoration = new BoxDecoration(_d) as unknown as D;
-    } else if (decorationType === "polygon") {
-      this.decoration = new PolygonDecoration(_d) as unknown as D;
+    if (!this.decoration) {
+      //根据type创建修饰器
+      if (decorationType === "box") {
+        this.decoration = new BoxDecoration(_d) as unknown as D;
+      } else if (decorationType === "polygon") {
+        this.decoration = new PolygonDecoration(_d) as unknown as D;
+      } else {
+        throw Error("Invalid decoration type: " + decorationType);
+      }
     } else {
-      throw Error("Invalid decoration type: " + decorationType);
+      this.decoration.update(_d);
     }
-    this.decorationOption = decoration;
+    this.decorationOption = _d;
     this.forceUpdate();
   }
   public setDecorationEntity(decorationEntity: DecorationBase) {
+    if (!decorationEntity) return;
     this.decoration = decorationEntity as D;
     this.forceUpdate();
   }
@@ -244,6 +248,10 @@ abstract class BaseViewObject<
       height ?? this.renderBox.height
     );
   }
+
+  public getKit(): ImageToolkit {
+    return this.kit;
+  }
   public get absoluteScale(): number {
     return this.renderBox.absoluteScale;
   }
@@ -333,6 +341,9 @@ abstract class BaseViewObject<
   get scaleHeight(): number {
     return this.rect.scaleHeight;
   }
+  get allButtons(): Array<BaseButton> {
+    return this.funcButton;
+  }
   public setScaleWidth(scale: number) {
     this.rect.setScaleWidth(scale);
   }
@@ -347,6 +358,17 @@ abstract class BaseViewObject<
   }
   public setAngle(angle: number) {
     this.rect.setAngle(angle);
+  }
+  public getButtonByIdSync<ButtonType extends BaseButton>(
+    id: string
+  ): ButtonType | undefined {
+    const foundButton = this.funcButton.find((button) => button.id === id);
+    return foundButton as ButtonType;
+  }
+  public getButtonById<ButtonType extends BaseButton>(
+    id: string
+  ): Promise<ButtonType | undefined> {
+    return Promise.resolve(this.getButtonByIdSync(id));
   }
 }
 

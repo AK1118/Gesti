@@ -22,13 +22,15 @@ declare module "Serialization" {
     angle: number;
   }
 
-  interface ExportButton {
-    type: string;
-    location?: Alignment;
+  interface ExportButton<O = any> {
+    id?: string;
+    type: ButtonNames;
+    alignment?: Alignment;
     radius?: number;
     iconColor?: string;
     backgroundColor?: string;
     displayBackground?: boolean;
+    option?: O;
   }
 
   export interface ViewObjectExportBaseInfo {

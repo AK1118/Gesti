@@ -24,7 +24,7 @@ class WriteViewObj extends ViewObject {
   async export(): Promise<ViewObjectExportGraffiti> {
     return {
       type: "write",
-      base: this.getBaseInfo(),
+      base: await this.getBaseInfo(),
       config: this.config,
       points: this.points,
     };

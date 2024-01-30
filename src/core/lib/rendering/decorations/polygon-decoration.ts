@@ -22,6 +22,7 @@ class PolygonDecoration extends DecorationBase<PolygonDecorationOption> {
   public setPoints(points: Array<Vector>) {
     this.points = points;
     this.option.points = this.points;
+    this.option.type = "polygon";
   }
   public updatePoint(deltaScale: number): void {
     this.points.forEach((_) => {
