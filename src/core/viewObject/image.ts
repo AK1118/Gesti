@@ -7,7 +7,7 @@ import ImageChunkConverterH5 from "../../utils/converters/image-chunk-converter-
 import ImageChunkConverter from "../../utils/converters/image-chunk-converter-H5";
 import ImageChunkConverterWeChat from "../../utils/converters/image-chunk-converter-WeChat";
 import XImage from "../lib/ximage";
-import CutterWeChat from "../..//utils/cutters/cutter-WeChat";
+// import CutterWeChat from "../..//utils/cutters/cutter-WeChat";
 import CutterH5 from "../../utils/cutters/cutter-H5";
 import Platform from "./tools/platform";
 import {

@@ -513,6 +513,7 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     super();
     this.fixedText = text;
     Object.assign(this.textOptions, option);
+    this.unUseCache();
   }
   setFontStyle(style: FontStyleType): void {
     this.textOptions.fontStyle = style;

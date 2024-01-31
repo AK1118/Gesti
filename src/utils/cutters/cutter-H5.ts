@@ -5,6 +5,7 @@ import Vector from "../../core/lib/vector";
 import ImageChunkConverter from "../converters/image-chunk-converter-H5";
 import XImage from "../../core/lib/ximage";
 import CutterBase from "@/core/bases/cutter-base";
+import { getImageDataEntity, proxyGetImageData } from "../canvas";
 
 /**
  * 图片切割
@@ -18,7 +19,7 @@ class CutterH5 extends CutterBase {
    * @param offset
    * @returns
    */
-  public getChunks(ximage: XImage): ImageChunk[] {
+  public async getChunks(ximage: XImage): Promise<ImageChunk[]> {
     let chunkSize: number = this.chunkSize;
     const imgWidth: number = ximage.fixedWidth,
       imgHeight: number = ximage.fixedHeight;
@@ -36,7 +37,7 @@ class CutterH5 extends CutterBase {
         const endX = Math.min(x + chunkSize, imgWidth);
         const width = endX - x;
         g.paint.drawImage(image, x, y, width, height, 0, 0, width, height);
-        const imageData = g.getImageData(0, 0, width, height);
+        const imageData = await proxyGetImageData(g,0,0,width,height)//g.getImageData(0, 0, width, height);
         g.clearRect(0, 0, width, height);
         chunks.push({
           x,
@@ -47,15 +48,13 @@ class CutterH5 extends CutterBase {
         });
       }
     }
-    return chunks;
+    return Promise.resolve(chunks);
   }
 
   public merge(width: number, height: number, chunks: ImageChunk[]): ImageData {
     const g: any = this.painter;
     const converter: ImageChunkConverter = new ImageChunkConverter();
-    const imageData: ImageData = new ImageData(width, height, {
-      colorSpace: "srgb",
-    });
+    const imageData: ImageData = getImageDataEntity(width,height);
     chunks.forEach((item) => {
       const chunk = converter.base64ToChunk(item);
       const A = 4;

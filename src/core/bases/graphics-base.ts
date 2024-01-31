@@ -34,7 +34,7 @@ abstract class GraphicsBase<
       this.decoration = buildDecoration(option?.decoration);
     //如果使用渐变，默认使用缓存
     if (this.option.decoration.gradient) {
-      this.useCache();
+      //this.useCache();
     }
     // this.borderDecoration = option?.borderDecoration;
   }

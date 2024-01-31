@@ -6,7 +6,7 @@ interface CutterInterface {
   painter: Painter;
   canvas:any;
   chunkSize:number;
-  getChunks(ximage: XImage):ImageChunk[];
+  getChunks(ximage: XImage):Promise<ImageChunk[]>;
   merge(
     width: number,
     height: number,

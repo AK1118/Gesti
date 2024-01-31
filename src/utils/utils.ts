@@ -8,7 +8,7 @@ import {
   waitingLoadImg,
 } from "./canvas";
 import Painter from "@/core/lib/painter";
-import CutterWeChat from "./cutters/cutter-WeChat";
+// import CutterWeChat from "./cutters/cutter-WeChat";
 import CutterH5 from "./cutters/cutter-H5";
 import XImage from "@/core/lib/ximage";
 
@@ -154,7 +154,7 @@ const reverseXImage = async (option: ReverseXImageOption): Promise<XImage> => {
     return xImage;
   } /*使用数据切片合并图片*/ else if (chunks && chunks?.length != 0) {
     //微信小程序
-    if (Platform.isWeChatMiniProgram) return reverseWeChat(option);
+    // if (Platform.isWeChatMiniProgram) return reverseWeChat(option);
     const cutter = new CutterH5();
     const source: ImageData = await cutter.merge(
       fixedWidth,
@@ -172,31 +172,31 @@ const reverseXImage = async (option: ReverseXImageOption): Promise<XImage> => {
   return null;
 };
 
-const reverseWeChat = async (option: ReverseXImageOption): Promise<XImage> => {
-  const { url, data, fixedHeight, fixedWidth } = option;
-  const chunks: ImageChunk[] = data;
-  const offCanvas = getOffscreenCanvasWidthPlatform(fixedWidth, fixedHeight);
-  const offPainter: Painter = getOffscreenCanvasContext(offCanvas);
-  //使用数据切片合并图片
-  const cutter = new CutterWeChat();
-  const source: ImageData = await cutter.merge(
-    fixedWidth,
-    fixedHeight,
-    chunks,
-    offCanvas
-  );
-  offPainter.putImageData(source, 0, 0);
-  const image = offCanvas.createImage();
-  image.src = offCanvas.toDataURL();
-  await waitingLoadImg(image);
-  const ximage = new XImage({
-    data: image,
-    width: fixedWidth,
-    height: fixedHeight,
-  });
+// const reverseWeChat = async (option: ReverseXImageOption): Promise<XImage> => {
+//   const { url, data, fixedHeight, fixedWidth } = option;
+//   const chunks: ImageChunk[] = data;
+//   const offCanvas = getOffscreenCanvasWidthPlatform(fixedWidth, fixedHeight);
+//   const offPainter: Painter = getOffscreenCanvasContext(offCanvas);
+//   //使用数据切片合并图片
+//   const cutter = new CutterWeChat();
+//   const source: ImageData = await cutter.merge(
+//     fixedWidth,
+//     fixedHeight,
+//     chunks,
+//     offCanvas
+//   );
+//   offPainter.putImageData(source, 0, 0);
+//   const image = offCanvas.createImage();
+//   image.src = offCanvas.toDataURL();
+//   await waitingLoadImg(image);
+//   const ximage = new XImage({
+//     data: image,
+//     width: fixedWidth,
+//     height: fixedHeight,
+//   });
 
-  return ximage;
-};
+//   return ximage;
+// };
 
 const fetchXImage = async (option: ReverseXImageOption): Promise<XImage> => {
   const { url, data, fixedHeight, fixedWidth } = option;

@@ -7,6 +7,7 @@ import {
   PolygonDecorationOption,
 } from "./graphics";
 import {
+  ExportXImage,
   ViewObjectExportBaseInfo,
   ViewObjectExportEntity,
 } from "./serialization";
@@ -109,10 +110,14 @@ export type ExportAllInterceptor = (
 ) => Promise<Array<ViewObjectExportEntity>>;
 
 interface OffScreenCanvasBuilderOption {
-  offScreenCanvasBuilder: (width: number, height: number) => any;
-  offScreenContextBuilder: (offScreenCanvas: any) => any;
+  offScreenCanvasBuilder?: (width: number, height: number) => any;
+  offScreenContextBuilder?: (offScreenCanvas: any) => any;
   imageBuilder?: (offScreenCanvas: any, url: string) => HTMLImageElement | any;
-  paintBuilder?: () => Painter;
+  paintBuilder?: () =>  | CanvasRenderingContext2D
+  | OffscreenCanvasRenderingContext2D;
+  buildImageData?:(width:number,height:number)=> ImageData;
+  // 代理获取图像数据
+  proxyGetImageData?:(ctx: any,sx:number,sy:number,sw:number,sh:number)=> Promise<ImageData> | null;
 }
 declare class Vector {
   x: number;
@@ -461,10 +466,12 @@ export abstract class ViewObject {
    */
   public setSelectedBorder(option: SelectedBorderStyle): void;
   //使用缓存
-  public useCache():void;
+  public useCache(): void;
   //不使用缓存
-  public unUseCache():void;
+  public unUseCache(): void;
 }
+
+
 export class XImage {
   constructor(params: createImageOptions);
   originData: any;
@@ -480,6 +487,7 @@ export class XImage {
   //矩形位置大小信息
   toJson(): RectParams;
   toJSON(): any;
+  export(): Promise<ExportXImage>;
 }
 // class Group {
 //   remove(id: string): void;

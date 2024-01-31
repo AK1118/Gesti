@@ -12,7 +12,7 @@ abstract class CutterBase implements CutterInterface{
         this.canvas=getOffscreenCanvasWidthPlatform(10000,500);
         this.painter=getOffscreenCanvasContext(this.canvas) as any;
     }
-    getChunks(ximage: XImage): ImageChunk[] {
+    getChunks(ximage: XImage): Promise<ImageChunk[]> {
         throw new Error("Method not implemented.");
     }
     merge(width: number, height: number, chunks: ImageChunk[], canvas?: any):ImageData {

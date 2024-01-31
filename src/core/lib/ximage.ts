@@ -3,6 +3,7 @@ import Cutter from "../../utils/cutters/cutter-H5";
 import { ImageChunk } from "Gesti";
 import ImageChunkConverter from "../abstract/image-chunk-converter";
 import ImageChunkConverterH5 from "@/utils/converters/image-chunk-converter-H5";
+import { ExportXImage } from "Serialization";
 class XImage implements Serializable<{}> {
   originData: any;
   data: any;
@@ -50,15 +51,31 @@ class XImage implements Serializable<{}> {
     this.width = ~~this.width;
     this.height = ~~this.height;
   }
-  toJSON(): any {
+  public async export(): Promise<ExportXImage> {
     const cutter: Cutter = new Cutter();
     const url: string = this.url;
     let data: ImageChunk[];
     if (!url) {
-      const chunks: ImageChunk[] = cutter.getChunks(this);
+      const chunks: ImageChunk[] =await cutter.getChunks(this);
       const coverter: ImageChunkConverter = new ImageChunkConverterH5();
       data = coverter.coverAllImageChunkToBase64(chunks);
     }
+    return Promise.resolve({
+      url: this.url,
+      data: data,
+      width: this.fixedWidth,
+      height: this.fixedHeight,
+    });
+  }
+  toJSON(): any {
+    const cutter: Cutter = new Cutter();
+    const url: string = this.url;
+    let data: ImageChunk[];
+    // if (!url) {
+    //   const chunks: ImageChunk[] = cutter.getChunks(this);
+    //   const coverter: ImageChunkConverter = new ImageChunkConverterH5();
+    //   data = coverter.coverAllImageChunkToBase64(chunks);
+    // }
     return {
       url: this.url,
       data: data,

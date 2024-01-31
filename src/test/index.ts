@@ -229,7 +229,7 @@ const buttons = [
 ];
 buttons.forEach((_) => _.setSenseRadius(screenUtil1.setSp(50)));
 rect.installMultipleButtons(buttons);
-// loadToGesti(rect);
+loadToGesti(rect);
 
 const polygon = new Polygon({
   radius: screenUtil1.setSp(750),

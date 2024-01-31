@@ -1,6 +1,7 @@
 import {
   Alignment,
   GraffitiTypes,
+  ImageChunk,
   ScreenUtilOption,
   TextOptions,
   ViewObject,
@@ -13,6 +14,14 @@ declare module "Serialization" {
   type FetchXImageForImportCallback = (
     data: ViewObjectExportEntity
   ) => Promise<XImage>;
+
+
+  interface ExportXImage{
+    url?:string,
+    data?:Array<ImageChunk>,
+    width:number,
+    height:number
+  }
 
   interface ExportRect {
     x: number;
