@@ -41,7 +41,7 @@ class Rectangle extends GraphicsBase<
     this.option.type = "rectangle";
     const { width, height } = option;
     this.rect.setSize(width, height);
-    this.useCache();
+    // this.useCache();
   }
   get value(): any {
     throw new Error("Method not implemented.");

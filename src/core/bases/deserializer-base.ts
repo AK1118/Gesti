@@ -82,6 +82,12 @@ abstract class DeserializerBase {
         option.lineWidth = this.adaptScreenFontSize(option.lineWidth);
       if (option.maxFontSize)
         option.maxFontSize = this.adaptScreenFontSize(option.maxFontSize);
+      // if (option.shadowOffsetX)
+      //   option.shadowOffsetX = this.adaptScreenSizeWidth(option.shadowOffsetX);
+      // if (option.shadowOffsetY)
+      //   option.shadowOffsetY = this.adaptScreenSizeHeight(option.shadowOffsetY);
+      // if (option.shadowBlur)
+      //   option.shadowBlur = this.adaptScreenFontSize(option.shadowBlur);
       return TextBox.reverse(textEntity);
     },
     write: (entity: ViewObjectExportGraffiti) => {

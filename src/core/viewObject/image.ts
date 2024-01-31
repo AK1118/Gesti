@@ -51,7 +51,7 @@ class ImageBox extends ViewObject {
     };
 
     this.setDecoration(decoration);
-    this.useCache();
+    // this.useCache();
   }
 
   public replaceXImage(xImage: XImage): void {

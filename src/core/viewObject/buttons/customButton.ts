@@ -3,19 +3,16 @@ import ViewObject from "@/core/abstract/view-object";
 import { FuncButtonTrigger } from "@/core/enums";
 import RenderObject from "@/core/interfaces/render-object";
 import Painter from "@/core/lib/painter";
+import Alignment from "@/core/lib/painting/alignment";
 import Rect from "@/core/lib/rect";
 import Vector from "@/core/lib/vector";
-import { Alignment } from "@/index";
+
 import { ExportButton } from "@/types/serialization";
 import { ViewObjectExportEntity } from "@/types/serialization";
 
-interface OO {
-  child: ViewObjectExportEntity;
-}
-
 class CustomButton extends BaseButton {
   readonly name: ButtonNames = "CustomButton";
-  protected buttonAlignment: Alignment;
+  protected buttonAlignment: Alignment=Alignment.topRight;
   public onClick: VoidFunction;
   trigger: FuncButtonTrigger = FuncButtonTrigger.click;
   private child: ViewObject;

@@ -41,6 +41,10 @@ export abstract class TextBoxBase extends ViewObject {
     weight: "normal",
     fontStyle: "normal",
     maxWidth: 300,
+    shadowColor: "",
+    shadowBlur: 0,
+    shadowOffsetX: 0,
+    shadowOffsetY: 0,
   };
   get textWrap(): boolean {
     return true;
@@ -75,9 +79,14 @@ export abstract class TextBoxBase extends ViewObject {
     return textSingle;
   };
   private getFont(): string {
-    const bold = this.textOptions.weight;
-    const italic = this.textOptions.fontStyle;
-    return `${bold} ${italic} ${this.textOptions.fontSize}px ${this.textOptions.fontFamily}`;
+    //uniapp 兼容写法
+    // const bold = this.textOptions.weight||'';
+    // const italic = this.textOptions.fontStyle||'';
+    // const family=this.textOptions.fontFamily||'';
+    // return `${bold} ${italic} ${~~this.textOptions.fontSize}px ${family}`;
+    const bold = this.textOptions.weight||'';
+    const italic = this.textOptions.fontStyle||'';
+    return `${bold} ${italic} ${~~this.textOptions.fontSize}px ${this.textOptions.fontFamily}`;
   }
   /**
    * @description 计算文字大小
@@ -86,41 +95,49 @@ export abstract class TextBoxBase extends ViewObject {
   private setFontDecorations(paint: Painter) {
     //设置字体大小
     paint.font = this.getFont();
+    //设置影音
+    if (this.textOptions.shadowColor)
+      paint.setShadow({
+        ...this.textOptions,
+      });
   }
   /**
    * @override
    */
-  public mount(): void {
-    this.computeTextSingle(true);
-    this.setMount(true);
+  // public mount(): void {
+  //   this.computeTextSingle(true);
+  //   this.setMount(true);
+  // }
+  protected onMounted(): void {
+      this.computeTextSingle(false);
   }
   protected computeTextSingle(
     isInitialization: boolean = false
   ): Array<TextSingle> {
     if (isInitialization) this.setFixedOption();
+    this.paint.save();
     if (this.mounted) this.setFontDecorations(this.paint);
     //This viewObject rect size
     const size: Size = Size.zero;
     const splitTexts: Array<string> = this.handleSplitText(this.fixedText);
     const getTextSingles = (texts: Array<string>): Array<TextSingle> => {
-      return texts.map((text) => {
+      return texts.map((text: string) => {
         const textSingle = this.getTextSingle(text);
+        if (text.length != 1) textSingle.texts = getTextSingles(text.split(""));
         //设置rect的大小
         size.setHeight(Math.max(textSingle.height, size.height));
         size.setWidth(size.width + textSingle.width);
         size.setWidth(Math.min(this.fixedOption.maxWidth, size.width));
-        if (text.length != 1) textSingle.texts = getTextSingles(text.split(""));
         return textSingle;
       }) as unknown as Array<TextSingle>;
     };
     this.texts = getTextSingles(splitTexts);
-
     this.computeDrawPoint(
       this.texts,
       isInitialization ? size : this.size,
       isInitialization
     );
-
+    this.paint.restore();
     return this.texts;
   }
   /**
@@ -395,6 +412,9 @@ export abstract class TextBoxBase extends ViewObject {
     this.isDirty = true;
     this.extendDidChangeDeltaScale(scale);
     this.updateFontSizeByRectSizeHeight();
+    if (this.textOptions.shadowOffsetX) this.textOptions.shadowOffsetX *= scale;
+    if (this.textOptions.shadowOffsetY) this.textOptions.shadowOffsetY *= scale;
+    if (this.textOptions.shadowBlur) this.textOptions.shadowBlur *= scale;
   }
   /**
    * 扩展给扩展类类用

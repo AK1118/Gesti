@@ -28,7 +28,7 @@ class Polygon extends GraphicsBase<GeneratePolygonOption, PolygonDecoration> {
       height: radius,
     });
     this.option.type = "polygon";
-    this.useCache();
+    // this.useCache();
   }
   /**
    * ### 设置边的数量

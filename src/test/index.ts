@@ -134,7 +134,7 @@ setTimeout(() => {
 }, 3000);
 imageBox.setId("第一");
 doCenter(imageBox);
- loadToGesti(imageBox);
+//  loadToGesti(imageBox);
 
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
@@ -149,9 +149,15 @@ const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
 const str1 = `你好你好，
 这是一篇英语短文12
 34567890`;
-const textBox2 = new TextBox(str, {
+const textBox2 = new TextBox(str1, {
   color: "red",
-  fontSize: screenUtil1.setSp(10),
+  fontSize: screenUtil1.setSp(60),
+  weight:'bold',
+   shadowBlur:1,
+  shadowColor:"#a12528",
+  shadowOffsetX:2,
+  shadowOffsetY:2,
+  maxWidth: 10000,
 });
 const textBox = new TextBox(str1, {
   color: "red",
@@ -162,20 +168,24 @@ const textBox = new TextBox(str1, {
   fontStyle: "italic",
   fontFamily: "楷体",
 });
+
+textBox2.installButton(new CustomButton({
+  child:new TextBox("点击")
+}));
 textBox2.setDecoration({
   // backgroundImage: ximage,
-  gradient: new LineGradientDecoration({
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: ["orange", "white", "yellow"],
-  }),
+  // gradient: new LineGradientDecoration({
+  //   begin: Alignment.topLeft,
+  //   end: Alignment.bottomRight,
+  //   colors: ["orange", "white", "yellow"],
+  // }),
 });
 textBox2.setId("第二");
 // textBox2.setDecoration({
 //   backgroundImage:null,
 // })
-// loadToGesti(textBox2);
-
+loadToGesti(textBox2);
+textBox2.toCenter()
 const gradient = new LineGradientDecoration({
   colors: ["white", "black", "red"],
   begin: Alignment.topLeft,
@@ -270,7 +280,7 @@ polygon.installMultipleButtons(
     return _;
   })
 );
-loadToGesti(polygon);
+//loadToGesti(polygon);
 polygon.toCenter();
 
 // loadToGesti(aa);
@@ -349,9 +359,9 @@ document.getElementById("import").addEventListener("click", () => {
     console.log("导入成功");
     
   });
-  importAll(a, null, gesti3).then((e) => {
-    console.log("导入成功");
-  });
+  // importAll(a, null, gesti3).then((e) => {
+  //   console.log("导入成功");
+  // });
 });
 
 document.getElementById("export").addEventListener("click", () => {

@@ -16,6 +16,12 @@ export declare interface SelectedBorderStyle {
   lineWidth?: number;
   padding?: number;
 }
+interface Shadow {
+  shadowColor?: string;
+  shadowBlur?: number;
+  shadowOffsetX?: number;
+  shadowOffsetY?: number;
+}
 declare class Gesti {
   constructor(config?: GestiConfigOption);
   get controller(): GestiController;
@@ -224,7 +230,7 @@ export class Alignment {
   public compute(size: Size): Offset;
 }
 
-export interface TextOptions {
+export interface TextOptions extends Shadow {
   /**
    * @description 字体风格，可以浏览器搜索 canvas自定义字体
    */
@@ -453,7 +459,11 @@ export abstract class ViewObject {
    * ### 设置被选中时边框的样式
    * - 颜色，dash,padding，lineWidth
    */
-  public setSelectedBorder(option: SelectedBorderStyle): void 
+  public setSelectedBorder(option: SelectedBorderStyle): void;
+  //使用缓存
+  public useCache():void;
+  //不使用缓存
+  public unUseCache():void;
 }
 export class XImage {
   constructor(params: createImageOptions);

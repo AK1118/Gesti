@@ -1,3 +1,5 @@
+import { Shadow } from "@/types/gesti";
+
 /*
 	使用代理模式重写Painter，兼容原生Painter
 */
@@ -33,6 +35,25 @@ class Painter implements Painter {
   set strokeStyle(style: string | CanvasGradient) {
     this.paint.strokeStyle = style;
   }
+  set shadowColor(shadowColor: string) {
+    this.paint.shadowColor = shadowColor;
+  }
+  set shadowBlur(shadowBlur: number) {
+    this.paint.shadowBlur = shadowBlur;
+    this.paint.shadowOffsetX;
+  }
+  public setShadow(option?: Shadow) {
+    this.shadowColor = option?.shadowColor;
+    this.shadowBlur = option?.shadowBlur;
+    this.shadowOffsetX = option?.shadowOffsetX;
+    this.shadowOffsetY = option?.shadowOffsetY;
+  }
+  set shadowOffsetX(shadowOffsetX: number) {
+    this.paint.shadowOffsetX = shadowOffsetX;
+  }
+  set shadowOffsetY(shadowOffsetY: number) {
+    this.paint.shadowOffsetY = shadowOffsetY;
+  }
   set textBaseLine(
     baseLine:
       | "top"
@@ -57,8 +78,8 @@ class Painter implements Painter {
     this.paint.stroke();
   }
   clearRect(x: number, y: number, w: number, h: number) {
-    if (typeof uni != "undefined" && (this.paint as any)?.draw) this.draw();
-    else this.paint.clearRect(x, y, w, h);
+    this.paint.clearRect(x, y, w, h);
+    this.draw();
   }
   save() {
     this.paint.save();
@@ -230,8 +251,9 @@ class Painter implements Painter {
     y1: number,
     r1: number
   ): CanvasGradient {
-    return this.paint.createRadialGradient(x0, y0, r0, x1, y1, r1);
+    return this.paint?.createRadialGradient(x0, y0, r0, x1, y1, r1);
   }
+
   createConicGradient() {}
   // roundRect(
   //   x: number,

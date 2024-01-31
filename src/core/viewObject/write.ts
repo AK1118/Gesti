@@ -78,7 +78,7 @@ class WriteViewObj extends ViewObject {
     this._scalex = config.scaleX ?? 1;
     this._scaley = config.scaleY ?? 1;
     this.config = config;
-    this.useCache();
+    // this.useCache();
   }
   public setStyle(decoration: {
     //strokeColor?: string;
