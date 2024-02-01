@@ -188,13 +188,13 @@ abstract class ImageToolkitBase {
         //扫除
         this.cleaning(item);
         item.render(this.paint);
-        this.paint.draw();
+        this.paint.drawSync();
       } else if (this.currentViewObjectState[ndx] == 1) {
         //标记过后不会再次标记
         this.currentViewObjectState[ndx] = 0;
         item.cancel();
         this.callHook("onHide", item);
-        this.paint.draw();
+        this.paint.drawSync();
       }
     });
     this.paint.restore();

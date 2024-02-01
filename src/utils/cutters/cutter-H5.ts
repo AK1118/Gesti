@@ -37,6 +37,7 @@ class CutterH5 extends CutterBase {
         const endX = Math.min(x + chunkSize, imgWidth);
         const width = endX - x;
         g.paint.drawImage(image, x, y, width, height, 0, 0, width, height);
+        await g.draw();
         const imageData = await proxyGetImageData(g,0,0,width,height)//g.getImageData(0, 0, width, height);
         g.clearRect(0, 0, width, height);
         chunks.push({

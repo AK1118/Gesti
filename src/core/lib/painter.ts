@@ -65,8 +65,15 @@ class Painter implements Painter {
   ) {
     if (this.paint.textBaseline) this.paint.textBaseline = baseLine;
   }
-  draw() {
+  drawSync() {
     (this.paint as any)?.draw?.(this.paint);
+  }
+  draw():Promise<void>{
+    return new Promise(r=>{
+      (this.paint as any)?.draw?.(this.paint,()=>{
+        r();
+      });
+    })
   }
   strokeRect(x: number, y: number, w: number, h: number) {
     this.paint.strokeRect(x, y, w, h);
@@ -79,7 +86,7 @@ class Painter implements Painter {
   }
   clearRect(x: number, y: number, w: number, h: number) {
     this.paint.clearRect(x, y, w, h);
-    this.draw();
+    this.drawSync();
   }
   save() {
     this.paint.save();
