@@ -68,12 +68,17 @@ class Painter implements Painter {
   drawSync() {
     (this.paint as any)?.draw?.(this.paint);
   }
-  draw():Promise<void>{
-    return new Promise(r=>{
-      (this.paint as any)?.draw?.(this.paint,()=>{
+  draw(): Promise<void> {
+    return new Promise((r) => {
+      const p = this.paint as any;
+      if (p?.draw != null) {
+        p?.draw?.(p, () => {
+          r();
+        });
+      } else {
         r();
-      });
-    })
+      }
+    });
   }
   strokeRect(x: number, y: number, w: number, h: number) {
     this.paint.strokeRect(x, y, w, h);

@@ -103,10 +103,10 @@ const getPaintContext = (): Painter => {
   return offScreenContextBuilder.buildPaintContext();
 };
 
-const getImageDataEntity = (width: number, height: number): ImageData => {
+const getImageDataEntity = (ctx:any,width: number, height: number): ImageData => {
   const offScreenContextBuilder: OffScreenCanvasGenerator =
     Plugins.getPluginByKey<OffScreenCanvasGenerator>("offScreenBuilder");
-  return offScreenContextBuilder.buildImageData(width, height);
+  return offScreenContextBuilder.buildImageData(ctx,width, height);
 };
 
 const proxyGetImageData = (

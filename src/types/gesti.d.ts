@@ -116,7 +116,7 @@ interface OffScreenCanvasBuilderOption {
   paintBuilder?: () =>
     | CanvasRenderingContext2D
     | OffscreenCanvasRenderingContext2D;
-  buildImageData?: (width: number, height: number) => ImageData;
+  buildImageData?: (ctx:any,width: number, height: number) => ImageData;
   // 代理获取图像数据
   proxyGetImageData?: (
     ctx: any,

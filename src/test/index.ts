@@ -289,6 +289,7 @@ const canvas3: HTMLCanvasElement = document.querySelector("#canvas3");
 const g3 = canvas3.getContext("2d", {
   willReadFrequently: true,
 });
+
 const g2 = canvas2.getContext("2d", {
   willReadFrequently: true,
 });

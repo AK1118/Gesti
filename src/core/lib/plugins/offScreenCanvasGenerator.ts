@@ -12,7 +12,7 @@ interface OffScreenCanvasBuilderInterface {
   // 构建绘图上下文
   buildPaintContext(): Painter;
   // 构建图像数据
-  buildImageData(width: number, height: number): ImageData;
+  buildImageData(ctx:any,width: number, height: number): ImageData;
   // 代理获取图像数据
   proxyGetImageData(
     offScreenContext: any,
@@ -41,7 +41,7 @@ class OffScreenCanvasBuilder implements OffScreenCanvasBuilderInterface {
   private paintBuilder: () =>
     | CanvasRenderingContext2D
     | OffscreenCanvasRenderingContext2D;
-  private _buildImageData: (width: number, height: number) => ImageData;
+  private _buildImageData: (ctx:any,width: number, height: number) => ImageData;
   private _proxyGetImageData: (
     ctx: any,
     sx: number,
@@ -106,10 +106,10 @@ class OffScreenCanvasBuilder implements OffScreenCanvasBuilderInterface {
   }
 
   // 实现构建图像数据方法
-  public buildImageData(width: number, height: number): ImageData {
+  public buildImageData(ctx:any,width: number, height: number): ImageData {
     if (!this._buildImageData) return getImageDataEntity(width, height);
     // 实现方法逻辑
-    return this._buildImageData?.(width, height);
+    return this._buildImageData?.(ctx,width, height);
   }
 
   // 实现代理获取图像数据方法
@@ -194,7 +194,7 @@ const proxyGetImageData = (
   sw: number,
   sh: number
 ): Promise<ImageData> => {
-  if (Platform.isBrowser)
+  if (Platform.isBrowser||Platform.isWeChatMiniProgram)
     return Promise.resolve(ctx.getImageData(sx, sy, sw, sh));
 };
 

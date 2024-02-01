@@ -5,7 +5,7 @@ import Vector from "../../core/lib/vector";
 import ImageChunkConverter from "../converters/image-chunk-converter-H5";
 import XImage from "../../core/lib/ximage";
 import CutterBase from "@/core/bases/cutter-base";
-import { getImageDataEntity, proxyGetImageData } from "../canvas";
+import { getImageDataEntity, getOffscreenCanvasWidthPlatform, proxyGetImageData } from "../canvas";
 
 /**
  * 图片切割
@@ -55,7 +55,8 @@ class CutterH5 extends CutterBase {
   public merge(width: number, height: number, chunks: ImageChunk[]): ImageData {
     const g: any = this.painter;
     const converter: ImageChunkConverter = new ImageChunkConverter();
-    const imageData: ImageData = getImageDataEntity(width,height);
+    const offCanvas=getOffscreenCanvasWidthPlatform(width,height);
+    const imageData: ImageData = getImageDataEntity(offCanvas,width,height);
     chunks.forEach((item) => {
       const chunk = converter.base64ToChunk(item);
       const A = 4;
@@ -79,7 +80,7 @@ class CutterH5 extends CutterBase {
         imageData.data[index] = item;
       });
     });
-    console.info("[H5] Merge successful.");
+    console.info("Merge successful.");
     return imageData;
   }
 }
