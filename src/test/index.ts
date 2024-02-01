@@ -74,7 +74,7 @@ Gesti.installPlugin(
       return offScreenCanvas.getContext("2d");
     },
     //图片构造器
-    imageBuilder: (OffscreenCanvas: OffscreenCanvas, url: string) => {
+    imageBuilder: ( url: string,width: number, height: number) => {
       console.log("图片", url);
       const img = new Image();
       img.src = url;

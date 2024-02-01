@@ -64,11 +64,10 @@ const getOffscreenCanvasContext = (offCanvas: any): Painter => {
  */
 const waitingLoadImg = (img): Promise<void> => {
   return new Promise((resolve) => {
-    img.onload = () => resolve();
-    // 最慢加载10秒
-    setTimeout(() => {
+    if (img?.onload != undefined) img.onload = () => resolve();
+    else {
       resolve();
-    }, 1000 * 10);
+    }
   });
 };
 
@@ -78,16 +77,14 @@ const waitingLoadImg = (img): Promise<void> => {
  * @param url 图像的 URL
  * @returns 返回图像对象
  */
-const getImage = (
-  offScreenCanvas: any,
-  url: string
+const getImage = (url: string,width:number,height:number,offCanvas:any
 ): HTMLImageElement | any => {
   const offScreenContextBuilder: OffScreenCanvasGenerator =
     Plugins.getPluginByKey<OffScreenCanvasGenerator>("offScreenBuilder");
 
   // 根据插件情况返回不同的图像对象
   if (offScreenContextBuilder) {
-    return offScreenContextBuilder.buildImage(offScreenCanvas, url);
+    return offScreenContextBuilder.buildImage(url,width,height,offCanvas);
   } else if (Platform.isBrowser) {
     return new Image();
   } else {
@@ -124,6 +121,16 @@ const proxyGetImageData = (
   return offScreenContextBuilder.proxyGetImageData(ctx, sx, sy, sw, sh);
 };
 
+const getMergedImageData = (
+  source: CanvasImageSource | Blob | ImageData,
+  width: number,
+  height: number
+): Promise<HTMLImageElement | ImageBitmap> => {
+  const offScreenContextBuilder: OffScreenCanvasGenerator =
+    Plugins.getPluginByKey<OffScreenCanvasGenerator>("offScreenBuilder");
+  return offScreenContextBuilder.buildMergedImage(source, width, height);
+};
+
 export {
   getOffscreenCanvasWidthPlatform,
   getOffscreenCanvasContext,
@@ -132,4 +139,5 @@ export {
   getPaintContext,
   getImageDataEntity,
   proxyGetImageData,
+  getMergedImageData,
 };

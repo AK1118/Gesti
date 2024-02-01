@@ -6,7 +6,7 @@ interface OffScreenCanvasBuilderInterface {
   // 构建离屏画布
   buildOffScreenCanvas(width: number, height: number): any;
   // 构建图像
-  buildImage(offScreenCanvas: any, url: string): any;
+  buildImage(url: string,width: number, height: number,offCanvas:any): any;
   // 构建离屏上下文
   buildOffScreenContext(offScreenCanvas: any): Painter | null;
   // 构建绘图上下文
@@ -21,6 +21,12 @@ interface OffScreenCanvasBuilderInterface {
     ex: number,
     ey: number
   ): Promise<ImageData> | null;
+  //获取图片合成时用于装载ImageData的载体，返回 image或者 ImageBitmap 或者其他可以被drawImage渲染的对象
+  buildMergedImage(
+    source: CanvasImageSource | Blob | ImageData,
+    width: number,
+    height: number
+  ): Promise<HTMLImageElement | ImageBitmap>;
 }
 
 // OffScreenCanvasBuilder 类实现 OffScreenCanvasBuilderInterface 接口
@@ -28,8 +34,9 @@ class OffScreenCanvasBuilder implements OffScreenCanvasBuilderInterface {
   private offScreenCanvasBuilder: (width: number, height: number) => any;
   private offScreenContextBuilder: (offScreenCanvas: any) => any;
   private imageBuilder: (
-    offScreenCanvas: any,
-    url: string
+    url: string,
+    width: number,
+    height: number,offCanvas:any
   ) => HTMLImageElement | any;
   private paintBuilder: () =>
     | CanvasRenderingContext2D
@@ -42,7 +49,11 @@ class OffScreenCanvasBuilder implements OffScreenCanvasBuilderInterface {
     ex: number,
     ey: number
   ) => Promise<ImageData> | null;
-
+  private _buildMergedImage: (
+    source: CanvasImageSource | Blob | ImageData,
+    width: number,
+    height: number
+  ) => Promise<HTMLImageElement | ImageBitmap>;
   constructor(option: OffScreenCanvasBuilderOption) {
     // 初始化选项
     this.offScreenCanvasBuilder = option?.offScreenCanvasBuilder;
@@ -51,6 +62,18 @@ class OffScreenCanvasBuilder implements OffScreenCanvasBuilderInterface {
     this.paintBuilder = option?.paintBuilder;
     this._buildImageData = option?.buildImageData;
     this._proxyGetImageData = option?.proxyGetImageData;
+    this._buildMergedImage = option?.buildMergedImage;
+  }
+
+  buildMergedImage(
+    source: CanvasImageSource | Blob | ImageData,
+    width: number,
+    height: number
+  ): Promise<HTMLImageElement | ImageBitmap> {
+    if (!this._buildMergedImage) {
+      return buildMergedImage(source, width, height);
+    }
+    return this._buildMergedImage?.(source, width, height);
   }
 
   // 实现构建离屏画布方法
@@ -61,9 +84,9 @@ class OffScreenCanvasBuilder implements OffScreenCanvasBuilderInterface {
   }
 
   // 实现构建图像方法
-  public buildImage(offScreenCanvas: any, url: string) {
-    if (!this.imageBuilder) return getImage(offScreenCanvas, url);
-    return this.imageBuilder?.(offScreenCanvas, url);
+  public buildImage(url: string, width: number, height: number,offCanvas:any) {
+    if (!this.imageBuilder) return getImage(url, width, height);
+    return this.imageBuilder?.(url, width, height,offCanvas);
   }
 
   // 实现构建离屏上下文方法
@@ -97,7 +120,7 @@ class OffScreenCanvasBuilder implements OffScreenCanvasBuilderInterface {
     sw: number,
     sh: number
   ): Promise<ImageData> | null {
-    if(!this._proxyGetImageData)return proxyGetImageData(ctx,sx, sy, sw, sh);
+    if (!this._proxyGetImageData) return proxyGetImageData(ctx, sx, sy, sw, sh);
     // 实现方法逻辑
     return this._proxyGetImageData?.(ctx, sx, sy, sw, sh);
   }
@@ -145,7 +168,11 @@ const getOffscreenCanvasContext = (offCanvas: OffscreenCanvas): Painter => {
  * @param url 图像的 URL
  * @returns 返回图像对象
  */
-const getImage = (screenCanvas: any, url: string): HTMLImageElement | any => {
+const getImage = (
+  url: string,
+  width: number,
+  height: number
+): HTMLImageElement | any => {
   if (Platform.isBrowser) {
     const image = new Image();
     image.src = url;
@@ -169,5 +196,16 @@ const proxyGetImageData = (
 ): Promise<ImageData> => {
   if (Platform.isBrowser)
     return Promise.resolve(ctx.getImageData(sx, sy, sw, sh));
+};
+
+const buildMergedImage = (
+  source: CanvasImageSource | Blob | ImageData,
+  width: number,
+  height: number
+): Promise<HTMLImageElement | ImageBitmap> => {
+  if (Platform.isBrowser) {
+    return createImageBitmap(source);
+  }
+  return null;
 };
 export default OffScreenCanvasBuilder;

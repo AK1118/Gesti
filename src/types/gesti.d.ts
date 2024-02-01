@@ -112,12 +112,25 @@ export type ExportAllInterceptor = (
 interface OffScreenCanvasBuilderOption {
   offScreenCanvasBuilder?: (width: number, height: number) => any;
   offScreenContextBuilder?: (offScreenCanvas: any) => any;
-  imageBuilder?: (offScreenCanvas: any, url: string) => HTMLImageElement | any;
-  paintBuilder?: () =>  | CanvasRenderingContext2D
-  | OffscreenCanvasRenderingContext2D;
-  buildImageData?:(width:number,height:number)=> ImageData;
+  imageBuilder?: (url: string,width:number,height:number,offCanvas:any) => HTMLImageElement | any;
+  paintBuilder?: () =>
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D;
+  buildImageData?: (width: number, height: number) => ImageData;
   // 代理获取图像数据
-  proxyGetImageData?:(ctx: any,sx:number,sy:number,sw:number,sh:number)=> Promise<ImageData> | null;
+  proxyGetImageData?: (
+    ctx: any,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number
+  ) => Promise<ImageData> | null;
+  //获取图片合成时用于装载ImageData的载体，返回 image或者 ImageBitmap 或者其他可以被drawImage渲染的对象
+  buildMergedImage?: (
+    source: CanvasImageSource | Blob | ImageData,
+    width: number,
+    height: number
+  ) => Promise<HTMLImageElement | ImageBitmap>;
 }
 declare class Vector {
   x: number;
@@ -470,7 +483,6 @@ export abstract class ViewObject {
   //不使用缓存
   public unUseCache(): void;
 }
-
 
 export class XImage {
   constructor(params: createImageOptions);

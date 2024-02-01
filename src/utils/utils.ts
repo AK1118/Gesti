@@ -3,6 +3,7 @@ import ImageChunkConverterWeChat from "./converters/image-chunk-converter-WeChat
 import Platform from "@/core/viewObject/tools/platform";
 import {
   getImage,
+  getMergedImageData,
   getOffscreenCanvasContext,
   getOffscreenCanvasWidthPlatform,
   waitingLoadImg,
@@ -156,16 +157,16 @@ const reverseXImage = async (option: ReverseXImageOption): Promise<XImage> => {
     //微信小程序
     // if (Platform.isWeChatMiniProgram) return reverseWeChat(option);
     const cutter = new CutterH5();
-    const source: ImageData = await cutter.merge(
+    const source: ImageData = cutter.merge(
       fixedWidth,
       fixedHeight,
       chunks
     );
-    const imageBitmap: ImageBitmap = await createImageBitmap(source);
+    const imageBitmap: ImageBitmap = await getMergedImageData(source,fixedWidth,fixedWidth) as any;
     const ximage = new XImage({
       data: imageBitmap,
-      width: imageBitmap.width,
-      height: imageBitmap.height,
+      width: fixedWidth,
+      height: fixedHeight,
     });
     return ximage;
   }
@@ -201,8 +202,8 @@ const reverseXImage = async (option: ReverseXImageOption): Promise<XImage> => {
 const fetchXImage = async (option: ReverseXImageOption): Promise<XImage> => {
   const { url, data, fixedHeight, fixedWidth } = option;
   const platform: PlatformType = Platform.platform;
-  const offCanvas = getOffscreenCanvasWidthPlatform(fixedWidth, fixedHeight);
-  const image = getImage(offCanvas, url);
+   const offCanvas = getOffscreenCanvasWidthPlatform(fixedWidth, fixedHeight);
+  const image =await getImage(url,fixedHeight,fixedWidth,offCanvas);
   if (image) {
     await waitingLoadImg(image);
     return new XImage({
