@@ -68,6 +68,14 @@ class Painter implements Painter {
   drawSync() {
     (this.paint as any)?.draw?.(this.paint);
   }
+  private _hasDrawFunction: boolean = null;
+  //只有uniapp才需要draw
+  public get hasDrawFunction(): boolean {
+    if (this._hasDrawFunction === null) {
+      this._hasDrawFunction = !!(this.paint as any)?.draw;
+    }
+    return this._hasDrawFunction;
+  }
   draw(): Promise<void> {
     return new Promise((r) => {
       const p = this.paint as any;

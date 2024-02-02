@@ -44,13 +44,22 @@ import Gesti, {
 import { BoxDecorationOption } from "@/types/graphics";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
+
+/**
+ * B：3
+ * A：2
+ * 
+ * B缩放因子比A大，导致A渲染B数据变得很小，
+ * 
+ * 
+ */
 Gesti.installPlugin("pako", require("pako"));
 
 const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const img2: HTMLImageElement = document.querySelector("#bg");
 
 const dev = window.devicePixelRatio;
-console.log(dev);
+console.log("DPR：",dev);
 canvas.width = 300 * dev;
 canvas.height = 300 * dev;
 canvas.style.width = 300 + "px";
@@ -59,7 +68,6 @@ const g = canvas.getContext("2d", {
   willReadFrequently: true,
 });
 // g.imageSmoothingEnabled = false;
-g.scale(dev, dev);
 
 Gesti.installPlugin(
   "offScreenBuilder",
@@ -198,9 +206,9 @@ const rect: Rectangle = new Rectangle({
   height: screenUtil1.fullWidth,
   decoration: {
     borderRadius: screenUtil1.setWidth(50),
-    backgroundColor: "skyblue",
-    gradient: gradient,
-    backgroundImage: ximage,
+    backgroundColor: "#ccc",
+    // gradient: gradient,
+    // backgroundImage: ximage,
   },
 });
 console.log(gesti);
@@ -298,28 +306,29 @@ canvas2.width = 200 * dev;
 canvas2.height = 200 * dev;
 canvas2.style.width = 200 + "px";
 canvas2.style.height = 200 + "px";
-canvas3.width = 100;
-canvas3.height = 100;
+canvas3.width = 1;
+canvas3.height = 1;
 const gesti2 = createGesti();
 const gesti3 = createGesti();
-const screenUtil2 = new ScreenUtils({
-  canvasHeight: canvas2.height,
-  canvasWidth: canvas2.width,
-});
 const controller2 = gesti2.initialization({
   renderContext: g2,
   rect: {
-    x:canvas2.getBoundingClientRect().left,
-    y:canvas2.getBoundingClientRect().top,
-    canvasWidth: canvas2.width * dev,
-    canvasHeight: canvas2.height * dev,
+    x:0,
+    y:canvas.height,
+    canvasWidth: canvas2.width,
+    canvasHeight: canvas2.height,
   },
 });
+console.log(controller2);
+
 controller2.generateScreenUtils({
   canvasWidth:canvas2.width,
   canvasHeight:canvas2.height,
   devicePixelRatio:dev,
+  designWidth: 750,
+  designHeight: 750,
 })
+// gesti2.debug=true
 gesti3.initialization({
   renderContext: g3,
   rect: {

@@ -158,18 +158,24 @@ abstract class ImageToolkitBase {
   public getViewObjects() {
     return this.ViewObjectList;
   }
+  //上一次是否渲染完成
+  private preRenderFinished: boolean = true;
   public render() {
     /**
      * 在使用绘制对象时，根据值来判断是否禁止重绘
      */
     this.debug("Update the Canvas");
     this.callHook("onUpdate", null);
-    this.paint.clearRect(
-      0,
-      0,
-      this.canvasRect.size.width,
-      this.canvasRect.size.height
-    );
+    if (this.preRenderFinished) {
+      this.preRenderFinished = !this.paint.hasDrawFunction;
+      this.paint.clearRect(
+        0,
+        0,
+        this.canvasRect.size.width,
+        this.canvasRect.size.height
+      );
+    }
+
     //当前显示标记数组初始化数据，且需要实时更新
     if (this.currentViewObjectState.length != this.ViewObjectList.length) {
       this.currentViewObjectState.push(1);
@@ -188,13 +194,19 @@ abstract class ImageToolkitBase {
         //扫除
         this.cleaning(item);
         item.render(this.paint);
-        this.paint.drawSync();
+        if (this.paint.hasDrawFunction)
+          this.paint.draw().then((e) => {
+            this.preRenderFinished = true;
+          });
       } else if (this.currentViewObjectState[ndx] == 1) {
         //标记过后不会再次标记
         this.currentViewObjectState[ndx] = 0;
         item.cancel();
         this.callHook("onHide", item);
-        this.paint.drawSync();
+        if (this.paint.hasDrawFunction)
+          this.paint.draw().then((e) => {
+            this.preRenderFinished = true;
+          });
       }
     });
     this.paint.restore();
@@ -236,8 +248,16 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     return obj;
   }
   generateScreenUtils(option: ScreenUtilOption): ScreenUtils {
+    //二次生成得时候需要重置缩放
+    if (this.screenUtils) {
+      this.paint.scale(this.screenUtils.devScale, this.screenUtils.devScale);
+    }
     //只要生成了必须使用屏幕适配器
     this.screenUtils = new ScreenUtils(option);
+    this.paint.scale(
+      this.screenUtils.devicePixelRatio,
+      this.screenUtils.devicePixelRatio
+    );
     return this.screenUtils;
   }
 
@@ -434,6 +454,8 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
           /**
            * - 双方设计稿大小必须一致
            * - 计算新的屏幕适配尺寸之前必须根据适配因子还原绝对大小
+           * - dpr双方必须一致   收方dpr等于送方dpr
+           *
            */
           this.screenUtils = this.generateScreenUtils({
             ...info.screen,

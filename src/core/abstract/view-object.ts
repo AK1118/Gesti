@@ -176,17 +176,21 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
   public setSelectedBorder(option: SelectedBorderStyle): void {
     this.selectedBorderColor = option?.borderColor || "#b2ccff";
     this.selectedLineDash = option?.lineDash || null;
-    this.selectedLineWidth = option?.lineWidth || 2
+    this.selectedLineWidth = option?.lineWidth || 2;
     this.selectedBorderPadding = option?.padding || 3;
   }
   public drawSelectedBorder(paint: Painter, size: Size): void {
     const screenUtils = this.getKit().getScreenUtil();
-    const padding = screenUtils.setSp(this.selectedBorderPadding);
+    const padding = screenUtils
+      ? screenUtils.setSp(this.selectedBorderPadding)
+      : this.selectedBorderPadding;
     paint.save();
     paint.beginPath();
-    paint.lineWidth = screenUtils.setSp(this.selectedLineWidth);
+    paint.lineWidth = screenUtils
+      ? screenUtils.setSp(this.selectedLineWidth)
+      : this.selectedLineWidth;
     paint.strokeStyle = this.selectedBorderColor;
-    if(this.selectedLineDash){
+    if (this.selectedLineDash) {
       paint.setLineDash(this.selectedLineDash);
     }
     paint.strokeRect(
