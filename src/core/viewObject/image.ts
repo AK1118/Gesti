@@ -60,7 +60,7 @@ class ImageBox extends ViewObject {
     const { width, height } = xImage.toJson();
     const oldPosition: Vector = this.rect.position.copy();
     this.rect.setPosition(oldPosition);
-    this.rect.setSize(width, height);
+    this.rect.setSize(width*this.absoluteScale, height*this.absoluteScale);
     this.forceUpdate();
   }
 

@@ -69,6 +69,7 @@ const g = canvas.getContext("2d", {
 });
 // g.imageSmoothingEnabled = false;
 
+
 Gesti.installPlugin(
   "offScreenBuilder",
   new OffScreenCanvasGenerator({
@@ -224,16 +225,17 @@ rect.setId("第三");
 rect.setLayer(9);
 rect.installButton(drag); 
 const buttons = [
-  new HorizonButton("left"),
-  new VerticalButton("top"),
-  new VerticalButton("bottom"),
-  new HorizonButton("right"),
-  new DragButton(),
-  new CloseButton(),
-  new SizeButton(Alignment.topLeft),
-  new MirrorButton({
-    alignment: Alignment.bottomLeft,
-  }),
+  // new HorizonButton("left"),
+  // new VerticalButton("top"),
+  // new VerticalButton("bottom"),
+  // new HorizonButton("right"),
+  // new DragButton(),
+  // new CloseButton(),
+  // new SizeButton(Alignment.topLeft),
+  // new MirrorButton({
+  //   alignment: Alignment.bottomLeft,
+  // }),
+  new SizeButton(Alignment.bottomRight),
 ];
 buttons.forEach((_) => _.setSenseRadius(screenUtil1.setSp(50)));
 rect.installMultipleButtons(buttons);

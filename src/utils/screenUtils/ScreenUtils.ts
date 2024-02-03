@@ -50,6 +50,9 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
       : this.scaleWidth;
     this.computeDevicePixelRatio(devicePixelRatio);
   }
+  /**
+   * 计算缩放因子的倒数控制画布缩放
+   */
   private computeDevicePixelRatio(devicePixelRatio: number): void {
     this._devicePixelRatio = devicePixelRatio;
     this._devScale = 1 / this._devicePixelRatio;
@@ -97,6 +100,11 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
   }
   public restoreFromFactorWidthText(fontSize: number): number {
     return fontSize / this.scaleText;
+  }
+
+  public setDevicePixelRatio(devicePixelRatio:number):void{
+    this._devicePixelRatio=devicePixelRatio;
+    this.computeDevicePixelRatio(devicePixelRatio);
   }
 }
 

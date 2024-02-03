@@ -86,7 +86,10 @@ const getImage = (url: string,width:number,height:number,offCanvas:any
   if (offScreenContextBuilder) {
     return offScreenContextBuilder.buildImage(url,width,height,offCanvas);
   } else if (Platform.isBrowser) {
-    return new Image();
+    const img = new Image();
+    img.src = url;
+    img.crossOrigin = "anonymous";
+    return img;
   } else {
     return null;
   }

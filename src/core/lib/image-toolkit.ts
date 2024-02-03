@@ -650,9 +650,9 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.eventHandler.disable();
   }
   public onDown(v: GestiEventParams): void {
-    this.debug(["Event Down,", v]);
     this.eventHandlerState = EventHandlerState.down;
     const event: Vector | Vector[] = this.correctEventPosition(v);
+    this.debug(["Event Down,", event]);
 
     //手势解析处理
     this.gesture.onDown(this.selectedViewObject, event);
@@ -732,10 +732,10 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.render();
   }
   public onMove(v: GestiEventParams): void {
-    this.debug(["Event Move,", v]);
+   
     if (this.eventHandlerState === EventHandlerState.down) {
       const event: Vector | Vector[] = this.correctEventPosition(v);
-
+      this.debug(["Event Move,", event]);
       //绘制处理,当down在已被选中的图册上时不能绘制
       if (this.writeFactory.current) {
         this.render();
@@ -773,8 +773,8 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     }
   }
   public onUp(v: GestiEventParams): void {
-    this.debug(["Event Up,", v]);
     const event: Vector | Vector[] = this.correctEventPosition(v);
+    this.debug(["Event Up,", event]);
     //判断是否选中对象
     this.eventHandlerState = EventHandlerState.up;
     //手势解析处理
