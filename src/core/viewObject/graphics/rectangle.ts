@@ -47,6 +47,7 @@ class Rectangle extends GraphicsBase<
     throw new Error("Method not implemented.");
   }
   setDecoration(option: BoxDecorationOption): void {}
+  
   drawImage(paint: Painter): void {
     this.renderGraphics(paint);
   }

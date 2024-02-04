@@ -175,13 +175,13 @@ const getImage = (
 ): HTMLImageElement | any => {
   if (Platform.isBrowser) {
     const image = new Image();
+    image.crossOrigin = "anonymous";
     image.src = url;
     return image;
   }
 };
 
 const getImageDataEntity = (width: number, height: number): ImageData => {
-  if (Platform.isBrowser)
     return new ImageData(width, height, {
       colorSpace: "srgb",
     });

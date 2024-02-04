@@ -166,15 +166,16 @@ abstract class ImageToolkitBase {
      */
     this.debug("Update the Canvas");
     this.callHook("onUpdate", null);
-    if (this.preRenderFinished) {
-      this.preRenderFinished = !this.paint.hasDrawFunction;
-      this.paint.clearRect(
-        0,
-        0,
-        this.canvasRect.size.width,
-        this.canvasRect.size.height
-      );
-    }
+    // if (this.preRenderFinished) {
+    //   this.preRenderFinished = !this.paint.hasDrawFunction;
+      
+    // }
+    this.paint.clearRect(
+      0,
+      0,
+      this.canvasRect.size.width,
+      this.canvasRect.size.height
+    );
 
     //当前显示标记数组初始化数据，且需要实时更新
     if (this.currentViewObjectState.length != this.ViewObjectList.length) {
@@ -194,21 +195,24 @@ abstract class ImageToolkitBase {
         //扫除
         this.cleaning(item);
         item.render(this.paint);
-        if (this.paint.hasDrawFunction)
-          this.paint.draw().then((e) => {
-            this.preRenderFinished = true;
-          });
+        this.paint.drawSync();
+        // if (this.paint.hasDrawFunction)
+        //   this.paint.draw().then((e) => {
+        //     this.preRenderFinished = true;
+        //   });
       } else if (this.currentViewObjectState[ndx] == 1) {
         //标记过后不会再次标记
         this.currentViewObjectState[ndx] = 0;
         item.cancel();
         this.callHook("onHide", item);
-        if (this.paint.hasDrawFunction)
-          this.paint.draw().then((e) => {
-            this.preRenderFinished = true;
-          });
+        this.paint.drawSync();
+        // if (this.paint.hasDrawFunction)
+        //   this.paint.draw().then((e) => {
+        //     this.preRenderFinished = true;
+        //   });
       }
     });
+    this.selectedViewObject?.performRenderSelected(this.paint);
     this.paint.restore();
   }
   public getScreenUtil(): ScreenUtils {

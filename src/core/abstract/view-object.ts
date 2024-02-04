@@ -144,6 +144,11 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
     paint.globalAlpha = this.opacity;
     this.renderImageOrCache(paint);
     //选中和不是缓存时才渲染
+    this.renderSelected(paint, isCache);
+    paint.restore();
+    paint.closePath();
+  }
+  private renderSelected(paint: Painter, isCache?: boolean) {
     if (this.selected && !isCache) {
       //边框
       this.drawSelectedBorder(paint, this.size);
@@ -156,8 +161,13 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
       this.updateFuncButton(paint);
       paint.restore();
     }
+  }
+  public performRenderSelected(paint: Painter): void {
+    paint.save();
+    paint.translate(this.positionX, this.positionY);
+    paint.rotate(this.rect.getAngle);
+    this.renderSelected(paint,false);
     paint.restore();
-    paint.closePath();
   }
   /**
    * 该方法需要子类实现

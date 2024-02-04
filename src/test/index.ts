@@ -44,15 +44,14 @@ import Gesti, {
 import { BoxDecorationOption } from "@/types/graphics";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
-
 /**
  * 假如全屏 360，    分成750份
  * dpr=3
- * 
+ *
  * 手机大小 为 400
  * 画布样式为 390*390
- * 但是dpr为400*3=1200，表示中心点在  600,需要解决这个偏移量，因为偏移量其实为 200*200，偏移量比值，  
- * 
+ * 但是dpr为400*3=1200，表示中心点在  600,需要解决这个偏移量，因为偏移量其实为 200*200，偏移量比值，
+ *
  */
 Gesti.installPlugin("pako", require("pako"));
 
@@ -60,7 +59,7 @@ const canvas: HTMLCanvasElement = document.querySelector("#canvas");
 const img2: HTMLImageElement = document.querySelector("#bg");
 
 const dev = window.devicePixelRatio;
-console.log("DPR：",dev);
+console.log("DPR：", dev);
 canvas.width = 300 * dev;
 canvas.height = 300 * dev;
 canvas.style.width = 300 + "px";
@@ -69,7 +68,6 @@ const g = canvas.getContext("2d", {
   // willReadFrequently: true,
 });
 // g.imageSmoothingEnabled = false;
-
 
 Gesti.installPlugin(
   "offScreenBuilder",
@@ -84,7 +82,7 @@ Gesti.installPlugin(
       return offScreenCanvas.getContext("2d");
     },
     //图片构造器
-    imageBuilder: ( url: string,width: number, height: number) => {
+    imageBuilder: (url: string, width: number, height: number) => {
       console.log("图片", url);
       const img = new Image();
       img.src = url;
@@ -103,8 +101,8 @@ console.log(canvas.width, canvas.height);
 gesti.initialization({
   renderContext: g,
   rect: {
-    canvasWidth:canvas.width,
-    canvasHeight:canvas.height,
+    canvasWidth: canvas.width,
+    canvasHeight: canvas.height,
   },
 });
 // gesti.debug=true;
@@ -121,19 +119,23 @@ const img: HTMLImageElement = document.querySelector("#dog");
 // controller.setScreenUtil();
 const ximage = new XImage({
   data: img,
-  width: screenUtil1.fullWidth,
-  height: screenUtil1.fullHeight,
+  width: img.width,
+  height: img.height,
   scale: 1,
-  url: img.src,
+  // url: img.src,
 });
 
 const imageBox = new ImageBox(ximage);
+imageBox.setSize({
+  width: screenUtil1.fullWidth,
+  height: screenUtil1.fullHeight,
+});
 imageBox.setId("第一");
 doCenter(imageBox);
 loadToGesti(imageBox);
 controller.layerTop(imageBox);
 imageBox.toBackground();
-imageBox.setLayer(10)
+imageBox.setLayer(10);
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
  to explain how we recommend using Redux today. The show includes
@@ -144,18 +146,17 @@ const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
    recommend using Redux today. The show includes a live-coded example
    app that shows how to use Redux Toolkit and React-Redux hooks with
    TypeScript, as well as the new RTK Query data fetching APIs.`;
-const str1 = `你好你好，
-这是一篇英语短文12
-34567890`;
+const str1 = `祝你前程似锦`;
 const textBox2 = new TextBox(str1, {
-  color: "red",
+  color: "white",
   fontSize: screenUtil1.setSp(60),
-  weight:'bold',
-   shadowBlur:1,
-  shadowColor:"#a12528",
-  shadowOffsetX:2,
-  shadowOffsetY:2,
+  weight: "bold",
+  shadowBlur: 1,
+  shadowColor: "#a12528",
+  shadowOffsetX: 2,
+  shadowOffsetY: 2,
   maxWidth: 10000,
+  fontFamily: "鸿雷行书简体",
 });
 const textBox = new TextBox(str1, {
   color: "red",
@@ -164,26 +165,39 @@ const textBox = new TextBox(str1, {
   // backgroundColor:'white',
   maxWidth: 300,
   fontStyle: "italic",
-  fontFamily: "楷体",
+  fontFamily: "鸿雷行书简体",
 });
 
-textBox2.installButton(new CustomButton({
-  child:new TextBox("点击")
-}));
-textBox2.setDecoration({
-  // backgroundImage: ximage,
-  // gradient: new LineGradientDecoration({
-  //   begin: Alignment.topLeft,
-  //   end: Alignment.bottomRight,
-  //   colors: ["orange", "white", "yellow"],
-  // }),
+const huanzi = new CustomButton({
+  child: new TextBox("换字", {
+    fontSize: screenUtil1.setSp(26),
+  }),
 });
-textBox2.setId("第二");
+huanzi.setSenseRadius(screenUtil1.setSp(36));
+huanzi.setId("huanzi1");
+textBox2.installMultipleButtons(
+  [
+    new DragButton(),
+    new RotateButton({
+      alignment: Alignment.topLeft,
+    }),
+    new MirrorButton({
+      alignment: Alignment.bottomLeft,
+    }),
+    huanzi,
+  ].map((_) => {
+    _.setSenseRadius(screenUtil1.setSp(50));
+    return _;
+  })
+);
+textBox2.setId("text1");
 // textBox2.setDecoration({
 //   backgroundImage:null,
 // })
 loadToGesti(textBox2);
-textBox2.toCenter()
+textBox2.toCenter();
+textBox2.setLayer(11);
+
 const gradient = new LineGradientDecoration({
   colors: ["white", "black", "red"],
   begin: Alignment.topLeft,
@@ -192,13 +206,18 @@ const gradient = new LineGradientDecoration({
 console.log("序列", JSON.stringify(gradient));
 
 const rect: Rectangle = new Rectangle({
-  width: screenUtil1.fullWidth,
-  height: screenUtil1.fullWidth,
+  width: screenUtil1.setWidth(750),
+  height: screenUtil1.setHeight(750),
   decoration: {
-    borderRadius: screenUtil1.setWidth(50),
+    // borderRadius: screenUtil1.setWidth(50),
     backgroundColor: "#ccc",
     // gradient: gradient,
-    // backgroundImage: ximage,
+    backgroundImage: new XImage({
+      data: img2,
+      width: img2.width,
+      height: img2.height,
+      url: img2.src,
+    }),
   },
 });
 console.log(gesti);
@@ -210,25 +229,42 @@ const drag = new DragButton({
     alignment: Alignment.bottomRight,
   },
 });
-rect.setId("第三");
+
 rect.setLayer(9);
-rect.installButton(drag); 
+rect.installButton(drag);
+const huantu = new CustomButton({
+  child: new TextBox("换图", {
+    fontSize: screenUtil1.setSp(26),
+  }),
+});
+huantu.setSenseRadius(screenUtil1.setSp(36));
+huantu.setId("huantu1");
 const buttons = [
-  // new HorizonButton("left"),
-  // new VerticalButton("top"),
-  // new VerticalButton("bottom"),
-  // new HorizonButton("right"),
-  // new DragButton(),
-  // new CloseButton(),
-  // new SizeButton(Alignment.topLeft),
-  // new MirrorButton({
-  //   alignment: Alignment.bottomLeft,
-  // }),
-  new SizeButton(Alignment.bottomRight),
+  huantu,
+  new RotateButton({
+    alignment: Alignment.topLeft,
+  }),
+  new DragButton(),
+  new MirrorButton({
+    alignment: Alignment.bottomLeft,
+  }),
 ];
 buttons.forEach((_) => _.setSenseRadius(screenUtil1.setSp(50)));
-rect.installMultipleButtons(buttons);
+// rect.installMultipleButtons(buttons);
 // loadToGesti(rect);
+
+const imageBox2 = new ImageBox(
+  new XImage({
+    data: img2,
+    width: img2.width,
+    height: img2.height,
+    url: img2.src,
+    scale:.5,
+  })
+);
+imageBox2.installMultipleButtons(buttons);
+imageBox2.setId("image1");
+loadToGesti(imageBox2);
 
 const polygon = new Polygon({
   radius: screenUtil1.setSp(750),
@@ -243,22 +279,25 @@ const polygon = new Polygon({
     // backgroundImage:ximage
   },
 });
-const label:TextBox=new TextBox("你好",{
-  color:'red',
-  fontSize:screenUtil1.setSp(26),
+const label: TextBox = new TextBox("你好", {
+  color: "red",
+  fontSize: screenUtil1.setSp(26),
 });
-const customButton=new CustomButton({
-  child:label,onClick:()=>{
-    const duobianx:Polygon=controller.getViewObjectByIdSync("duobianx");
+const customButton = new CustomButton({
+  child: label,
+  onClick: () => {
+    const duobianx: Polygon = controller.getViewObjectByIdSync("duobianx");
     duobianx.setDecoration({
-      backgroundColor:['red','orange','skyblue','#ffffff'][~~(Math.random()*3)]
+      backgroundColor: ["red", "orange", "skyblue", "#ffffff"][
+        ~~(Math.random() * 3)
+      ],
     });
     duobianx.setCount(Math.floor(Math.random() * (10 - 3 + 1)) + 3);
   },
-  option:{
-    alignment:Alignment.topRight
-  }
-},);
+  option: {
+    alignment: Alignment.topRight,
+  },
+});
 customButton.setId("huanbian");
 label.installButton(new DragButton());
 polygon.setId("duobianx");
@@ -304,8 +343,8 @@ const gesti3 = createGesti();
 const controller2 = gesti2.initialization({
   renderContext: g2,
   rect: {
-    x:0,
-    y:canvas.height,
+    x: 0,
+    y: canvas.height,
     canvasWidth: canvas2.width,
     canvasHeight: canvas2.height,
   },
@@ -313,18 +352,18 @@ const controller2 = gesti2.initialization({
 console.log(controller2);
 
 controller2.generateScreenUtils({
-  canvasWidth:canvas2.width,
-  canvasHeight:canvas2.height,
-  devicePixelRatio:dev,
+  canvasWidth: canvas2.width,
+  canvasHeight: canvas2.height,
+  devicePixelRatio: dev,
   designWidth: 750,
   designHeight: 750,
-})
+});
 // gesti2.debug=true
 gesti3.initialization({
   renderContext: g3,
   rect: {
-    x:canvas3.getBoundingClientRect().left,
-    y:canvas3.getBoundingClientRect().top,
+    x: canvas3.getBoundingClientRect().left,
+    y: canvas3.getBoundingClientRect().top,
     canvasWidth: canvas3.width * dev,
     canvasHeight: canvas3.height * dev,
   },
@@ -344,21 +383,20 @@ document.getElementById("import").addEventListener("click", () => {
   importAll(
     a,
     async (arr) => {
-      arr.forEach(_=>{
-       const huanbianButton= _.getButtonByIdSync<CustomButton>("huanbian");
-       if(huanbianButton){
-        huanbianButton.onClick=()=>{
-          alert("哈哈哈");
+      arr.forEach((_) => {
+        const huanbianButton = _.getButtonByIdSync<CustomButton>("huanbian");
+        if (huanbianButton) {
+          huanbianButton.onClick = () => {
+            alert("哈哈哈");
+          };
         }
-       }
-      })
+      });
       return Promise.resolve(arr);
     },
     gesti2
   ).then((e) => {
     console.log(gesti2.controller.getScreenUtil());
     console.log("导入成功");
-    
   });
   // importAll(a, null, gesti3).then((e) => {
   //   console.log("导入成功");
@@ -378,6 +416,7 @@ document.getElementById("input").addEventListener("input", (e: any) => {
   textBox2.setText(e.target?.value);
   console.log(e.target?.value);
 });
+controller.render();
 console.log(controller.getAllViewObject());
 // const box1 = new Rectangle({
 //   width: screenUtil1.setWidth(300),
