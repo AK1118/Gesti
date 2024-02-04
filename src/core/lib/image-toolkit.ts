@@ -855,8 +855,8 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
          * ### 适配屏幕，触摸点也需要适配
          */
         if (this.screenUtils) {
-          item.x *= this.screenUtils.devicePixelRatio;
-          item.y *= this.screenUtils.devicePixelRatio;
+          item.x *= this.screenUtils.devicePixelRatio*this.screenUtils.deviceCanvasRatio.widthRatio;
+          item.y *= this.screenUtils.devicePixelRatio*this.screenUtils.deviceCanvasRatio.heightRatio;
         }
 
         _vector.push(item.sub(this.offset));
@@ -867,8 +867,8 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
        * ### 适配屏幕，触摸点也需要适配
        */
       const v = vector as unknown as Vector;
-      v.x *= this.screenUtils.devicePixelRatio;
-      v.y *= this.screenUtils.devicePixelRatio;
+      v.x *= this.screenUtils.devicePixelRatio*this.screenUtils.deviceCanvasRatio.widthRatio;
+      v.y *= this.screenUtils.devicePixelRatio*this.screenUtils.deviceCanvasRatio.heightRatio;
       return v.sub(this.offset);
     }
     return vector.sub(this.offset);

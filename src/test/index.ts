@@ -46,11 +46,12 @@ import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
 
 /**
- * B：3
- * A：2
+ * 假如全屏 360，    分成750份
+ * dpr=3
  * 
- * B缩放因子比A大，导致A渲染B数据变得很小，
- * 
+ * 手机大小 为 400
+ * 画布样式为 390*390
+ * 但是dpr为400*3=1200，表示中心点在  600,需要解决这个偏移量，因为偏移量其实为 200*200，偏移量比值，  
  * 
  */
 Gesti.installPlugin("pako", require("pako"));
@@ -65,7 +66,7 @@ canvas.height = 300 * dev;
 canvas.style.width = 300 + "px";
 canvas.style.height = 300 + "px";
 const g = canvas.getContext("2d", {
-  willReadFrequently: true,
+  // willReadFrequently: true,
 });
 // g.imageSmoothingEnabled = false;
 
@@ -102,8 +103,8 @@ console.log(canvas.width, canvas.height);
 gesti.initialization({
   renderContext: g,
   rect: {
-    canvasWidth: canvas.width,
-    canvasHeight: canvas.height,
+    canvasWidth:canvas.width,
+    canvasHeight:canvas.height,
   },
 });
 // gesti.debug=true;
@@ -120,31 +121,19 @@ const img: HTMLImageElement = document.querySelector("#dog");
 // controller.setScreenUtil();
 const ximage = new XImage({
   data: img,
-  width: screenUtil1.setWidth(img.width),
-  height: screenUtil1.setHeight(img.height),
+  width: screenUtil1.fullWidth,
+  height: screenUtil1.fullHeight,
   scale: 1,
   url: img.src,
 });
 
 const imageBox = new ImageBox(ximage);
-setTimeout(() => {
-  const ximage2 = new XImage({
-    data: img2,
-    width: screenUtil1.setWidth(img2.width),
-    height: screenUtil1.setHeight(img2.height),
-    scale: 1,
-    url: img2.src,
-  });
-  // imageBox.replaceXImage(ximage2);
-  imageBox.setDecoration<BoxDecorationOption>({
-    // borderRadius: screenUtil1.setSp(10),
-   borderRadius:screenUtil1.setSp(50),
-  });
-}, 3000);
 imageBox.setId("第一");
 doCenter(imageBox);
-//  loadToGesti(imageBox);
-
+loadToGesti(imageBox);
+controller.layerTop(imageBox);
+imageBox.toBackground();
+imageBox.setLayer(10)
 const str = `你好，这是一篇英语短文1234567890 😄 ⚪ Redux
  maintainer Mark Erikson appeared on the "Learn with Jason" show
  to explain how we recommend using Redux today. The show includes
@@ -239,7 +228,7 @@ const buttons = [
 ];
 buttons.forEach((_) => _.setSenseRadius(screenUtil1.setSp(50)));
 rect.installMultipleButtons(buttons);
-loadToGesti(rect);
+// loadToGesti(rect);
 
 const polygon = new Polygon({
   radius: screenUtil1.setSp(750),

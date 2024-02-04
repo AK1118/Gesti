@@ -28,6 +28,10 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
   private readonly scaleText: number;
   private readonly designWidth: number;
   private readonly designHeight: number;
+  private readonly _deviceCanvasRatio: {
+    widthRatio: number;
+    heightRatio: number;
+  };
   private _devScale: number = 1;
   private _devicePixelRatio: number = 1;
   constructor(option?: ScreenUtilOption) {
@@ -48,6 +52,10 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
     this.scaleText = minTextAdapt
       ? Math.min(this.scaleWidth, this.scaleHeight)
       : this.scaleWidth;
+    this._deviceCanvasRatio = option.deviceCanvasRatio || {
+      widthRatio: 1,
+      heightRatio: 1,
+    };
     this.computeDevicePixelRatio(devicePixelRatio);
   }
   /**
@@ -57,7 +65,12 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
     this._devicePixelRatio = devicePixelRatio;
     this._devScale = 1 / this._devicePixelRatio;
   }
-
+  public get deviceCanvasRatio(): {
+    widthRatio: number;
+    heightRatio: number;
+  } {
+    return this._deviceCanvasRatio;
+  }
   public get devScale(): number {
     return this._devScale;
   }
@@ -102,9 +115,9 @@ class ScreenUtils implements Serializable<ScreenUtilExportEntity> {
     return fontSize / this.scaleText;
   }
 
-  public setDevicePixelRatio(devicePixelRatio:number):void{
-    this._devicePixelRatio=devicePixelRatio;
-    this.computeDevicePixelRatio(devicePixelRatio);
+  public setDevicePixelRatio(devicePixelRatio: number): void {
+    this._devicePixelRatio = devicePixelRatio;
+    // this.computeDevicePixelRatio(devicePixelRatio);
   }
 }
 

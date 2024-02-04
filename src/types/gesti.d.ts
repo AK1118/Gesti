@@ -112,11 +112,16 @@ export type ExportAllInterceptor = (
 interface OffScreenCanvasBuilderOption {
   offScreenCanvasBuilder?: (width: number, height: number) => any;
   offScreenContextBuilder?: (offScreenCanvas: any) => any;
-  imageBuilder?: (url: string,width:number,height:number,offCanvas:any) => HTMLImageElement | any;
+  imageBuilder?: (
+    url: string,
+    width: number,
+    height: number,
+    offCanvas: any
+  ) => HTMLImageElement | any;
   paintBuilder?: () =>
     | CanvasRenderingContext2D
     | OffscreenCanvasRenderingContext2D;
-  buildImageData?: (ctx:any,width: number, height: number) => ImageData;
+  buildImageData?: (ctx: any, width: number, height: number) => ImageData;
   // 代理获取图像数据
   proxyGetImageData?: (
     ctx: any,
@@ -592,7 +597,13 @@ export interface CanvasSizeOption {
 }
 
 export interface ScreenUtilOption extends DesignSizeOption, CanvasSizeOption {
+  //dpr
   devicePixelRatio?: number;
+  //设备与画布比值
+  deviceCanvasRatio?: {
+    widthRatio: number;
+    heightRatio: number;
+  };
   /**
    * - 是否使用宽高中的最小值计算文字大小，默认 true
    */
