@@ -487,6 +487,10 @@ export abstract class ViewObject {
   public useCache(): void;
   //不使用缓存
   public unUseCache(): void;
+  //使固定，不能被手指拖拽操作等
+  public makeFixed(): void;
+  //解除固定
+  public makeUnfixed(): void;
 }
 
 export class XImage {

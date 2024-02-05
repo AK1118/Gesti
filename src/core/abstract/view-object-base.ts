@@ -197,6 +197,12 @@ abstract class BaseViewObject<
   public toBackground(): void {
     this._background = true;
   }
+  public makeFixed(): void {
+    this.toBackground();
+  }
+  public makeUnfixed(): void {
+    this.unBackground();
+  }
   get isBackground(): boolean {
     return this._background;
   }

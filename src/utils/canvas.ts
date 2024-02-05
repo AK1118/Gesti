@@ -62,11 +62,17 @@ const getOffscreenCanvasContext = (offCanvas: any): Painter => {
  * @param img 图片对象
  * @returns 返回一个 Promise，在图片加载完成后 resolve
  */
-const waitingLoadImg = (img): Promise<void> => {
-  return new Promise((resolve) => {
-    if (img?.onload != undefined) img.onload = () => resolve();
-    else {
-      resolve();
+const waitingLoadImg = async (img: HTMLImageElement): Promise<void> => {
+  return new Promise((r, v) => {
+    if (img && "onload" in img) {
+      img.onload = () => {
+        r();
+      };
+      setTimeout(() => {
+        r();
+      }, 3000);
+    } else {
+      r();
     }
   });
 };
@@ -77,14 +83,18 @@ const waitingLoadImg = (img): Promise<void> => {
  * @param url 图像的 URL
  * @returns 返回图像对象
  */
-const getImage = (url: string,width:number,height:number,offCanvas:any
+const getImage = (
+  url: string,
+  width: number,
+  height: number,
+  offCanvas: any
 ): HTMLImageElement | any => {
   const offScreenContextBuilder: OffScreenCanvasGenerator =
     Plugins.getPluginByKey<OffScreenCanvasGenerator>("offScreenBuilder");
 
   // 根据插件情况返回不同的图像对象
   if (offScreenContextBuilder) {
-    return offScreenContextBuilder.buildImage(url,width,height,offCanvas);
+    return offScreenContextBuilder.buildImage(url, width, height, offCanvas);
   } else if (Platform.isBrowser) {
     const img = new Image();
     img.src = url;
@@ -106,10 +116,14 @@ const getPaintContext = (): Painter => {
   return offScreenContextBuilder.buildPaintContext();
 };
 
-const getImageDataEntity = (ctx:any,width: number, height: number): ImageData => {
+const getImageDataEntity = (
+  ctx: any,
+  width: number,
+  height: number
+): ImageData => {
   const offScreenContextBuilder: OffScreenCanvasGenerator =
     Plugins.getPluginByKey<OffScreenCanvasGenerator>("offScreenBuilder");
-  return offScreenContextBuilder.buildImageData(ctx,width, height);
+  return offScreenContextBuilder.buildImageData(ctx, width, height);
 };
 
 const proxyGetImageData = (

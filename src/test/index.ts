@@ -42,6 +42,7 @@ import Gesti, {
   XImage,
 } from "@/index";
 import { BoxDecorationOption } from "@/types/graphics";
+import { waitingLoadImg } from "@/utils/canvas";
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
 /**
@@ -132,7 +133,7 @@ imageBox.setSize({
 });
 imageBox.setId("第一");
 doCenter(imageBox);
-loadToGesti(imageBox);
+// loadToGesti(imageBox);
 controller.layerTop(imageBox);
 imageBox.toBackground();
 imageBox.setLayer(10);
@@ -194,7 +195,7 @@ textBox2.setId("text1");
 // textBox2.setDecoration({
 //   backgroundImage:null,
 // })
-loadToGesti(textBox2);
+// loadToGesti(textBox2);
 textBox2.toCenter();
 textBox2.setLayer(11);
 
@@ -259,12 +260,12 @@ const imageBox2 = new ImageBox(
     width: img2.width,
     height: img2.height,
     url: img2.src,
-    scale:.5,
+    scale: 0.5,
   })
 );
 imageBox2.installMultipleButtons(buttons);
 imageBox2.setId("image1");
-loadToGesti(imageBox2);
+// loadToGesti(imageBox2);
 
 const polygon = new Polygon({
   radius: screenUtil1.setSp(750),
@@ -417,33 +418,51 @@ document.getElementById("input").addEventListener("input", (e: any) => {
   console.log(e.target?.value);
 });
 controller.render();
-console.log(controller.getAllViewObject());
-// const box1 = new Rectangle({
-//   width: screenUtil1.setWidth(300),
-//   height: screenUtil1.setHeight(300),
-//   decoration: {
-//     backgroundColor: "skyblue",
-//     borderRadius: screenUtil1.setSp(50),
-//   },
-// });
-// box1.setId("box1");
 
-// const box2 = new InteractiveImage(ximage, {
-//   borderRadius: screenUtil1.setSp(50),
-// });
-// box2.setId("box2");
+async function main() {
+  const bg = await loadImg(
+    "https://raw.githubusercontent.com/AK1118/my-images/master/Desktop/QQ图片20231121111336 拷贝.png"
+  );
+  const bgBox = new ImageBox(
+    new XImage({
+      data: bg,
+      width: bg.width,
+      height: bg.height,
+    })
+  );
+  bgBox.setLayer(3);
+  bgBox.setSize({
+    width: screenUtil1.fullWidth,
+    height: screenUtil1.fullHeight,
+  });
+  bgBox.makeFixed();
+  controller.center(bgBox);
+  controller.load(bgBox);
 
-// loadToGesti(box1, gesti);
-// loadToGesti(box2, gesti);
+  const moteImg = await loadImg(
+    "https://raw.githubusercontent.com/AK1118/my-images/master/Desktop/mmexport1700542539766.png"
+  );
 
-// const main = async () => {
-//   const b1 = await controller2.getViewObjectById<Rectangle>("box1");
-//   const b2 = await controller2.getViewObjectById<InteractiveImage>("box2");
-
-//   b2.setSize(b1.size.copy());
-
-//   b1.setPosition(100, 100);
-//   b2.setPosition(100, 100);
-
-//   doUpdate(null, gesti2);
-// };
+  const moteBox = new ImageBox(
+    new XImage({
+      data: moteImg,
+      width: moteImg.width,
+      height: moteImg.height,
+    })
+  );
+  moteBox.setLayer(3);
+  // moteBox.setSize({
+  //   width: screenUtil1.fullWidth,
+  //   height: screenUtil1.fullHeight,
+  // });
+  controller.center(moteBox);
+  controller.load(moteBox);
+}
+async function loadImg(src): Promise<HTMLImageElement> {
+  const bg = new Image();
+  bg.src = src; //;
+  bg.crossOrigin = "anonymous";
+  await waitingLoadImg(bg);
+  return Promise.resolve(bg);
+}
+main();
