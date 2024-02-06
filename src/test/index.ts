@@ -534,6 +534,7 @@ async function main() {
     console.log(e.targetTouches);
     controller.up(e);
   });
+  gesti.debug=true;
 }
 async function loadImg(src): Promise<HTMLImageElement> {
   const bg = new Image();

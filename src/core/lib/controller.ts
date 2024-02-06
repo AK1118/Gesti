@@ -295,13 +295,18 @@ abstract class GesteControllerImpl implements GestiControllerInterface {
    */
   private action(_e: any, callback: any, key: string) {
     /**
+     * 2024/2/6新增：uniapp端touches概率版本为对象
      * 点击和移动事件 三个都有
      * 抬起事件只有changedTouches
      * 针对Up事件，提供以下针对方案
      */
-    const touches = key
+    let touches = key
       ? _e[key]
       : _e.touches || _e.targetTouches || _e.changedTouches;
+    //如果是对象
+    if (typeof touches === "object") {
+      touches = Object.values(touches);
+    }
     if (touches.length >= 2) {
       callback.bind(this.kit)(this.twoFingers(touches));
     } else {

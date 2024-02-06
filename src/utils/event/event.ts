@@ -97,8 +97,8 @@ class GestiTouchEvent implements GestiEvent {
   down(down: GestiEventFunction): GestiEvent {
     window.addEventListener("touchstart", (_e: TouchEvent) => {
       if (this.disabled) return;
-      const touches: TouchList = _e.targetTouches;
-      if (touches.length >= 2) {
+      const touches: TouchList = _e.targetTouches??_e.touches;
+      if (touches?.length >= 2) {
         down.bind(this.kit)(this.twoFingers(touches));
       } else {
         const e: Touch = touches[0];
@@ -120,8 +120,8 @@ class GestiTouchEvent implements GestiEvent {
   move(move: GestiEventFunction): GestiEvent {
     window.addEventListener("touchmove", (_e: TouchEvent) => {
       if (this.disabled) return;
-      const touches: TouchList = _e.targetTouches;
-      if (touches.length >= 2) {
+      const touches: TouchList = _e.targetTouches??_e.touches;
+      if (touches?.length >= 2) {
         move.bind(this.kit)(this.twoFingers(touches));
       } else {
         const e: Touch = touches[0];

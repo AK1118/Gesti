@@ -10,7 +10,7 @@
 - 新增屏幕适配,可根据设置设计稿大小适配屏幕
 - 新增导入/导出拦截函数
 - 新增 BoxDecoration
-- 新增 Graphics 系列，RectAngle,Polygon 图形
+- 新增 Graphics 系列，Rectangle,Polygon 图形
 - 新增 Alignment 类，替换 LocationButton
 - 新增 ViewObject 的 makeFixed 和 maxUnFixed 方法
 - 新增插件插槽 OffScreenBuilder,用于自定义离屏画布生成 key = "offScreenBuilder"
@@ -21,6 +21,7 @@
 
 - 修复导出图片为 url 时强制为 base64 问题
 - 修复对象未选择时按钮会被执行bug
+- 修复uniapp个别版本带来的二指缩放无效bug
 
 ### 优化
 
