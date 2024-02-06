@@ -3,6 +3,7 @@ import Painter from "../../core/lib/painter";
 import Rect from "../../core/lib/rect";
 import WriteViewObj from "../viewObject/write";
 import ViewObject from "./view-object";
+import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 
 /**
  * 绘制类别
@@ -44,11 +45,23 @@ abstract class WriteBase {
   onUp(position: Vector | Vector[]) {
     if (!Array.isArray(position)) this.draw(position);
   }
-  onMove(position: Vector | Vector[]) {
+  protected screenUtils: ScreenUtils;
+  setScreenUtils(screenUtils: ScreenUtils) {
+    this.screenUtils = screenUtils;
+  }
+  onMove(position: Vector | Vector[], devScale: number = 1) {
     if (!Array.isArray(position)) {
       if (!this.startPoint) this.startPoint = position;
       //this.paint.clearRect(0,0,9999,9999);
+      this.paint.save();
+      if (this.screenUtils) {
+        this.paint.scale(this.screenUtils.devScale, this.screenUtils.devScale);
+      } else {
+        this.paint.scale(devScale, devScale);
+      }
+
       this.draw(position);
+      this.paint.restore();
       const [x, y] = position.toArray();
       this.maxX = Math.max(x, this.maxX);
       this.maxY = Math.max(y, this.maxY);
@@ -59,7 +72,7 @@ abstract class WriteBase {
   getRect(): Rect {
     const width = this.maxX - this.minX;
     const height = this.maxY - this.minY;
-    const offset: number =( this.config?.lineWidth || 3)+10;
+    const offset: number = (this.config?.lineWidth || 3) + 10;
     const rect: Rect = new Rect({
       width: width + offset,
       height: height + offset,

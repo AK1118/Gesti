@@ -535,6 +535,10 @@ async function main() {
     controller.up(e);
   });
   gesti.debug=true;
+
+  controller.addWrite({
+    type:"write",
+  })
 }
 async function loadImg(src): Promise<HTMLImageElement> {
   const bg = new Image();

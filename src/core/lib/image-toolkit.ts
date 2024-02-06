@@ -692,8 +692,10 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       }
 
       //涂鸦等待且现在手机点击在已选中对象内
-      if (this.writeFactory.watching && !selectedTarget.selected)
+      if (this.writeFactory.watching && !selectedTarget.selected) {
         this.writeFactory.onDraw();
+        
+      }
 
       this.selectedViewObject = this.handleSelectedTarget(event);
       this.ViewObjectList.forEach((item) =>
@@ -746,7 +748,8 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       //绘制处理,当down在已被选中的图册上时不能绘制
       if (this.writeFactory.current) {
         this.render();
-        return this.writeFactory.current?.onMove(event);
+        this.writeFactory.current?.setScreenUtils(this.screenUtils);
+        return this.writeFactory.current?.onMove(event,this.screenUtils?.devScale);
       }
 
       //手势解析处理
