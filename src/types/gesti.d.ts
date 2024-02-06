@@ -91,7 +91,7 @@ export declare enum ViewObjectFamily {
   text,
   group,
   graphicsRectangle,
-  graphicsCircle,
+  graphicsPolygon,
 }
 /*
  * @Author: AK1118
@@ -333,8 +333,11 @@ export interface TextOptions extends Shadow {
   maxWidth?: number;
 }
 
-interface createImageOptions {
-  data:
+declare interface createImageOptions {
+  /**
+   * 图片数据源，确保你的数据源能正确的显示到canvas上后再添加进来
+   */
+  data?:
     | HTMLImageElement
     | SVGImageElement
     | HTMLVideoElement
@@ -344,12 +347,39 @@ interface createImageOptions {
     | ImageBitmap
     | OffscreenCanvas;
   originData?: any;
-  // options: createImageOptions;
-  width: number;
-  height: number;
+  options?: createImageOptions;
+  /**
+   * 宽度
+   */
+  width?: number;
+  /**
+   * 高度
+   */
+  height?: number;
+  /**
+   * 缩放倍数
+   */
   scale?: number;
+  /**
+   * 最大放大倍数
+   */
   maxScale?: number;
+  /**
+   * 最小缩小倍数
+   */
   minScale?: number;
+  /**
+   * 图片原始宽度
+   */
+  fixedWidth?: number;
+  /**
+   * 图片原始高度
+   */
+  fixedHeight?: number;
+  /**
+   * 图片网络地址
+   */
+  url?: string;
 }
 
 interface Rect {
@@ -375,7 +405,16 @@ export interface ImageChunk {
   base64?: string;
 }
 export abstract class ViewObject {
-  public getBaseInfo(): ViewObjectExportBaseInfo;
+  /**
+   * ### 获取view的基础信息
+   * - 包含按钮信息
+   */
+  public getBaseInfo(): Promise<ViewObjectExportBaseInfo>;
+  /**
+   * ### 获取view的基础信息
+   * - 不包含按钮信息
+   */
+  public getBaseInfoSync(): ViewObjectExportBaseInfo;
   readonly rect: Rect;
   get value(): any;
   readonly family: ViewObjectFamily;
@@ -574,6 +613,11 @@ export class TextBox extends ViewObject implements TextHandler {
 
 export declare class ImageBox extends ViewObject {
   constructor(ximage: XImage);
+  /**
+   * ### 替换图片，传入一个XImage
+   * - 替换图片会继承被替换图片的scale
+   */
+  public replaceXImage(xImage: XImage): void ;
 }
 
 type GraffitiCloser = [

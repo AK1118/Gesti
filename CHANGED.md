@@ -10,19 +10,24 @@
 - 新增屏幕适配,可根据设置设计稿大小适配屏幕
 - 新增导入/导出拦截函数
 - 新增 BoxDecoration
-- 新增 Graphics 系列，可新增图形为可操作对象 Rectangle & InteractiveImage,支持设置 decoration
-- 新增插件插槽 OffScreenBuilder,用于自定义离屏画布生成
+- 新增 Graphics 系列，RectAngle,Polygon 图形
 - 新增 Alignment 类，替换 LocationButton
+- 新增 ViewObject 的 makeFixed 和 maxUnFixed 方法
+- 新增插件插槽 OffScreenBuilder,用于自定义离屏画布生成 key = "offScreenBuilder"
+- 新增 CustomButton 自定义按钮点击事件
+- 新增 ViewObject 的 getButtonById方法，用于通过id获取某个按钮
 
 ### 修复
 
 - 修复导出图片为 url 时强制为 base64 问题
+- 修复对象未选择时按钮会被执行bug
 
 ### 优化
 
 - 优化 TextBox 缓存,优化涂鸦概率性缺角 bug
 - 优化声明文件
 - 导出格式变化
+- 按钮和选中框始终显示在最上层
 
   旧格式:
 

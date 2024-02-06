@@ -263,12 +263,12 @@ interface ImageToolKitController {
   /**
    * 获取所有的视图对象
    */
-  getAllViewObject(): Array<ViewObject>;
+  getAllViewObjectSync(): Array<ViewObject>;
 
   /**
    * 异步，获取所有的视图对象
    */
-  getAllViewObjectSync(): Promise<Array<ViewObject>>;
+  getAllViewObject(): Promise<Array<ViewObject>>;
   /**
    * 设置屏幕适配器
    */

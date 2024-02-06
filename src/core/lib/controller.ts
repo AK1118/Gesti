@@ -43,11 +43,11 @@ abstract class GesteControllerImpl implements GestiControllerInterface {
   remove(view?: ViewObject): boolean {
     return this.kit.remove(view);
   }
-  getAllViewObject(): ViewObject[] {
-    return this.kit.getAllViewObject();
-  }
-  getAllViewObjectSync(): Promise<ViewObject[]> {
+  getAllViewObjectSync(): ViewObject[] {
     return this.kit.getAllViewObjectSync();
+  }
+  getAllViewObject(): Promise<ViewObject[]> {
+    return this.kit.getAllViewObject();
   }
   mount(view: ViewObject): void {
     this.kit.mount(view);

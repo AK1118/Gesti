@@ -33,6 +33,7 @@ class Rectangle extends GraphicsBase<
   GenerateRectAngleOption,
   BoxDecoration
 > {
+  public originFamily: ViewObjectFamily=ViewObjectFamily.graphicsPolygon;
   family: ViewObjectFamily = ViewObjectFamily.graphicsRectangle;
   constructor(option: GenerateRectAngleOption) {
     super(option,(option)=>{
@@ -46,7 +47,9 @@ class Rectangle extends GraphicsBase<
   get value(): any {
     throw new Error("Method not implemented.");
   }
-  setDecoration(option: BoxDecorationOption): void {}
+  setDecoration(option: BoxDecorationOption,extension: boolean = true,): void {
+    super.setDecoration<BoxDecorationOption>(option,extension,"box");
+  }
   
   drawImage(paint: Painter): void {
     this.renderGraphics(paint);

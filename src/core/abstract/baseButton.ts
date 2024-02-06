@@ -61,12 +61,10 @@ export abstract class BaseButton implements RenderObject {
   //与寄主的位置关系，根据寄主的大小获取最初的距离
   private originPositionWithSize: Offset;
   private _mounted: boolean = false;
-  public get id():string{
+  public get id(): string {
     return this._id;
   }
-  public setId(id:string):void{
-    this._id=id;
-  }
+  
   get mounted(): boolean {
     return this._mounted;
   }
@@ -241,27 +239,35 @@ export abstract class BaseButton implements RenderObject {
   get position(): Vector {
     return this.rect.position;
   }
-  setSenseRadius(senseRadius: number) {
+  setSenseRadius(senseRadius: number) : BaseButton{
     this.senseRadius = senseRadius;
     this.radius = senseRadius;
     if (!this.mounted) return;
     this.icon.setSize(this.radius);
     this.reset();
+    return this;
   }
 
   //设置Icon颜色
-  public setIconColor(color: string) {
+  public setIconColor(color: string): BaseButton {
     this.iconColor = color;
     this.icon.setColor(color);
+    return this;
+  }
+  public setId(id: string): BaseButton {
+    this._id = id;
+    return this;
   }
   /**
    * @description 关闭背景
    */
-  public hideBackground() {
+  public hideBackground() : BaseButton{
     this.displayBackground = false;
+    return this;
   }
   public setBackgroundColor(color: string) {
     this.background = color;
+    return this;
   }
   public setLocation(alignment: Alignment): void {
     this.customAlignment = alignment;
@@ -273,7 +279,7 @@ export abstract class BaseButton implements RenderObject {
   }
   public async export<O = any>(): Promise<ExportButton<O>> {
     const entity = {
-      id:this.id,
+      id: this.id,
       type: this.name,
       alignment: this.btnLocation,
       radius: this.senseRadius,

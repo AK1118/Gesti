@@ -16,6 +16,8 @@ import {
 } from "Serialization";
 
 class Polygon extends GraphicsBase<GeneratePolygonOption, PolygonDecoration> {
+  public originFamily: ViewObjectFamily=ViewObjectFamily.graphicsPolygon;
+  
   private points: Array<Vector> = [];
   constructor(option: GeneratePolygonOption) {
     super(option, (_option: PolygonDecorationOption) => {

@@ -141,7 +141,7 @@ interface LayerController {
   remove(view?: ViewObject): void;
 }
 
-type ListenerCallback = (object: any) => void;
+type ListenerCallback = (object: ViewObject|any) => void;
 
 //画布控制器
 interface ImageToolKitController {
@@ -274,12 +274,12 @@ interface ImageToolKitController {
   /**
    * 获取所有的视图对象
    */
-  getAllViewObject(): Array<ViewObject>;
+  getAllViewObject(): Promise<Array<ViewObject>>;
 
   /**
    * 异步，获取所有的视图对象
    */
-  getAllViewObjectSync(): Promise<Array<ViewObject>>;
+  getAllViewObjectSync(): Array<ViewObject>;
   /**
    * 设置屏幕适配器
    */
@@ -431,8 +431,8 @@ declare class GestiController implements GestiControllerInterface {
   ): Promise<ViewObject | ViewObject[]>;
   getViewObjectById<T extends ViewObject>(id: string): Promise<T>;
   getViewObjectByIdSync<T extends ViewObject>(id: string): T;
-  getAllViewObject(): ViewObject[];
-  getAllViewObjectSync(): Promise<ViewObject[]>;
+  getAllViewObject(): Promise<ViewObject[]>;
+  getAllViewObjectSync(): ViewObject[];
   generateScreenUtils(option: ScreenUtilOption): ScreenUtils;
 }
 

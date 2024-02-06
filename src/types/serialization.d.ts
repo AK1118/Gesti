@@ -15,12 +15,11 @@ declare module "Serialization" {
     data: ViewObjectExportEntity
   ) => Promise<XImage>;
 
-
-  interface ExportXImage{
-    url?:string,
-    data?:Array<ImageChunk>,
-    width:number,
-    height:number
+  interface ExportXImage {
+    url?: string;
+    data?: Array<ImageChunk>;
+    width: number;
+    height: number;
   }
 
   interface ExportRect {
@@ -55,7 +54,7 @@ declare module "Serialization" {
     relativeRect: ExportRect;
     mirror: boolean;
     locked: boolean;
-    buttons: Array<ExportButton>;
+    buttons?: Array<ExportButton>;
     id: string;
     layer: number;
     isBackground: boolean;

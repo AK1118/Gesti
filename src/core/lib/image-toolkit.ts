@@ -168,7 +168,7 @@ abstract class ImageToolkitBase {
     this.callHook("onUpdate", null);
     // if (this.preRenderFinished) {
     //   this.preRenderFinished = !this.paint.hasDrawFunction;
-      
+
     // }
     this.paint.clearRect(
       0,
@@ -275,10 +275,10 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.render();
     return true;
   }
-  getAllViewObject(): ViewObject[] {
+  getAllViewObjectSync(): ViewObject[] {
     return this.ViewObjectList;
   }
-  getAllViewObjectSync(): Promise<ViewObject[]> {
+  getAllViewObject(): Promise<ViewObject[]> {
     return Promise.resolve(this.ViewObjectList);
   }
 
@@ -463,6 +463,10 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
            */
           this.screenUtils = this.generateScreenUtils({
             ...info.screen,
+            devicePixelRatio:
+              this.screenUtils.devicePixelRatio ??
+              info.screen?.devicePixelRatio ??
+              1,
             canvasWidth: this.canvasRect.size.width,
             canvasHeight: this.canvasRect.size.height,
           });
@@ -736,7 +740,6 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.render();
   }
   public onMove(v: GestiEventParams): void {
-   
     if (this.eventHandlerState === EventHandlerState.down) {
       const event: Vector | Vector[] = this.correctEventPosition(v);
       this.debug(["Event Move,", event]);
@@ -859,8 +862,12 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
          * ### 适配屏幕，触摸点也需要适配
          */
         if (this.screenUtils) {
-          item.x *= this.screenUtils.devicePixelRatio*this.screenUtils.deviceCanvasRatio.widthRatio;
-          item.y *= this.screenUtils.devicePixelRatio*this.screenUtils.deviceCanvasRatio.heightRatio;
+          item.x *=
+            this.screenUtils.devicePixelRatio *
+            this.screenUtils.deviceCanvasRatio.widthRatio;
+          item.y *=
+            this.screenUtils.devicePixelRatio *
+            this.screenUtils.deviceCanvasRatio.heightRatio;
         }
 
         _vector.push(item.sub(this.offset));
@@ -871,8 +878,12 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
        * ### 适配屏幕，触摸点也需要适配
        */
       const v = vector as unknown as Vector;
-      v.x *= this.screenUtils.devicePixelRatio*this.screenUtils.deviceCanvasRatio.widthRatio;
-      v.y *= this.screenUtils.devicePixelRatio*this.screenUtils.deviceCanvasRatio.heightRatio;
+      v.x *=
+        this.screenUtils.devicePixelRatio *
+        this.screenUtils.deviceCanvasRatio.widthRatio;
+      v.y *=
+        this.screenUtils.devicePixelRatio *
+        this.screenUtils.deviceCanvasRatio.heightRatio;
       return v.sub(this.offset);
     }
     return vector.sub(this.offset);
@@ -913,8 +924,8 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     obj.initialization(this);
     if (obj.getLayer() === null) obj.setLayer(this.getViewObjectCount() - 1);
     this.callHook("onLoad", obj);
-    this.render();
     this.tool.sortByLayer(this.ViewObjectList);
+    this.render();
   }
 
   /**

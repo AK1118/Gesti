@@ -53,6 +53,14 @@ import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
  * 画布样式为 390*390
  * 但是dpr为400*3=1200，表示中心点在  600,需要解决这个偏移量，因为偏移量其实为 200*200，偏移量比值，
  *
+ * 导入时dpr 2 ,自己的dpr 3
+ * 但是dpr用于：
+ * 视图层：控制画布大小，scale缩放
+ * 操作层：将输入事件映射到实际画布内
+ *
+ * 输入时与画布大小无关，与设计稿有关
+ *
+ *
  */
 Gesti.installPlugin("pako", require("pako"));
 
@@ -428,6 +436,7 @@ async function main() {
       data: bg,
       width: bg.width,
       height: bg.height,
+      url: bg.src,
     })
   );
   bgBox.setLayer(3);
@@ -448,15 +457,83 @@ async function main() {
       data: moteImg,
       width: moteImg.width,
       height: moteImg.height,
+      url: moteImg.src,
+      scale: 0.7,
     })
   );
-  moteBox.setLayer(3);
-  // moteBox.setSize({
-  //   width: screenUtil1.fullWidth,
-  //   height: screenUtil1.fullHeight,
-  // });
+  moteBox.setId("image1");
+  moteBox.setLayer(2);
+  moteBox.installMultipleButtons(
+    [
+      new DragButton(),
+      new RotateButton({
+        alignment: Alignment.topLeft,
+      }),
+      new MirrorButton({
+        alignment: Alignment.bottomLeft,
+      }),
+      new CustomButton({
+        child: new TextBox("换图", {
+          fontSize: screenUtil1.setSp(26),
+        }),
+      }).setId("huantu"),
+    ].map((_) => {
+      _.setSenseRadius(screenUtil1.setSp(50));
+      return _;
+    })
+  );
   controller.center(moteBox);
   controller.load(moteBox);
+
+  const textBox = new TextBox("杨", {
+    fontSize: screenUtil1.setSp(200),
+    weight: "bold",
+    color: "#bb6474",
+    fontFamily: "鸿雷行书简体",
+    shadowBlur: screenUtil1.setSp(3),
+    shadowOffsetX: screenUtil1.setSp(3),
+    shadowOffsetY: screenUtil1.setSp(3),
+    shadowColor: "#ccc",
+    lineHeight: 1,
+  });
+  textBox.setId("text1");
+  textBox.installMultipleButtons(
+    [
+      new DragButton(),
+      new RotateButton({
+        alignment: Alignment.topLeft,
+      }),
+      new MirrorButton({
+        alignment: Alignment.bottomLeft,
+      }),
+      new CustomButton({
+        child: new TextBox("换字", {
+          fontSize: screenUtil1.setSp(26),
+        }),
+      }).setId("huanzi"),
+    ].map((_) => {
+      _.setSenseRadius(screenUtil1.setSp(50));
+      return _;
+    })
+  );
+  textBox.setLayer(5);
+  controller.load(textBox);
+  textBox.toCenter();
+
+  controller.cancelEvent();
+
+  canvas.addEventListener("touchstart", (e) => {
+    console.log(e.targetTouches);
+    controller.down(e);
+  });
+  canvas.addEventListener("touchmove", (e) => {
+    console.log(e.targetTouches);
+    controller.move(e);
+  });
+  canvas.addEventListener("touchend", (e) => {
+    console.log(e.targetTouches);
+    controller.up(e);
+  });
 }
 async function loadImg(src): Promise<HTMLImageElement> {
   const bg = new Image();

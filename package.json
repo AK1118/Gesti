@@ -8,6 +8,7 @@
   "type": "module",
   "scripts": {
     "build": "rollup --config rollup.config.js",
+    "test":"rollup --config rollup.config.js && node --loader ts-node/esm --inspect ./testGesti.ts",
     "dev": "webpack-dev-server --config webpack.config.js --mode development"
   },
   "repository": {

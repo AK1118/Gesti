@@ -1,4 +1,7 @@
 {
+  "ts-node": {
+    "esm": true,
+  },
   "compilerOptions": {
     "target": "ES6",
     "module": "ESNext",
@@ -12,7 +15,7 @@
       "Serialization": ["types/serialization.d.ts"],
       "Graphics": ["types/graphics.d.ts"],
       "Gesti": ["types/gesti.d.ts"],
-      "Hooks":["types/hooks.d.ts"]
+      "Hooks": ["types/hooks.d.ts"]
     }
   },
   "include": ["src/**/*", "webpack.config.ts"],

@@ -156,7 +156,7 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
        * ### 在kit.render方法中使用了scale全局，这里需要矫正回来
        */
       paint.save();
-      if (this.isMirror) paint.scale(-1, 1);
+       if (this.isMirror) paint.scale(-1, 1);
       //按钮
       this.updateFuncButton(paint);
       paint.restore();
@@ -166,7 +166,8 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
     paint.save();
     paint.translate(this.positionX, this.positionY);
     paint.rotate(this.rect.getAngle);
-    this.renderSelected(paint,false);
+    if (this.isMirror) paint.scale(-1, 1);
+    this.renderSelected(paint, false);
     paint.restore();
   }
   /**
@@ -390,6 +391,13 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
     );
     const buttons: ExportButton[] = await Promise.all(buttonPromises);
     return {
+      buttons: buttons,
+      ...this.getBaseInfoSync(),
+    };
+  }
+
+  public getBaseInfoSync(): ViewObjectExportBaseInfo {
+    return {
       rect: {
         x: ~~this.rect.position.x,
         y: ~~this.rect.position.y,
@@ -411,7 +419,6 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
       },
       mirror: this.isMirror,
       locked: this.isLock,
-      buttons: buttons,
       id: this.id,
       layer: this.getLayer(),
       isBackground: this.isBackground,

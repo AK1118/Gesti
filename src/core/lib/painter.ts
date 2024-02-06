@@ -275,54 +275,58 @@ class Painter implements Painter {
   }
 
   createConicGradient() {}
-  // roundRect(
-  //   x: number,
-  //   y: number,
-  //   width: number,
-  //   height: number,
-  //   radii?: number | DOMPointInit | Iterable<number | DOMPointInit>
-  // ) {
-  //   if (this.paint.roundRect) this.paint.roundRect(x, y, width, height, radii);
-  //   else {
-  //     if (!(radii instanceof Number)) {
-  //       throw Error("Radius value must a number.");
-  //     }
-  //     const radius: number = radii as unknown as number;
-  //     const paint = this.paint;
-  //     paint.beginPath();
-  //     paint.moveTo(x + radius, y);
-  //     paint.arcTo(x + width, y, x + width, y + height, radius);
-  //     paint.arcTo(x + width, y + height, x, y + height, radius);
-  //     paint.arcTo(x, y + height, x, y, radius);
-  //     paint.arcTo(x, y, x + width, y, radius);
-  //     paint.closePath();
-  //   }
-  // }
   roundRect(
     x: number,
     y: number,
     width: number,
     height: number,
-    radii?: number | DOMPointInit | Iterable<number | DOMPointInit>
+    radii?: number | Iterable<number>
   ) {
-    if (this.paint.roundRect) {
-      this.paint.roundRect(x, y, width, height, radii);
+    const r2d = Math.PI / 180;
+    let r: Array<number>;
+    if (Array.isArray(radii)) {
+      r = radii.map((r) => Math.min(r, Math.min(width, height) / 2));
     } else {
-      const getRadius = (index: number): number => {
-        if (typeof radii === "number") return radii;
-        if (Array.isArray(radii)) {
-          return radii[index] ?? 0;
-        }
-      };
-      const paint = this.paint;
-      paint.beginPath();
-      paint.moveTo(x + getRadius(0), y);
-      paint.arcTo(x + width, y, x + width, y + height, getRadius(1));
-      paint.arcTo(x + width, y + height, x, y + height, getRadius(2));
-      paint.arcTo(x, y + height, x, y, getRadius(3));
-      paint.arcTo(x, y, x + width, y, getRadius(0));
-      paint.closePath();
+      r = new Array(4)
+        .fill(radii)
+        .map((r) => Math.min(r, Math.min(width, height) / 2));
     }
+    this.beginPath();
+    this.moveTo(x + r[0], y);
+    this.lineTo(x + width - r[1], y);
+    this.arc(x + width - r[1], y + r[1], r[1], r2d * 270, r2d * 360, false);
+    this.lineTo(x + width, y + height - r[2]);
+    this.arc(
+      x + width - r[2],
+      y + height - r[2],
+      r[2],
+      r2d * 0,
+      r2d * 90,
+      false
+    );
+    this.lineTo(x + r[3], y + height);
+    this.arc(x + r[3], y + height - r[3], r[3], r2d * 90, r2d * 180, false);
+    this.lineTo(x, y + r[0]);
+    this.arc(x + r[0], y + r[0], r[0], r2d * 180, r2d * 270, false);
+    this.closePath();
+    // if (this.paint.roundRect) {
+    //   this.paint.roundRect(x, y, width, height, radii);
+    // } else {
+    //   const getRadius = (index: number): number => {
+    //     if (typeof radii === "number") return radii;
+    //     if (Array.isArray(radii)) {
+    //       return radii[index] ?? 0;
+    //     }
+    //   };
+    //   const paint = this.paint;
+    //   paint.beginPath();
+    //   paint.moveTo(x + getRadius(0), y);
+    //   paint.arcTo(x + width, y, x + width, y + height, getRadius(1));
+    //   paint.arcTo(x + width, y + height, x, y + height, getRadius(2));
+    //   paint.arcTo(x, y + height, x, y, getRadius(3));
+    //   paint.arcTo(x, y, x + width, y, getRadius(0));
+    //   paint.closePath();
+    // }
   }
   /*清空画布|刷新画布*/
   update() {}
