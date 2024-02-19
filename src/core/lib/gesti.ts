@@ -1,28 +1,37 @@
-import GestiConfig, { gesticonfig } from "../../config/gestiConfig";
-import GesteControllerImpl from "./controller";
+import GestiConfig, { GestiConfigOption } from "../../config/gestiConfig";
+import GestiController from "./controller";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "./image-toolkit";
-import GestiController from "../interfaces/gesticontroller";
 import XImage from "./ximage";
-import { InitializationOption, PluginKeys } from "@/types/index";
 import Plugins from "./plugins";
+import { InitializationOption, PluginKeys } from "Gesti";
+import GestiControllerInterface, {
+  BindControllerInterface,
+} from "../interfaces/gesticontroller";
 
-class Gesti {
-  private kit: ImageToolkit;
-  public static XImage = XImage;
+class Gesti implements BindControllerInterface {
+  private _kit: ImageToolkit;
   public static config: GestiConfig;
-  constructor(config?: gesticonfig) {
+  constructor(config?: GestiConfigOption) {
     Gesti.config = new GestiConfig(config);
   }
+  initialized: boolean = false;
+  bindController(controller: GestiController): void {
+    controller.bindGesti(this);
+  }
+  bindGesti(gesti: Gesti): void {
+    throw new Error("Method not implemented.");
+  }
   private _controller: GestiController;
+  public get kit(): ImageToolkit {
+    return this._kit;
+  }
   get controller(): GestiController {
-    return (
-      this._controller || (this._controller = new GesteControllerImpl(this.kit))
-    );
+    return this._controller || (this._controller = new GestiController(this));
   }
 
   set debug(value: boolean) {
-    if (this.kit) this.kit.isDebug = value;
+    if (this._kit) this._kit.isDebug = value;
   }
 
   public static mount(option: InitializationOption): [Gesti, GestiController] {
@@ -31,12 +40,20 @@ class Gesti {
     return [gesti, controller];
   }
 
+  /**
+   *
+   * @param option
+   * @returns
+   */
   public initialization(option: InitializationOption): GestiController {
     if (!option) throw Error("The option is should not undefined.");
     if (!option.renderContext)
       throw Error("RenderContext must not be undefined.");
+    if (option.rect.canvasWidth === 0 || option.rect.canvasHeight === 0)
+      throw Error("Both 'canvasWidth' and 'canvasHeight' must be non-zero.");
     this._controller && this.dispose();
-    if (option.rect) this.kit = new ImageToolkit(option);
+    if (option.rect) this._kit = new ImageToolkit(option);
+    this.initialized = true;
     return this.controller;
   }
 
@@ -66,9 +83,9 @@ class Gesti {
    * @description 设置配置，跟构造函数一样
    * @param config
    */
-  public setConfig(config?: gesticonfig): void {
+  public setConfig(config?: GestiConfigOption): void {
     Gesti.config.setParams(config);
-    this.kit.render();
+    this._kit.render();
   }
   /**
    * @deprecated
@@ -77,20 +94,21 @@ class Gesti {
   public destroy(): void {
     this.controller?.destroyGesti();
     this._controller = null;
-    this.kit = null;
+    this._kit = null;
   }
   public dispose(): void {
     this.controller?.destroyGesti();
     this._controller = null;
-    this.kit = null;
+    this._kit = null;
+    this.initialized = false;
   }
 
   static Family = ViewObjectFamily;
 
   /**
    * @description 安装预设插件
-   * @param key 
-   * @param plugin 
+   * @param key
+   * @param plugin
    */
   public static installPlugin(key: PluginKeys, plugin: any): void {
     Plugins.installPlugin(key, plugin);

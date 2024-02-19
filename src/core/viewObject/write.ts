@@ -12,7 +12,7 @@ import {
   ViewObjectImportGraffiti,
   ViewObjectImportImageBox,
 } from "@/types/serialization";
-import { GraffitiTypes } from "@/types/index";
+import { GraffitiTypes } from "@/types/gesti";
 /**
  * 实现逻辑
  * 新建一个 canvas等宽高的矩阵,锁定它，
@@ -20,28 +20,11 @@ import { GraffitiTypes } from "@/types/index";
  */
 class WriteViewObj extends ViewObject {
   family: ViewObjectFamily = ViewObjectFamily.write;
-  async export(): Promise<ViewObjectExportGraffiti> {
-    // this.points.forEach((item) => {
-    //   item.x = ~~item.x;
-    //   item.y = ~~item.y;
-    // });
-    // const json = {
-    //   viewObjType: "write",
-    //   options: {
-    //     config: {
-    //       ...this.config,
-    //       scaleX: this._scalex,
-    //       scaleY: this._scaley,
-    //     },
-    //     points: this.points,
 
-    //     ...this.getBaseInfo(),
-    //   },
-    // };
-    // return json;
+  async export(): Promise<ViewObjectExportGraffiti> {
     return {
       type: "write",
-      base: this.getBaseInfo(),
+      base: await this.getBaseInfo(),
       config: this.config,
       points: this.points,
     };
@@ -95,8 +78,9 @@ class WriteViewObj extends ViewObject {
     this._scalex = config.scaleX ?? 1;
     this._scaley = config.scaleY ?? 1;
     this.config = config;
+    // this.useCache();
   }
-  public setDecoration(decoration: {
+  public setStyle(decoration: {
     //strokeColor?: string;
     color?: string;
     isFill?: boolean;
@@ -106,6 +90,7 @@ class WriteViewObj extends ViewObject {
     this.isFill = decoration?.isFill;
     this.lineWidth = decoration?.lineWidth;
   }
+
   //供外部设置数据
   public setParams(config: {
     color?: string;

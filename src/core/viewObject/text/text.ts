@@ -7,7 +7,7 @@ import {
   ViewObjectExportEntity,
   ViewObjectExportTextBox,
 } from "Serialization";
-import { ViewObject } from "@/types/index";
+import { ViewObject } from "@/types/gesti";
 
 /**
  * 1.改变大小时文字大小不会发生变化，只会被挤压拉伸
@@ -219,6 +219,7 @@ abstract class TextBase extends TextViewBase {
     this.computeTextSingle();
   }
   protected onInput(value: string): void {
+    if (!this.mounted) return;
     this.computeTextSingle();
     this.doCache();
     this.forceUpdate();
@@ -231,17 +232,20 @@ class TextBox extends TextBase {
   ): Promise<TextBox> {
     return new TextBox(entity.text, entity.option);
   }
-  export(painter?: Painter): Promise<ViewObjectExportTextBox> {
+  async export(painter?: Painter): Promise<ViewObjectExportTextBox> {
     const entity: ViewObjectExportTextBox = {
       type: "text",
       text: this.fixedText,
       option: this.textOptions,
-      base: this.getBaseInfo(),
+      base: await this.getBaseInfo(),
     };
     return Promise.resolve(entity);
   }
-  exportWeChat(painter?: Painter, canvas?: any): Promise<ViewObjectExportEntity> {
-      return this.export();
+  exportWeChat(
+    painter?: Painter,
+    canvas?: any
+  ): Promise<ViewObjectExportEntity> {
+    return this.export();
   }
 }
 

@@ -1,4 +1,4 @@
-import { ButtonLocation, FuncButtonTrigger } from "../../enums";
+import {  FuncButtonTrigger } from "../../enums";
 
 import BaseButton from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
@@ -9,11 +9,12 @@ import ViewObject from "../../abstract/view-object";
 import GestiConfig from "../../../config/gestiConfig";
 import { Icon } from "@/core/lib/icon";
 import { CloseIcon } from "@/composite/icons";
+import Alignment from "@/core/lib/painting/alignment";
 
 class CloseButton extends BaseButton {
     readonly name: ButtonNames="CloseButton";
     protected icon: Icon=new CloseIcon();
-    protected buttonLocation:ButtonLocation=ButtonLocation.RT;
+    protected buttonAlignment:Alignment=Alignment.topRight;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     updatePosition(vector: Vector): void {
         this.updateRelativePosition();

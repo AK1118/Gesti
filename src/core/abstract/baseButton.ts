@@ -1,4 +1,4 @@
-import { ButtonLocation, FuncButtonTrigger } from "@/core/enums";
+import { FuncButtonTrigger } from "@/core/enums";
 import RenderObject from "../interfaces/render-object";
 import Painter from "@/core/lib/painter";
 import CatchPointUtil from "../../utils/event/catchPointUtil";
@@ -8,36 +8,38 @@ import Vector from "../lib/vector";
 import { Icon } from "../lib/icon";
 import DefaultIcon from "@/static/icons/defaultIcon";
 import GestiConfig from "@/config/gestiConfig";
+import Alignment from "../lib/painting/alignment";
+import { ExportButton } from "Serialization";
 export type ButtonOption = {
-  location?: ButtonLocation;
+  alignment?: Alignment;
   icon?: Icon;
 };
 //按钮抽象类
 export abstract class BaseButton implements RenderObject {
-
   protected icon: Icon = new DefaultIcon({
     color: "#c1c1c1",
     size: 10,
   });
-  public iconColor:string="#c1c1c1";
+  public iconColor: string = "#c1c1c1";
   //自定义位置
-  private customLocation: ButtonLocation;
+  private customAlignment: Alignment;
   /**
    * 获取按钮的位置枚举
    */
-  get btnLocation(): ButtonLocation {
-    return this.buttonLocation;
+  get btnLocation(): Alignment {
+    return this.buttonAlignment;
   }
   private customIcon: Icon;
   //是否显示背景，按钮默认有一个白色背景
   public displayBackground: boolean = true;
   public background: string = "rgba(255,255,255,.8)";
+  private _id: string = "";
   constructor(option?: ButtonOption) {
     if (!option) return;
-    this.customLocation = option?.location;
+    this.customAlignment = option?.alignment;
     this.customIcon = option?.icon;
   }
-  protected abstract buttonLocation: ButtonLocation;
+  protected abstract buttonAlignment: Alignment;
   abstract readonly name: ButtonNames;
   //隐藏
   disabled: boolean = false;
@@ -59,6 +61,10 @@ export abstract class BaseButton implements RenderObject {
   //与寄主的位置关系，根据寄主的大小获取最初的距离
   private originPositionWithSize: Offset;
   private _mounted: boolean = false;
+  public get id(): string {
+    return this._id;
+  }
+  
   get mounted(): boolean {
     return this._mounted;
   }
@@ -148,7 +154,7 @@ export abstract class BaseButton implements RenderObject {
   public initialization(master: ViewObject) {
     this.master = master;
     this.beforeMounted();
-    this.location = this.setLocationByEnum(this.customLocation);
+    this.location = this.setLocationByAlignment(this.customAlignment);
     this.icon = this.customIcon || this.icon;
     //icon的大小等于半径
     this.icon.setSize(this.radius);
@@ -171,98 +177,35 @@ export abstract class BaseButton implements RenderObject {
     if (this.master.isLock && this.canBeeLocking) return false;
     return CatchPointUtil.checkInsideArc(target, event, this.senseRadius);
   }
-  protected setLocationByEnum(
-    _location?: ButtonLocation
+  protected setLocationByAlignment(
+    _location?: Alignment
   ): [x: number, y: number] {
     //如果没有自定义位置，就使用自己的位置
-    const location = _location ?? this.buttonLocation;
-    this.buttonLocation = location;
-    let result: [x: number, y: number] = [0, 0];
-    switch (location) {
-      case ButtonLocation.LT:
-        result = [-0.5, -0.5];
-        break;
-      case ButtonLocation.LB:
-        result = [-0.5, 0.5];
-        break;
-      case ButtonLocation.RT:
-        result = [0.5, -0.5];
-        break;
-      case ButtonLocation.RB:
-        result = [0.5, 0.5];
-        break;
-      case ButtonLocation.RC:
-        result = [0.5, 0.0];
-        break;
-      case ButtonLocation.BC:
-        result = [0, 0.5];
-        break;
-      case ButtonLocation.LC:
-        result = [-0.5, 0];
-        break;
-      case ButtonLocation.TC:
-        result = [0, -0.5];
-        break;
-      case ButtonLocation.OutBC:
-        result = [0, 0.75];
-        break;
-    }
-    return result;
-  }
-  /**
-   * @description 根据枚举的值获取固定的位置，比如rotateButton的位置
-   */
-  private getFixedLocationPosition(
-    location: ButtonLocation,
-    width: number,
-    height: number,
-    px: number,
-    py: number
-  ): [x: number, y: number] {
-    const distance: number = 30 * GestiConfig.DPR;
-    const hf = height * 0.5,
-      wf = width * 0.5;
-    const baseX = width * px,
-      baseY = height * py;
-    switch (location) {
-      case ButtonLocation.OutBC:
-        return [baseX, hf + distance];
-      case ButtonLocation.OutTC:
-        return [baseX, -hf - distance];
-      case ButtonLocation.OutRC:
-        return [wf + distance, baseY];
-      case ButtonLocation.OutLC:
-        return [-wf - distance, baseY];
-      case ButtonLocation.OutLT:
-        return [-wf - distance, -hf - distance];
-      case ButtonLocation.OutLB:
-        return [-wf - distance, hf + distance];
-      case ButtonLocation.OutRT:
-        return [wf + distance, -hf - distance];
-      case ButtonLocation.OutRB:
-        return [wf + distance, hf + distance];
-    }
-    return [baseX, baseY];
+    const location = _location ?? this.buttonAlignment;
+    this.buttonAlignment = location;
+    if (!this.buttonAlignment) return;
+    const { offsetX, offsetY }: Offset = this.buttonAlignment.compute(
+      this.master.size
+    );
+    // console.log(offsetX,offsetY);
+    return [offsetX, offsetY];
   }
   /**
    * @description 根据父Box的大小宽度比作为基础定位
    * @param location ,占比值，四个点坐标
    */
   private computeRelativePositionByLocation() {
-    const { width, height } = this.master.rect.size;
-    const [percent_x, percent_y] = this.location;
-    const [cx, cy] = this.getFixedLocationPosition(
-      this.buttonLocation,
-      width,
-      height,
-      percent_x,
-      percent_y
-    );
-    // if(this.buttonLocation===ButtonLocation.OutBC){
-    //   positionY=height*.5+30;
-    // }
+    if (!this.buttonAlignment) return;
+    const { offsetX, offsetY } = this.buttonAlignment.compute(this.master.size);
+    // const [cx, cy] = this.getFixedLocationPosition(
+    //   this.buttonAlignment,
+    //   width,
+    //   height,
+    //   percent_x,
+    //   percent_y
+    // );
     //更改相对定位，看好了，这可是按钮类里面的
-    this.relativeRect.position.setXY(cx, cy);
+    this.relativeRect.position.setXY(offsetX, offsetY);
   }
   public getOriginDistance(): number {
     return this.originDistance;
@@ -296,37 +239,56 @@ export abstract class BaseButton implements RenderObject {
   get position(): Vector {
     return this.rect.position;
   }
-  setSenseRadius(senseRadius: number) {
+  setSenseRadius(senseRadius: number) : BaseButton{
     this.senseRadius = senseRadius;
     this.radius = senseRadius;
     if (!this.mounted) return;
     this.icon.setSize(this.radius);
     this.reset();
+    return this;
   }
-  
+
   //设置Icon颜色
-  public setIconColor(color: string) {
-    this.iconColor=color;
+  public setIconColor(color: string): BaseButton {
+    this.iconColor = color;
     this.icon.setColor(color);
+    return this;
+  }
+  public setId(id: string): BaseButton {
+    this._id = id;
+    return this;
   }
   /**
    * @description 关闭背景
    */
-  public hideBackground() {
+  public hideBackground() : BaseButton{
     this.displayBackground = false;
+    return this;
   }
   public setBackgroundColor(color: string) {
     this.background = color;
+    return this;
   }
-  public setLocation(location: ButtonLocation): void {
-    this.customLocation = location;
-    this.buttonLocation = location;
+  public setLocation(alignment: Alignment): void {
+    this.customAlignment = alignment;
+    this.buttonAlignment = alignment;
     //如果已经被初始化
     if (this.mounted) {
       this.initialization(this.master);
     }
   }
-
+  public async export<O = any>(): Promise<ExportButton<O>> {
+    const entity = {
+      id: this.id,
+      type: this.name,
+      alignment: this.btnLocation,
+      radius: this.senseRadius,
+      backgroundColor: this.background,
+      iconColor: this.iconColor,
+      displayBackground: this.displayBackground,
+    };
+    return Promise.resolve(entity);
+  }
   protected drawButton(
     position: Vector,
     size: Size,

@@ -30,7 +30,34 @@ enum ViewObjectFamily {
   rect,
   text,
   group,
+  graphicsRectangle,
+  graphicsPolygon,
 }
+
+// enum Alignment {
+//   topLeft,
+//   topCenter,
+//   topRight,
+//   centerLeft,
+//   center,
+//   centerRight,
+//   bottomLeft,
+//   bottomCenter,
+//   bottomRight,
+//   outTopLeft,
+//   outTopCenter,
+//   outTopRight,
+//   outCenterLeft,
+//   outCenter,
+//   outCenterRight,
+//   outBottomLeft,
+//   outBottomCenter,
+//   outBottomRight,
+// }
+
+/**
+ * @deprecated
+ */
 enum ButtonLocation {
   LT,
   LB,
@@ -49,9 +76,11 @@ enum ButtonLocation {
   OutRT,
   OutRB,
 }
+
 export {
   FuncButtonTrigger,
   OperationTypeEmum,
   ViewObjectFamily,
-  ButtonLocation,
+  // ButtonLocation,
+  // Alignment
 };

@@ -118,12 +118,12 @@ class AuxiliaryLine {
       paint.moveTo(p1.x, p1.y);
       paint.lineTo(p2.x, p2.y);
     });
-    paint.setlineDash(this.dash)
+    paint.setLineDash(this.dash)
     paint.strokeStyle = this.color;
     paint.lineWidth = 1;
     paint.stroke();
     paint.closePath();
-    paint.setlineDash([])
+    paint.setLineDash([])
   }
 }
 export default AuxiliaryLine;

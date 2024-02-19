@@ -1,31 +1,53 @@
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "./image-toolkit";
-import GestiController from "../interfaces/gesticontroller";
+import GestiControllerInterface, {
+  BindControllerInterface,
+} from "../interfaces/gesticontroller";
 import Vector from "./vector";
 import XImage from "./ximage";
-import { GraffitiCloser, TextOptions } from "@/types/index";
+import {
+  ExportAllInterceptor,
+  GraffitiCloser,
+  ImportAllInterceptor,
+  ScreenUtilOption,
+  TextOptions,
+} from "@/types/gesti";
+import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
+import Gesti from "./gesti";
+import { GestiControllerListenerTypes } from "@/types/controller";
 
 declare type CenterAxis = "vertical" | "horizon";
 
-class GesteControllerImpl implements GestiController {
+abstract class GesteControllerImpl implements GestiControllerInterface {
   /**
    * @ImageToolkit
    * @private
    */
-  private kit: ImageToolkit;
-  constructor(kit: ImageToolkit) {
+  protected kit: ImageToolkit;
+  constructor(kit?: ImageToolkit) {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  getScreenUtil(): ScreenUtils {
+    return this.kit.getScreenUtil();
+  }
+  forceRender(): void {
+    this.kit.forceRender();
+  }
+  //取消手势(二指)
+  cancelGesture(): void {
+    this.kit.cancelGesture();
+  }
+
   remove(view?: ViewObject): boolean {
     return this.kit.remove(view);
   }
-  getAllViewObject(): ViewObject[] {
-   return this.kit.getAllViewObject();
-  }
-  getAllViewObjectSync(): Promise<ViewObject[]> {
+  getAllViewObjectSync(): ViewObject[] {
     return this.kit.getAllViewObjectSync();
+  }
+  getAllViewObject(): Promise<ViewObject[]> {
+    return this.kit.getAllViewObject();
   }
   mount(view: ViewObject): void {
     this.kit.mount(view);
@@ -33,7 +55,7 @@ class GesteControllerImpl implements GestiController {
   unMount(view: ViewObject): void {
     this.kit.unMount(view);
   }
-  
+
   close(view?: ViewObject): void {
     this.kit.close(view);
   }
@@ -52,6 +74,12 @@ class GesteControllerImpl implements GestiController {
     if (!id) throw Error("Invalid id");
     return this.kit.getViewObjectById<T>(id);
   }
+  getViewObjectByIdSync<T extends ViewObject>(id: string): T {
+    return this.kit.getViewObjectByIdSync<T>(id);
+  }
+  generateScreenUtils(option: ScreenUtilOption): ScreenUtils {
+    return this.kit.generateScreenUtils(option);
+  }
   /**
    * @description 设置某个对象的位置
    * @param x
@@ -66,19 +94,19 @@ class GesteControllerImpl implements GestiController {
    * @param offScreenPainter 离屏画笔
    * @returns
    */
-  exportAllWithWeChat(
-    offScreenPainter: CanvasRenderingContext2D
-  ): Promise<string> {
-    return this.kit.exportAllWithWeChat(offScreenPainter);
-  }
-  /**
-   * @description 微信小程序导入
-   * @param offScreenPainter 离屏画布
-   * @returns
-   */
-  importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
-    return this.kit.importAllWithWeChat(json, weChatCanvas);
-  }
+  // exportAllWithWeChat(
+  //   offScreenPainter: CanvasRenderingContext2D
+  // ): Promise<string> {
+  //   return this.kit.exportAllWithWeChat(offScreenPainter);
+  // }
+  // /**
+  //  * @description 微信小程序导入
+  //  * @param offScreenPainter 离屏画布
+  //  * @returns
+  //  */
+  // importAllWithWeChat(json: string, weChatCanvas: any): Promise<void> {
+  //   return this.kit.importAllWithWeChat(json, weChatCanvas);
+  // }
   cleanAll(): Promise<void> {
     return this.kit.cleanAll();
   }
@@ -115,11 +143,11 @@ class GesteControllerImpl implements GestiController {
   rightward(viewObject?: ViewObject): number {
     return this.kit.rightward(viewObject);
   }
-  importAll(json: string): Promise<void> {
-    return this.kit.importAll(json);
+  importAll(json: string, interceptor: ImportAllInterceptor): Promise<void> {
+    return this.kit.importAll(json, interceptor);
   }
-  exportAll(offScreenPainter: CanvasRenderingContext2D): Promise<string> {
-    return this.kit.exportAll(offScreenPainter);
+  exportAll(exportAllInterceptor?: ExportAllInterceptor): Promise<string> {
+    return this.kit.exportAll(exportAllInterceptor);
   }
   addWrite(options: {
     type: "circle" | "write" | "line" | "rect" | "none";
@@ -140,8 +168,8 @@ class GesteControllerImpl implements GestiController {
   updateText(text: string, options?: TextOptions): void {
     this.kit.updateText(text, options);
   }
-  center(view?: ViewObject,axis?: CenterAxis): void {
-    this.kit.center( view,axis);
+  center(view?: ViewObject, axis?: CenterAxis): void {
+    this.kit.center(view, axis);
   }
   addText(text: string, options?: TextOptions): Promise<ViewObject> {
     return this.kit.addText(text, options);
@@ -267,13 +295,18 @@ class GesteControllerImpl implements GestiController {
    */
   private action(_e: any, callback: any, key: string) {
     /**
+     * 2024/2/6新增：uniapp端touches概率版本为对象
      * 点击和移动事件 三个都有
      * 抬起事件只有changedTouches
      * 针对Up事件，提供以下针对方案
      */
-    const touches = key
+    let touches = key
       ? _e[key]
       : _e.touches || _e.targetTouches || _e.changedTouches;
+    //如果是对象
+    if (typeof touches === "object") {
+      touches = Object.values(touches);
+    }
     if (touches.length >= 2) {
       callback.bind(this.kit)(this.twoFingers(touches));
     } else {
@@ -330,4 +363,25 @@ class GesteControllerImpl implements GestiController {
   }
 }
 
-export default GesteControllerImpl;
+class GestiController
+  extends GesteControllerImpl
+  implements BindControllerInterface
+{
+  constructor(gesti?: Gesti) {
+    super(gesti?.kit);
+  }
+  initialized: boolean = false;
+  bindController(controller: GestiControllerInterface): void {
+    throw new Error("Method not implemented.");
+  }
+  bindGesti(gesti: Gesti): void {
+    this.kit = gesti.kit;
+    this.initialized = gesti.initialized;
+  }
+  destroyGesti(): void {
+    this.initialized = false;
+    this.kit.destroyGesti();
+  }
+}
+
+export default GestiController;

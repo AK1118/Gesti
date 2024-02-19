@@ -1,5 +1,5 @@
-import { ButtonLocation, FuncButtonTrigger } from "../../enums";
-
+import {  FuncButtonTrigger } from "../../enums";
+import Alignment from "@/core/lib/painting/alignment";
 import BaseButton from "../../abstract/baseButton";
 import Painter from "../../lib/painter";
 import Rect from "../../lib/rect";
@@ -15,7 +15,7 @@ import { LockIcon } from "@/composite/icons";
 class LockButton extends BaseButton {
     readonly name: ButtonNames="LockButton";
     protected icon: Icon=new LockIcon();
-    protected buttonLocation:ButtonLocation=ButtonLocation.LT;
+    protected buttonAlignment:Alignment=Alignment.topLeft;
     trigger: FuncButtonTrigger = FuncButtonTrigger.click;
     radius: number = 10;
 

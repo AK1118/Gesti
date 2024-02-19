@@ -1,7 +1,27 @@
-import { GraffitiCloser, TextOptions } from "@/types/index";
+import {
+  ExportAllInterceptor,
+  GraffitiCloser,
+  ImportAllInterceptor,
+  ScreenUtilOption,
+  TextOptions,
+} from "@/types/gesti";
 import ViewObject from "../abstract/view-object";
 import { ViewObjectFamily } from "../enums";
 import XImage from "../lib/ximage";
+import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
+import Gesti from "../lib/gesti";
+import {
+  CenterAxis,
+  GestiControllerListenerTypes,
+  GraffitiType,
+} from "@/types/controller";
+
+export interface BindControllerInterface {
+  initialized: boolean;
+  bindController(controller: GestiControllerInterface): void;
+  bindGesti(gesti: Gesti): void;
+}
+
 //图层控制器
 interface LayerController {
   /**
@@ -39,7 +59,7 @@ interface LayerController {
   /**
    * 被选中对象居中画布
    */
-  center( view?: ViewObject,axis?: CenterAxis): void;
+  center(view?: ViewObject, axis?: CenterAxis): void;
   /**
      * 更新文字图层内容
      * @param text:String
@@ -95,21 +115,20 @@ interface LayerController {
    */
   cleanAll(): Promise<void>;
 
-  position(x:number,y:number,view?:ViewObject):void;
+  position(x: number, y: number, view?: ViewObject): void;
   /**
    * @description 关闭某个图层
-   * @param view 
+   * @param view
    */
-  close(view?:ViewObject):void;
+  close(view?: ViewObject): void;
   /**
    * @description 镜像
-   * @param view 
+   * @param view
    * @returns {boolean} 返回是否处于镜像
    */
-  mirror(view?:ViewObject):boolean;
+  mirror(view?: ViewObject): boolean;
 
-  remove(view?:ViewObject):void;
-
+  remove(view?: ViewObject): void;
 }
 
 type ListenerCallback = (object: any) => void;
@@ -118,14 +137,14 @@ type ListenerCallback = (object: any) => void;
 interface ImageToolKitController {
   /**
    * @description 挂载一个对象进入gesti内
-   * @param view 
+   * @param view
    */
-  mount(view:ViewObject):void;
+  mount(view: ViewObject): void;
   /**
    * @description 卸载一个对象在gesti内
-   * @param view 
+   * @param view
    */
-  unMount(view:ViewObject):void;
+  unMount(view: ViewObject): void;
   /**
    *
    * @param view 将可操作对象载入gesti内
@@ -145,10 +164,15 @@ interface ImageToolKitController {
    * 刷新画布
    */
   render(): void;
-    /**
+  /**
+   * ### 强制刷新画布
+   * - 下一帧不会是缓存
+   */
+  forceRender(): void;
+  /**
    * @deprecated 即将废弃，请使用 render()
    */
-  update():void;
+  update(): void;
   /**
    * 新增图片
    * @param @XImage
@@ -205,7 +229,7 @@ interface ImageToolKitController {
    * @description 导出所有对象成JSON字符串
    * @param offScreenPainter  离屏渲染对象
    */
-  exportAll(offScreenPainter: CanvasRenderingContext2D): Promise<string>;
+  exportAll(interceptor?: ExportAllInterceptor): Promise<string>;
   /**
    * @description 导出所有对象成JSON字符串
    * @param offScreenPainter  离屏渲染对象
@@ -215,7 +239,7 @@ interface ImageToolKitController {
    * @description 导入Json字符串解析成canvas对象
    * @param json
    */
-  importAll(json: string): Promise<void>;
+  importAll(json: string, interceptor?: ImportAllInterceptor): Promise<void>;
   /**
    * 在微信小程序内导入
    * @param json 导入JSON
@@ -228,24 +252,38 @@ interface ImageToolKitController {
    */
   destroyGesti(): void;
 
-  querySelector(select:string|ViewObjectFamily):Promise<ViewObject|ViewObject[]>;
+  querySelector(
+    select: string | ViewObjectFamily
+  ): Promise<ViewObject | ViewObject[]>;
 
-  getViewObjectById<T extends ViewObject>(id:string):Promise<T>;
+  getViewObjectById<T extends ViewObject>(id: string): Promise<T>;
+
+  getViewObjectByIdSync<T extends ViewObject>(id: string): T;
 
   /**
    * 获取所有的视图对象
    */
-  getAllViewObject():Array<ViewObject>;
+  getAllViewObjectSync(): Array<ViewObject>;
 
   /**
    * 异步，获取所有的视图对象
    */
-  getAllViewObjectSync():Promise<Array<ViewObject>>;
+  getAllViewObject(): Promise<Array<ViewObject>>;
+  /**
+   * 设置屏幕适配器
+   */
+  generateScreenUtils(option: ScreenUtilOption): ScreenUtils;
+  /**
+   * 获取该控制器的屏幕适配器
+   */
+  getScreenUtil(): ScreenUtils;
 }
 /**
  * 控制器类，提供接口供给用户使用
  */
-interface GestiController extends LayerController, ImageToolKitController {
+interface GestiControllerInterface
+  extends LayerController,
+    ImageToolKitController {
   /**
    * @description 鼠标/手指按下时调用
    * @param e
@@ -297,6 +335,8 @@ interface GestiController extends LayerController, ImageToolKitController {
             })
       */
   cancelEvent(): void;
+
+  cancelGesture(): void;
 }
 
-export default GestiController;
+export default GestiControllerInterface;

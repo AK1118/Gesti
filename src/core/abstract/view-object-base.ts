@@ -3,20 +3,114 @@ import Painter from "../lib/painter";
 import Rect, { Size } from "../lib/rect";
 import Vector from "../lib/vector";
 import { Point } from "../lib/vertex";
-import Button from "./baseButton";
+import Button, { BaseButton } from "./baseButton";
 import OperationObserver from "./operation-observer";
-import AuxiliaryLine from "../../tools/auxiliary-lines";
-import GestiConfig from "../../config/gestiConfig";
 import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
 import { ViewObjectExportEntity } from "@/types/serialization";
-// import { ViewObjectExportEntity } from "@/types/index";
+import {
+  getOffscreenCanvasContext,
+  getOffscreenCanvasWidthPlatform,
+} from "@/utils/canvas";
+import RenderBox from "../lib/rendering/renderbox";
+import BoxDecoration from "../lib/rendering/decorations/box-decoration";
+import {
+  BoxDecorationOption,
+  Decoration,
+  DecorationOption,
+  DecorationTypes,
+} from "Graphics";
+import DecorationBase from "../bases/decoration-base";
+import PolygonDecoration from "../lib/rendering/decorations/polygon-decoration";
+
+class ViewObjectRenderBox extends RenderBox {}
 
 /**
  * 图层基类
  */
-abstract class BaseViewObject extends OperationObserver {
+abstract class BaseViewObject<
+  D extends DecorationBase
+> extends OperationObserver {
+  protected decoration: D;
+  public renderBox: RenderBox = new ViewObjectRenderBox();
+  protected offScreenCanvas;
+  protected offScreenPainter: Painter;
+  private _isCache: boolean = false;
+  private _didChanged: boolean = false;
+  protected get canRenderCache(): boolean {
+    return this._isCache && this.offScreenCreated;
+  }
+  protected get offScreenCreated(): boolean {
+    return this.offScreenCanvas != null && this.offScreenPainter != null;
+  }
+  protected get isUseRenderCache(): boolean {
+    return this._isCache;
+  }
+  protected get didChanged(): boolean {
+    return this._didChanged;
+  }
+  protected _didChangedAll(): void {
+    this._didChanged = true;
+  }
+  protected reBuild(): void {
+    this._didChanged = false;
+  }
+  public useCache(): void {
+    this._isCache = true;
+  }
+  public generateOffScreenCanvas(): boolean {
+    this.offScreenCanvas = getOffscreenCanvasWidthPlatform(
+      this.renderBox.width,
+      this.renderBox.height
+    );
+    this.offScreenPainter = getOffscreenCanvasContext(this.offScreenCanvas);
+    return this.offScreenCanvas != null && this.offScreenPainter != null;
+  }
+  public unUseCache(): void {
+    this._isCache = false;
+    this.offScreenCanvas = null;
+    this.offScreenPainter = null;
+  }
+  private decorationOption: BoxDecorationOption = {};
+  /**
+   * ## 设置View盒子装饰
+   * - decoration 装饰参数，包括背景颜色，背景图片，圆角，背景渐变等
+   * - extension 是否在原来的基础上扩展，默认true
+   * @param decoration
+   * @param extension
+   */
+  public setDecoration<O extends DecorationOption = BoxDecorationOption>(
+    decoration: O,
+    extension: boolean = true,
+    decorationType: DecorationTypes = "box"
+  ): void {
+    let _d = {
+      ...decoration,
+    };
+    if (extension) {
+      _d = Object.assign(this.decorationOption, _d);
+    }
+    if (!this.decoration) {
+      //根据type创建修饰器
+      if (decorationType === "box") {
+        this.decoration = new BoxDecoration(_d) as unknown as D;
+      } else if (decorationType === "polygon") {
+        this.decoration = new PolygonDecoration(_d) as unknown as D;
+      } else {
+        throw Error("Invalid decoration type: " + decorationType);
+      }
+    } else {
+      this.decoration.update(_d);
+    }
+    this.decorationOption = _d;
+    this.forceUpdate();
+  }
+  public setDecorationEntity(decorationEntity: DecorationBase) {
+    if (!decorationEntity) return;
+    this.decoration = decorationEntity as D;
+    this.forceUpdate();
+  }
   //是否挂载到Gesti
   private _mounted: boolean = false;
   //瞬时缩放倍数
@@ -29,10 +123,6 @@ abstract class BaseViewObject extends OperationObserver {
   protected isMirror: boolean = false;
   //是否隐藏
   public disabled: boolean = false;
-  //描述对象在二维坐标中的平面信息数据
-  private _rect: Rect;
-  //相对于自身描述对象在二维坐标中的平面信息数据
-  private _relativeRect: Rect;
   //不透明度
   public opacity: number = 1;
   //按钮数组，所安装的按钮都在里面
@@ -57,10 +147,8 @@ abstract class BaseViewObject extends OperationObserver {
   //image kit 对象
   protected kit: ImageToolkit;
   //对象层级 => 对象在数组中的位置
-  private layer: number = 0;
-  //宽度的绝对增长倍数
-  private _scaleWidth: number = 1;
-  private _scaleHeight: number = 1;
+  private layer: number = null;
+
   //初始化时的尺寸，用于计算scaleWidth,和scaleHeight
   private _fixedSize: Size = Size.zero;
   get fixedSize(): Size {
@@ -106,21 +194,14 @@ abstract class BaseViewObject extends OperationObserver {
     return this._mounted;
   }
 
-  set relativeRect(value: Rect) {
-    this._relativeRect = value;
-  }
-  get relativeRect(): Rect {
-    return this._relativeRect;
-  }
-  set rect(value: Rect) {
-    this._rect = value;
-    this.relativeRect = value;
-  }
-  get rect(): Rect {
-    return this._rect;
-  }
   public toBackground(): void {
     this._background = true;
+  }
+  public makeFixed(): void {
+    this.toBackground();
+  }
+  public makeUnfixed(): void {
+    this.unBackground();
   }
   get isBackground(): boolean {
     return this._background;
@@ -159,46 +240,7 @@ abstract class BaseViewObject extends OperationObserver {
       button.disabled = button.isFree;
     });
   }
-  get size(): Size {
-    return this.rect.size;
-  }
-  public get position(): Vector {
-    return this.rect.position;
-  }
-  get width(): number {
-    return this.size.width;
-  }
-  get height(): number {
-    return this.size.height;
-  }
-  get positionX(): number {
-    return this.position.x;
-  }
-  get positionY(): number {
-    return this.position.y;
-  }
-  get scaleWidth(): number {
-    return this._scaleWidth;
-  }
-  get scaleHeight(): number {
-    return this._scaleHeight;
-  }
-  private preScaleWidth: number = 1;
-  private preScaleHeight: number = 1;
-  public setScaleWidth(scale: number): void {
-    if (this.preScaleWidth.toFixed(2) === scale.toFixed(2)) return;
-    this._scaleWidth = scale;
-    this._didChangeScaleWidth();
-    this.didChangeScaleWidth();
-    this.preScaleWidth = scale;
-  }
-  public setScaleHeight(scale: number): void {
-    if (this.preScaleHeight.toFixed(2) === scale.toFixed(2)) return;
-    this._scaleHeight = scale;
-    this._didChangeScaleHeight();
-    this.didChangeScaleHeight();
-    this.preScaleHeight = scale;
-  }
+
   protected preWhRatio: number = 0;
   protected preHwRatio: number = 0;
   //设置大小
@@ -207,10 +249,17 @@ abstract class BaseViewObject extends OperationObserver {
     if (this._fixedSize.equals(Size.zero)) {
       this.setFixedSize(size);
     }
-    this.rect.setSize(width ?? this.width, height ?? this.height);
+    this.renderBox.rect.setSize(
+      width ?? this.renderBox.width,
+      height ?? this.renderBox.height
+    );
+  }
+
+  public getKit(): ImageToolkit {
+    return this.kit;
   }
   public get absoluteScale(): number {
-    return this.rect.absoluteScale;
+    return this.renderBox.absoluteScale;
   }
   /**
    * 被加入gesti内时调用
@@ -234,8 +283,11 @@ abstract class BaseViewObject extends OperationObserver {
   /**
    * @description 强制刷新画布
    */
-  protected forceUpdate() {
-    this.kit.render();
+  public forceUpdate() {
+    if (this.mounted) {
+      this.offScreenCanvas = null;
+      this.kit.render();
+    }
   }
   //导出为JSON
   abstract export(painter?: Painter): Promise<ViewObjectExportEntity>;
@@ -252,14 +304,78 @@ abstract class BaseViewObject extends OperationObserver {
   //手指抬起在范围外时调用
   protected didEventUpWithOuter(): void {}
 
-  protected didChangeScaleWidth(): void {}
+  set rect(newRect: Rect) {
+    this.renderBox.rect = newRect;
+  }
 
-  protected didChangeScaleHeight(): void {}
-
-  protected _didChangeScaleWidth(): void {}
-
-  protected _didChangeScaleHeight(): void {}
-
+  get rect(): Rect {
+    return this.renderBox.rect;
+  }
+  set relativeRect(value: Rect) {
+    this.renderBox.relativeRect = value;
+  }
+  get relativeRect(): Rect {
+    return this.renderBox.relativeRect;
+  }
+  get size(): Size {
+    return this.rect.size;
+  }
+  public get position(): Vector {
+    return this.rect.position;
+  }
+  get width(): number {
+    return this.size.width;
+  }
+  get height(): number {
+    return this.size.height;
+  }
+  get positionX(): number {
+    return this.position.x;
+  }
+  get positionY(): number {
+    return this.position.y;
+  }
+  public get halfWidth(): number {
+    return this.rect.halfWidth;
+  }
+  public get halfHeight(): number {
+    return this.rect.halfHeight;
+  }
+  get scaleWidth(): number {
+    return this.rect.scaleWidth;
+  }
+  get scaleHeight(): number {
+    return this.rect.scaleHeight;
+  }
+  get allButtons(): Array<BaseButton> {
+    return this.funcButton;
+  }
+  public setScaleWidth(scale: number) {
+    this.rect.setScaleWidth(scale);
+  }
+  public setScaleHeight(scale: number) {
+    this.rect.setScaleHeight(scale);
+  }
+  public setPosition(x: number, y: number): void {
+    this.rect.setPosition(new Vector(x, y));
+  }
+  public addPosition(deltaX: number, deltaY: number) {
+    this.rect.addPosition(new Vector(deltaX, deltaY));
+  }
+  public setAngle(angle: number) {
+    this.rect.setAngle(angle);
+  }
+  public getButtonByIdSync<ButtonType extends BaseButton>(
+    id: string
+  ): ButtonType | undefined {
+    const foundButton = this.funcButton.find((button) => button.id === id);
+    return foundButton as ButtonType;
+  }
+  public getButtonById<ButtonType extends BaseButton>(
+    id: string
+  ): Promise<ButtonType | undefined> {
+    return Promise.resolve(this.getButtonByIdSync(id));
+  }
 }
 
 export default BaseViewObject;

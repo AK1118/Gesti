@@ -1,4 +1,4 @@
-import { ImageChunk } from "@/types/index";
+import { ImageChunk } from "@/types/gesti";
 import CutterInterface from "../interfaces/cutter";
 import Painter from "../lib/painter";
 import XImage from "../lib/ximage";
@@ -15,7 +15,7 @@ abstract class CutterBase implements CutterInterface{
     getChunks(ximage: XImage): Promise<ImageChunk[]> {
         throw new Error("Method not implemented.");
     }
-    merge(width: number, height: number, chunks: ImageChunk[], canvas?: any): Promise<ImageData> {
+    merge(width: number, height: number, chunks: ImageChunk[], canvas?: any):ImageData {
         throw new Error("Method not implemented.");
     }
     

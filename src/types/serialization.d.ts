@@ -1,10 +1,26 @@
-import { ButtonLocation } from "@/core/enums";
-import { GraffitiTypes, TextOptions, ViewObject, XImage } from "./index";
+import {
+  Alignment,
+  GraffitiTypes,
+  ImageChunk,
+  ScreenUtilOption,
+  TextOptions,
+  ViewObject,
+  XImage,
+} from "./gesti";
+
+import { BoxDecoration, Decoration, GenerateGraphicsOption } from "./graphics";
 
 declare module "Serialization" {
   type FetchXImageForImportCallback = (
     data: ViewObjectExportEntity
   ) => Promise<XImage>;
+
+  interface ExportXImage {
+    url?: string;
+    data?: Array<ImageChunk>;
+    width: number;
+    height: number;
+  }
 
   interface ExportRect {
     x: number;
@@ -14,16 +30,18 @@ declare module "Serialization" {
     angle: number;
   }
 
-  interface ExportButton {
-    type: string;
-    location?: ButtonLocation;
+  interface ExportButton<O = any> {
+    id?: string;
+    type: ButtonNames;
+    alignment?: Alignment;
     radius?: number;
     iconColor?: string;
     backgroundColor?: string;
     displayBackground?: boolean;
+    option?: O;
   }
 
-  interface ViewObjectExportBaseInfo {
+  export interface ViewObjectExportBaseInfo {
     rect: ExportRect;
     fixedSize: {
       width: number;
@@ -36,17 +54,24 @@ declare module "Serialization" {
     relativeRect: ExportRect;
     mirror: boolean;
     locked: boolean;
-    buttons: Array<ExportButton>;
+    buttons?: Array<ExportButton>;
     id: string;
     layer: number;
     isBackground: boolean;
     opacity: number;
     platform: PlatformType;
+    decoration: BoxDecoration;
   }
 
-  type ViewObjectExportTypes = "image" | "text" | "write" | "group";
+  type ViewObjectExportTypes =
+    | "image"
+    | "text"
+    | "write"
+    | "group"
+    | "graphicsRectangle"
+    | "graphicsPolygon";
 
-  interface ViewObjectExportEntity {
+  export interface ViewObjectExportEntity {
     base: ViewObjectExportBaseInfo;
     type: ViewObjectExportTypes;
   }
@@ -72,7 +97,14 @@ declare module "Serialization" {
       type: GraffitiTypes;
       isFill?: boolean;
     };
-    points:Array<Vector>
+    points: Array<Vector>;
+  }
+
+  //图形导出
+  interface ViewObjectExportGraphics<
+    T extends GenerateGraphicsOption | any = {}
+  > extends ViewObjectExportEntity {
+    option: T;
   }
 
   interface ViewObjectImportBaseInfo extends ViewObjectExportBaseInfo {}
@@ -83,8 +115,30 @@ declare module "Serialization" {
 
   interface ViewObjectImportTextBox extends ViewObjectExportTextBox {}
 
-  interface ViewObjectImportGraffiti extends ViewObjectExportGraffiti{}
+  interface ViewObjectImportGraffiti extends ViewObjectExportGraffiti {}
+
+  interface ViewObjectImportGraphics<T> extends ViewObjectExportGraphics<T> {}
+
   interface Reverse<Entity extends ViewObjectExportEntity> {
     reverse(entity: Entity): Promise<ViewObject>;
+  }
+
+  /**
+   * 屏幕适配导出
+   * 适配因子，设计稿大小，画布大小
+   */
+  interface ScreenUtilExportEntity extends ScreenUtilOption {
+    scaleWidth: number;
+    scaleHeight: number;
+    scaleText: number;
+  }
+
+  interface ViewObjectExportWrapperBaseInfo {
+    platform: PlatformType;
+    screen: ScreenUtilExportEntity;
+  }
+  interface ViewObjectExportWrapper {
+    entities: Array<ViewObjectExportEntity>;
+    info: ViewObjectExportWrapperBaseInfo;
   }
 }

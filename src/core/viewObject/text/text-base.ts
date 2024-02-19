@@ -8,7 +8,7 @@ import {
   FontWeight,
   TextHandler,
   TextOptions,
-} from "../../../types/index";
+} from "../../../types/gesti";
 import Vector from "../../lib/vector";
 import { Point } from "../../lib/vertex";
 import Platform from "../tools/platform";
@@ -24,6 +24,7 @@ import {
   getOffscreenCanvasWidthPlatform,
   waitingLoadImg,
 } from "@/utils/canvas";
+import { BoxDecorationOption } from "Graphics";
 /**
  * 普通模式，矩形根据文字而定
  * 拖拽模式，文字根据缩放倍数而定
@@ -35,11 +36,15 @@ export abstract class TextBoxBase extends ViewObject {
   protected textOptions: TextOptions = {
     fontSize: 20,
     color: "black",
-    spacing: 0,
+    spacing: 1,
     lineHeight: 1.5,
     weight: "normal",
     fontStyle: "normal",
     maxWidth: 300,
+    shadowColor: "",
+    shadowBlur: 0,
+    shadowOffsetX: 0,
+    shadowOffsetY: 0,
   };
   get textWrap(): boolean {
     return true;
@@ -55,12 +60,14 @@ export abstract class TextBoxBase extends ViewObject {
    * @deprecated
    * @param text
    * @param options
+   * @deprecated
    * @returns
    */
   updateText(text: string, options?: TextOptions): Promise<void> {
     return Promise.resolve();
   }
   private getTextSingle = (text: string): TextSingle => {
+    if (!this.paint) return;
     const measureText = this.paint.measureText(text);
     //行高
     const lineHeight: number = this.textOptions.lineHeight || 1;
@@ -72,9 +79,14 @@ export abstract class TextBoxBase extends ViewObject {
     return textSingle;
   };
   private getFont(): string {
-    const bold = this.textOptions.weight;
-    const italic = this.textOptions.fontStyle;
-    return `${bold} ${italic} ${this.textOptions.fontSize}px ${this.textOptions.fontFamily}`;
+    //uniapp 兼容写法
+    // const bold = this.textOptions.weight||'';
+    // const italic = this.textOptions.fontStyle||'';
+    // const family=this.textOptions.fontFamily||'';
+    // return `${bold} ${italic} ${~~this.textOptions.fontSize}px ${family}`;
+    const bold = this.textOptions.weight||'';
+    const italic = this.textOptions.fontStyle||'';
+    return `${bold} ${italic} ${~~this.textOptions.fontSize}px ${this.textOptions.fontFamily}`;
   }
   /**
    * @description 计算文字大小
@@ -83,41 +95,49 @@ export abstract class TextBoxBase extends ViewObject {
   private setFontDecorations(paint: Painter) {
     //设置字体大小
     paint.font = this.getFont();
+    //设置影音
+    if (this.textOptions.shadowColor)
+      paint.setShadow({
+        ...this.textOptions,
+      });
   }
   /**
    * @override
    */
-  public mount(): void {
-    this.computeTextSingle(true);
-    this.setMount(true);
+  // public mount(): void {
+  //   this.computeTextSingle(true);
+  //   this.setMount(true);
+  // }
+  protected onMounted(): void {
+      this.computeTextSingle(false);
   }
   protected computeTextSingle(
     isInitialization: boolean = false
   ): Array<TextSingle> {
     if (isInitialization) this.setFixedOption();
-    this.setFontDecorations(this.paint);
+    this.paint.save();
+    if (this.mounted) this.setFontDecorations(this.paint);
     //This viewObject rect size
     const size: Size = Size.zero;
     const splitTexts: Array<string> = this.handleSplitText(this.fixedText);
     const getTextSingles = (texts: Array<string>): Array<TextSingle> => {
-      return texts.map((text) => {
+      return texts.map((text: string) => {
         const textSingle = this.getTextSingle(text);
+        if (text.length != 1) textSingle.texts = getTextSingles(text.split(""));
         //设置rect的大小
         size.setHeight(Math.max(textSingle.height, size.height));
         size.setWidth(size.width + textSingle.width);
         size.setWidth(Math.min(this.fixedOption.maxWidth, size.width));
-        if (text.length != 1) textSingle.texts = getTextSingles(text.split(""));
         return textSingle;
       }) as unknown as Array<TextSingle>;
     };
     this.texts = getTextSingles(splitTexts);
-
     this.computeDrawPoint(
       this.texts,
       isInitialization ? size : this.size,
       isInitialization
     );
-
+    this.paint.restore();
     return this.texts;
   }
   /**
@@ -128,7 +148,7 @@ export abstract class TextBoxBase extends ViewObject {
   private handleSplitText(text: string): Array<string> {
     const result = [];
     const regex =
-      /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[!\"#\$%&'\(\)\*\+,\-\./:;<=>\?@\[\\\]\^_`{\|}~]|[！？｡。，；：…“”‘’（）&#8203;``【】``&#8203;〔〕｛｝《》〈〉『』「」]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
+      /[\s]+|[\u4e00-\u9fa5]|[A-Za-z]+|\d|[!\"#\$%&'\(\)\*\+,\-\./:;<=>\?@\[\\\]\^_`{\|}~]|[！？｡。，；：…“”‘’（）&#8203;``【】``&#8203;〔〕｛｝《》〈〉『』「」\s]|[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u26FF\u2700-\u27BF]/g;
     let match: Array<string> = [];
     while ((match = regex.exec(text)) !== null) {
       result.push(match[0]);
@@ -392,6 +412,9 @@ export abstract class TextBoxBase extends ViewObject {
     this.isDirty = true;
     this.extendDidChangeDeltaScale(scale);
     this.updateFontSizeByRectSizeHeight();
+    if (this.textOptions.shadowOffsetX) this.textOptions.shadowOffsetX *= scale;
+    if (this.textOptions.shadowOffsetY) this.textOptions.shadowOffsetY *= scale;
+    if (this.textOptions.shadowBlur) this.textOptions.shadowBlur *= scale;
   }
   /**
    * 扩展给扩展类类用
@@ -453,12 +476,11 @@ export abstract class TextBoxBase extends ViewObject {
   }
   protected doCache(): void {
     //是否使用缓存  该平台是否存在离屏画布
-    if (!this.isUseCache || !this.getCacheCanvasByPlatform()) {
+    if (!this.isUseCache) {
       return;
     }
     //没变过大小就不缓存
     if (!this.isDirty) return;
-    // this.updateFontSizeByRectSizeHeight();
     this.flushCache();
     this.cache();
     this.updateCache();
@@ -468,62 +490,17 @@ export abstract class TextBoxBase extends ViewObject {
   //最终渲染缓存图像  OffscreenCanvas | Image
   protected renderedCacheImage = null;
   private async cache(): Promise<void> {
-    const painter: Painter = this.getCacheCanvasPainter();
+    //必须新建canvas重置画布大小
+    const created = this.generateOffScreenCanvas();
+    if (!created) return this.unUseCache();
+    const painter = this.offScreenPainter;
     this.setFontDecorations(painter);
     painter.clearRect(0, 0, this.width, this.height);
+    painter.save();
     painter.translate(this.width * 0.5, this.height * 0.5);
     this.render(painter, true);
-    painter.translate(-this.width * 0.5, -this.height * 0.5);
-
-    if (Platform.isBrowser) {
-      this.renderedCacheImage = this.cacheCanvas;
-    } else if (Platform.isWeChatMiniProgram) {
-      if (Platform.isWeChatMiniProgram) {
-        const img = (this.cacheCanvas as any)?.createImage();
-        img.src = (this.cacheCanvas as any)?.toDataURL();
-        await waitingLoadImg(img);
-        this.renderedCacheImage = img;
-      }
-    }
-  }
-  /**
-   * @description 获取平台的离屏画布
-   * @test
-   * @returns
-   */
-  private getCacheCanvasByPlatform(): any {
-    if (this.cacheCanvas) return this.cacheCanvas;
-    const offScreenCanvas = getOffscreenCanvasWidthPlatform(
-      this.width,
-      this.height
-    );
-    this.cacheCanvas = offScreenCanvas;
-    if (!offScreenCanvas) {
-      this.unUseCache();
-      return null;
-      // throw new Error(
-      //   "Your platform does not support OffscreenCanvas in [Gesti]. Please run textBox.unUseCache() to resolve this error."
-      // );
-    }
-    return this.cacheCanvas;
-  }
-  //创建时,刷新缓存时调用
-  private createCacheCanvas(): HTMLCanvasElement | OffscreenCanvas {
-    this.cacheCanvas = this.getCacheCanvasByPlatform();
-
-    this.cacheCanvas.width = this.width;
-    this.cacheCanvas.height = this.height;
-
-    return this.cacheCanvas;
-  }
-  //渲染时调用
-  private getCacheCanvas() {
-    return this.createCacheCanvas();
-  }
-  //获取画笔
-  private getCacheCanvasPainter(): Painter {
-    const cacheCanvas = this.getCacheCanvas();
-    return new Painter(cacheCanvas.getContext("2d") as any);
+    painter.restore();
+    this.renderedCacheImage = this.offScreenCanvas;
   }
   protected onInput(value: string): void {}
 }
@@ -536,6 +513,7 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     super();
     this.fixedText = text;
     Object.assign(this.textOptions, option);
+    this.unUseCache();
   }
   setFontStyle(style: FontStyleType): void {
     this.textOptions.fontStyle = style;
@@ -567,8 +545,8 @@ class TextViewBase extends TextBoxBase implements TextHandler {
   get value(): string {
     return this.fixedText;
   }
-  setDecoration(args: TextOptions): void {
-    this.textOptions=Object.assign(this.textOptions,args)
+  setTextStyle(args: TextOptions): void {
+    this.textOptions = Object.assign(this.textOptions, args);
   }
   async drawImage(paint: Painter): Promise<void> {
     //改过大小，且有缓存，渲染缓存
@@ -578,8 +556,8 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     ) {
       paint.drawImage(
         this.renderedCacheImage,
-        -this.width * 0.5,
-        -this.height * 0.5,
+        -this.width / 2,
+        -this.height / 2,
         this.width,
         this.height
       );
@@ -602,6 +580,7 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     this.rebuild();
   }
   private rebuild() {
+    if (!this.mounted) return;
     this.isDirty = false;
     this.computeTextSingle(false);
     //强制更新Gesti

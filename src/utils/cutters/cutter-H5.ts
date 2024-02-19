@@ -1,16 +1,17 @@
 import CutterInterface from "../../core/interfaces/cutter";
 import Painter from "../../core/lib/painter";
-import { ImageChunk } from "../../types/index";
+import { ImageChunk } from "../../types/gesti";
 import Vector from "../../core/lib/vector";
 import ImageChunkConverter from "../converters/image-chunk-converter-H5";
 import XImage from "../../core/lib/ximage";
 import CutterBase from "@/core/bases/cutter-base";
+import { getImageDataEntity, getOffscreenCanvasWidthPlatform, proxyGetImageData } from "../canvas";
 
 /**
  * 图片切割
  * 只做图片切割工作，其他不管
  */
-class CutterH5  extends CutterBase{
+class CutterH5 extends CutterBase {
   /**
    * @description 切割图片成小块
    * @param chunkSize
@@ -18,15 +19,13 @@ class CutterH5  extends CutterBase{
    * @param offset
    * @returns
    */
-  public async getChunks(
-    ximage: XImage
-  ): Promise<ImageChunk[]> {
-    let chunkSize:number=this.chunkSize;
+  public async getChunks(ximage: XImage): Promise<ImageChunk[]> {
+    let chunkSize: number = this.chunkSize;
     const imgWidth: number = ximage.fixedWidth,
       imgHeight: number = ximage.fixedHeight;
-      //当切块过小时合并
-      if(imgWidth-chunkSize<20)chunkSize=imgWidth;
-      if(imgHeight-chunkSize<20)chunkSize=imgHeight;
+    //当切块过小时合并
+    if (imgWidth - chunkSize < 20) chunkSize = imgWidth;
+    if (imgHeight - chunkSize < 20) chunkSize = imgHeight;
     const g: Painter = this.painter;
     const chunks: ImageChunk[] = [];
     const image = ximage.data;
@@ -37,18 +36,9 @@ class CutterH5  extends CutterBase{
       for (let x: number = 0; x < imgWidth; x += chunkSize) {
         const endX = Math.min(x + chunkSize, imgWidth);
         const width = endX - x;
-        g.paint.drawImage(
-          image,
-          x,
-          y,
-          width,
-          height,
-          0,
-          0,
-          width,
-          height
-        );
-        const imageData = await g.getImageData(0, 0, width, height);
+        g.paint.drawImage(image, x, y, width, height, 0, 0, width, height);
+        await g.draw();
+        const imageData = await proxyGetImageData(g,0,0,width,height)//g.getImageData(0, 0, width, height);
         g.clearRect(0, 0, width, height);
         chunks.push({
           x,
@@ -56,23 +46,17 @@ class CutterH5  extends CutterBase{
           width,
           height,
           imageData,
-          base64: "",
         });
       }
     }
-    return chunks;
+    return Promise.resolve(chunks);
   }
 
-  public async merge(
-    width: number,
-    height: number,
-    chunks: ImageChunk[]
-  ): Promise<ImageData> {
+  public merge(width: number, height: number, chunks: ImageChunk[]): ImageData {
     const g: any = this.painter;
     const converter: ImageChunkConverter = new ImageChunkConverter();
-    const imageData: ImageData = new ImageData(width, height, {
-      colorSpace: "srgb",
-    });
+    const offCanvas=getOffscreenCanvasWidthPlatform(width,height);
+    const imageData: ImageData = getImageDataEntity(offCanvas,width,height);
     chunks.forEach((item) => {
       const chunk = converter.base64ToChunk(item);
       const A = 4;
@@ -96,7 +80,7 @@ class CutterH5  extends CutterBase{
         imageData.data[index] = item;
       });
     });
-    console.info("[H5] Merge successful.");
+    console.info("Merge successful.");
     return imageData;
   }
 }

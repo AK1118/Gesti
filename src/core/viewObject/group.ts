@@ -11,6 +11,7 @@ import ImageToolkit from "../lib/image-toolkit";
 import Painter from "../lib/painter";
 import Rect, { Size } from "../lib/rect";
 import Vector from "../lib/vector";
+import { BoxDecorationOption } from "Graphics";
 /**
  *
  */
@@ -231,9 +232,7 @@ class Group extends GroupBase {
   get value(): any {
     return this.value;
   }
-  setDecoration(args: any): void {
-    throw new Error("Method not implemented.");
-  }
+  setDecoration(option: BoxDecorationOption): void {}
   public drawSelected(paint: Painter): void {}
 
   drawImage(paint: Painter): void {

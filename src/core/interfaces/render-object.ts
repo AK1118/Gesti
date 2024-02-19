@@ -18,4 +18,8 @@ export interface RenderObject {
     relativeRect: Rect;
 }
 
+
+
+
+
 export default RenderObject;

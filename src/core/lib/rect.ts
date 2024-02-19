@@ -1,5 +1,4 @@
 import { ObserverObj, OperationType } from "../abstract/operation-observer";
-import RecorderInterface from "../interfaces/recorder";
 import Vector from "./vector";
 import Vertex from "./vertex";
 
@@ -60,11 +59,13 @@ class Rect extends ObserverObj {
   private _size: Size;
   private _deltaScale: number;
   private _absoluteScale: number = 1;
+  //宽度的绝对增长倍数
+  private _scaleWidth: number = 1;
+  private _scaleHeight: number = 1;
+  private _preScaleWidth: number = 1;
+  private _preScaleHeight: number = 1;
   public readonly key: string = Math.random().toString(16).substring(2);
-  constructor(
-    params?: RectParams,
-    key?: string,
-  ) {
+  constructor(params?: RectParams, key?: string) {
     super();
     const { width, height, x, y } = params || {
       x: 0,
@@ -81,14 +82,21 @@ class Rect extends ObserverObj {
       this.setAngle(params?.angle);
     }
   }
+  public get halfWidth(): number {
+    return this.size.width * 0.5;
+  }
+  public get halfHeight(): number {
+    return this.size.height * 0.5;
+  }
   public updateVertex(): void {
-    const half_w = this._size.width * 0.5,
-      half_h = this._size.height * 0.5;
-    this._vertex = new Vertex([
+    const half_w = this.halfWidth,
+      half_h = this.halfHeight;
+    if (!this._vertex) this._vertex = new Vertex();
+    this._vertex.updatePoints([
       [-half_w, -half_h],
-      [+half_w, -half_h],
-      [+half_w, +half_h],
-      [-half_w, +half_h],
+      [half_w, -half_h],
+      [half_w, half_h],
+      [-half_w, half_h],
     ]);
     this._vertex.rotate(this.getAngle, this);
   }
@@ -112,6 +120,28 @@ class Rect extends ObserverObj {
   }
   public get getAngle(): number {
     return this._angle;
+  }
+  get scaleWidth(): number {
+    return this._scaleWidth;
+  }
+  get scaleHeight(): number {
+    return this._scaleHeight;
+  }
+  public setScaleWidth(scale: number): void {
+    if (this._preScaleWidth.toFixed(2) === scale.toFixed(2)) return;
+    this._scaleWidth = scale;
+    // this._didChangeScaleWidth();
+    // this.didChangeScaleWidth();
+    this.report(scale,"sizeScaleWidth");
+    this._preScaleWidth = scale;
+  }
+  public setScaleHeight(scale: number): void {
+    if (this._preScaleHeight.toFixed(2) === scale.toFixed(2)) return;
+    this._scaleHeight = scale;
+    // this._didChangeScaleHeight();
+    // this.didChangeScaleHeight();
+    this.report(scale,"sizeScaleHeight");
+    this._preScaleHeight = scale;
   }
   public set position(position: Vector) {
     if (position.equals(this.position)) return;

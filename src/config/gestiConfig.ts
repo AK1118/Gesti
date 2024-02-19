@@ -1,4 +1,4 @@
-export interface gesticonfig{
+export interface GestiConfigOption{
     auxiliary?: boolean,
     dashedLine?:boolean,
 }
@@ -7,13 +7,13 @@ class GestiConfig{
     //开启辅助参考线
     static auxiliary:boolean=true;
     static dashedLine:boolean=true;
-    constructor(config?:gesticonfig){
+    constructor(config?:GestiConfigOption){
         if(!config)return;
         //默认开启辅助参考线
         GestiConfig.auxiliary=config?.auxiliary??true;
         GestiConfig.dashedLine=config?.dashedLine??true;
     }
-    public setParams(config?:gesticonfig){
+    public setParams(config?:GestiConfigOption){
         if(!config)return;
         //默认开启辅助参考线
         GestiConfig.auxiliary=config?.auxiliary??true;

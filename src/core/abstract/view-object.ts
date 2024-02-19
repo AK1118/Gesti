@@ -7,7 +7,7 @@ import Button, { BaseButton } from "./baseButton";
 import OperationObserver from "./operation-observer";
 import AuxiliaryLine from "../../tools/auxiliary-lines";
 import GestiConfig from "../../config/gestiConfig";
-import { ButtonLocation, ViewObjectFamily } from "../enums";
+import { ViewObjectFamily } from "../enums";
 import ImageToolkit from "../lib/image-toolkit";
 import { Delta } from "../../utils/event/event";
 import BaseViewObject from "./view-object-base";
@@ -20,23 +20,31 @@ import {
   ViewObjectImportImageBox,
 } from "@/types/serialization";
 import Platform from "../viewObject/tools/platform";
-//转换为json的类型
-// export type toJsonType = "image" | "text" | "write";
-
-// export interface toJSONInterface {
-//   viewObjType: toJsonType;
-//   options: Object;
-// }
-
-abstract class ViewObject extends BaseViewObject implements RenderObject {
+import BoxDecoration from "../lib/rendering/decorations/box-decoration";
+import { BoxDecorationOption, Decoration } from "Graphics";
+import { CenterAxis } from "@/types/controller";
+import DecorationBase from "../bases/decoration-base";
+import { SelectedBorderStyle } from "@/types/gesti";
+/**
+ *
+ * 缓存要做到 数据层缓存，渲染层缓存
+ * 如果没有缓存 =》 新建缓存  =》渲染缓存
+ * 如果有缓存 =》 渲染缓存
+ *
+ * 缓存包括数据有   rect,渲染层图片
+ *
+ *
+ */
+abstract class ViewObject<D extends DecorationBase = DecorationBase>
+  extends BaseViewObject<D>
+  implements RenderObject
+{
   //辅助线
   private auxiliary: AuxiliaryLine;
   public originFamily: ViewObjectFamily;
 
   constructor() {
     super();
-    this.rect = Rect.zero;
-    this.relativeRect = Rect.zero;
   }
 
   //获取对象值
@@ -47,12 +55,13 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     //初始化一些数据，准备挂载
     this.ready(kit);
     //添加监听
-    this.addObserver(this);
+    this.addObserver(this.renderBox);
     //初始化矩阵点
     this.rect.updateVertex();
     //挂载
     this.mount();
     this.setFixedSize(this.size.toObject());
+    this.initializationButtons();
   }
   //卸载按钮
   public unInstallButton(buttons: Array<Button>) {
@@ -65,58 +74,101 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
   }
   //安装按钮
   public installButton(button: Button) {
-    button.initialization(this);
     this.funcButton.push(button);
+    this.initializationButtons();
   }
   //安装多个按钮
-  public installMultipleButtons(buttons: Array<Button>):void {
+  public installMultipleButtons(buttons: Array<Button>): void {
     if (!Array.isArray(buttons))
       throw new Error("Must be a class Button Array.");
-    buttons.forEach((_) => _.initialization(this));
+    //如果已经挂载，就初始化按钮
     this.funcButton.push(...buttons);
+    this.initializationButtons();
+  }
+  private initializationButtons(): void {
+    if (this.mounted) this.funcButton.forEach((_) => _.initialization(this));
   }
   public mirror(): boolean {
     this.isMirror = !this.isMirror;
     return this.isMirror;
   }
+
   public render(paint: Painter, isCache?: boolean) {
     if (!this.mounted) return;
+    /*更新顶点数据*/
+    if (this.didChanged) {
+      this.rect.updateVertex();
+      this.reBuild();
+    }
+    //执行缓存画布生成
+    if (this.isUseRenderCache && !this.offScreenCreated) {
+      this.performCache();
+    }
     this.draw(paint, isCache);
   }
-
-  abstract setDecoration(args: any): void;
-
-  private renderCache(paint: Painter) {
-    this.drawImage(paint);
+  protected performCache() {
+    //生成画布会返回布尔值判断是否生成成功，生成失败关闭缓存功能
+    const created = this.generateOffScreenCanvas();
+    //创建离屏失败，关闭缓存渲染
+    if (!created) this.unUseCache();
+    this.draw(this.offScreenPainter, true);
+    this.offScreenPainter.save();
+    this.offScreenPainter.translate(this.width * 0.5, this.height * 0.5);
+    this.decoration?.render(this.offScreenPainter, this.rect);
+    this.drawImage(this.offScreenPainter);
+    this.offScreenPainter.restore();
   }
-
+  /**
+   * @description 实时渲染或者渲染缓存
+   * @param paint
+   */
+  private renderImageOrCache(paint: Painter) {
+    if (this.canRenderCache) {
+      //渲染缓存
+      paint.drawImage(this.offScreenCanvas, 0, 0, this.width, this.height);
+    } else {
+      this.decoration?.render(paint, this.rect);
+      this.drawImage(paint);
+    }
+  }
   public draw(paint: Painter, isCache?: boolean): void {
     //渲染缓存不需要设置或渲染其他属性
-    if (isCache) return this.renderCache(paint);
     paint.beginPath();
     paint.save();
     //缓存不需要这两个
-    paint.translate(this.rect.position.x, this.rect.position.y);
-    paint.rotate(this.rect.getAngle);
+    if (!isCache) {
+      paint.translate(this.positionX, this.positionY);
+      paint.rotate(this.rect.getAngle);
+    }
     if (this.isMirror) paint.scale(-1, 1);
     paint.globalAlpha = this.opacity;
-    this.drawImage(paint);
-    paint.globalAlpha = 1;
-    if (this.isMirror) paint.scale(-1, 1);
-    if (this.selected) {
+    this.renderImageOrCache(paint);
+    //选中和不是缓存时才渲染
+    this.renderSelected(paint, isCache);
+    paint.restore();
+    paint.closePath();
+  }
+  private renderSelected(paint: Painter, isCache?: boolean) {
+    if (this.selected && !isCache) {
       //边框
       this.drawSelectedBorder(paint, this.size);
+      /**
+       * ### 在kit.render方法中使用了scale全局，这里需要矫正回来
+       */
+      paint.save();
+       if (this.isMirror) paint.scale(-1, 1);
       //按钮
       this.updateFuncButton(paint);
-    } else {
-      //根据配置开关虚线框
-      // if (GestiConfig.dashedLine) this.strokeDashBorder(paint);
+      paint.restore();
     }
+  }
+  public performRenderSelected(paint: Painter): void {
+    paint.save();
+    paint.translate(this.positionX, this.positionY);
+    paint.rotate(this.rect.getAngle);
+    if (this.isMirror) paint.scale(-1, 1);
+    this.renderSelected(paint, false);
     paint.restore();
-    paint.translate(0, 0);
-    /*更新顶点数据*/
-    this.rect.updateVertex();
-    paint.closePath();
   }
   /**
    * 该方法需要子类实现
@@ -127,20 +179,39 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * 被选中后外边框
    * @param paint
    */
-  private readonly borderColor: string = "#b2ccff";
+  private selectedBorderColor: string = "#b2ccff";
+  private selectedLineDash: Iterable<number> = [];
+  private selectedLineWidth: number = 2;
+  private selectedBorderPadding: number = 3;
+  //设置被选中时描边颜色
+  public setSelectedBorder(option: SelectedBorderStyle): void {
+    this.selectedBorderColor = option?.borderColor || "#b2ccff";
+    this.selectedLineDash = option?.lineDash || null;
+    this.selectedLineWidth = option?.lineWidth || 2;
+    this.selectedBorderPadding = option?.padding || 3;
+  }
   public drawSelectedBorder(paint: Painter, size: Size): void {
-    const padding = 2;
+    const screenUtils = this.getKit().getScreenUtil();
+    const padding = screenUtils
+      ? screenUtils.setSp(this.selectedBorderPadding)
+      : this.selectedBorderPadding;
+    paint.save();
     paint.beginPath();
-    paint.lineWidth = 1;
-    paint.strokeStyle = this.borderColor;
+    paint.lineWidth = screenUtils
+      ? screenUtils.setSp(this.selectedLineWidth)
+      : this.selectedLineWidth;
+    paint.strokeStyle = this.selectedBorderColor;
+    if (this.selectedLineDash) {
+      paint.setLineDash(this.selectedLineDash);
+    }
     paint.strokeRect(
-      (-this.width - padding) >> 1,
-      (-this.height - padding) >> 1,
-      this.width + padding + 1,
-      this.height + padding + 1
+      (~~this.width + padding) * -0.5,
+      (~~this.height + padding) * -0.5,
+      ~~this.width + padding,
+      ~~this.height + padding
     );
     paint.closePath();
-    paint.stroke();
+    paint.restore();
   }
   /**
    * 镜像翻转
@@ -270,6 +341,11 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
     this.rect.position = new Vector(x, y);
   }
 
+  public toCenter(axis?: CenterAxis): void {
+    if (!this.mounted) return;
+    this.kit.center(this, axis);
+  }
+
   protected _didChangeSize(size: Size): void {
     this.computedRespectRatio();
   }
@@ -285,7 +361,7 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    */
     const deltaWidth = this.width / this.absoluteScale,
       deltaHeight = this.height / this.absoluteScale;
-    this.setScaleWidth(deltaWidth / this.fixedSize.width);
+    this.renderBox.setScaleWidth(deltaWidth / this.fixedSize.width);
     this.setScaleHeight(deltaHeight / this.fixedSize.height);
   }
   protected _didChangePosition(position: Vector): void {
@@ -307,7 +383,20 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
    * @returns
    */
 
-  public getBaseInfo(): ViewObjectExportBaseInfo {
+  public async getBaseInfo(): Promise<ViewObjectExportBaseInfo> {
+    const buttonPromises: Promise<ExportButton>[] = this.funcButton.map(
+      (button: BaseButton) => {
+        return button.export();
+      }
+    );
+    const buttons: ExportButton[] = await Promise.all(buttonPromises);
+    return {
+      buttons: buttons,
+      ...this.getBaseInfoSync(),
+    };
+  }
+
+  public getBaseInfoSync(): ViewObjectExportBaseInfo {
     return {
       rect: {
         x: ~~this.rect.position.x,
@@ -330,43 +419,22 @@ abstract class ViewObject extends BaseViewObject implements RenderObject {
       },
       mirror: this.isMirror,
       locked: this.isLock,
-      buttons: this.funcButton.map<ExportButton>((button: BaseButton) => {
-        return {
-          type: button.name,
-          location: button.btnLocation,
-          radius: button.senseRadius,
-          backgroundColor: button.background,
-          iconColor: button.iconColor,
-          displayBackground: button.displayBackground,
-        };
-      }),
       id: this.id,
       layer: this.getLayer(),
       isBackground: this.isBackground,
       opacity: this.opacity,
       platform: Platform.platform,
+      decoration: this.decoration,
     };
   }
+
   /**
    * 自定义一些操作
    */
   public custom() {}
 
-  private readonly setPosVec:Vector=Vector.zero;
-  public setPosition(x: number, y: number): void {
-    this.setPosVec.setXY(x,y);
-    this.rect.setPosition(this.setPosVec);
-  }
-  private readonly addPosVec:Vector=Vector.zero;
-  public addPosition(deltaX: number, deltaY: number) {
-    this.addPosVec.setXY(deltaX,deltaY);
-    this.rect.addPosition(this.addPosVec);
-  }
   public setOpacity(opacity: number): void {
     this.opacity = opacity;
-  }
-  public setAngle(angle: number) {
-    this.rect.setAngle(angle);
   }
 }
 

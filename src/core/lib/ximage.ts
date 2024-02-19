@@ -1,4 +1,10 @@
-class XImage {
+import Serializable from "../interfaces/Serialization";
+import Cutter from "../../utils/cutters/cutter-H5";
+import { ImageChunk } from "Gesti";
+import ImageChunkConverter from "../abstract/image-chunk-converter";
+import ImageChunkConverterH5 from "@/utils/converters/image-chunk-converter-H5";
+import { ExportXImage } from "Serialization";
+class XImage implements Serializable<{}> {
   originData: any;
   data: any;
   width: number = 0;
@@ -9,38 +15,34 @@ class XImage {
   /**
    * 原始数据大小
    */
-  fixedWidth: number=0;
-  fixedHeight: number=0;
-
-  url:string;
-  /**
- *   interface createImageOptions {
-        data?: HTMLImageElement | SVGImageElement | HTMLVideoElement | HTMLCanvasElement | Blob | ImageData | ImageBitmap | OffscreenCanvas, options?: createImageOptions,
-        width?: number,
-        height?: number,
-        scale?: number,
-        maxScale?: number,
-        minScale?: number,
-    }
- * 
- */
+  fixedWidth: number = 0;
+  fixedHeight: number = 0;
+  url: string;
   constructor(params: createImageOptions) {
-    const { data, width, height, scale, originData, fixedWidth, fixedHeight,url } =
-      params;
+    const {
+      data,
+      width,
+      height,
+      scale,
+      originData,
+      fixedWidth,
+      fixedHeight,
+      url,
+    } = params;
     if (!data || !width || !height) throw Error("数据或宽或高不能为空");
     this.originData = originData;
     this.data = data;
     this.width = width;
     this.height = height;
     this.scale = scale || 1;
-    this.url=url;
+    this.url = url;
     /**
      * 需要保留图片原始大小
      */
     if (fixedWidth && fixedHeight) {
       this.fixedWidth = fixedWidth;
       this.fixedHeight = fixedHeight;
-    }else{
+    } else {
       this.fixedWidth = width;
       this.fixedHeight = height;
     }
@@ -48,6 +50,38 @@ class XImage {
     this.height *= this.scale;
     this.width = ~~this.width;
     this.height = ~~this.height;
+  }
+  public async export(): Promise<ExportXImage> {
+    const cutter: Cutter = new Cutter();
+    const url: string = this.url;
+    let data: ImageChunk[];
+    if (!url) {
+      const chunks: ImageChunk[] =await cutter.getChunks(this);
+      const coverter: ImageChunkConverter = new ImageChunkConverterH5();
+      data = coverter.coverAllImageChunkToBase64(chunks);
+    }
+    return Promise.resolve({
+      url: this.url,
+      data: data,
+      width: this.fixedWidth,
+      height: this.fixedHeight,
+    });
+  }
+  toJSON(): any {
+    const cutter: Cutter = new Cutter();
+    const url: string = this.url;
+    let data: ImageChunk[];
+    // if (!url) {
+    //   const chunks: ImageChunk[] = cutter.getChunks(this);
+    //   const coverter: ImageChunkConverter = new ImageChunkConverterH5();
+    //   data = coverter.coverAllImageChunkToBase64(chunks);
+    // }
+    return {
+      url: this.url,
+      data: data,
+      width: this.fixedWidth,
+      height: this.fixedHeight,
+    };
   }
   toJson(): RectParams {
     return {

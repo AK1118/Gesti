@@ -1,7 +1,7 @@
 import ImageBox from "../core/viewObject/image";
 import TextBox from "../core/viewObject/text/text";
 import XImage from "../core/lib/ximage";
-import { TextOptions } from "@/types/index";
+import { TextOptions } from "@/types/gesti";
 
 function createTextBoxView(text: string, options?: TextOptions): TextBox {
   const textBox = new TextBox(text, options);

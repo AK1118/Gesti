@@ -1,5 +1,3 @@
-
-
 //uniapp
 declare const uni: any;
 //微信小程序
@@ -9,12 +7,19 @@ declare const tt: any;
 declare var document: Document;
 declare interface EventHandle {}
 declare class Size {
-  width: number;
-  height: number;
   constructor(width: number, height: number);
+  static get zero(): Size;
+  get width(): number;
+  get height(): number;
   toVector(): Vector;
   copy(): Size;
-  static get zero(): Size;
+  equals(size: Size | { width?: number; height?: number }): boolean;
+  public setWidth(width: number): void;
+  public setHeight(height: number): void;
+  public toObject(): {
+    width: number;
+    height: number;
+  };
 }
 declare interface CanvasRenderingContext2D {
   draw(): void;
@@ -28,9 +33,8 @@ declare interface RectParams {
   y?: number;
   width: number;
   height: number;
-  angle?:number,
+  angle?: number;
 }
-
 
 declare class Vector {
   x: number;
@@ -61,8 +65,6 @@ declare class Vector {
   toZero(): void;
   double(): Vector;
 }
-
-
 
 declare interface GestiEventParams {
   v: Vector | Vector[];
@@ -119,7 +121,7 @@ declare interface createImageOptions {
   /**
    * 图片网络地址
    */
-  url?:string,
+  url?: string;
 }
 
 declare interface XImageOptions {
@@ -166,28 +168,6 @@ declare interface XImageOptions {
   fixedHeight?: number;
 }
 
-
-
-declare type CenterAxis = "vertical" | "horizon";
-
-declare type GestiControllerListenerTypes =
-  | "onSelect"
-  | "onHide"
-  | "onCancel"
-  | "onHover"
-  | "onLeave"
-  | "onUpdate"
-  | "onLoad"
-  | "onDestroy"
-  | "onMirror"
-  | "onBeforeDestroy"
-  | "onCreateGraffiti"
-  | "onUpdateText"|"onRemove";
-
-
-declare type GraffitiType = "circle" | "write" | "line" | "rect" | "none";
-
-
 declare type Boundary = {
   x: number;
   y: number;
@@ -203,7 +183,7 @@ declare interface TextSingle {
   texts?: Array<TextSingle>;
   width: number;
   height: number;
-  next?:boolean
+  next?: boolean;
 }
 declare interface FixedOption {
   fontSize: number;
@@ -216,4 +196,14 @@ declare interface FixedOption {
 declare type PlatformType = "WeChat" | "Browser";
 
 //所有按钮名字
-declare type ButtonNames="CloseButton"|"UnLockButton"|"DragButton"|"HorizonButton"|"LockButton"|"MirrorButton"|"RotateButton"|"SizeButton"|"VerticalButton";
+declare type ButtonNames =
+  | "CloseButton"
+  | "UnLockButton"
+  | "DragButton"
+  | "HorizonButton"
+  | "LockButton"
+  | "MirrorButton"
+  | "RotateButton"
+  | "SizeButton"
+  | "VerticalButton"
+  | "CustomButton";
