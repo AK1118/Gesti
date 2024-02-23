@@ -33,6 +33,7 @@ abstract class BaseViewObject<
   D extends DecorationBase
 > extends OperationObserver {
   protected decoration: D;
+  private _angleDisabled: boolean = false;
   public renderBox: RenderBox = new ViewObjectRenderBox();
   protected offScreenCanvas;
   protected offScreenPainter: Painter;
@@ -49,6 +50,15 @@ abstract class BaseViewObject<
   }
   protected get didChanged(): boolean {
     return this._didChanged;
+  }
+  public disableRotate() {
+    this._angleDisabled = true;
+  }
+  public enableRotate() {
+    this._angleDisabled = false;
+  }
+  get angleDisabled(): boolean {
+    return this._angleDisabled;
   }
   protected _didChangedAll(): void {
     this._didChanged = true;
@@ -363,7 +373,7 @@ abstract class BaseViewObject<
     this.rect.addPosition(new Vector(deltaX, deltaY));
   }
   public setAngle(angle: number) {
-    this.rect.setAngle(angle);
+    if (!this.angleDisabled) this.rect.setAngle(angle);
   }
   public getButtonByIdSync<ButtonType extends BaseButton>(
     id: string

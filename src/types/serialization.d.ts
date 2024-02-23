@@ -2,6 +2,7 @@ import {
   Alignment,
   GraffitiTypes,
   ImageChunk,
+  RectCropOption,
   ScreenUtilOption,
   TextOptions,
   ViewObject,
@@ -69,7 +70,8 @@ declare module "Serialization" {
     | "write"
     | "group"
     | "graphicsRectangle"
-    | "graphicsPolygon";
+    | "graphicsPolygon"
+    | "rectCrop";
 
   export interface ViewObjectExportEntity {
     base: ViewObjectExportBaseInfo;
@@ -98,6 +100,10 @@ declare module "Serialization" {
       isFill?: boolean;
     };
     points: Array<Vector>;
+  }
+
+  interface ViewObjectExportRectCrop extends ViewObjectExportEntity {
+    option: RectCropOption;
   }
 
   //图形导出

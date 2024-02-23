@@ -23,6 +23,12 @@ interface Shadow {
   shadowOffsetX?: number;
   shadowOffsetY?: number;
 }
+interface RectCropValue {
+  sx: number;
+  sy: number;
+  width: number;
+  height: number;
+}
 declare class Gesti {
   constructor(config?: GestiConfigOption);
   get controller(): GestiController;
@@ -530,6 +536,12 @@ export abstract class ViewObject {
   public makeFixed(): void;
   //解除固定
   public makeUnfixed(): void;
+  //禁用旋转
+  public disableRotate(): void;
+  //启动旋转
+  public enableRotate(): void;
+  //是否旋转
+  get angleDisabled(): boolean;
 }
 
 export class XImage {
@@ -617,7 +629,7 @@ export declare class ImageBox extends ViewObject {
    * ### 替换图片，传入一个XImage
    * - 替换图片会继承被替换图片的scale
    */
-  public replaceXImage(xImage: XImage): void ;
+  public replaceXImage(xImage: XImage): void;
 }
 
 type GraffitiCloser = [
@@ -792,6 +804,34 @@ export class Rectangle extends GraphicsBase<GenerateRectAngleOption> {
 export class Polygon extends GraphicsBase<GeneratePolygonOption> {
   constructor(option: GeneratePolygonOption);
   setDecoration<PolygonDecorationOption>(option: PolygonDecorationOption): void;
+}
+/**
+ * ### 框选矩形
+ * - 裁剪框矩形
+ */
+export class RectCrop extends ViewObject {
+  constructor(option: RectCropOption);
+  //设置蒙版颜色
+  public setMaskColor(maskColor: string): void;
+  //设置线条颜色
+  public setLineDashColor(lineDashColor: string): void;
+  //设置线条等份数量
+  public setCount(count: number): void;
+  /**
+   * #### 获取矩形框包裹参数
+   * - 包括：sx,sy,width,height
+   * - 坐标以左上角（0，0）为原点，大小对应canvas
+   */
+  get value(): RectCropValue;
+}
+interface RectCropOption {
+  width: number;
+  height: number;
+  maskColor?: string;
+  lineDashColor?: string;
+  count?: number;
+  lineDash?: Iterable<number>;
+  lineWidth?: number;
 }
 
 /**

@@ -12,6 +12,7 @@ import {
   ViewObjectExportGraffiti,
   ViewObjectExportGraphics,
   ViewObjectExportImageBox,
+  ViewObjectExportRectCrop,
   ViewObjectExportTextBox,
   ViewObjectExportTypes,
   ViewObjectImportBaseInfo,
@@ -37,6 +38,7 @@ import BoxDecoration from "../lib/rendering/decorations/box-decoration";
 import DecorationBase from "./decoration-base";
 import Polygon from "../viewObject/graphics/polygon";
 import PolygonDecoration from "../lib/rendering/decorations/polygon-decoration";
+import RectCrop from "../viewObject/crop/rect-crop";
 
 type ViewObjectHandler<T> = (entity: ViewObjectImportEntity) => T;
 
@@ -125,6 +127,10 @@ abstract class DeserializerBase {
     },
     group: (entity) => {
       throw Error("Method has not implemented.");
+    },
+    rectCrop: (entity) => {
+      const _entity = this.formatEntity<ViewObjectExportRectCrop>(entity);
+      return RectCrop.reserve(_entity);
     },
   };
 

@@ -13,6 +13,7 @@ import CustomButton from "@/core/viewObject/buttons/customButton";
 import DragButton from "@/core/viewObject/buttons/dragbutton";
 import RotateButton from "@/core/viewObject/buttons/rotateButton";
 import SizeButton from "@/core/viewObject/buttons/sizeButton";
+import RectCrop from "@/core/viewObject/crop/rect-crop";
 import Polygon from "@/core/viewObject/graphics/polygon";
 // import Circle from "@/core/viewObject/graphics/circle";
 import Rectangle, {
@@ -428,6 +429,24 @@ document.getElementById("input").addEventListener("input", (e: any) => {
 controller.render();
 
 async function main() {
+  const crop = new RectCrop({
+    width: 400,
+    height: 400,
+    lineDashColor: "red",
+  });
+  crop.installMultipleButtons(
+    [new VerticalButton("bottom"), new HorizonButton("right")].map((_) => {
+      _.setSenseRadius(screenUtil1.setSp(30));
+      return _;
+    })
+  );
+  crop.unUseCache();
+  crop.setDecoration({
+    backgroundColor: "transparent",
+  });
+  controller.load(crop);
+  controller.center(crop);
+  crop.setLayer(999);
   const bg = await loadImg(
     "https://raw.githubusercontent.com/AK1118/my-images/master/Desktop/QQ图片20231121111336 拷贝.png"
   );
@@ -446,7 +465,7 @@ async function main() {
   });
   bgBox.makeFixed();
   controller.center(bgBox);
-  controller.load(bgBox);
+  // controller.load(bgBox);
 
   const moteImg = await loadImg(
     "https://raw.githubusercontent.com/AK1118/my-images/master/Desktop/mmexport1700542539766.png"
@@ -517,28 +536,24 @@ async function main() {
     })
   );
   textBox.setLayer(5);
-  controller.load(textBox);
+  // controller.load(textBox);
   textBox.toCenter();
 
   controller.cancelEvent();
 
   canvas.addEventListener("touchstart", (e) => {
-    console.log(e.targetTouches);
+    // console.log(e.targetTouches);
     controller.down(e);
   });
   canvas.addEventListener("touchmove", (e) => {
-    console.log(e.targetTouches);
+    // console.log(e.targetTouches);
     controller.move(e);
   });
   canvas.addEventListener("touchend", (e) => {
-    console.log(e.targetTouches);
+    // console.log(e.targetTouches);
     controller.up(e);
   });
-  gesti.debug=true;
-
-  controller.addWrite({
-    type:"write",
-  })
+  // gesti.debug=true;
 }
 async function loadImg(src): Promise<HTMLImageElement> {
   const bg = new Image();

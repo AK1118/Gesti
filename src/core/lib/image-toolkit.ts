@@ -266,7 +266,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   }
 
   remove(view?: ViewObject): boolean {
-    const _view = this.selectedViewObject || view;
+    const _view =  view||this.selectedViewObject;
     if (!_view) return false;
     this.setViewObjectList(
       this.ViewObjectList.filter((_) => _.key != _view.key)
