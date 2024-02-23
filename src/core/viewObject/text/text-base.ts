@@ -6,6 +6,7 @@ import Rect, { Size } from "../../lib/rect";
 import {
   FontStyleType,
   FontWeight,
+  Shadow,
   TextHandler,
   TextOptions,
 } from "../../../types/gesti";
@@ -84,9 +85,11 @@ export abstract class TextBoxBase extends ViewObject {
     // const italic = this.textOptions.fontStyle||'';
     // const family=this.textOptions.fontFamily||'';
     // return `${bold} ${italic} ${~~this.textOptions.fontSize}px ${family}`;
-    const bold = this.textOptions.weight||'';
-    const italic = this.textOptions.fontStyle||'';
-    return `${bold} ${italic} ${~~this.textOptions.fontSize}px ${this.textOptions.fontFamily}`;
+    const bold = this.textOptions.weight || "";
+    const italic = this.textOptions.fontStyle || "";
+    return `${bold} ${italic} ${~~this.textOptions.fontSize}px ${
+      this.textOptions.fontFamily
+    }`;
   }
   /**
    * @description 计算文字大小
@@ -109,7 +112,7 @@ export abstract class TextBoxBase extends ViewObject {
   //   this.setMount(true);
   // }
   protected onMounted(): void {
-      this.computeTextSingle(false);
+    this.computeTextSingle(false);
   }
   protected computeTextSingle(
     isInitialization: boolean = false
@@ -514,6 +517,9 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     this.fixedText = text;
     Object.assign(this.textOptions, option);
     this.unUseCache();
+  }
+  setShadow(shadow: Shadow): void {
+    this.textOptions = Object.assign(this.textOptions, shadow);
   }
   setFontStyle(style: FontStyleType): void {
     this.textOptions.fontStyle = style;

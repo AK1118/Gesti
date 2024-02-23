@@ -612,6 +612,11 @@ export class TextBox extends ViewObject implements TextHandler {
   setColor(color: string): void;
   setFontSize(fontSize: number): void;
   setDecoration(decoration: BoxDecorationOption): void;
+  /**
+   * ### 设置文字阴影
+   * - 颜色，偏移量X,偏移量Y，模糊程度
+   */
+  setShadow(shadow: Shadow): void
   get fontSize(): number;
   /**
    * @deprecated

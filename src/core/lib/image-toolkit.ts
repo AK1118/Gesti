@@ -266,7 +266,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   }
 
   remove(view?: ViewObject): boolean {
-    const _view =  view||this.selectedViewObject;
+    const _view = view || this.selectedViewObject;
     if (!_view) return false;
     this.setViewObjectList(
       this.ViewObjectList.filter((_) => _.key != _view.key)
@@ -564,7 +564,9 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.render();
   }
   cancelAll(): void {
-    this.ViewObjectList.forEach((item: ViewObject) => item.cancel());
+    this.ViewObjectList.forEach((item: ViewObject) =>
+      this.handleCancelView(item)
+    );
     this.render();
   }
   layerLower(view?: ViewObject): void {
@@ -694,52 +696,22 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       //涂鸦等待且现在手机点击在已选中对象内
       if (this.writeFactory.watching && !selectedTarget.selected) {
         this.writeFactory.onDraw();
-        
       }
 
       this.selectedViewObject = this.handleSelectedTarget(event);
       this.ViewObjectList.forEach((item) =>
-        item.key === selectedTarget.key ? "" : item.cancel()
+        item.key === selectedTarget.key ? "" : this.handleCancelView(item)
       );
     } else {
       //点击图像外取消选中上一个对象
-      this.selectedViewObject?.cancel();
+      this.handleCancelView(this.selectedViewObject);
       if (this.writeFactory.watching && !selectedTarget?.selected)
         return this.writeFactory.onDraw();
     }
-
-    // /**
-    //  * 选中元素存在 且不是已选中元素,且不是锁定,且不是背景元素
-    //  */
-    // if (
-    //   selectedViewObject &&
-    //   this.selectedViewObject === selectedViewObject &&
-    //   !this.selectedViewObject.isLock &&
-    //   !selectedViewObject.isBackground
-    // ) {
-    //   this.drag.catchViewObject(selectedViewObject.rect, event);
-    // }
-
-    // /**
-    //  * 已选中图层移动优先级>涂鸦动作优先级>选中图层动作优先级
-    //  * */
-    // if (
-    //   this.selectedViewObject != selectedViewObject ||
-    //   selectedViewObject == null
-    // ) {
-    //   this.writeFactory.onDraw();
-    // }
-
-    // /**
-    //  * 按下，有选中对象
-    //  */
-    // const selectedTarget = this.handleSelectedTarget(event);
-    // if (selectedTarget ?? false) {
-    //   //判断抬起时手指是在对象范围内还是外
-    //   this.selectedViewObject = selectedTarget;
-    // }
-
     this.render();
+  }
+  private handleCancelView(view: ViewObject): void {
+    this.cancel(view);
   }
   public onMove(v: GestiEventParams): void {
     if (this.eventHandlerState === EventHandlerState.down) {
@@ -749,7 +721,10 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
       if (this.writeFactory.current) {
         this.render();
         this.writeFactory.current?.setScreenUtils(this.screenUtils);
-        return this.writeFactory.current?.onMove(event,this.screenUtils?.devScale);
+        return this.writeFactory.current?.onMove(
+          event,
+          this.screenUtils?.devScale
+        );
       }
 
       //手势解析处理
@@ -845,7 +820,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
         this.selectedViewObject &&
         selectedViewObjectTarget.key != this.selectedViewObject.key
       ) {
-        this.selectedViewObject.cancel();
+        this.handleCancelView(this.selectedViewObject);
       }
       //选中后变为选中状态
       selectedViewObjectTarget.onSelected();
