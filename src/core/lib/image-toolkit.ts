@@ -141,7 +141,6 @@ abstract class ImageToolkitBase {
   }
 
   protected callHook(type: GestiControllerListenerTypes, arg = null) {
-    this.render();
     this.listen.callHooks(type, arg);
   }
   /**
@@ -248,6 +247,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     if (view) {
       view.hide();
       this.callHook("onHide", view);
+      this.render();
     }
   }
   show(_view?: ViewObject): void {
@@ -255,6 +255,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     if (view) {
       view.show();
       this.callHook("onShow", view);
+      this.render();
     }
   }
   forceRender(): void {
