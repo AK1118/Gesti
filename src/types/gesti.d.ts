@@ -616,7 +616,7 @@ export class TextBox extends ViewObject implements TextHandler {
    * ### 设置文字阴影
    * - 颜色，偏移量X,偏移量Y，模糊程度
    */
-  setShadow(shadow: Shadow): void
+  setShadow(shadow: Shadow): void;
   get fontSize(): number;
   /**
    * @deprecated
@@ -626,6 +626,15 @@ export class TextBox extends ViewObject implements TextHandler {
   updateText(text: string, options?: TextOptions): Promise<void>;
   public useCache(): void;
   public unUseCache(): void;
+  get color(): string;
+  get shadowColor(): string;
+  get fontFamily(): string ;
+  get shadow(): Shadow ;
+  /**
+   * ### 文字样式数据
+   */
+  get textStyles(): TextOptions;
+  get weight():FontWeight;
 }
 
 export declare class ImageBox extends ViewObject {
@@ -637,13 +646,18 @@ export declare class ImageBox extends ViewObject {
   public replaceXImage(xImage: XImage): void;
 }
 
+export declare class WriteViewObj extends ViewObject {
+  public setStyle(decoration: {
+    //strokeColor?: string;
+    color?: string;
+    isFill?: boolean;
+    lineWidth?: number;
+  }): void;
+}
 type GraffitiCloser = [
   () => void,
-  (callback: (view: ViewObject) => void) => void
+  (callback: (view: WriteViewObj) => void) => void
 ];
-
-export declare class WriteViewObj extends ViewObject {}
-
 export type CenterAxis = "vertical" | "horizon";
 
 /**

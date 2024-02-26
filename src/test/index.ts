@@ -432,21 +432,19 @@ async function main() {
   const crop = new RectCrop({
     width: 400,
     height: 400,
-    lineDashColor: "red",
   });
-  crop.installMultipleButtons(
-    [new VerticalButton("bottom"), new HorizonButton("right")].map((_) => {
-      _.setSenseRadius(screenUtil1.setSp(30));
-      return _;
-    })
-  );
-  crop.unUseCache();
-  crop.setDecoration({
-    backgroundColor: "transparent",
-  });
+
+  crop.installMultipleButtons([
+    new VerticalButton("bottom"),
+    new HorizonButton("right"),
+  ]);
   controller.load(crop);
   controller.center(crop);
   crop.setLayer(999);
+  // .map((_) => {
+  //   _.setSenseRadius(screenUtil1.setSp(30));
+  //   return _;
+  // })
   const bg = await loadImg(
     "https://raw.githubusercontent.com/AK1118/my-images/master/Desktop/QQ图片20231121111336 拷贝.png"
   );
@@ -503,7 +501,7 @@ async function main() {
   );
   controller.center(moteBox);
   controller.load(moteBox);
-
+    
   const textBox = new TextBox("杨", {
     fontSize: screenUtil1.setSp(200),
     weight: "bold",
@@ -515,6 +513,7 @@ async function main() {
     shadowColor: "#ccc",
     lineHeight: 1,
   });
+  
   textBox.setId("text1");
   textBox.installMultipleButtons(
     [
@@ -554,6 +553,33 @@ async function main() {
     controller.up(e);
   });
   // gesti.debug=true;
+
+  const [closer, generator] = controller.addWrite({
+    type: "write",
+    lineWidth:screenUtil1.setSp(90),
+  });
+  const oo = [];
+  generator((view) => {
+    oo.push(view);
+  });
+  setTimeout(() => {
+    const rect = new Rectangle({
+      width: screenUtil1.fullWidth,
+      height: screenUtil1.fullHeight,
+      decoration: {
+        backgroundColor: "black",
+      },
+    });
+    controller.load(rect);
+    controller.layerTop(rect);
+    controller.center(rect);
+    oo.forEach((_) => {
+      _.setStyle({
+        color: "white",
+      });
+      controller.layerTop(_);
+    });
+  }, 1000 * 10);
 }
 async function loadImg(src): Promise<HTMLImageElement> {
   const bg = new Image();

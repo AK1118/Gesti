@@ -86,9 +86,9 @@ class WriteViewObj extends ViewObject {
     isFill?: boolean;
     lineWidth?: number;
   }): void {
-    this.color = decoration?.color;
-    this.isFill = decoration?.isFill;
-    this.lineWidth = decoration?.lineWidth;
+    this.color = decoration?.color ?? this.color;
+    this.isFill = decoration?.isFill ?? this.isFill;
+    this.lineWidth = decoration?.lineWidth ?? this.lineWidth;
   }
 
   //供外部设置数据

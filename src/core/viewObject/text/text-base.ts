@@ -518,6 +518,27 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     Object.assign(this.textOptions, option);
     this.unUseCache();
   }
+  get color(): string {
+    return this.color;
+  }
+  get shadowColor(): string {
+    return this.shadowColor;
+  }
+  get fontFamily(): string {
+    return this.fontFamily;
+  }
+  get shadow(): Shadow {
+    return this.shadow;
+  }
+  get fontSize(): void {
+    return this.fontSize;
+  }
+  get textStyles(): TextOptions {
+    return this.textOptions;
+  }
+  get weight(): FontWeight {
+    return this.textOptions.weight;
+  }
   setShadow(shadow: Shadow): void {
     this.textOptions = Object.assign(this.textOptions, shadow);
   }

@@ -16,6 +16,8 @@ import {
 import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 import Gesti from "./gesti";
 import { GestiControllerListenerTypes } from "@/types/controller";
+import { BoxDecorationOption } from "@/types/graphics";
+import DecorationBase from "../bases/decoration-base";
 
 declare type CenterAxis = "vertical" | "horizon";
 
@@ -28,6 +30,12 @@ abstract class GesteControllerImpl implements GestiControllerInterface {
   constructor(kit?: ImageToolkit) {
     //使用控制器时，取消原有控制
     this.kit = kit;
+  }
+  hide(view?: ViewObject<DecorationBase<BoxDecorationOption>>): void {
+    this.kit.hide();
+  }
+  show(view?: ViewObject<DecorationBase<BoxDecorationOption>>): void {
+    this.kit.show();
   }
   getScreenUtil(): ScreenUtils {
     return this.kit.getScreenUtil();

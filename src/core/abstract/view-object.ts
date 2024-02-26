@@ -156,7 +156,7 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
        * ### 在kit.render方法中使用了scale全局，这里需要矫正回来
        */
       paint.save();
-       if (this.isMirror) paint.scale(-1, 1);
+      if (this.isMirror) paint.scale(-1, 1);
       //按钮
       this.updateFuncButton(paint);
       paint.restore();
@@ -265,6 +265,10 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
     this.onHide();
     this.cancel();
   }
+  public show() {
+    this.disabled = false;
+  }
+
   public getVertex(): Point[] {
     return this.rect.vertex?.getPoints();
   }

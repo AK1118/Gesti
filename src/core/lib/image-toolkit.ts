@@ -34,6 +34,8 @@ import Deserializer from "@/utils/deserializer/Deserializer";
 import Plugins from "./plugins";
 import OffScreenCanvasBuilder from "./plugins/offScreenCanvasGenerator";
 import { CenterAxis, GestiControllerListenerTypes } from "@/types/controller";
+import { BoxDecorationOption } from "@/types/graphics";
+import DecorationBase from "../bases/decoration-base";
 enum EventHandlerState {
   down,
   up,
@@ -139,6 +141,7 @@ abstract class ImageToolkitBase {
   }
 
   protected callHook(type: GestiControllerListenerTypes, arg = null) {
+    this.render();
     this.listen.callHooks(type, arg);
   }
   /**
@@ -240,6 +243,20 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  hide(_view?: ViewObject): void {
+    const view = _view ?? this.currentViewObject;
+    if (view) {
+      view.hide();
+      this.callHook("onHide", view);
+    }
+  }
+  show(_view?: ViewObject): void {
+    const view = _view ?? this.currentViewObject;
+    if (view) {
+      view.show();
+      this.callHook("onShow", view);
+    }
+  }
   forceRender(): void {
     this.ViewObjectList.forEach((_) => _.forceUpdate());
   }
@@ -281,7 +298,6 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   getAllViewObject(): Promise<ViewObject[]> {
     return Promise.resolve(this.ViewObjectList);
   }
-
   mount(view: ViewObject): void {
     this.load(view);
   }

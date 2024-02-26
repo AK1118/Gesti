@@ -7,6 +7,7 @@
 ### 新增
 
 - disableRotate 和 enableRotate 方法，控制 view 是否可被旋转.值 angleDisabled
+- 控制器新增show 和 hide方法，用于控制图层的显示与隐藏
 - RectCrop 对象，裁剪框，可通过该实例获取被框选区域矩形数据(非 ImageData)
 
 ### 修复

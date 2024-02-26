@@ -21,6 +21,7 @@ export declare type CenterAxis = "vertical" | "horizon";
 export declare type GestiControllerListenerTypes =
   | "onSelect"
   | "onHide"
+  | "onShow"
   | "onCancel"
   | "onHover"
   | "onLeave"
@@ -139,9 +140,13 @@ interface LayerController {
   mirror(view?: ViewObject): boolean;
 
   remove(view?: ViewObject): void;
+  //隐藏图层
+  hide(view?: ViewObject): void;
+  //显示图层
+  show(view?: ViewObject): void;
 }
 
-type ListenerCallback = (object: ViewObject|any) => void;
+type ListenerCallback = (object: ViewObject | any) => void;
 
 //画布控制器
 interface ImageToolKitController {
@@ -355,6 +360,8 @@ declare interface GestiControllerInterface
 }
 
 declare class GestiController implements GestiControllerInterface {
+  hide(view?: ViewObject): void;
+  show(view?: ViewObject): void;
   getScreenUtil(): ScreenUtils;
   forceRender(): void;
   initialized: boolean;
