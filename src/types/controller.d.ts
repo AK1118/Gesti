@@ -52,6 +52,10 @@ interface LayerController {
    */
   layerBottom(view?: ViewObject): void;
   /**
+   * 设置图层
+   */
+  setLayer(layer: number, view?: ViewObject): void;
+  /**
    * 解锁图层
    */
   unLock(view?: ViewObject): void;
@@ -176,14 +180,15 @@ interface ImageToolKitController {
    */
   cancelFallback(): void;
   /**
-   * 刷新画布
+   * ###刷新画布
+   * - 不会重新排序图层
    */
   render(): void;
   /**
    * ### 强制刷新画布
    * - 下一帧不会是缓存
+   * - 强制重新排序图层，强制重绘图层,
    */
-  forceRender(): void;
   forceRender(): void;
   /**
    * @deprecated 即将废弃，请使用 render()
@@ -360,6 +365,7 @@ declare interface GestiControllerInterface
 }
 
 declare class GestiController implements GestiControllerInterface {
+  setLayer(layer: number, view?: ViewObject): void;
   hide(view?: ViewObject): void;
   show(view?: ViewObject): void;
   getScreenUtil(): ScreenUtils;

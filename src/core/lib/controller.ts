@@ -31,11 +31,17 @@ abstract class GesteControllerImpl implements GestiControllerInterface {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  setLayer(
+    layer: number,
+    view?: ViewObject<DecorationBase<BoxDecorationOption>>
+  ): void {
+    return this.kit.setLayer(layer, view);
+  }
   hide(view?: ViewObject<DecorationBase<BoxDecorationOption>>): void {
-    this.kit.hide();
+    this.kit.hide(view);
   }
   show(view?: ViewObject<DecorationBase<BoxDecorationOption>>): void {
-    this.kit.show();
+    this.kit.show(view);
   }
   getScreenUtil(): ScreenUtils {
     return this.kit.getScreenUtil();

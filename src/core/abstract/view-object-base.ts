@@ -164,6 +164,13 @@ abstract class BaseViewObject<
   get fixedSize(): Size {
     return this._fixedSize;
   }
+
+  /**
+   * ### 设置Layer
+   * - 注意，你不应该直接使用该方法
+   * - 使用controller.setLayer(layer,view)可以更好的被监听
+   * @param layer
+   */
   public setLayer(layer: number) {
     this.layer = layer;
   }

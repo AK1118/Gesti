@@ -41,6 +41,10 @@ interface LayerController {
    */
   layerBottom(view?: ViewObject): void;
   /**
+   * 设置layer
+   */
+  setLayer(layer: number, view?: ViewObject): void;
+  /**
    * 解锁图层
    */
   unLock(view?: ViewObject): void;

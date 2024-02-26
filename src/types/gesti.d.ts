@@ -500,6 +500,13 @@ export abstract class ViewObject {
    */
   public getLayer(): number;
   /**
+   * @deprecated
+   * ### 设置Layer
+   * - 注意，你不应该直接使用该方法
+   * - 使用controller.setLayer(layer,view)可以更好的被监听
+   */
+  public setLayer(layer: number): void;
+  /**
    * - 强制刷新画布
    */
   public forceUpdate(): void;
@@ -628,13 +635,13 @@ export class TextBox extends ViewObject implements TextHandler {
   public unUseCache(): void;
   get color(): string;
   get shadowColor(): string;
-  get fontFamily(): string ;
-  get shadow(): Shadow ;
+  get fontFamily(): string;
+  get shadow(): Shadow;
   /**
    * ### 文字样式数据
    */
   get textStyles(): TextOptions;
-  get weight():FontWeight;
+  get weight(): FontWeight;
 }
 
 export declare class ImageBox extends ViewObject {

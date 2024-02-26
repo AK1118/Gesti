@@ -415,6 +415,7 @@ document.getElementById("import").addEventListener("click", () => {
 
 document.getElementById("export").addEventListener("click", () => {
   console.log("导出");
+  controller.cancelAll();
   exportAll(gesti).then((json) => {
     console.log(json);
     window.localStorage.setItem("aa", json);
@@ -463,45 +464,8 @@ async function main() {
   });
   bgBox.makeFixed();
   controller.center(bgBox);
-  // controller.load(bgBox);
+  controller.load(bgBox);
 
-  const moteImg = await loadImg(
-    "https://raw.githubusercontent.com/AK1118/my-images/master/Desktop/mmexport1700542539766.png"
-  );
-
-  const moteBox = new ImageBox(
-    new XImage({
-      data: moteImg,
-      width: moteImg.width,
-      height: moteImg.height,
-      url: moteImg.src,
-      scale: 0.7,
-    })
-  );
-  moteBox.setId("image1");
-  moteBox.setLayer(2);
-  moteBox.installMultipleButtons(
-    [
-      new DragButton(),
-      new RotateButton({
-        alignment: Alignment.topLeft,
-      }),
-      new MirrorButton({
-        alignment: Alignment.bottomLeft,
-      }),
-      new CustomButton({
-        child: new TextBox("换图", {
-          fontSize: screenUtil1.setSp(26),
-        }),
-      }).setId("huantu"),
-    ].map((_) => {
-      _.setSenseRadius(screenUtil1.setSp(50));
-      return _;
-    })
-  );
-  controller.center(moteBox);
-  controller.load(moteBox);
-    
   const textBox = new TextBox("杨", {
     fontSize: screenUtil1.setSp(200),
     weight: "bold",
@@ -513,7 +477,7 @@ async function main() {
     shadowColor: "#ccc",
     lineHeight: 1,
   });
-  
+
   textBox.setId("text1");
   textBox.installMultipleButtons(
     [
@@ -534,6 +498,7 @@ async function main() {
       return _;
     })
   );
+  textBox.setSelectedBorder;
   textBox.setLayer(5);
   // controller.load(textBox);
   textBox.toCenter();
@@ -554,32 +519,24 @@ async function main() {
   });
   // gesti.debug=true;
 
-  const [closer, generator] = controller.addWrite({
-    type: "write",
-    lineWidth:screenUtil1.setSp(90),
-  });
-  const oo = [];
-  generator((view) => {
-    oo.push(view);
-  });
+  // const [closer, generator] = controller.addWrite({
+  //   type: "write",
+  //   lineWidth:screenUtil1.setSp(90),
+  // });
+  // const oo = [];
+  // generator((view) => {
+  //   oo.push(view);
+  // });
   setTimeout(() => {
-    const rect = new Rectangle({
-      width: screenUtil1.fullWidth,
-      height: screenUtil1.fullHeight,
-      decoration: {
-        backgroundColor: "black",
-      },
-    });
-    controller.load(rect);
-    controller.layerTop(rect);
-    controller.center(rect);
-    oo.forEach((_) => {
-      _.setStyle({
-        color: "white",
-      });
-      controller.layerTop(_);
-    });
-  }, 1000 * 10);
+    controller.hide(bgBox);
+    bgBox.setLayer(9999);
+    // controller.forceRender();
+  }, 3000);
+  setTimeout(() => {
+    controller.show(bgBox);
+    console.log(bgBox.getLayer());
+    console.log(crop.getLayer());
+  }, 6000);
 }
 async function loadImg(src): Promise<HTMLImageElement> {
   const bg = new Image();

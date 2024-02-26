@@ -51,6 +51,8 @@ enum LayerOperationType {
   top,
   //至于底层
   bottom,
+  //不执行操作
+  none,
 }
 
 type ListenerHook = (viewObject: ViewObject) => void;
@@ -242,6 +244,16 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
     this.writeFactory = new WriteFactory(this.paint);
     this.bindEvent();
   }
+  setLayer(
+    layer: number,
+    view?: ViewObject<DecorationBase<BoxDecorationOption>>
+  ): void {
+    let _view = view || this.selectedViewObject;
+    _view.setLayer(layer);
+    this.tool.arrangeLayer(this.ViewObjectList, _view, LayerOperationType.none);
+    this.render();
+  }
+
   hide(_view?: ViewObject): void {
     const view = _view ?? this.currentViewObject;
     if (view) {
@@ -260,6 +272,7 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   }
   forceRender(): void {
     this.ViewObjectList.forEach((_) => _.forceUpdate());
+    this.tool.arrangeLayer(this.ViewObjectList, null, LayerOperationType.none);
   }
   cancelGesture(): void {
     this.gesture.disable();
@@ -573,8 +586,9 @@ class ImageToolkit extends ImageToolkitBase implements GestiController {
   cancel(view?: ViewObject): void {
     const _view = view || this.selectedViewObject;
     if (_view) {
-      if (_view.key == this.selectedViewObject.key)
+      if (_view.key == this.selectedViewObject?.key) {
         this.selectedViewObject = null;
+      }
       _view?.cancel();
       this.callHook("onCancel", _view);
     }
@@ -985,6 +999,9 @@ class _Tools {
     selectedViewObject: ViewObject,
     operationType: LayerOperationType
   ): void {
+    if (operationType == LayerOperationType.none || !selectedViewObject) {
+      return this.sortByLayer(ViewObjectList);
+    }
     //对象是否在数组中
     const ndx = ViewObjectList.findIndex(
       (item: ViewObject) => item.key === selectedViewObject.key
