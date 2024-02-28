@@ -118,6 +118,7 @@ gesti.initialization({
 // gesti.debug=true;
 const controller = gesti.controller;
 console.log("屏幕1大小", canvas.width, canvas.height);
+
 const screenUtil1 = controller.generateScreenUtils({
   canvasHeight: canvas.height,
   canvasWidth: canvas.width,
@@ -125,6 +126,7 @@ const screenUtil1 = controller.generateScreenUtils({
   designHeight: 750,
   devicePixelRatio: dev,
 });
+
 const img: HTMLImageElement = document.querySelector("#dog");
 // controller.setScreenUtil();
 const ximage = new XImage({
@@ -418,8 +420,11 @@ document.getElementById("export").addEventListener("click", () => {
   controller.cancelAll();
   exportAll(gesti).then((json) => {
     console.log(json);
-    window.localStorage.setItem("aa", json);
+    // window.localStorage.setItem("aa", json);
     console.log("导出成功");
+    controller2.importAll(json).then(e=>{
+      console.log("导入成功");
+    })
   });
 });
 
@@ -447,14 +452,14 @@ async function main() {
   //   return _;
   // })
   const bg = await loadImg(
-    "https://raw.githubusercontent.com/AK1118/my-images/master/Desktop/QQ图片20231121111336 拷贝.png"
+    "https://th.bing.com/th/id/R.480a6d4abeab9dd27d76b91285a1fadd?rik=5VUtscE2LG%2bIoQ&riu=http%3a%2f%2fpic1.win4000.com%2fwallpaper%2f6%2f537ea1544f0e1.jpg&ehk=9JmVlCL0jY0tabBNx1oTgiHYYqOkmxBCoO3hdUmAtPQ%3d&risl=&pid=ImgRaw&r=0"
   );
   const bgBox = new ImageBox(
     new XImage({
       data: bg,
       width: bg.width,
       height: bg.height,
-      url: bg.src,
+      // url: bg.src,
     })
   );
   bgBox.setLayer(3);

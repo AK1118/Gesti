@@ -52,10 +52,10 @@ class XImage implements Serializable<{}> {
     this.height = ~~this.height;
   }
   public async export(): Promise<ExportXImage> {
-    const cutter: Cutter = new Cutter();
     const url: string = this.url;
     let data: ImageChunk[];
     if (!url) {
+      const cutter: Cutter = new Cutter();
       const chunks: ImageChunk[] =await cutter.getChunks(this);
       const coverter: ImageChunkConverter = new ImageChunkConverterH5();
       data = coverter.coverAllImageChunkToBase64(chunks);
@@ -68,14 +68,7 @@ class XImage implements Serializable<{}> {
     });
   }
   toJSON(): any {
-    const cutter: Cutter = new Cutter();
-    const url: string = this.url;
     let data: ImageChunk[];
-    // if (!url) {
-    //   const chunks: ImageChunk[] = cutter.getChunks(this);
-    //   const coverter: ImageChunkConverter = new ImageChunkConverterH5();
-    //   data = coverter.coverAllImageChunkToBase64(chunks);
-    // }
     return {
       url: this.url,
       data: data,

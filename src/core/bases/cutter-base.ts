@@ -9,7 +9,7 @@ abstract class CutterBase implements CutterInterface{
     painter: Painter;
     chunkSize: number=200;
     constructor(){
-        this.canvas=getOffscreenCanvasWidthPlatform(10000,500);
+        this.canvas=getOffscreenCanvasWidthPlatform(500,500);
         this.painter=getOffscreenCanvasContext(this.canvas) as any;
     }
     getChunks(ximage: XImage): Promise<ImageChunk[]> {

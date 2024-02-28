@@ -157,7 +157,7 @@ abstract class GesteControllerImpl implements GestiControllerInterface {
   rightward(viewObject?: ViewObject): number {
     return this.kit.rightward(viewObject);
   }
-  importAll(json: string, interceptor: ImportAllInterceptor): Promise<void> {
+  importAll(json: string, interceptor?: ImportAllInterceptor): Promise<void> {
     return this.kit.importAll(json, interceptor);
   }
   exportAll(exportAllInterceptor?: ExportAllInterceptor): Promise<string> {

@@ -76,10 +76,10 @@ class ImageBox extends ViewObject {
   }
 
   async export(): Promise<ViewObjectExportImageBox> {
-    const cutter: Cutter = new Cutter();
     const url: string = this.ximage.url;
     let data: ImageChunk[];
     if (!url) {
+      const cutter: Cutter = new Cutter();
       const chunks: ImageChunk[] = await cutter.getChunks(this.ximage);
       const coverter: ImageChunkConverter = new ImageChunkConverterH5();
       data = coverter.coverAllImageChunkToBase64(chunks);
