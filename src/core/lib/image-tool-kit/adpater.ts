@@ -47,7 +47,11 @@ abstract class ImageToolkitAdapterController
   implements GestiController
 {
   constructor(option: InitializationOption) {
+    console.log("VERSION DEBUG 626");
     super(option);
+  }
+  cleanListener(listenType?: GestiControllerListenerTypes): void {
+    this.listen.cleanHook(listenType);
   }
   getCanvasSize(): Size {
     const { size } = this.canvasRect;
@@ -107,8 +111,9 @@ abstract class ImageToolkitAdapterController
   remove(view?: ViewObject): boolean {
     const _view = view || this.focusedViewObject;
     if (!_view) return false;
+    this.cancel(_view);
     this.setlayers(this.layers.filter((_) => _.key != _view.key));
-    this.callHook("onRemove", null);
+    this.callHook("onRemove", _view);
     this.render();
     return true;
   }
@@ -216,7 +221,13 @@ abstract class ImageToolkitAdapterController
     super.addViewObject(obj);
   }
   select(select: ViewObject): Promise<void> {
-    if (select && select.onSelected) {
+    //不允许二次选中,背景不允许被选中
+    if (
+      select &&
+      select.onSelected &&
+      select.key !== this.focusedViewObject?.key &&
+      !select.isBackground
+    ) {
       select.onSelected();
       this.focusedViewObject = select;
       this.callHook("onSelect", select);

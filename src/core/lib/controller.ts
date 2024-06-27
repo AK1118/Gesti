@@ -36,6 +36,9 @@ abstract class GesteControllerImpl implements GestiControllerInterface {
     //使用控制器时，取消原有控制
     this.kit = kit;
   }
+  cleanListener(listenType?: GestiControllerListenerTypes): void {
+    this.kit.cleanListener(listenType);
+  }
   getCanvasSize(): Size {
     return this.kit.getCanvasSize();
   }

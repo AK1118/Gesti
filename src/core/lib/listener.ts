@@ -30,6 +30,13 @@ import ViewObject from "../abstract/view-object";
       const hooks = this.hooks[hookType] || [];
       hooks.forEach((hook: ListenerHook) => hook(arg));
     }
+    cleanHook(hookType?:GestiControllerListenerTypes){
+      if(hookType){
+        this.hooks[hookType] = [];
+      }else{
+        this.hooks = {};
+      }
+    }
     removeHook(hookType: GestiControllerListenerTypes, hook: ListenerHook) {
       const hooks: Array<ListenerHook> = this.hooks[hookType] || [];
       const ndx: number = hooks.indexOf(hook);

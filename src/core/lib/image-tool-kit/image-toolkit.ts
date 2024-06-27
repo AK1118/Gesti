@@ -134,6 +134,7 @@ class ImageToolkit extends ImageToolkitBase {
       }
 
       this.focusedViewObject = this.handleSelectedTarget(event);
+      //所有图层刷新聚焦和失焦
       this.layers.forEach((item) =>
         item.key === selectedTarget.key ? "" : this.handleCancelView(item)
       );
@@ -146,6 +147,10 @@ class ImageToolkit extends ImageToolkitBase {
     this.render();
   }
   protected handleCancelView(view: ViewObject): void {
+    //没有被选中的不需要被再次失焦
+    if(!view?.selected){
+      return;
+    }
     this.blurViewObject(view);
   }
   /**
