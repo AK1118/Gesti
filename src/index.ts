@@ -2,7 +2,7 @@
  * @Author: AK1118
  * @Date: 2023-11-03 18:14:02
  * @Last Modified by: AK1118
- * @Last Modified time: 2024-01-20 16:33:37
+ * @Last Modified time: 2024-06-28 16:07:49
  */
 import { ViewObjectFamily } from "./core/enums";
 import Gesti from "./core/lib/gesti";
@@ -24,6 +24,7 @@ import RectClipMask from "./core/viewObject/mask/rect-clip-mask";
 import BoxFit from "./core/lib/painting/box-fit";
 import BoxDecoration from "./core/lib/rendering/decorations/box-decoration";
 import PolygonDecoration from "./core/lib/rendering/decorations/polygon-decoration";
+import ParagraphBox from "./core/viewObject/text/paragraph-box";
 
 
 //Hooks
@@ -41,7 +42,7 @@ export { OffScreenCanvasBuilder };
 //Vector
 export { Alignment };
 //View
-export { Rectangle,Polygon, InteractiveImage, ImageBox, XImage, TextBox, WriteViewObj,RectCrop,RectClipMask };
+export { Rectangle,Polygon, InteractiveImage, ImageBox, XImage, TextBox, WriteViewObj,RectCrop,RectClipMask,ParagraphBox };
 //Enum
 export { ViewObjectFamily,BoxFit };
 //Config

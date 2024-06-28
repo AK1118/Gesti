@@ -58,6 +58,7 @@ import {
   TextStyle,
 } from "./text-painter";
 import { Size } from "@/core/lib/rect";
+import RenderObject from "@/core/interfaces/render-object";
 
 /**
  * 假如全屏 360，    分成750份
@@ -579,37 +580,74 @@ const controller2 = gesti2.initialization({
 
 const s2 = controller.getScreenUtil();
 
-// controller.load(new Rectangle({
-//   width:s2.fullWidth,
-//   height:s2.fullHeight,
-//   decoration:{
-//     backgroundColor:'orange'
-//   }
-// }));
-
-const t = new ParagraphBox(
-  `好的话`,
-  new TextStyle({
-    fontSize: 30,
-    height: 30,
-    fontStyle: FontStyle.italic,
-    fontWeight: FontWeight.bold,
-    // fontFamily:'鸿雷行书简体',
+controller.load(
+  new Rectangle({
+    width: s2.fullWidth,
+    height: s2.fullHeight,
+    decoration: {
+      backgroundColor: "white",
+    },
   })
 );
+controller.load(
+  new Rectangle({
+    width: s2.fullWidth,
+    height: s2.fullHeight,
+    decoration: {
+      backgroundColor: "#efefef",
+    },
+  })
+);
+
+const t = new ParagraphBox(`好的话`, {
+  fontSize: 30,
+  height: 30,
+  fontStyle: FontStyle.italic,
+  fontWeight: FontWeight.bold,
+  // shadow: {
+  //   shadowBlur: 3,
+  //   shadowColor: "orange",
+  // },
+  decoration: TextDecoration.lineThrough,
+  fillGradient: {
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: ["red", "blue"],
+  },
+});
 
 controller.load(t);
 
 t.installButton(new DragButton());
-
+let view: any;
+controller.addListener("onSelect", (_) => {
+  view = _;
+});
 // t.installButton(new HorizonButton());
 // t.installButton(new VerticalButton())
 controller.center(t);
-
-document.querySelector("textarea").addEventListener("input", (e: any) => {
-  t.setText(e.target.value);
+document.addEventListener("DOMContentLoaded", () => {
+  // document.querySelector("textarea").addEventListener("input", (e: any) => {
+  //   t.setText(e.target.value);
+  // });
+  console.log(document.querySelector("#s"));
+  document.querySelector("#s").addEventListener("click", (e: any) => {
+    controller.layerRise(view);
+    console.log("上一层", view);
+  });
+  document.querySelector("#x").addEventListener("click", (e: any) => {
+    controller.layerLower(view);
+    console.log("下一层", view);
+  });
+  document.querySelector("#t").addEventListener("click", (e: any) => {
+    controller.layerTop(view);
+    console.log("顶部", view);
+  });
+  document.querySelector("#b").addEventListener("click", (e: any) => {
+    controller.layerBottom(view);
+    console.log("底部", view);
+  });
 });
-
 // t.setDecoration({
 //   backgroundColor:'white',
 //   gradient:new LineGradientDecoration({

@@ -281,7 +281,7 @@ export interface TextOptions extends Shadow {
    * @description 字体风格，可以浏览器搜索 canvas自定义字体
    */
   fontFamily?: string;
-  weight?: FontWeight;
+  weight?: FontWeightType;
   fontStyle?: FontStyleType;
   fontSize?: number;
   /**
@@ -656,7 +656,7 @@ export class XImage {
 }
 
 export type FontStyleType = "normal" | "italic" | "oblique";
-export type FontWeight =
+export type FontWeightType =
   | "bold"
   | "normal"
   | 100
@@ -676,12 +676,12 @@ interface TextHandler {
   setColor(color: string): void;
   setText(text: string): void;
   setFontStyle(style: FontStyleType): void;
-  setWeight(weight: FontWeight): void;
+  setWeight(weight: FontWeightType): void;
 }
 
 export class TextBox extends ViewObject implements TextHandler {
   constructor(text: string, options?: TextOptions);
-  setWeight(weight: FontWeight): void;
+  setWeight(weight: FontWeightType): void;
   /**
    * ### 设置文字样式，斜体
    */
@@ -723,7 +723,7 @@ export class TextBox extends ViewObject implements TextHandler {
    * ### 文字样式数据
    */
   get textStyles(): TextOptions;
-  get weight(): FontWeight;
+  get weight(): FontWeightType;
 }
 
 export declare class ImageBox extends ViewObject {

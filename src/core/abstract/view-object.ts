@@ -98,9 +98,9 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
   public render(paint: Painter, isCache?: boolean) {
     if (!this.mounted) return;
     /*更新顶点数据*/
-    if (this.didChanged) {
-      this.rect.updateVertex();
-      this.reBuild();
+    this.rect.updateVertex();
+    if(this.needReBuild){
+      this.performRebuild();
     }
     //执行缓存画布生成
     if (this.isUseRenderCache && !this.offScreenCreated) {
@@ -464,7 +464,6 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
       if (deltaY < 0) this.enlarge();
       else this.narrow();
   }
-  
 }
 
 export default ViewObject;

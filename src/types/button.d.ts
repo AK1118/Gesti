@@ -1,3 +1,4 @@
+
 import { Alignment, Icon, ImageBox, Rectangle, TextBox } from "./gesti";
 
 type ButtonOption = {
@@ -74,3 +75,5 @@ interface HorizonButtonOption extends ARButtonOption {
 export class HorizonButton extends Button {
   constructor(option?: HorizonButtonOption);
 }
+
+export class DeleteButton extends CloseButton {}

@@ -6,27 +6,31 @@ import Painter, { PaintingStyle } from "@/core/lib/painter";
 import Alignment from "@/core/lib/painting/alignment";
 import Vector from "@/core/lib/vector";
 import { TextPainter, TextSpan, TextStyle } from "@/test/text-painter";
+import { ForegroundOption, TextStyleOption } from "@/types/paragraph";
 import { ViewObjectExportEntity } from "Serialization";
 class ParagraphBox extends ViewObject {
   private textPainter: TextPainter;
   private text: TextSpan;
   private textStyle: TextStyle;
-  constructor(text: string, textStyle?: TextStyle) {
+  private option: Partial<TextStyleOption & ForegroundOption>;
+  constructor(
+    text: string,
+    option?: Partial<TextStyleOption & ForegroundOption>
+  ) {
     super();
-    this.textStyle = textStyle;
+    this.textStyle = new TextStyle(option ?? {});
     this.text = new TextSpan({
       text: text,
-      textStyle,
+      textStyle: this.textStyle,
     });
-  }
-  public initialization(kit: ImageToolkitAdapterController): void {
-    super.initialization(kit);
-    this.initTextPainter();
-    this.size = this.textPainter.size.copy();
+    this.option = option;
   }
   protected initTextPainter() {
     this.textPainter = new TextPainter(this.text);
     this.textPainter.layout();
+    this.size = this.textPainter.size.copy();
+    this.size.setWidth(this.size.width*this.absoluteScale);
+    this.size.setHeight(this.size.height*this.absoluteScale);
   }
   get value(): any {
     return this.text.text;
@@ -36,25 +40,33 @@ class ParagraphBox extends ViewObject {
     const scaleHeight = this.size.height / this.textPainter.size.height;
     paint.transform(scaleWidth, 0, 0, scaleHeight, 0, 0);
 
-    const forground = paint;
-    forground.fillStyle = "white";
+    const { fillGradient, strokeGradient } = this.option;
+    if (fillGradient) {
+      const foreground = paint;
+      foreground.fillStyle = new LineGradientDecoration({
+        begin: fillGradient.begin,
+        end: fillGradient.end,
+        colors: fillGradient.colors,
+      }).getGradient(paint, this.size);
+      this.textPainter.paragraph.textStyle.foreground = foreground;
+    }
+    if (strokeGradient) {
+      const foreground = paint;
+      foreground.fillStyle = new LineGradientDecoration({
+        begin: strokeGradient.begin,
+        end: strokeGradient.end,
+        colors: strokeGradient.colors,
+      }).getGradient(paint, this.size);
+      this.textPainter.paragraph.textStyle.foreground = foreground;
+    }
 
-    forground.strokeStyle = "black";
-    // new LineGradientDecoration({
-    //     begin: Alignment.topCenter,
-    //     end: Alignment.bottomCenter,
-    //     colors: ["orangered", "white"],
-    //   }).getGradient(paint, this.size);
-
-    // forground.setShadow({
-    //   shadowBlur: 0,
-    //   shadowColor: "black",
-    //   shadowOffsetX: 3,
-    //   shadowOffsetY: 3,
-    // });
-    forground.lineWidth=1;
-    forground.style = PaintingStyle.both;
-    this.textPainter.paragraph.textStyle.foreground = forground;
+    if (strokeGradient) {
+      paint.style = PaintingStyle.stroke;
+    } else if (fillGradient) {
+      paint.style = PaintingStyle.fill;
+    } else if (strokeGradient && fillGradient) {
+      paint.style = PaintingStyle.both;
+    }
 
     this.textPainter.paint(
       paint,
@@ -73,15 +85,15 @@ class ParagraphBox extends ViewObject {
     });
     this.markNeedsReBuild();
   }
-  setTextStyle(textStyle:TextStyle){
-    this.textStyle=textStyle;
+  setTextStyle(textStyle: TextStyle) {
+    this.textStyle = textStyle;
     this.markNeedsReBuild();
   }
-  protected reBuild(): void {
-    super.reBuild();
+  performRebuild(): void {
+    super.performRebuild();
     this.initTextPainter();
   }
-  family: ViewObjectFamily;
+  family: ViewObjectFamily = ViewObjectFamily.text;
   export(painter?: Painter): Promise<ViewObjectExportEntity> {
     throw new Error("Method not implemented.");
   }

@@ -5,7 +5,7 @@ import Painter from "../../lib/painter";
 import Rect, { Size } from "../../lib/rect";
 import {
   FontStyleType,
-  FontWeight,
+  FontWeightType,
   Shadow,
   TextHandler,
   TextOptions,
@@ -587,7 +587,7 @@ class TextViewBase extends TextBoxBase implements TextHandler {
   get textStyles(): TextOptions {
     return this.textOptions;
   }
-  get weight(): FontWeight {
+  get weight(): FontWeightType {
     return this.textOptions.weight;
   }
   setShadow(shadow: Shadow): void {
@@ -612,7 +612,7 @@ class TextViewBase extends TextBoxBase implements TextHandler {
     this.textOptions.color = color;
     this.rebuild();
   }
-  setWeight(weight: FontWeight): void {
+  setWeight(weight: FontWeightType): void {
     this.textOptions.weight = weight;
   }
   public ready(adapter: ImageToolkitAdapterController): void {

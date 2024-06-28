@@ -45,7 +45,7 @@ abstract class BaseViewObject<
   protected offScreenCanvas;
   protected offScreenPainter: Painter;
   private _isCache: boolean = false;
-  private _didChanged: boolean = false;
+  private _needReBuild: boolean = false;
   private _scaleConstraints: ValueConstraints<number> = {
     min: 0.1,
     max: Infinity,
@@ -59,8 +59,8 @@ abstract class BaseViewObject<
   protected get isUseRenderCache(): boolean {
     return this._isCache;
   }
-  protected get didChanged(): boolean {
-    return this._didChanged;
+  protected get needReBuild(): boolean {
+    return this._needReBuild;
   }
   //约束倍数变换大小
   public setScaleConstraints(constraints: ValueConstraints<number>): void {
@@ -84,11 +84,11 @@ abstract class BaseViewObject<
   get angleDisabled(): boolean {
     return this._angleDisabled;
   }
-  protected _didChangedAll(): void {
-    this._didChanged = true;
+  protected _needReBuildAll(): void {
+    this._needReBuild = true;
   }
-  protected reBuild(): void {
-    this._didChanged = false;
+  performRebuild() {
+    this._needReBuild = false;
   }
   public useCache(): void {
     this._isCache = true;
@@ -426,8 +426,13 @@ abstract class BaseViewObject<
     this.kit.render();
   }
   protected markNeedsReBuild() {
+    if (this._needReBuild) return;
+    this._needReBuild = true;
     this.reBuild();
     this.markNeedsRePaint();
+  }
+  protected reBuild() {
+    this.performRebuild();
   }
 }
 
