@@ -242,6 +242,11 @@ interface ImageToolKitController {
     listenType: GestiControllerListenerTypes,
     hook: ListenerCallback
   ): void;
+  /**
+   * 清除某类型回调，当传入参数空时，清除所有回调
+   * @param listenType
+   */
+  cleanListener(listenType?: GestiControllerListenerTypes): void;
   addWrite(options: {
     type: GraffitiType;
     lineWidth?: number;
@@ -443,6 +448,11 @@ declare class GestiController implements GestiControllerInterface {
     listenType: GestiControllerListenerTypes,
     hook: ListenerCallback
   ): void;
+  /**
+   * 清除某类型回调，当传入参数空时，清除所有回调
+   * @param listenType
+   */
+  cleanListener(listenType?: GestiControllerListenerTypes): void;
   addWrite(options: {
     type: GraffitiType;
     lineWidth?: number;
