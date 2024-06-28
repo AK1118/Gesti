@@ -31,7 +31,7 @@ class DragButton extends BaseButton {
   public radius: number = 10;
   protected preMag: number = -1;
   private angleDisabled: boolean = false;
- 
+
   constructor(options?: DragButtonOption) {
     super(options);
     this.rect.onDrag = (currentButtonRect: Rect) => {
@@ -43,7 +43,7 @@ class DragButton extends BaseButton {
       this.angleDisabled = options.angleDisabled;
     }
   }
-  
+
   updatePosition(vector: Vector): void {
     this.updateRelativePosition();
     this.setAbsolutePosition(vector);
@@ -60,6 +60,7 @@ class DragButton extends BaseButton {
   }
   effect(currentButtonRect?: Rect): void {
     const mag = this.getButtonWidthMasterMag(currentButtonRect);
+    if (mag <= this.radius) return;
     if (this.preMag === -1) this.preMag = mag;
     const deltaScale: number = mag / this.preMag;
     const [offsetX, offsetY] = currentButtonRect.position
@@ -83,7 +84,7 @@ class DragButton extends BaseButton {
     const mag: number = Vector.mag(
       Vector.sub(currentButtonPosition, currentMasterPosition)
     );
-    return mag;
+    return Math.max(mag, this.senseRadius);
   }
   public get getOldAngle(): number {
     return this.oldAngle;

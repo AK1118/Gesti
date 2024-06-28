@@ -1,15 +1,55 @@
 import { Shadow } from "@/types/gesti";
 
+export enum PaintingStyle {
+  fill = "fill",
+  stroke = "stroke",
+  both = "both",
+}
+
 /*
 	使用代理模式重写Painter，兼容原生Painter
 */
 class Painter implements Painter {
+  private static _paint:
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D = null;
   paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D = null;
+  style: PaintingStyle = PaintingStyle.fill;
   constructor(
-    paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+    paint:
+      | CanvasRenderingContext2D
+      | OffscreenCanvasRenderingContext2D = Painter._paint
   ) {
-    this.setPaintQuality(paint);
-    this.paint = paint;
+    if (!paint) {
+      if (Painter._paint) {
+        this.paint = Painter._paint;
+      } else {
+        throw new Error(
+          "The Painter must insert a paint object of CanvasRenderingContext2D. Try running new Painter(g) to avoid this error.The 'g' value is a CanvasRenderingContext2D object."
+        );
+      }
+    } else {
+      this.setPaintQuality(paint);
+      this.paint = paint;
+      Painter._paint = paint;
+    }
+    // this.setPaintQuality(paint);
+    // this.paint = paint;
+    // Painter._paint ??= paint;
+    // if (Painter._paint) {
+    //   this.paint = Painter._paint;
+    // } else {
+    //   throw Error(
+    //     "The Painter must insert a paint object of CanvasRenderingContext2D. Try running new Painter(g) to avoid this error.The 'g' value is a CanvasRenderingContext2D object."
+    //   );
+    // }
+  }
+  public static setPaint(
+    paint:
+      | CanvasRenderingContext2D
+      | OffscreenCanvasRenderingContext2D = Painter._paint
+  ) {
+    Painter._paint = paint;
   }
   private setPaintQuality(
     paint: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
@@ -115,6 +155,13 @@ class Painter implements Painter {
   }
   restore() {
     this.paint.restore();
+  }
+  restoreShadow() {
+    this.setShadow({
+      shadowOffsetX: 0,
+      shadowOffsetY: 0,
+      shadowBlur: 0,
+    });
   }
   translate(x: number, y: number) {
     this.paint.translate(x, y);
@@ -274,6 +321,9 @@ class Painter implements Painter {
     y1: number
   ): CanvasGradient {
     return this.paint?.createLinearGradient?.(x0, y0, x1, y1);
+  }
+  transform(a: number, b: number, c: number, d: number, e: number, f: number) {
+    this.paint?.transform(a, b, c, d, e, f);
   }
   createRadialGradient(
     x0: number,

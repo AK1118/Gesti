@@ -30,6 +30,7 @@ class VerticalButton extends SizeButton {
   protected icon: Icon = new DefaultIcon();
   effect(currentButtonRect?: Rect): void {
     const mag = this.getButtonWidthMasterMag(currentButtonRect);
+    
     const preMasterSize: Size = this.master.size.copy();
     if (this.preMag === -1) {
       this.preMag = mag;

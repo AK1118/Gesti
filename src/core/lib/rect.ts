@@ -50,7 +50,6 @@ export class Size {
   }
 }
 
-
 class Rect extends ObserverObj {
   public onDrag: onDragFunction;
   public beforeDrag: onDragFunction;
@@ -110,6 +109,9 @@ class Rect extends ObserverObj {
   public get size(): Size {
     return this._size;
   }
+  public set size(size: Size) {
+    this._size = size;
+  }
   public get absoluteScale(): number {
     return this._absoluteScale;
   }
@@ -133,7 +135,7 @@ class Rect extends ObserverObj {
     this._scaleWidth = scale;
     // this._didChangeScaleWidth();
     // this.didChangeScaleWidth();
-    this.report(scale,"sizeScaleWidth");
+    this.report(scale, "sizeScaleWidth");
     this._preScaleWidth = scale;
   }
   public setScaleHeight(scale: number): void {
@@ -141,7 +143,7 @@ class Rect extends ObserverObj {
     this._scaleHeight = scale;
     // this._didChangeScaleHeight();
     // this.didChangeScaleHeight();
-    this.report(scale,"sizeScaleHeight");
+    this.report(scale, "sizeScaleHeight");
     this._preScaleHeight = scale;
   }
   public set position(position: Vector) {
@@ -167,8 +169,8 @@ class Rect extends ObserverObj {
     this.report(delta, "addPosition");
   }
   //设置绝对大小，不依赖于瞬时scale
-  public setAbsoluteScale(scale:number):void{
-    this._absoluteScale=scale;
+  public setAbsoluteScale(scale: number): void {
+    this._absoluteScale = scale;
   }
   public setDeltaScale(deltaScale: number, change?: boolean): void {
     this._absoluteScale *= deltaScale;

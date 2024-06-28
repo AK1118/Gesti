@@ -63,6 +63,7 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
     this.mount();
     this.setFixedSize(this.size.toObject());
     this.initializationButtons();
+    this.markNeedsReBuild();
   }
   //卸载按钮
   public unInstallButton(buttons: Array<Button>) {
@@ -451,15 +452,9 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
   public setOpacity(opacity: number): void {
     this.opacity = opacity;
   }
-  onDown(e: Vector | Vector[]): void {
-   
-  }
-  onMove(e: Vector | Vector[]): void {
-    
-  }
-  onUp(e: Vector | Vector[]): void {
-    
-  }
+  onDown(e: Vector | Vector[]): void {}
+  onMove(e: Vector | Vector[]): void {}
+  onUp(e: Vector | Vector[]): void {}
   public cancelDrag() {
     this.drag.cancel();
   }
@@ -469,6 +464,7 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
       if (deltaY < 0) this.enlarge();
       else this.narrow();
   }
+  
 }
 
 export default ViewObject;

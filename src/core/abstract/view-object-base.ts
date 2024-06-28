@@ -360,6 +360,9 @@ abstract class BaseViewObject<
   get size(): Size {
     return this.rect.size;
   }
+  set size(size: Size) {
+    this.rect.size = size;
+  }
   public get position(): Vector {
     return this.rect.position;
   }
@@ -419,7 +422,13 @@ abstract class BaseViewObject<
   public getKit(): ImageToolkitAdapterController {
     return this.kit;
   }
-  
+  protected markNeedsRePaint() {
+    this.kit.render();
+  }
+  protected markNeedsReBuild() {
+    this.reBuild();
+    this.markNeedsRePaint();
+  }
 }
 
 export default BaseViewObject;
