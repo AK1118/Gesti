@@ -604,10 +604,13 @@ const t = new ParagraphBox(`好的话`, {
   height: 30,
   fontStyle: FontStyle.italic,
   fontWeight: FontWeight.bold,
-  // shadow: {
-  //   shadowBlur: 3,
-  //   shadowColor: "orange",
-  // },
+  shadow: {
+    shadowBlur: 1,
+    shadowColor: "orange",
+    shadowOffsetX:3,
+    shadowOffsetY:3,
+  },
+  backgroundColor:"#f8f8f8",
   decoration: TextDecoration.lineThrough,
   fillGradient: {
     begin: Alignment.topCenter,

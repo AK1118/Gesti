@@ -77,7 +77,20 @@ declare interface ForegroundOption {
   strokeColor: string;
 }
 
+declare interface BackgroundOption {
+  backgroundColor: string;
+  backgroundGradient: LineGradientDecorationOption;
+}
+
+declare interface ParagraphBoxOption
+  extends BackgroundOption,
+    ForegroundOption,
+    TextStyleOption {}
+
 declare class ParagraphBox extends ViewObject {
-  constructor(text: string, style?: TextStyleOption & ForegroundOption);
+  constructor(text: string, style?: ParagraphBoxOption);
   setText(text: string): void;
+  updateOption(newOption: ParagraphBoxOption): void;
+  setOption(newOption: ParagraphBoxOption): void;
+  get styleOption(): Partial<ParagraphBoxOption>;
 }

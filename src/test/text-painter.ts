@@ -458,9 +458,6 @@ export class Paragraph {
     paint.font = `${this.textStyle.fontWeight} ${this.textStyle.fontStyle} ${~~(
       this.textStyle.fontSize ?? _kDefaultFontSize
     )}px ${this.textStyle.fontFamily}`;
-    if (this.textStyle.shadow) {
-      paint.setShadow(this.textStyle.shadow);
-    }
     callback?.(paint);
     if (callback) {
       paint.restore();
