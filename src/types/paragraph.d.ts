@@ -85,7 +85,12 @@ declare interface BackgroundOption {
 declare interface ParagraphBoxOption
   extends BackgroundOption,
     ForegroundOption,
-    TextStyleOption {}
+    TextStyleOption {
+  constraintWidth: {
+    minWidth: number;
+    maxWidth: number;
+  };
+}
 
 declare class ParagraphBox extends ViewObject {
   constructor(text: string, style?: ParagraphBoxOption);

@@ -28,7 +28,10 @@ class ParagraphBox extends ViewObject {
   }
   protected initTextPainter() {
     this.textPainter = new TextPainter(this.text);
-    this.textPainter.layout();
+    this.textPainter.layout(
+      this.option?.constraintWidth?.minWidth ?? 0,
+      this.option?.constraintWidth?.maxWidth ?? Infinity
+    );
     this.size = this.textPainter.size.copy();
     this.size.setWidth(this.size.width * this.absoluteScale);
     this.size.setHeight(this.size.height * this.absoluteScale);

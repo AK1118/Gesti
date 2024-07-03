@@ -59,6 +59,7 @@ import {
 } from "./text-painter";
 import { Size } from "@/core/lib/rect";
 import RenderObject from "@/core/interfaces/render-object";
+import Clipper from "./clipper";
 
 /**
  * 假如全屏 360，    分成750份
@@ -138,18 +139,9 @@ const screenUtil1 = controller.generateScreenUtils({
   canvasWidth: canvas.width,
   designWidth: 750,
   designHeight: 750,
-  // devicePixelRatio: dev,
+  devicePixelRatio: dev,
 });
 
-// const img: HTMLImageElement = document.querySelector("#dog");
-// // controller.setScreenUtil();
-// const ximage = new XImage({
-//   data: img,
-//   width: img.width,
-//   height: img.height,
-//   scale: 1,
-//   // url: img.src,
-// });
 // console.log("哈哈");
 // const imageBox = new ImageBox(ximage);
 // imageBox.setSize({
@@ -580,76 +572,125 @@ const controller2 = gesti2.initialization({
 
 const s2 = controller.getScreenUtil();
 
-controller.load(
-  new Rectangle({
-    width: s2.fullWidth,
-    height: s2.fullHeight,
-    decoration: {
-      backgroundColor: "white",
-    },
-  })
-);
-controller.load(
-  new Rectangle({
-    width: s2.fullWidth,
-    height: s2.fullHeight,
-    decoration: {
-      backgroundColor: "#efefef",
-    },
-  })
-);
+// controller.load(
+//   new Rectangle({
+//     width: s2.fullWidth,
+//     height: s2.fullHeight,
+//     decoration: {
+//       backgroundColor: "white",
+//     },
+//   })
+// );
+// controller.load(
+//   new Rectangle({
+//     width: s2.fullWidth,
+//     height: s2.fullHeight,
+//     decoration: {
+//       backgroundColor: "#efefef",
+//     },
+//   })
+// );
 
-const t = new ParagraphBox(`好的话`, {
-  fontSize: 30,
-  height: 30,
-  fontStyle: FontStyle.italic,
-  fontWeight: FontWeight.bold,
-  shadow: {
-    shadowBlur: 1,
-    shadowColor: "orange",
-    shadowOffsetX:3,
-    shadowOffsetY:3,
-  },
-  backgroundColor:"#f8f8f8",
-  decoration: TextDecoration.lineThrough,
-  fillGradient: {
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: ["red", "blue"],
-  },
+// const t = new ParagraphBox(`好的话`, {
+//   fontSize: 30,
+//   height: 30,
+//   fontStyle: FontStyle.italic,
+//   fontWeight: FontWeight.bold,
+//   shadow: {
+//     shadowBlur: 1,
+//     shadowColor: "orange",
+//     shadowOffsetX:3,
+//     shadowOffsetY:3,
+//   },
+//   backgroundColor:"#f8f8f8",
+//   decoration: TextDecoration.lineThrough,
+//   fillGradient: {
+//     begin: Alignment.topCenter,
+//     end: Alignment.bottomCenter,
+//     colors: ["red", "blue"],
+//   },
+// });
+
+// controller.load(t);
+
+// t.installButton(new DragButton());
+
+const img: HTMLImageElement = document.querySelector("#dog");
+// controller.setScreenUtil();
+const ximage = new XImage({
+  data: img,
+  width: img.width,
+  height: img.height,
+  scale: 1,
+  // url: img.src,
 });
 
-controller.load(t);
+const clipper = new Clipper({
+  width: img.width,
+  height: img.height,
+  maskColor: "rgba(0,0,0,.2)",
+  image: ximage,
+});
 
-t.installButton(new DragButton());
+controller.load(clipper);
+controller.center(clipper);
+
+clipper.installMultipleButtons([
+  new SizeButton({
+    alignment: Alignment.bottomRight,
+  }),
+  new SizeButton({
+    alignment: Alignment.topRight,
+  }),
+  new SizeButton({
+    alignment: Alignment.topLeft,
+  }),
+  new SizeButton({
+    alignment: Alignment.bottomLeft,
+  }),
+  new HorizonButton({
+    location: "left",
+    alignment: Alignment.centerLeft,
+  }),
+  new HorizonButton({
+    location: "right",
+    alignment: Alignment.centerRight,
+  }),
+  new VerticalButton({
+    location: "top",
+    alignment: Alignment.topCenter,
+  }),
+  new VerticalButton({
+    location: "bottom",
+    alignment: Alignment.bottomCenter,
+  }),
+]);
 let view: any;
 controller.addListener("onSelect", (_) => {
   view = _;
 });
 // t.installButton(new HorizonButton());
 // t.installButton(new VerticalButton())
-controller.center(t);
+// controller.center(t);
 document.addEventListener("DOMContentLoaded", () => {
   // document.querySelector("textarea").addEventListener("input", (e: any) => {
   //   t.setText(e.target.value);
   // });
   console.log(document.querySelector("#s"));
   document.querySelector("#s").addEventListener("click", (e: any) => {
-    controller.layerRise(view);
-    console.log("上一层", view);
+    clipper.clipStart();
   });
   document.querySelector("#x").addEventListener("click", (e: any) => {
-    controller.layerLower(view);
-    console.log("下一层", view);
+    clipper.clipStop();
   });
-  document.querySelector("#t").addEventListener("click", (e: any) => {
-    controller.layerTop(view);
-    console.log("顶部", view);
-  });
-  document.querySelector("#b").addEventListener("click", (e: any) => {
-    controller.layerBottom(view);
-    console.log("底部", view);
-  });
+  // document.querySelector("#t").addEventListener("click", (e: any) => {
+  //   controller.layerTop(view);
+  //   console.log("顶部", view);
+  // });
+  // document.querySelector("#b").addEventListener("click", (e: any) => {
+  //   controller.layerBottom(view);
+  //   console.log("底部", view);
+  // });
 });
 // t.setDecoration({
 //   backgroundColor:'white',

@@ -4,8 +4,8 @@ import Vector from "../../core/lib/vector";
 class Drag {
   private rect: Rect = null;
   private offset: Vector;
-  get busy():boolean{
-    return this.rect!==null;
+  get busy(): boolean {
+    return this.rect !== null;
   }
   public catchViewObject(rect: Rect, position: Vector | any): void {
     this.rect = rect;
@@ -24,10 +24,12 @@ class Drag {
   }
   public update(position: Vector | any): void {
     if (!this.rect) return;
-    this.rect.beforeDrag?.(this.rect);
+    this.rect.beforeDrag?.(this.rect,position);
     position.add(this.offset);
-    this.rect.setPositionXY(position.x, position.y);
-    this.rect.onDrag?.(this.rect);
+    if (!this.rect.disableDragPosition) {
+      this.rect.setPositionXY(position.x, position.y);
+    }
+    this.rect.onDrag?.(this.rect,position);
   }
 }
 

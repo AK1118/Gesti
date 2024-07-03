@@ -6,7 +6,7 @@ import Vertex from "./vertex";
  * @ 拖拽的回调函数
  */
 declare interface onDragFunction {
-  (rect: Rect): void;
+  (rect: Rect,position?:Vector): void;
 }
 export class Size {
   private _width: number;
@@ -64,6 +64,7 @@ class Rect extends ObserverObj {
   private _scaleHeight: number = 1;
   private _preScaleWidth: number = 1;
   private _preScaleHeight: number = 1;
+  public disableDragPosition:boolean=false;
   public readonly key: string = Math.random().toString(16).substring(2);
   constructor(params?: RectParams, key?: string) {
     super();

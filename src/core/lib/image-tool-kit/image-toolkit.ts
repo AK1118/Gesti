@@ -102,6 +102,8 @@ class ImageToolkit extends ImageToolkitBase {
     //手势解析处理
     this.gesture.onDown(this.focusedViewObject, event);
 
+    this.handleNotifyEventToLayers("down", event);
+
     if (this.focusedViewObject ?? false) {
       if (Array.isArray(event) || this.checkFuncButton(event)) {
         return;
@@ -144,11 +146,27 @@ class ImageToolkit extends ImageToolkitBase {
       if (this.writeFactory.watching && !selectedTarget?.selected)
         return this.writeFactory.onDraw();
     }
+
     this.render();
+  }
+  /**
+   * 通知图层，手指/鼠标事件
+   * @param type
+   * @param e
+   */
+  private handleNotifyEventToLayers(
+    type: "down" | "up" | "move",
+    e: Vector | Vector[]
+  ) {
+    this.layers.forEach((item) => {
+      if (type === "down") item.onDown(e);
+      else if (type === "up") item.onUp(e);
+      else if (type === "move") item.onMove(e);
+    });
   }
   protected handleCancelView(view: ViewObject): void {
     //没有被选中的不需要被再次失焦
-    if(!view?.selected){
+    if (!view?.selected) {
       return;
     }
     this.blurViewObject(view);
@@ -172,6 +190,7 @@ class ImageToolkit extends ImageToolkitBase {
     if (this.eventHandlerState === EventHandlerState.down) {
       const event: Vector | Vector[] = this.correctEventPosition(v);
       this.debug(["Event Move,", event]);
+      this.handleNotifyEventToLayers("move",event);
       //绘制处理,当down在已被选中的图册上时不能绘制
       if (this.writeFactory.current) {
         this.render();
@@ -233,6 +252,7 @@ class ImageToolkit extends ImageToolkitBase {
       if (this._inObjectArea) this.focusedViewObject.onUpWithInner(this.paint);
       else this.focusedViewObject.onUpWithOuter(this.paint);
     }
+    this.handleNotifyEventToLayers("up", event);
     this.render();
     this._inObjectArea = false;
   }

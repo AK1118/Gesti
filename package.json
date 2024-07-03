@@ -46,6 +46,7 @@
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/webpack": "^5.28.4",
     "clean-webpack-plugin": "^4.0.0",
+    "eruda": "^3.0.1",
     "glob": "^10.3.10",
     "html-webpack-plugin": "^5.5.0",
     "pako": "^2.1.0",

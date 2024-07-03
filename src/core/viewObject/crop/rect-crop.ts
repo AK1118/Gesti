@@ -15,8 +15,15 @@ class RectCrop extends ViewObject {
     lineDashColor: "#ffffff",
     count: 3,
     lineDash: [5, 5],
-    lineWidth: 2,
+    lineWidth: 1,
   };
+  private displayCrossLine: boolean = true;
+  hiddenCrossLine() {
+    this.displayCrossLine = false;
+  }
+  showCrossLine() {
+    this.displayCrossLine = true;
+  }
   constructor(option: RectCropOption) {
     super();
     this.option = Object.assign(this.optionDefault, option);
@@ -47,10 +54,10 @@ class RectCrop extends ViewObject {
   drawImage(paint: Painter): void {
     paint.save();
     this.drawMask(paint);
-    this.drawLineDesh(paint);
+    if (this.displayCrossLine) this.drawLineDesh(paint);
     paint.restore();
   }
-  private drawLineDesh(paint: Painter): void {
+  protected drawLineDesh(paint: Painter): void {
     const hw = this.halfWidth,
       hh = this.halfHeight;
     const count = this.option.count;
@@ -75,7 +82,7 @@ class RectCrop extends ViewObject {
       paint.stroke();
     }
   }
-  private drawMask(paint: Painter): void {
+  protected drawMask(paint: Painter): void {
     const x = this.position.x,
       y = this.position.y;
     const hw = this.halfWidth,
