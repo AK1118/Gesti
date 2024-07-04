@@ -284,6 +284,7 @@ class Clipper extends RectCrop {
   private offset: Vector = Vector.zero;
   public clipRotate: number = 0;
   family: ViewObjectFamily;
+  private oldLayer: number;
   constructor(
     option: RectCropOption & {
       image: XImage;
@@ -388,7 +389,7 @@ class Clipper extends RectCrop {
       this.isClip = true;
       super.hiddenCrossLine();
       this.markNeedsRePaint();
-    }, 500);
+    }, 200);
   }
   get value(): any {
     throw new Error("Method not implemented.");
@@ -414,27 +415,27 @@ class Clipper extends RectCrop {
   }
 
   private renderImageWidthClipping(paint: Painter) {
-    // if (this.isClip) {
-    //   paint.clipRect(
-    //     new Rect({
-    //       x: this.position.x - this.width * 0.5,
-    //       y: this.position.y - this.height * 0.5,
-    //       width: this.width,
-    //       height: this.height,
-    //     }),
-    //     () => {
-    //       this.drawClipImage(paint);
-    //     }
-    //   );
-    // } else {
-    //   this.drawClipImage(paint);
-    // }
-    this.drawClipImage(paint);
+    if (this.isClip) {
+      paint.clipRect(
+        new Rect({
+          x: this.position.x - this.width * 0.5,
+          y: this.position.y - this.height * 0.5,
+          width: this.width,
+          height: this.height,
+        }),
+        () => {
+          this.drawClipImage(paint);
+        }
+      );
+    } else {
+      this.drawClipImage(paint);
+    }
+    // this.drawClipImage(paint);
   }
   private drawClipImage(paint: Painter) {
     const { data } = this.xImage;
     const { width, height } = this.imageRect.size;
-    paint.save();
+    // paint.save();
     // paint.translate(this.position.x, this.position.y);
     // paint.rotate(this.clipRotate);
     // paint.translate(-this.position.x, -this.position.y);
@@ -445,7 +446,7 @@ class Clipper extends RectCrop {
       width,
       height
     );
-    paint.restore();
+    // paint.restore();
   }
   public clipStart() {
     if (this.clipping) return;
@@ -453,7 +454,10 @@ class Clipper extends RectCrop {
     this.clipping = true;
     this.isClip = true;
     this.imageRect.position = Vector.sub(this.position, this.offset);
+    this.oldLayer = this.getLayer();
+    this.getKit().setLayer(200, this);
     this.markNeedClip();
+    this.markNeedsRePaint();
   }
   public clipStop() {
     if (!this.clipping) return;
@@ -461,6 +465,8 @@ class Clipper extends RectCrop {
     this.isClip = false;
     this.rect.disableDragPosition = false;
     this.offset = Vector.sub(this.position, this.imageRect.position);
+    this.getKit().setLayer(this.oldLayer, this);
+    this.markNeedsRePaint();
   }
   public updateClipImageRotate(rotate: number) {
     if (!this.clipping) return;

@@ -407,6 +407,16 @@ class Painter implements Painter {
   /*清空画布|刷新画布*/
   update() {}
   clipRect(clipPath: Rect, paint: VoidFunction, angle?: number) {
+    // paint.beginPath();
+		// 	paint.save();
+		// 	paint.rect(this.position.x - this.width * 0.5,this.position.y - this.height * 0.5,this.width,this.height);
+		// 	paint.clip();
+		// 	const { data } = this.xImage;
+		// 	const { width, height } = this.imageRect.size;
+		// 	paint.deepDrawImage(data, this.imageRect.position.x - width * 0.5, this.imageRect.position.y - height * 0.5, width, height);
+		// 	paint.restore();
+		// 	paint.closePath();
+    this.beginPath();
     this.save();
     this.rect(
       clipPath.position.x,
@@ -417,6 +427,7 @@ class Painter implements Painter {
     this.clip();
     paint();
     this.restore();
+    this.closePath();
   }
 }
 
