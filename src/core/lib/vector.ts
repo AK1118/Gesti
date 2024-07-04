@@ -71,6 +71,7 @@ class Vector{
 		return this;
 	}
 	equals(v:Vector):boolean{
+		if(!v)return false;
 		return v.x==this.x&&v.y==this.y;
 	}
 	toArray():number[]{

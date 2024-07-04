@@ -44,6 +44,7 @@ import { ListenerHook } from "../listener";
 import gestiEventManager from "@/utils/event/event-manager";
 
 class ImageToolkit extends ImageToolkitBase {
+  private prePointer: Vector | Vector[] = null;
   constructor(option: InitializationOption) {
     super();
     const {
@@ -98,6 +99,7 @@ class ImageToolkit extends ImageToolkitBase {
     this.eventHandlerState = EventHandlerState.down;
     const event: Vector | Vector[] = this.correctEventPosition(v);
     this.debug(["Event Down,", event]);
+    this.handleRecordPrePointer(event);
 
     //手势解析处理
     this.gesture.onDown(this.focusedViewObject, event);
@@ -105,9 +107,9 @@ class ImageToolkit extends ImageToolkitBase {
     this.handleNotifyEventToLayers("down", event);
 
     if (this.focusedViewObject ?? false) {
-      if (Array.isArray(event) || this.checkFuncButton(event)) {
-        return;
-      }
+      // if (Array.isArray(event) || this.checkFuncButton(event)) {
+      //   return;
+      // }
     }
     /**
      * 处理拖拽的代码块，被选中图册是检测选中的最高优先级
@@ -118,31 +120,24 @@ class ImageToolkit extends ImageToolkitBase {
       this.layers,
       event
     );
+    if (this.focusedViewObject) {
+      this.drag.catchViewObject(this.focusedViewObject.rect, event);
+      if (!Array.isArray(event)) {
+        this.checkFuncButton(event);
+      }
+    }
     /**
      * 已选中图层移动优先级>涂鸦动作优先级>选中图层动作优先级
      * 没有选中的图层时执行涂鸦动作，判断涂鸦动作是否开启
      * */
     if (selectedTarget && !selectedTarget.isBackground) {
-      if (selectedTarget.selected) {
-        if (!selectedTarget.isLock)
-          this.drag.catchViewObject(selectedTarget.rect, event);
-        this.focusedViewObject = this.handleSelectedTarget(event);
-        return;
-      }
-
       //涂鸦等待且现在手机点击在已选中对象内
       if (this.writeFactory.watching && !selectedTarget.selected) {
         this.writeFactory.onDraw();
       }
-
-      this.focusedViewObject = this.handleSelectedTarget(event);
-      //所有图层刷新聚焦和失焦
-      this.layers.forEach((item) =>
-        item.key === selectedTarget.key ? "" : this.handleCancelView(item)
-      );
     } else {
       //点击图像外取消选中上一个对象
-      this.handleCancelView(this.focusedViewObject);
+      // this.handleCancelView(this.focusedViewObject);
       if (this.writeFactory.watching && !selectedTarget?.selected)
         return this.writeFactory.onDraw();
     }
@@ -190,7 +185,7 @@ class ImageToolkit extends ImageToolkitBase {
     if (this.eventHandlerState === EventHandlerState.down) {
       const event: Vector | Vector[] = this.correctEventPosition(v);
       this.debug(["Event Move,", event]);
-      this.handleNotifyEventToLayers("move",event);
+      this.handleNotifyEventToLayers("move", event);
       //绘制处理,当down在已被选中的图册上时不能绘制
       if (this.writeFactory.current) {
         this.render();
@@ -207,6 +202,7 @@ class ImageToolkit extends ImageToolkitBase {
       if (Array.isArray(event)) {
         this.gesture.update(event);
         return this.render();
+      } else {
       }
       //拖拽
       this.drag.update(event);
@@ -214,6 +210,8 @@ class ImageToolkit extends ImageToolkitBase {
       if (this.focusedViewObject != null) this.render();
     } else {
       const event: Vector | Vector[] = this.correctEventPosition(v);
+      if (Array.isArray(event)) return;
+      if (!CatchPointUtil.inArea(this.canvasRect, event)) return;
       //Hover检测
       const focusedViewObject: ViewObject = CatchPointUtil.catchViewObject(
         this.layers,
@@ -248,6 +246,28 @@ class ImageToolkit extends ImageToolkitBase {
         this.addViewObject(value);
       }
     });
+    if (this.isEqualPointer(event) && !Array.isArray(event)) {
+      /**
+       * 点击相同位置后判断是否捕获到对象，未捕获失焦全部，捕获则聚焦
+       */
+      console.log("相同点");
+      let selectedTarget: ViewObject = CatchPointUtil.catchViewObject(
+        this.layers,
+        event
+      );
+      if (selectedTarget && !selectedTarget?.isLock) {
+        this.drag.catchViewObject(selectedTarget.rect, event);
+        this.focusedViewObject = this.handleSelectedTarget(event);
+        console.log("选中", this.drag);
+      } else if (
+        !Array.isArray(event) &&
+        this.focusedViewObject &&
+        !this.checkFuncButton(event, false)
+      ) {
+        this.layers.forEach((item) => this.handleCancelView(item));
+      }
+    }
+
     if (this.focusedViewObject) {
       if (this._inObjectArea) this.focusedViewObject.onUpWithInner(this.paint);
       else this.focusedViewObject.onUpWithOuter(this.paint);
@@ -300,7 +320,10 @@ class ImageToolkit extends ImageToolkitBase {
     return vector.sub(this.offset);
   }
 
-  private checkFuncButton(eventPosition: Vector): boolean {
+  private checkFuncButton(
+    eventPosition: Vector,
+    isCall: boolean = true
+  ): boolean {
     const _button: BaseButton | boolean =
       this.focusedViewObject.checkFuncButton(eventPosition);
     const result: any = _button;
@@ -312,11 +335,11 @@ class ImageToolkit extends ImageToolkitBase {
         button.onSelected();
         this.drag.catchViewObject(button.rect, eventPosition);
       } else if (button.trigger == FuncButtonTrigger.click) {
-        button.effect();
+        if (isCall) button.effect();
       }
       return true;
     } else {
-      this.drag.cancel();
+      // this.drag.cancel();
       this.gesture.cancel();
     }
     return false;
@@ -374,6 +397,13 @@ class ImageToolkit extends ImageToolkitBase {
       this.focusedViewObject === null ||
       this.focusedViewObject?.key === view.key
     );
+  }
+  private handleRecordPrePointer(e: Vector | Vector[]) {
+    this.prePointer = e;
+  }
+  private isEqualPointer(e: Vector | Vector[]): boolean {
+    if (Array.isArray(e)) return false;
+    return e.equals(this.prePointer as Vector);
   }
 }
 

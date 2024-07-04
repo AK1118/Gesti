@@ -125,6 +125,9 @@ class Rect extends ObserverObj {
   public get getAngle(): number {
     return this._angle;
   }
+  get angle(): number {
+    return this._angle;
+  }
   get scaleWidth(): number {
     return this._scaleWidth;
   }

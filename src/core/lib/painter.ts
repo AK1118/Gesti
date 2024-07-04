@@ -1,4 +1,5 @@
 import { Shadow } from "@/types/gesti";
+import Rect from "./rect";
 
 export enum PaintingStyle {
   fill = "fill",
@@ -325,6 +326,19 @@ class Painter implements Painter {
   transform(a: number, b: number, c: number, d: number, e: number, f: number) {
     this.paint?.transform(a, b, c, d, e, f);
   }
+  setTransform(
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+    e: number,
+    f: number
+  ) {
+    this.paint?.transform(a, b, c, d, e, f);
+  }
+  resetTranslate() {
+    this.setTransform(1, 0, 0, 1, 0, 0);
+  }
   createRadialGradient(
     x0: number,
     y0: number,
@@ -392,6 +406,18 @@ class Painter implements Painter {
   }
   /*清空画布|刷新画布*/
   update() {}
+  clipRect(clipPath: Rect, paint: VoidFunction, angle?: number) {
+    this.save();
+    this.rect(
+      clipPath.position.x,
+      clipPath.position.y,
+      clipPath.size.width,
+      clipPath.size.height
+    );
+    this.clip();
+    paint();
+    this.restore();
+  }
 }
 
 export default Painter;

@@ -37,6 +37,7 @@ import {
 import Gesti, {
   ARButton,
   CloseButton,
+  DeleteButton,
   EventButton,
   HorizonButton,
   ImageBox,
@@ -581,15 +582,7 @@ const s2 = controller.getScreenUtil();
 //     },
 //   })
 // );
-// controller.load(
-//   new Rectangle({
-//     width: s2.fullWidth,
-//     height: s2.fullHeight,
-//     decoration: {
-//       backgroundColor: "#efefef",
-//     },
-//   })
-// );
+
 
 // const t = new ParagraphBox(`好的话`, {
 //   fontSize: 30,
@@ -621,20 +614,53 @@ const ximage = new XImage({
   data: img,
   width: img.width,
   height: img.height,
-  scale: 1,
+  scale: .5,
   // url: img.src,
 });
-
-const clipper = new Clipper({
-  width: img.width,
-  height: img.height,
-  maskColor: "rgba(0,0,0,.2)",
-  image: ximage,
+const rect1=new Rectangle({
+  width: s2.fullWidth,
+  height: s2.fullHeight,
+  decoration: {
+    backgroundColor: "#efefef",
+    backgroundImage:ximage
+  },
+  
 });
-
+rect1.installMultipleButtons([
+  new DragButton(),
+  new RotateButton(
+    {
+      alignment:new Alignment(0,1.25),
+    }
+  ),
+  new DeleteButton(),
+  new MirrorButton(),
+]);
+// controller.load(
+//   rect1
+// );
+// new Clipper({
+//   width: ximage.width,
+//   height: ximage.height,
+//   maskColor: "rgba(0,0,0,.2)",
+//   image: ximage,
+// });
+// const clipper = new Clipper({
+//   width: ximage.width,
+//   height: ximage.height,
+//   maskColor: "rgba(0,0,0,.2)",
+//   image: ximage,
+// });
+const clipper =new ImageBox(ximage);
+// clipper.hide();
 controller.load(clipper);
-controller.center(clipper);
 
+controller.load(new ImageBox(ximage));
+controller.load(new ImageBox(ximage));
+controller.load(new ImageBox(ximage));
+
+// controller.center(clipper);
+clipper.setPosition(100,100);
 clipper.installMultipleButtons([
   new SizeButton({
     alignment: Alignment.bottomRight,
@@ -664,7 +690,11 @@ clipper.installMultipleButtons([
     location: "bottom",
     alignment: Alignment.bottomCenter,
   }),
+  new RotateButton({
+    alignment:new Alignment(0,1.5)
+  }),
 ]);
+
 let view: any;
 controller.addListener("onSelect", (_) => {
   view = _;
@@ -678,10 +708,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // });
   console.log(document.querySelector("#s"));
   document.querySelector("#s").addEventListener("click", (e: any) => {
-    clipper.clipStart();
+    // clipper.replaceXImage( new XImage({
+    //   data: img2,
+    //   width: img2.width,
+    //   height: img2.height,
+    //   scale: .2,
+    //   // url: img.src,
+    // }))
+     clipper.clipStart();
+    
   });
   document.querySelector("#x").addEventListener("click", (e: any) => {
     clipper.clipStop();
+    
   });
   // document.querySelector("#t").addEventListener("click", (e: any) => {
   //   controller.layerTop(view);

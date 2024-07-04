@@ -202,8 +202,6 @@ declare class Size {
   };
 }
 
-
-
 declare class Painter {}
 
 type IconDataType = number[][][];
@@ -726,7 +724,14 @@ export class TextBox extends ViewObject implements TextHandler {
   get weight(): FontWeightType;
 }
 
-export declare class ImageBox extends ViewObject {
+export class Clipper extends RectCrop {
+  clipStart(): void;
+  clipStop(): void;
+  clipRotate: number;
+  updateClipImageRotate(rotate: number): void;
+}
+
+export declare class ImageBox extends Clipper {
   constructor(ximage: XImage);
   /**
    * ### 替换图片，传入一个XImage
@@ -841,8 +846,6 @@ type GestiControllerListenerTypes =
   | "onCreateGraffiti"
   | "onUpdateText"
   | "onRemove";
-
-
 
 declare abstract class GraphicsBase<
   T extends GenerateGraphicsOption

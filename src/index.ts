@@ -26,6 +26,7 @@ import BoxDecoration from "./core/lib/rendering/decorations/box-decoration";
 import PolygonDecoration from "./core/lib/rendering/decorations/polygon-decoration";
 import ParagraphBox from "./core/viewObject/text/paragraph-box";
 import { FontStyle, FontWeight ,TextDecoration,TextDecorationStyle,TextOverflow} from "./test/text-painter";
+import Clipper from "./test/clipper";
 
 
 //Hooks
@@ -43,7 +44,7 @@ export { OffScreenCanvasBuilder };
 //Vector
 export { Alignment,FontWeight,FontStyle,TextDecoration,TextDecorationStyle,TextOverflow };
 //View
-export { Rectangle,Polygon, InteractiveImage, ImageBox, XImage, TextBox, WriteViewObj,RectCrop,RectClipMask,ParagraphBox };
+export { Rectangle,Polygon, InteractiveImage, ImageBox, XImage, TextBox, WriteViewObj,RectCrop,RectClipMask,ParagraphBox,Clipper };
 //Enum
 export { ViewObjectFamily,BoxFit };
 //Config

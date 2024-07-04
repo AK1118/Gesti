@@ -355,11 +355,13 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
     const x = canvasSize.width >> 1,
       y = canvasSize.height >> 1;
     this.rect.position = new Vector(x, y);
+    this.markNeedsReBuild();
   }
 
   public toCenter(axis?: CenterAxis): void {
     if (!this.mounted) return;
     this.getKit().center(this, axis);
+    this.markNeedsReBuild();
   }
 
   protected _didChangeSize(size: Size): void {
@@ -454,7 +456,9 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
   }
   onDown(e: Vector | Vector[]): void {}
   onMove(e: Vector | Vector[]): void {}
-  onUp(e: Vector | Vector[]): void {}
+  onUp(e: Vector | Vector[]): void {
+    this.delta.clean();
+  }
   public cancelDrag() {
     this.drag.cancel();
   }

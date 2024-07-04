@@ -27,6 +27,7 @@ import { reverseXImage } from "@/utils/utils";
 import { BoxDecorationOption } from "Graphics";
 import BoxFit, { applyBoxFit } from "../lib/painting/box-fit";
 import XImage from "../lib/ximage";
+import Clipper from "@/test/clipper";
 interface SrcDataOption {
   srcX: number;
   srcY: number;
@@ -36,7 +37,7 @@ interface SrcDataOption {
 /**
  * 可设置背景，且背景
  */
-class ImageBox extends ViewObject {
+class ImageBox extends Clipper {
   family: ViewObjectFamily = ViewObjectFamily.image;
   private srcWidth: number = 0;
   private srcHeight: number = 0;
@@ -54,11 +55,15 @@ class ImageBox extends ViewObject {
     | OffscreenCanvas;
   public originFamily: ViewObjectFamily = ViewObjectFamily.image;
   constructor(xImage: XImage) {
-    super();
+    super({
+      image: xImage,
+      width: xImage.width,
+      height: xImage.height,
+      maskColor: "rgba(0,0,0,.54)",
+    });
     this.xImage = xImage;
     this.image = xImage.data;
     this.rect = new Rect(xImage.toJson());
-    this.setSrcSize(xImage.width, xImage.height);
     const decoration: BoxDecorationOption = {
       // backgroundImage: xImage,
     };
@@ -70,56 +75,26 @@ class ImageBox extends ViewObject {
   public replaceXImage(xImage: XImage): void {
     this.xImage = xImage;
     this.image = xImage.data;
-    const { width, height } = xImage.toJson();
-    this.setSrcSize(width, height);
-    const oldPosition: Vector = this.rect.position.copy();
-    this.rect.setPosition(oldPosition);
-    this.rect.setSize(width * this.absoluteScale, height * this.absoluteScale);
-    this.forceUpdate();
+    console.log("替换", xImage.toJson());
+    super.replaceXImage(xImage);
   }
-  private setSrcSize(srcWidth: number, srcHeight: number) {
-    this.srcWidth = srcWidth;
-    this.srcHeight = srcHeight;
-  }
-  protected onMounted(): void {
-    super.onMounted();
-    if (
-      this.mounted &&
-      this.xImage.fit != BoxFit.none &&
-      this.xImage.fit != undefined
-    ) {
-      const kit = this.getKit();
-      const size = kit.getCanvasRect().size;
-      const fittedSizes = applyBoxFit(this.xImage.fit, this.size, size);
-      this.setSize({
-        width: fittedSizes.destination.width,
-        height: fittedSizes.destination.height,
-      });
-    }
-  }
-  //@Override
-  public drawImage(paint: Painter): void {
-    // paint.drawImage(
-    //   this.image,
-    //   this.rect.position.x >> 0,
-    //   this.rect.position.y >> 0,
-    //   this.rect.size.width >> 0,
-    //   this.rect.size.height >> 0
-    // );
-    paint.deepDrawImage(
-      this.image,
-      this.srcX,
-      this.srcY,
-      this.srcWidth,
-      this.srcHeight,
-      (this.halfWidth * -1) >> 0,
-      (this.halfHeight * -1) >> 0,
-      this.rect.size.width >> 0,
-      this.rect.size.height >> 0
-    );
-  }
-
-  async export(): Promise<ViewObjectExportImageBox> {
+  // protected onMounted(): void {
+  //   super.onMounted();
+  //   if (
+  //     this.mounted &&
+  //     this.xImage.fit != BoxFit.none &&
+  //     this.xImage.fit != undefined
+  //   ) {
+  //     const kit = this.getKit();
+  //     const size = kit.getCanvasRect().size;
+  //     const fittedSizes = applyBoxFit(this.xImage.fit, this.size, size);
+  //     this.setSize({
+  //       width: fittedSizes.destination.width,
+  //       height: fittedSizes.destination.height,
+  //     });
+  //   }
+  // }
+  async export(): Promise<any> {
     const url: string = this.xImage.url;
     let data: ImageChunk[];
     if (!url) {
@@ -139,7 +114,7 @@ class ImageBox extends ViewObject {
     };
     return json;
   }
-  exportWeChat(): Promise<ViewObjectExportImageBox> {
+  exportWeChat(): Promise<any> {
     return this.export();
   }
   public static async reverse(
@@ -152,13 +127,6 @@ class ImageBox extends ViewObject {
       fixedWidth: entity.fixedWidth,
     });
     return new ImageBox(xImage);
-  }
-
-  public setSrcData(option: Partial<SrcDataOption>) {
-    this.srcX = option?.srcX ?? this.srcX;
-    this.srcY = option?.srcY ?? this.srcY;
-    this.srcWidth = option?.srcWidth ?? this.srcWidth;
-    this.srcHeight = option?.srcHeight ?? this.srcHeight;
   }
 }
 export default ImageBox;
