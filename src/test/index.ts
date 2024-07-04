@@ -655,10 +655,6 @@ const clipper =new ImageBox(ximage);
 // clipper.hide();
 controller.load(clipper);
 
-controller.load(new ImageBox(ximage));
-controller.load(new ImageBox(ximage));
-controller.load(new ImageBox(ximage));
-
 // controller.center(clipper);
 clipper.setPosition(100,100);
 clipper.installMultipleButtons([
@@ -739,3 +735,14 @@ document.addEventListener("DOMContentLoaded", () => {
 //     colors:['#00ff00','#ffff00']
 //   })
 // });
+
+
+g.translate(100,100);
+g.rotate(Math.PI/180*45);
+const v=new Vector(0,0);
+
+
+setInterval(()=>{
+  g.fillRect(v.x,v.y,20,20);
+  v.add(new Vector(1,0))
+},100)
