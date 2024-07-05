@@ -219,36 +219,41 @@ class Clipper extends RectCrop {
   }
 
   private renderImageWidthClipping(paint: Painter) {
-    if (this.isClip) {
-      paint.save();
-      paint.translate(this.positionX, this.positionY);
-      paint.rotate(this.rect.angle);
-      paint.rect(
-        -this.width * 0.5,
-        -this.height * 0.5,
-        this.width,
-        this.height
-      );
-      paint.clip();
-      this.drawClipImage(paint);
-      paint.restore();
-    } else {
-      paint.save();
-      paint.translate(this.positionX, this.positionY);
-      paint.rotate(this.rect.angle);
+    // if (this.isClip) {
+    //   paint.save();
+    //   paint.translate(this.positionX, this.positionY);
+    //   paint.rotate(this.rect.angle);
+    //   paint.rect(
+    //     -this.width * 0.5,
+    //     -this.height * 0.5,
+    //     this.width,
+    //     this.height
+    //   );
+    //   paint.clip();
+    //   this.drawClipImage(paint);
+    //   paint.restore();
+    // } else {
+    //   paint.save();
+    //   paint.translate(this.positionX, this.positionY);
+    //   paint.rotate(this.rect.angle);
 
-      this.drawClipImage(paint);
-      paint.restore();
-    }
-    // this.drawClipImage(paint);
+    //   this.drawClipImage(paint);
+    //   paint.restore();
+    // }
+    paint.save();
+    paint.translate(this.positionX, this.positionY);
+    paint.rotate(this.rect.angle);
+
+    this.drawClipImage(paint);
+    paint.restore();
   }
   private drawClipImage(paint: Painter) {
     const { data } = this.xImage;
     const { width, height } = this.imageRect.size;
 
     // 计算图像相对于旋转中心 (this.position) 的偏移量
-    const offsetX = this.imageRect.position.x - this.position.x;
-    const offsetY = this.imageRect.position.y - this.position.y;
+    const offsetX = this.imageRect.position.x+(width*this.scaleWidth*.5) - this.position.x;
+    const offsetY = this.imageRect.position.y+(height*this.scaleHeight*.5) - this.position.y;
 
     paint.save(); // 保存当前绘图状态
     paint.beginPath();
@@ -260,12 +265,24 @@ class Clipper extends RectCrop {
     paint.translate(offsetX, offsetY);
 
     // 绘制图像
-    const imgX = -width * 0.5;
-    const imgY = -height * 0.5;
+    const imgX =0// -width * 0.5;
+    const imgY =0// -height * 0.5;
 
     paint.save();
-    paint.transform(0, this.scaleHeight, this.scaleWidth, 0, 0, 0);
-    paint.deepDrawImage(data, imgX, imgY, width, height);
+    // paint.transform(this.scaleWidth, 0, 0, this.scaleHeight, 0, 0);
+    console.log(
+      this.rect.angle,
+      imgX,
+      imgY
+    );
+    paint.deepDrawImage(
+      data,
+      imgX,
+      imgY,
+      width*this.scaleWidth,
+      height*this.scaleHeight
+    );
+    // paint.transform(0, 0, 0,0, 0, 0);
     paint.restore();
     paint.restore(); // 恢复绘图状态
   }
