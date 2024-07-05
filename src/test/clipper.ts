@@ -90,12 +90,32 @@ class Clipper extends RectCrop {
   onDown(e: Vector | Vector[]): void {
     super.onDown(e);
     if (Array.isArray(e)) return;
+    this.handleUpdateDragOffset();
+  }
+  private handleUpdateDragOffset() {
     if (!this.dragOffset) this.dragOffset = Vector.zero;
+    if (!this.clipping) {
+      this.dragOffset.setXY(
+        this.imageRect.position.x - this.position.x,
+        this.imageRect.position.y - this.position.y
+      );
+    } else {
+      const angle = this.clipRotate + this.rect.angle;
+      // 计算旋转矩阵
+      const cosAngle = Math.cos(angle);
+      const sinAngle = Math.sin(angle);
 
-    this.dragOffset.setXY(
-      this.imageRect.position.x - this.position.x,
-      this.imageRect.position.y - this.position.y
-    );
+      // 获取当前的偏移量
+      const offsetX = this.imageRect.position.x - this.position.x;
+      const offsetY = this.imageRect.position.y - this.position.y;
+
+      // 旋转偏移量
+      const rotatedOffsetX = offsetX * cosAngle - offsetY * sinAngle;
+      const rotatedOffsetY = offsetX * sinAngle + offsetY * cosAngle;
+
+      // 更新 dragOffset
+      this.dragOffset.setXY(rotatedOffsetX, rotatedOffsetY);
+    }
   }
   protected didChangeSize(size: Size): void {
     this.handleChangeImageSize();
