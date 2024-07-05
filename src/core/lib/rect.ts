@@ -6,7 +6,7 @@ import Vertex from "./vertex";
  * @ 拖拽的回调函数
  */
 declare interface onDragFunction {
-  (rect: Rect,position?:Vector): void;
+  (rect: Rect, position?: Vector): void;
 }
 export class Size {
   private _width: number;
@@ -64,7 +64,8 @@ class Rect extends ObserverObj {
   private _scaleHeight: number = 1;
   private _preScaleWidth: number = 1;
   private _preScaleHeight: number = 1;
-  public disableDragPosition:boolean=false;
+  public disableDragPosition: boolean = false;
+  public disableScale: boolean = false;
   public readonly key: string = Math.random().toString(16).substring(2);
   constructor(params?: RectParams, key?: string) {
     super();
@@ -181,7 +182,7 @@ class Rect extends ObserverObj {
     if (deltaScale === this.deltaScale) return;
     this.beforeReport(deltaScale, "scale");
     //是否真正改变大小，还是之通知倍数改变了，后续可以考虑移除监听scale
-    if (change ?? true) {
+    if ((change ?? true) && !this.disableScale) {
       this.size.setWidth(this.size.width * deltaScale);
       this.size.setHeight(this.size.height * deltaScale);
     }

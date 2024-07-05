@@ -1,7 +1,10 @@
+import { HorizonButton, SizeButton, VerticalButton } from "@/composite/buttons";
+import BaseButton from "@/core/abstract/baseButton";
 import ViewObject from "@/core/abstract/view-object";
 import { ViewObjectFamily } from "@/core/enums";
 import ImageToolkitAdapterController from "@/core/lib/image-tool-kit/adpater";
 import Painter from "@/core/lib/painter";
+import Alignment from "@/core/lib/painting/alignment";
 import Rect from "@/core/lib/rect";
 import Vector from "@/core/lib/vector";
 import XImage from "@/core/lib/ximage";
@@ -82,11 +85,15 @@ class Clipper extends RectCrop {
     this.rect.updateVertex();
   }
   protected _didChangeDeltaScale(scale: number): void {
-    if (this.clipping) return;
+    if (this.clipping) {
+      this.imageRect.setDeltaScale(scale);
+      return;
+    }
     this.imageRect.setDeltaScale(scale);
     this.offset.mult(new Vector(scale, scale));
     this.imageRect.position = Vector.sub(this.position, this.offset);
   }
+
   onDown(e: Vector | Vector[]): void {
     super.onDown(e);
     if (Array.isArray(e)) return;
@@ -131,11 +138,25 @@ class Clipper extends RectCrop {
     if (!this.clipping) return;
     const imgWidth = this.imageRect.size.width,
       imgHeight = this.imageRect.size.height;
+
     if (this.width > imgWidth || this.height > imgHeight) {
       const widthScale = this.width / imgWidth;
       const heightScale = this.height / imgHeight;
       const scale = Math.max(widthScale, heightScale);
       this.imageRect.setSize(imgWidth * scale, imgHeight * scale);
+    }
+
+    if (this.clipRotate !== 0) {
+      // 计算矩形的对角线长度
+      const diagonalLength = Math.sqrt(this.width ** 2 + this.height ** 2);
+
+      // 当图片的宽度或高度小于矩形的对角长度时，尽可能填满对角长度
+      if (imgWidth < diagonalLength || imgHeight < diagonalLength) {
+        const widthScale = diagonalLength / imgWidth;
+        const heightScale = diagonalLength / imgHeight;
+        const scale = Math.max(widthScale, heightScale);
+        this.imageRect.setSize(imgWidth * scale, imgHeight * scale);
+      }
     }
 
     const { position } = this.imageRect;
@@ -215,6 +236,7 @@ class Clipper extends RectCrop {
       paint.save();
       paint.translate(this.positionX, this.positionY);
       paint.rotate(this.rect.angle);
+
       this.drawClipImage(paint);
       paint.restore();
     }
@@ -223,7 +245,6 @@ class Clipper extends RectCrop {
   private drawClipImage(paint: Painter) {
     const { data } = this.xImage;
     const { width, height } = this.imageRect.size;
-    const angle = (this.clipRotate + this.rect.angle) * -1;
 
     // 计算图像相对于旋转中心 (this.position) 的偏移量
     const offsetX = this.imageRect.position.x - this.position.x;
@@ -241,14 +262,20 @@ class Clipper extends RectCrop {
     // 绘制图像
     const imgX = -width * 0.5;
     const imgY = -height * 0.5;
-    paint.deepDrawImage(data, imgX, imgY, width, height);
 
+    paint.save();
+    paint.transform(0, this.scaleHeight, this.scaleWidth, 0, 0, 0);
+    paint.deepDrawImage(data, imgX, imgY, width, height);
+    paint.restore();
     paint.restore(); // 恢复绘图状态
   }
-
+  private tempButtons: Array<BaseButton> = [];
   public clipStart() {
     if (this.clipping) return;
+    this.tempButtons = this.allButtons;
+    this.installClipButtons();
     this.rect.disableDragPosition = true;
+    this.rect.disableScale = true;
     this.clipping = true;
     this.isClip = true;
     this.imageRect.position = Vector.sub(this.position, this.offset);
@@ -257,11 +284,47 @@ class Clipper extends RectCrop {
     this.markNeedClip();
     this.markNeedsRePaint();
   }
+  private installClipButtons() {
+    this.unInstallButton(this.allButtons);
+    this.installMultipleButtons([
+      new SizeButton({
+        alignment: Alignment.topLeft,
+      }),
+      new SizeButton({
+        alignment: Alignment.topRight,
+      }),
+      new SizeButton({
+        alignment: Alignment.bottomRight,
+      }),
+      new SizeButton({
+        alignment: Alignment.bottomLeft,
+      }),
+      new HorizonButton({
+        location: "left",
+        alignment: Alignment.centerLeft,
+      }),
+      new HorizonButton({
+        location: "right",
+        alignment: Alignment.centerRight,
+      }),
+      new VerticalButton({
+        location: "top",
+        alignment: Alignment.topCenter,
+      }),
+      new VerticalButton({
+        location: "bottom",
+        alignment: Alignment.bottomCenter,
+      }),
+    ]);
+  }
   public clipStop() {
     if (!this.clipping) return;
+    this.unInstallButton(this.allButtons);
+    this.installMultipleButtons(this.tempButtons);
     this.clipping = false;
     this.isClip = false;
     this.rect.disableDragPosition = false;
+    this.rect.disableScale = false;
     this.offset = Vector.sub(this.position, this.imageRect.position);
     this.getKit().setLayer(this.oldLayer, this);
     this.markNeedsRePaint();
@@ -269,6 +332,9 @@ class Clipper extends RectCrop {
   public updateClipImageRotate(rotate: number) {
     if (!this.clipping) return;
     this.clipRotate = (Math.PI / 180) * rotate;
+    this.isClip = false;
+    this.markNeedClip();
+    this.handleChangeImageSize();
     this.markNeedsRePaint();
   }
 }

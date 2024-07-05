@@ -323,6 +323,25 @@ class Painter implements Painter {
   ): CanvasGradient {
     return this.paint?.createLinearGradient?.(x0, y0, x1, y1);
   }
+  /**
+a (m11)
+水平缩放。
+
+b (m12)
+垂直倾斜。
+
+c (m21)
+水平倾斜。
+
+d (m22)
+垂直缩放。
+
+e (dx)
+水平移动。
+
+f (dy)
+垂直移动。
+   */
   transform(a: number, b: number, c: number, d: number, e: number, f: number) {
     this.paint?.transform(a, b, c, d, e, f);
   }
@@ -408,17 +427,17 @@ class Painter implements Painter {
   update() {}
   clipRect(clipPath: Rect, paint: VoidFunction, angle?: number) {
     // paint.beginPath();
-		// 	paint.save();
-		// 	paint.rect(this.position.x - this.width * 0.5,this.position.y - this.height * 0.5,this.width,this.height);
-		// 	paint.clip();
-		// 	const { data } = this.xImage;
-		// 	const { width, height } = this.imageRect.size;
-		// 	paint.deepDrawImage(data, this.imageRect.position.x - width * 0.5, this.imageRect.position.y - height * 0.5, width, height);
-		// 	paint.restore();
-		// 	paint.closePath();
+    // 	paint.save();
+    // 	paint.rect(this.position.x - this.width * 0.5,this.position.y - this.height * 0.5,this.width,this.height);
+    // 	paint.clip();
+    // 	const { data } = this.xImage;
+    // 	const { width, height } = this.imageRect.size;
+    // 	paint.deepDrawImage(data, this.imageRect.position.x - width * 0.5, this.imageRect.position.y - height * 0.5, width, height);
+    // 	paint.restore();
+    // 	paint.closePath();
     this.beginPath();
     this.save();
-    this.translate(clipPath.position.x,clipPath.position.y);
+    this.translate(clipPath.position.x, clipPath.position.y);
     this.rotate(angle);
     this.rect(
       clipPath.position.x,
@@ -427,7 +446,7 @@ class Painter implements Painter {
       clipPath.size.height
     );
     this.clip();
-    this.translate(-clipPath.position.x,-clipPath.position.y);
+    this.translate(-clipPath.position.x, -clipPath.position.y);
     paint();
     this.restore();
     this.closePath();

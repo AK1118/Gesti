@@ -583,7 +583,6 @@ const s2 = controller.getScreenUtil();
 //   })
 // );
 
-
 // const t = new ParagraphBox(`好的话`, {
 //   fontSize: 30,
 //   height: 30,
@@ -614,25 +613,22 @@ const ximage = new XImage({
   data: img,
   width: img.width,
   height: img.height,
-  scale: .5,
+  scale: 0.5,
   // url: img.src,
 });
-const rect1=new Rectangle({
+const rect1 = new Rectangle({
   width: s2.fullWidth,
   height: s2.fullHeight,
   decoration: {
     backgroundColor: "#efefef",
-    backgroundImage:ximage
+    backgroundImage: ximage,
   },
-  
 });
 rect1.installMultipleButtons([
   new DragButton(),
-  new RotateButton(
-    {
-      alignment:new Alignment(0,1.25),
-    }
-  ),
+  new RotateButton({
+    alignment: new Alignment(0, 1.25),
+  }),
   new DeleteButton(),
   new MirrorButton(),
 ]);
@@ -651,12 +647,12 @@ rect1.installMultipleButtons([
 //   maskColor: "rgba(0,0,0,.2)",
 //   image: ximage,
 // });
-const clipper =new ImageBox(ximage);
+const clipper = new ImageBox(ximage);
 // clipper.hide();
 controller.load(clipper);
 
 // controller.center(clipper);
-clipper.setPosition(100,100);
+clipper.setPosition(100, 100);
 clipper.installMultipleButtons([
   new SizeButton({
     alignment: Alignment.bottomRight,
@@ -687,7 +683,7 @@ clipper.installMultipleButtons([
     alignment: Alignment.bottomCenter,
   }),
   new RotateButton({
-    alignment:new Alignment(0,1.5)
+    alignment: new Alignment(0, 1.5),
   }),
 ]);
 
@@ -711,12 +707,10 @@ document.addEventListener("DOMContentLoaded", () => {
     //   scale: .2,
     //   // url: img.src,
     // }))
-     clipper.clipStart();
-    
+    clipper.clipStart();
   });
   document.querySelector("#x").addEventListener("click", (e: any) => {
     clipper.clipStop();
-    
   });
   // document.querySelector("#t").addEventListener("click", (e: any) => {
   //   controller.layerTop(view);
@@ -736,13 +730,11 @@ document.addEventListener("DOMContentLoaded", () => {
 //   })
 // });
 
-
 // g.translate(100,100);
 // g.rotate(Math.PI/180*45);
 // const v=new Vector(0,0);
 // g.translate(150,150);
-
-// setInterval(()=>{
-//   g.fillRect(v.x,v.y,20,20);
-//   v.add(new Vector(1,0))
-// },100)
+// let i = 0;
+// setInterval(() => {
+//   clipper.updateClipImageRotate(i++);
+// }, 100);
