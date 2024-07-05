@@ -24,7 +24,7 @@ class Clipper extends RectCrop {
   private clipping: boolean = false;
   private clipTimer: any = null;
   private offset: Vector = Vector.zero;
-  public clipRotate: number = 170;
+  public clipRotate: number = 0;
   family: ViewObjectFamily;
   private oldLayer: number;
   constructor(
@@ -46,11 +46,27 @@ class Clipper extends RectCrop {
     };
     this.rect.onDrag = (rect, position) => {
       this.setPosition(this._position.x, this._position.y);
-
-      const cosAngle = Math.cos(-this.rect.angle - this.clipRotate); // 使用反方向角度进行矫正
-      const sinAngle = Math.sin(-this.rect.angle - this.clipRotate); // 使用反方向角度进行矫正
-
-      this.imageRect.position = Vector.add(position.copy(), this.dragOffset);
+      // 计算新的图像位置
+      const newImgPos = Vector.add(position.copy(), this.dragOffset);
+      if (this.clipping) {
+        // 将角度转换为弧度
+        const angleInRadians = (this.clipRotate + this.rect.angle) * -1;
+        // 计算旋转矩阵
+        const cosAngle = Math.cos(angleInRadians);
+        const sinAngle = Math.sin(angleInRadians);
+        // 将 newImgPos 相对于旋转中心进行旋转变换
+        const relativeX = newImgPos.x - this.position.x;
+        const relativeY = newImgPos.y - this.position.y;
+        const rotatedX = relativeX * cosAngle - relativeY * sinAngle;
+        const rotatedY = relativeX * sinAngle + relativeY * cosAngle;
+        // 更新 imageRect 的位置，将旋转后的坐标加回旋转中心
+        this.imageRect.position = new Vector(
+          this.position.x + rotatedX,
+          this.position.y + rotatedY
+        );
+      } else {
+        this.imageRect.position = newImgPos;
+      }
     };
     if (this.imageRect === null) {
       this.imageRect = this.rect.copy();
@@ -75,6 +91,7 @@ class Clipper extends RectCrop {
     super.onDown(e);
     if (Array.isArray(e)) return;
     if (!this.dragOffset) this.dragOffset = Vector.zero;
+
     this.dragOffset.setXY(
       this.imageRect.position.x - this.position.x,
       this.imageRect.position.y - this.position.y
@@ -186,7 +203,7 @@ class Clipper extends RectCrop {
   private drawClipImage(paint: Painter) {
     const { data } = this.xImage;
     const { width, height } = this.imageRect.size;
-    const angle = this.rect.angle;
+    const angle = (this.clipRotate + this.rect.angle) * -1;
 
     // 计算图像相对于旋转中心 (this.position) 的偏移量
     const offsetX = this.imageRect.position.x - this.position.x;
@@ -194,9 +211,6 @@ class Clipper extends RectCrop {
 
     paint.save(); // 保存当前绘图状态
     paint.beginPath();
-
-    // 平移到旋转中心位置
-    // paint.translate(this.position.x, this.position.y);
 
     // 进行旋转
     paint.rotate(this.clipRotate);
