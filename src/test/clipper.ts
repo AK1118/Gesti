@@ -27,7 +27,7 @@ class Clipper extends RectCrop {
   private clipping: boolean = false;
   private clipTimer: any = null;
   private offset: Vector = Vector.zero;
-  public clipRotate: number = 0;
+  public clipRotate: number = 0//Math.PI/180*45;
   family: ViewObjectFamily;
   private oldLayer: number;
   constructor(
@@ -78,6 +78,7 @@ class Clipper extends RectCrop {
     this.markNeedsReBuild();
   }
   protected didChangePosition(position: Vector): void {
+    console.log("改变坐标")
     super.didChangePosition(position);
     if (this.offset.equals(Vector.zero)) {
       this.imageRect.position = this.position.copy();
@@ -85,15 +86,20 @@ class Clipper extends RectCrop {
     this.rect.updateVertex();
   }
   protected _didChangeDeltaScale(scale: number): void {
+    console.log("改变背书1")
     if (this.clipping) {
       this.imageRect.setDeltaScale(scale);
       return;
     }
+    this.updateImageScale(scale);
+  }
+  private updateImageScale(scale?:number){
+    if(!scale)return;
+    this.handleChangeImageSize();
     this.imageRect.setDeltaScale(scale);
     this.offset.mult(new Vector(scale, scale));
     this.imageRect.position = Vector.sub(this.position, this.offset);
   }
-
   onDown(e: Vector | Vector[]): void {
     super.onDown(e);
     if (Array.isArray(e)) return;
@@ -126,18 +132,14 @@ class Clipper extends RectCrop {
   }
   protected didChangeSize(size: Size): void {
     this.handleChangeImageSize();
-    if (!this.clipping) {
-      // this.scale
-    }
+    this.imageRect.position = Vector.sub(this.position, this.offset);
   }
 
-  protected didChangeDeltaScale(deltaScale: number): void {
-    this.handleChangeImageSize();
-  }
+
   handleChangeImageSize() {
     if (!this.clipping) return;
-    const imgWidth = this.imageRect.size.width,
-      imgHeight = this.imageRect.size.height;
+    const imgWidth = this.imageRect.size.width*this.scaleWidth,
+      imgHeight = this.imageRect.size.height*this.scaleHeight;
 
     if (this.width > imgWidth || this.height > imgHeight) {
       const widthScale = this.width / imgWidth;
@@ -219,71 +221,66 @@ class Clipper extends RectCrop {
   }
 
   private renderImageWidthClipping(paint: Painter) {
-    // if (this.isClip) {
-    //   paint.save();
-    //   paint.translate(this.positionX, this.positionY);
-    //   paint.rotate(this.rect.angle);
-    //   paint.rect(
-    //     -this.width * 0.5,
-    //     -this.height * 0.5,
-    //     this.width,
-    //     this.height
-    //   );
-    //   paint.clip();
-    //   this.drawClipImage(paint);
-    //   paint.restore();
-    // } else {
-    //   paint.save();
-    //   paint.translate(this.positionX, this.positionY);
-    //   paint.rotate(this.rect.angle);
+   if(!this.clipping){
+    this.imageRect.position = Vector.sub(this.position, this.offset);
+   }
+    if (this.isClip) {
+      paint.save();
+      paint.translate(this.positionX, this.positionY);
+      paint.rotate(this.rect.angle);
+      paint.rect(
+        -this.width * 0.5,
+        -this.height * 0.5,
+        this.width,
+        this.height
+      );
+      paint.clip();
+      this.drawClipImage(paint);
+      paint.restore();
+    } else {
+      paint.save();
+      paint.translate(this.positionX, this.positionY);
+      paint.rotate(this.rect.angle);
 
-    //   this.drawClipImage(paint);
-    //   paint.restore();
-    // }
-    paint.save();
-    paint.translate(this.positionX, this.positionY);
-    paint.rotate(this.rect.angle);
+      this.drawClipImage(paint);
+      paint.restore();
+    }
+   
+    // paint.save();
+    // paint.translate(this.positionX, this.positionY);
+    // paint.rotate(this.rect.angle);
 
-    this.drawClipImage(paint);
-    paint.restore();
+    // this.drawClipImage(paint);
+    // paint.restore();
   }
   private drawClipImage(paint: Painter) {
     const { data } = this.xImage;
-    const { width, height } = this.imageRect.size;
-
+    let { width, height } = this.imageRect.size;
     // 计算图像相对于旋转中心 (this.position) 的偏移量
-    const offsetX = this.imageRect.position.x+(width*this.scaleWidth*.5) - this.position.x;
-    const offsetY = this.imageRect.position.y+(height*this.scaleHeight*.5) - this.position.y;
+    const offsetX = (this.imageRect.position.x) - this.position.x;
+    const offsetY = (this.imageRect.position.y) - this.position.y;
 
     paint.save(); // 保存当前绘图状态
     paint.beginPath();
-
+    paint.transform(this.scaleWidth,0,0,this.scaleHeight, 0, 0);
     // 进行旋转
     paint.rotate(this.clipRotate);
+
 
     // 平移图像到相对于旋转中心的偏移位置
     paint.translate(offsetX, offsetY);
 
     // 绘制图像
-    const imgX =0// -width * 0.5;
-    const imgY =0// -height * 0.5;
+    const imgX = -width * 0.5;
+    const imgY = -height * 0.5;
 
-    paint.save();
-    // paint.transform(this.scaleWidth, 0, 0, this.scaleHeight, 0, 0);
-    console.log(
-      this.rect.angle,
-      imgX,
-      imgY
-    );
     paint.deepDrawImage(
       data,
       imgX,
       imgY,
-      width*this.scaleWidth,
-      height*this.scaleHeight
+      width,
+      height
     );
-    // paint.transform(0, 0, 0,0, 0, 0);
-    paint.restore();
     paint.restore(); // 恢复绘图状态
   }
   private tempButtons: Array<BaseButton> = [];
