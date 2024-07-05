@@ -418,6 +418,8 @@ class Painter implements Painter {
 		// 	paint.closePath();
     this.beginPath();
     this.save();
+    this.translate(clipPath.position.x,clipPath.position.y);
+    this.rotate(angle);
     this.rect(
       clipPath.position.x,
       clipPath.position.y,
@@ -425,6 +427,7 @@ class Painter implements Painter {
       clipPath.size.height
     );
     this.clip();
+    this.translate(-clipPath.position.x,-clipPath.position.y);
     paint();
     this.restore();
     this.closePath();

@@ -737,12 +737,12 @@ document.addEventListener("DOMContentLoaded", () => {
 // });
 
 
-g.translate(100,100);
-g.rotate(Math.PI/180*45);
-const v=new Vector(0,0);
+// g.translate(100,100);
+// g.rotate(Math.PI/180*45);
+// const v=new Vector(0,0);
+// g.translate(150,150);
 
-
-setInterval(()=>{
-  g.fillRect(v.x,v.y,20,20);
-  v.add(new Vector(1,0))
-},100)
+// setInterval(()=>{
+//   g.fillRect(v.x,v.y,20,20);
+//   v.add(new Vector(1,0))
+// },100)

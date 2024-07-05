@@ -24,7 +24,7 @@ class Clipper extends RectCrop {
   private clipping: boolean = false;
   private clipTimer: any = null;
   private offset: Vector = Vector.zero;
-  public clipRotate: number = 0;
+  public clipRotate: number = 170;
   family: ViewObjectFamily;
   private oldLayer: number;
   constructor(
@@ -46,7 +46,11 @@ class Clipper extends RectCrop {
     };
     this.rect.onDrag = (rect, position) => {
       this.setPosition(this._position.x, this._position.y);
-      this.imageRect.setPosition(Vector.add(position.copy(), this.dragOffset));
+
+      const cosAngle = Math.cos(-this.rect.angle - this.clipRotate); // 使用反方向角度进行矫正
+      const sinAngle = Math.sin(-this.rect.angle - this.clipRotate); // 使用反方向角度进行矫正
+
+      this.imageRect.position = Vector.add(position.copy(), this.dragOffset);
     };
     if (this.imageRect === null) {
       this.imageRect = this.rect.copy();
@@ -157,39 +161,57 @@ class Clipper extends RectCrop {
   }
 
   private renderImageWidthClipping(paint: Painter) {
-    // if (this.isClip) {
-    //   paint.clipRect(
-    //     new Rect({
-    //       x: this.position.x - this.width * 0.5,
-    //       y: this.position.y - this.height * 0.5,
-    //       width: this.width,
-    //       height: this.height,
-    //     }),
-    //     () => {
-    //       this.drawClipImage(paint);
-    //     }
-    //   );
-    // } else {
-    //   this.drawClipImage(paint);
-    // }
-    this.drawClipImage(paint);
+    if (this.isClip) {
+      paint.save();
+      paint.translate(this.positionX, this.positionY);
+      paint.rotate(this.rect.angle);
+      paint.rect(
+        -this.width * 0.5,
+        -this.height * 0.5,
+        this.width,
+        this.height
+      );
+      paint.clip();
+      this.drawClipImage(paint);
+      paint.restore();
+    } else {
+      paint.save();
+      paint.translate(this.positionX, this.positionY);
+      paint.rotate(this.rect.angle);
+      this.drawClipImage(paint);
+      paint.restore();
+    }
+    // this.drawClipImage(paint);
   }
   private drawClipImage(paint: Painter) {
     const { data } = this.xImage;
     const { width, height } = this.imageRect.size;
-    const px = this.imageRect.position.x - width * 0.5,
-      py = this.imageRect.position.y - height * 0.5;
-    paint.save();
-    paint.translate(this.position.x, this.position.y);
-    paint.rotate(this.rect.angle);
-    paint.restore();
-    paint.translate(this.imageRect.position.x, this.imageRect.position.y);
-    // paint.translate(-this.position.x, -this.position.y);
-    const imgX = width * -0.5,
-      imgY = height * -0.5;
+    const angle = this.rect.angle;
+
+    // 计算图像相对于旋转中心 (this.position) 的偏移量
+    const offsetX = this.imageRect.position.x - this.position.x;
+    const offsetY = this.imageRect.position.y - this.position.y;
+
+    paint.save(); // 保存当前绘图状态
+    paint.beginPath();
+
+    // 平移到旋转中心位置
+    // paint.translate(this.position.x, this.position.y);
+
+    // 进行旋转
+    paint.rotate(this.clipRotate);
+
+    // 平移图像到相对于旋转中心的偏移位置
+    paint.translate(offsetX, offsetY);
+
+    // 绘制图像
+    const imgX = -width * 0.5;
+    const imgY = -height * 0.5;
     paint.deepDrawImage(data, imgX, imgY, width, height);
-    paint.restore();
+
+    paint.restore(); // 恢复绘图状态
   }
+
   public clipStart() {
     if (this.clipping) return;
     this.rect.disableDragPosition = true;
