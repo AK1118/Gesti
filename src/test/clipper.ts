@@ -27,7 +27,7 @@ class Clipper extends RectCrop {
   private clipping: boolean = false;
   private clipTimer: any = null;
   private offset: Vector = Vector.zero;
-  public clipRotate: number = 0//Math.PI/180*45;
+  public clipRotate: number = 0; //Math.PI/180*45;
   family: ViewObjectFamily;
   private oldLayer: number;
   constructor(
@@ -78,7 +78,6 @@ class Clipper extends RectCrop {
     this.markNeedsReBuild();
   }
   protected didChangePosition(position: Vector): void {
-    console.log("改变坐标")
     super.didChangePosition(position);
     if (this.offset.equals(Vector.zero)) {
       this.imageRect.position = this.position.copy();
@@ -86,15 +85,23 @@ class Clipper extends RectCrop {
     this.rect.updateVertex();
   }
   protected _didChangeDeltaScale(scale: number): void {
-    console.log("改变背书1")
     if (this.clipping) {
-      this.imageRect.setDeltaScale(scale);
+      // this.imageRect.setDeltaScale(scale);
       return;
-    }
-    this.updateImageScale(scale);
+    } else this.updateImageScale(scale);
   }
-  private updateImageScale(scale?:number){
-    if(!scale)return;
+  protected didChangeScaleWidth(): void {
+    if (!this.clipping) {
+      this.imageRect.setScaleWidth(this.scaleWidth);
+    }
+  }
+  protected didChangeScaleHeight(): void {
+    if (!this.clipping) {
+      this.imageRect.setScaleHeight(this.scaleHeight);
+    }
+  }
+  private updateImageScale(scale?: number) {
+    if (!scale) return;
     this.handleChangeImageSize();
     this.imageRect.setDeltaScale(scale);
     this.offset.mult(new Vector(scale, scale));
@@ -135,31 +142,34 @@ class Clipper extends RectCrop {
     this.imageRect.position = Vector.sub(this.position, this.offset);
   }
 
-
   handleChangeImageSize() {
     if (!this.clipping) return;
-    const imgWidth = this.imageRect.size.width*this.scaleWidth,
-      imgHeight = this.imageRect.size.height*this.scaleHeight;
+    const imgWidth = this.imageRect.size.width,
+      imgHeight = this.imageRect.size.height* this.imageRect.scaleHeight;
 
-    if (this.width > imgWidth || this.height > imgHeight) {
-      const widthScale = this.width / imgWidth;
-      const heightScale = this.height / imgHeight;
+    if (
+      this.width > imgWidth * this.imageRect.scaleWidth ||
+      this.height > imgHeight * this.imageRect.scaleHeight
+    ) {
+      const widthScale = this.width / (imgWidth * this.imageRect.scaleWidth);
+      const heightScale =
+        this.height / (imgHeight * this.imageRect.scaleHeight);
       const scale = Math.max(widthScale, heightScale);
       this.imageRect.setSize(imgWidth * scale, imgHeight * scale);
     }
 
-    if (this.clipRotate !== 0) {
-      // 计算矩形的对角线长度
-      const diagonalLength = Math.sqrt(this.width ** 2 + this.height ** 2);
+    // if (this.clipRotate !== 0) {
+    //   // 计算矩形的对角线长度
+    //   const diagonalLength = Math.sqrt(this.width ** 2 + this.height ** 2);
 
-      // 当图片的宽度或高度小于矩形的对角长度时，尽可能填满对角长度
-      if (imgWidth < diagonalLength || imgHeight < diagonalLength) {
-        const widthScale = diagonalLength / imgWidth;
-        const heightScale = diagonalLength / imgHeight;
-        const scale = Math.max(widthScale, heightScale);
-        this.imageRect.setSize(imgWidth * scale, imgHeight * scale);
-      }
-    }
+    //   // 当图片的宽度或高度小于矩形的对角长度时，尽可能填满对角长度
+    //   if (imgWidth < diagonalLength || imgHeight < diagonalLength) {
+    //     const widthScale = diagonalLength / imgWidth;
+    //     const heightScale = diagonalLength / imgHeight;
+    //     const scale = Math.max(widthScale, heightScale);
+    //     this.imageRect.setSize(imgWidth * scale, imgHeight * scale);
+    //   }
+    // }
 
     const { position } = this.imageRect;
     let currentPositionX = position.x,
@@ -221,9 +231,9 @@ class Clipper extends RectCrop {
   }
 
   private renderImageWidthClipping(paint: Painter) {
-   if(!this.clipping){
-    this.imageRect.position = Vector.sub(this.position, this.offset);
-   }
+    if (!this.clipping) {
+      this.imageRect.position = Vector.sub(this.position, this.offset);
+    }
     if (this.isClip) {
       paint.save();
       paint.translate(this.positionX, this.positionY);
@@ -245,7 +255,7 @@ class Clipper extends RectCrop {
       this.drawClipImage(paint);
       paint.restore();
     }
-   
+
     // paint.save();
     // paint.translate(this.positionX, this.positionY);
     // paint.rotate(this.rect.angle);
@@ -257,15 +267,22 @@ class Clipper extends RectCrop {
     const { data } = this.xImage;
     let { width, height } = this.imageRect.size;
     // 计算图像相对于旋转中心 (this.position) 的偏移量
-    const offsetX = (this.imageRect.position.x) - this.position.x;
-    const offsetY = (this.imageRect.position.y) - this.position.y;
+    const offsetX = this.imageRect.position.x - this.position.x;
+    const offsetY = this.imageRect.position.y - this.position.y;
 
     paint.save(); // 保存当前绘图状态
     paint.beginPath();
-    paint.transform(this.scaleWidth,0,0,this.scaleHeight, 0, 0);
+    console.log(this.scaleWidth, this.scaleHeight);
+    paint.transform(
+      this.imageRect.scaleWidth,
+      0,
+      0,
+      this.imageRect.scaleHeight,
+      0,
+      0
+    );
     // 进行旋转
     paint.rotate(this.clipRotate);
-
 
     // 平移图像到相对于旋转中心的偏移位置
     paint.translate(offsetX, offsetY);
@@ -274,13 +291,7 @@ class Clipper extends RectCrop {
     const imgX = -width * 0.5;
     const imgY = -height * 0.5;
 
-    paint.deepDrawImage(
-      data,
-      imgX,
-      imgY,
-      width,
-      height
-    );
+    paint.deepDrawImage(data, imgX, imgY, width, height);
     paint.restore(); // 恢复绘图状态
   }
   private tempButtons: Array<BaseButton> = [];
@@ -289,7 +300,7 @@ class Clipper extends RectCrop {
     this.tempButtons = this.allButtons;
     this.installClipButtons();
     this.rect.disableDragPosition = true;
-    this.rect.disableScale = true;
+    this.disableWheelScale = true;
     this.clipping = true;
     this.isClip = true;
     this.imageRect.position = Vector.sub(this.position, this.offset);
@@ -338,7 +349,7 @@ class Clipper extends RectCrop {
     this.clipping = false;
     this.isClip = false;
     this.rect.disableDragPosition = false;
-    this.rect.disableScale = false;
+    this.disableWheelScale = false;
     this.offset = Vector.sub(this.position, this.imageRect.position);
     this.getKit().setLayer(this.oldLayer, this);
     this.markNeedsRePaint();
@@ -351,5 +362,17 @@ class Clipper extends RectCrop {
     this.handleChangeImageSize();
     this.markNeedsRePaint();
   }
+  // onWheel(e: WheelEvent): void {
+  //   super.onWheel(e);
+  //   const enlargeScale: number = 1.1;
+  //   const narrowScale: number = 1 / 1.1;
+  //   const { deltaY } = e;
+  //   console.log("改变鼠标");
+  //   if (this.selected) {
+  //     if (deltaY < 0) {
+  //       this.imageRect.setDeltaScale(enlargeScale);
+  //     } else this.imageRect.setDeltaScale(narrowScale);
+  //   }
+  // }
 }
 export default Clipper;

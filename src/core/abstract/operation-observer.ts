@@ -46,8 +46,8 @@ class Observer {
   }
 }
 
-abstract class OperationObserver extends SimpleGestiEventObject{
-  abstract renderBox:RenderBox;
+abstract class OperationObserver extends SimpleGestiEventObject {
+  abstract renderBox: RenderBox;
   onHide(): void {}
   private observeRenderBox: RenderBox;
   /**
@@ -125,6 +125,14 @@ abstract class OperationObserver extends SimpleGestiEventObject{
           this.didAddPosition(value);
         }
         break;
+      case "sizeScaleWidth":
+        {
+          this.didChangeScaleWidth();
+        }
+        break;
+        case "sizeScaleHeight":{
+          this.didChangeScaleHeight();
+        }break
       default: {
       }
     }

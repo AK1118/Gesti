@@ -43,6 +43,7 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
   //辅助线
   private auxiliary: AuxiliaryLine;
   public originFamily: ViewObjectFamily;
+  public disableWheelScale: boolean = false;
 
   constructor() {
     super();
@@ -99,7 +100,7 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
     if (!this.mounted) return;
     /*更新顶点数据*/
     this.rect.updateVertex();
-    if(this.needReBuild){
+    if (this.needReBuild) {
       this.performRebuild();
     }
     //执行缓存画布生成
@@ -303,11 +304,13 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
   private readonly enlargeScale: number = 1.1;
   private readonly narrowScale: number = 1 / 1.1;
   public enlarge() {
+    if(this.disableWheelScale)return;
     this.deltaScale = this.enlargeScale;
     this.setDeltaScale(this.deltaScale);
     this.doScale();
   }
   public narrow() {
+    if(this.disableWheelScale)return;
     this.deltaScale = this.narrowScale;
     this.setDeltaScale(this.deltaScale);
     this.doScale();
@@ -463,6 +466,7 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
     this.drag.cancel();
   }
   onWheel(e: WheelEvent): void {
+    if (this.disableWheelScale) return;
     const { deltaY } = e;
     if (this.selected)
       if (deltaY < 0) this.enlarge();
