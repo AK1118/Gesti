@@ -387,6 +387,7 @@ class ImageToolkit extends ImageToolkitBase {
     this.callHook("onLoad", obj);
     this.tool.sortByLayer(this.layers);
     this.render();
+    this.focus(obj);
   }
   /**
    * 是否可以被选中

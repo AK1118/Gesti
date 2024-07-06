@@ -10,6 +10,7 @@ import ScreenUtils from "@/utils/screenUtils/ScreenUtils";
 import { GestiControllerListenerTypes } from "@/types/controller";
 import Listeners from "../listener";
 import _Tools from "./utils";
+import RenderObjectBase from "../rendering/object";
 export enum EventHandlerState {
   down,
   up,
@@ -30,7 +31,14 @@ abstract class ImageToolkitBase {
   //手势处理识别器
   protected gesture: Gesture = new Gesture();
   //当前选中的图层
-  protected focusedViewObject: ViewObject = null;
+  private _focusedViewObject: ViewObject = null;
+  get focusedViewObject(): ViewObject {
+    return this._focusedViewObject;
+  }
+  set focusedViewObject(view: ViewObject) {
+    this._focusedViewObject = view;
+    this.markNeedsCompileLayer();
+  }
   //canvas偏移量
   protected offset: Vector;
   //画布矩形大小
@@ -92,18 +100,26 @@ abstract class ImageToolkitBase {
   }
   //上一次是否渲染完成
   private preRenderFinished: boolean = true;
+  private lowerCompileLayer: CompileRenderLayer = new CompileRenderLayer();
+  private upperCompileLayer: CompileRenderLayer = new CompileRenderLayer();
+  private preRenderDate: number = +new Date();
+  get canRender(): boolean {
+    const nowDate = +new Date();
+    return nowDate - this.preRenderDate > (1000/90);
+  }
   public render() {
+    if(!this.canRender) return;
     /**
      * 在使用绘制对象时，根据值来判断是否禁止重绘
      */
     this.debug("Update the Canvas");
     this.callHook("onUpdate", null);
-    this.paint.clearRect(
-      0,
-      0,
-      this.canvasRect.size.width,
-      this.canvasRect.size.height
-    );
+    // this.paint.clearRect(
+    //   0,
+    //   0,
+    //   this.canvasRect.size.width,
+    //   this.canvasRect.size.height
+    // );
 
     //当前显示标记数组初始化数据，且需要实时更新
     if (this.currentViewObjectState.length != this.layers.length) {
@@ -118,11 +134,12 @@ abstract class ImageToolkitBase {
     //适配屏幕分辨率
     if (this.screenUtils)
       this.paint.scale(this.screenUtils.devScale, this.screenUtils.devScale);
+    this.lowerCompileLayer.render(this.paint);
     this.layers.forEach((item: ViewObject, ndx: number) => {
       if (!item.disabled) {
         //扫除
         this.cleaning(item);
-        item.render(this.paint);
+        if (item.selected) item.render(this.paint);
         this.paint.drawSync();
         this.currentViewObjectState[ndx] = 1;
       } else if (this.currentViewObjectState[ndx] == 1) {
@@ -133,8 +150,42 @@ abstract class ImageToolkitBase {
         this.paint.drawSync();
       }
     });
+    this.upperCompileLayer.render(this.paint);
     this.focusedViewObject?.performRenderSelected(this.paint);
     this.paint.restore();
+    this.preRenderDate=+new Date();
+  }
+  private performRender(){
+
+  }
+  protected markNeedsCompileLayer(): void {
+    const view = this.focusedViewObject;
+    const canvasSize = this.getCanvasRect().size;
+    this.lowerCompileLayer.update(canvasSize.width, canvasSize.height);
+    this.upperCompileLayer.update(canvasSize.width, canvasSize.height);
+    this.handleCompileLayers(view);
+  }
+  protected handleCompileLayers(currentView: ViewObject) {
+    //没有任何选中时合成所有帧
+    if (!currentView) {
+      this.lowerCompileLayer.performCompileRender(this.layers);
+      return;
+    }
+    const currentNdx = this.layers.findIndex(
+      (item) => item.key === currentView.key
+    );
+    this.lowerCompileLayer.performCompileRender(
+      this.getLowerLayers(currentNdx)
+    );
+    this.upperCompileLayer.performCompileRender(
+      this.getUpperLayers(currentNdx)
+    );
+  }
+  private getLowerLayers(currentNdx: number) {
+    return this.layers.slice(0, currentNdx);
+  }
+  private getUpperLayers(currentNdx: number) {
+    return this.layers.slice(currentNdx + 1, this.layers.length);
   }
   public getScreenUtil(): ScreenUtils {
     return this.screenUtils;
@@ -148,4 +199,38 @@ abstract class ImageToolkitBase {
   }
 }
 
+class CompileRenderLayer {
+  private canvas: OffscreenCanvas;
+  private painter: Painter;
+  private initialized: boolean = false;
+  public update(
+    width: number = this.canvas.width,
+    height: number = this.canvas.height
+  ) {
+    this.canvas = new OffscreenCanvas(width, height);
+    const g: OffscreenCanvasRenderingContext2D = this.canvas.getContext(
+      "2d"
+    ) as OffscreenCanvasRenderingContext2D;
+    this.painter = new Painter(g);
+    this.initialized = true;
+  }
+  render(paint: Painter) {
+    if (!this.initialized) return;
+    console.log("渲染合成图层");
+    paint.deepDrawImage(
+      this.canvas,
+      0,
+      0,
+      this.canvas.width,
+      this.canvas.height
+    );
+  }
+  public performCompileRender(layers: Array<ViewObject>) {
+    if (!this.initialized || layers.length === 0) return;
+    layers.forEach((_) => {
+      _.render(this.painter);
+    });
+    console.log("合成", layers.length);
+  }
+}
 export default ImageToolkitBase;

@@ -632,9 +632,19 @@ rect1.installMultipleButtons([
   new DeleteButton(),
   new MirrorButton(),
 ]);
-// controller.load(
-//   rect1
-// );
+controller.load(rect1);
+
+new Array(1000).fill(0).forEach((_) => {
+  controller.load(
+    new Rectangle({
+      width: s2.fullWidth * 0.1,
+      height: s2.fullHeight * 0.1,
+      decoration: {
+        backgroundColor: "#edd9fc",
+      },
+    })
+  );
+});
 // new Clipper({
 //   width: ximage.width,
 //   height: ximage.height,
