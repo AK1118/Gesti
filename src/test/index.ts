@@ -736,5 +736,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // g.translate(150,150);
 // let i = 0;
 // setInterval(() => {
-//   clipper.updateClipImageRotate(i++);
+//   g.rect(100,100,100,100);
+//   g.fill("nonzero");
 // }, 100);

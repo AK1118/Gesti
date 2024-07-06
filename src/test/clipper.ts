@@ -141,11 +141,18 @@ class Clipper extends RectCrop {
     this.handleChangeImageSize();
     this.imageRect.position = Vector.sub(this.position, this.offset);
   }
+  public handleChangeScaleByTouch(scale: number, angle: number): void {
+    if (this.clipping) {
+      this.imageRect.setDeltaScale(scale);
+    } else {
+      super.handleChangeScaleByTouch(scale, angle);
+    }
+  }
 
   handleChangeImageSize() {
     if (!this.clipping) return;
     const imgWidth = this.imageRect.size.width,
-      imgHeight = this.imageRect.size.height* this.imageRect.scaleHeight;
+      imgHeight = this.imageRect.size.height * this.imageRect.scaleHeight;
 
     if (
       this.width > imgWidth * this.imageRect.scaleWidth ||
@@ -225,9 +232,9 @@ class Clipper extends RectCrop {
     this.performInit();
     this.markNeedsRePaint();
   }
-  render(paint: Painter): void {
+  drawImage(paint: Painter): void {
     this.renderImageWidthClipping(paint);
-    if (this.clipping) super.render(paint, false);
+    if (this.clipping) super.drawImage(paint);
   }
 
   private renderImageWidthClipping(paint: Painter) {
@@ -236,8 +243,8 @@ class Clipper extends RectCrop {
     }
     if (this.isClip) {
       paint.save();
-      paint.translate(this.positionX, this.positionY);
-      paint.rotate(this.rect.angle);
+      // paint.translate(this.positionX, this.positionY);
+      // paint.rotate(this.rect.angle);
       paint.rect(
         -this.width * 0.5,
         -this.height * 0.5,
@@ -249,8 +256,8 @@ class Clipper extends RectCrop {
       paint.restore();
     } else {
       paint.save();
-      paint.translate(this.positionX, this.positionY);
-      paint.rotate(this.rect.angle);
+      // paint.translate(this.positionX, this.positionY);
+      // paint.rotate(this.rect.angle);
 
       this.drawClipImage(paint);
       paint.restore();
@@ -272,7 +279,6 @@ class Clipper extends RectCrop {
 
     paint.save(); // 保存当前绘图状态
     paint.beginPath();
-    console.log(this.scaleWidth, this.scaleHeight);
     paint.transform(
       this.imageRect.scaleWidth,
       0,
@@ -311,36 +317,42 @@ class Clipper extends RectCrop {
   }
   private installClipButtons() {
     this.unInstallButton(this.allButtons);
-    this.installMultipleButtons([
-      new SizeButton({
-        alignment: Alignment.topLeft,
-      }),
-      new SizeButton({
-        alignment: Alignment.topRight,
-      }),
-      new SizeButton({
-        alignment: Alignment.bottomRight,
-      }),
-      new SizeButton({
-        alignment: Alignment.bottomLeft,
-      }),
-      new HorizonButton({
-        location: "left",
-        alignment: Alignment.centerLeft,
-      }),
-      new HorizonButton({
-        location: "right",
-        alignment: Alignment.centerRight,
-      }),
-      new VerticalButton({
-        location: "top",
-        alignment: Alignment.topCenter,
-      }),
-      new VerticalButton({
-        location: "bottom",
-        alignment: Alignment.bottomCenter,
-      }),
-    ]);
+    this.installMultipleButtons(
+      [
+        new SizeButton({
+          alignment: Alignment.topLeft,
+        }),
+        new SizeButton({
+          alignment: Alignment.topRight,
+        }),
+        new SizeButton({
+          alignment: Alignment.bottomRight,
+        }),
+        new SizeButton({
+          alignment: Alignment.bottomLeft,
+        }),
+        new HorizonButton({
+          location: "left",
+          alignment: Alignment.centerLeft,
+        }),
+        new HorizonButton({
+          location: "right",
+          alignment: Alignment.centerRight,
+        }),
+        new VerticalButton({
+          location: "top",
+          alignment: Alignment.topCenter,
+        }),
+        new VerticalButton({
+          location: "bottom",
+          alignment: Alignment.bottomCenter,
+        }),
+      ].map((_) => {
+        _.setSenseRadius(this.getKit().getScreenUtil()?.setSp(50));
+        _.displayBackground = false;
+        return _;
+      })
+    );
   }
   public clipStop() {
     if (!this.clipping) return;

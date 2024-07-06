@@ -31,7 +31,7 @@ class RectCrop extends ViewObject {
       width: option.width,
       height: option.height,
     });
-    this.disableRotate();
+    // this.disableRotate();
   }
   private option: RectCropOption;
   get value(): RectCropValue {
@@ -88,11 +88,34 @@ class RectCrop extends ViewObject {
     const hw = this.halfWidth,
       hh = this.halfHeight;
     const { width, height } = this.getKit().getCanvasRect().size;
+
+    // 保存当前绘图状态
+    paint.save();
+
+    // 平移和旋转画布
+    // 开始绘制路径
+    paint.beginPath();
+
+    // 绘制整个画布的蒙版路径
+    paint.moveTo(-width, -height);
+    paint.lineTo(width, -height);
+    paint.lineTo(width, height);
+    paint.lineTo(-width, height);
+    paint.closePath();
+
+    // 绘制镂空部分的路径
+    paint.moveTo(-hw, -hh);
+    paint.lineTo(hw, -hh);
+    paint.lineTo(hw, hh);
+    paint.lineTo(-hw, hh);
+    paint.closePath();
+
+    // 使用奇偶规则（evenodd）进行填充，生成镂空效果
     paint.fillStyle = this.option.maskColor;
-    paint.fillRect(-x, -y, width * 2, y - hh);
-    paint.fillRect(hw, -hh, width * 2, height * 2);
-    paint.fillRect(-hw, hh, this.width, height * 2);
-    paint.fillRect(-x, -hh, x - hw, height * 2);
+    paint.fill("evenodd");
+
+    // 恢复绘图状态
+    paint.restore();
   }
 
   family: ViewObjectFamily;

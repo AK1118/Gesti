@@ -338,7 +338,10 @@ abstract class ViewObject<D extends DecorationBase = DecorationBase>
     }
     this.rect.setDeltaScale(deltaScale);
   }
-
+  public handleChangeScaleByTouch(scale:number,angle:number){
+    this.setDeltaScale(scale);
+    this.setAngle(angle);
+  }
   /**
    * 世界坐标居中
    */

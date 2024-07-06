@@ -167,8 +167,8 @@ class Painter implements Painter {
   translate(x: number, y: number) {
     this.paint.translate(x, y);
   }
-  fill() {
-    this.paint.fill();
+  fill(fillRule?: CanvasFillRule) {
+    this.paint.fill(fillRule);
   }
   rect(x: number, y: number, w: number, h: number) {
     this.paint.rect(x, y, w, h);

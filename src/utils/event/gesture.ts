@@ -41,10 +41,11 @@ class TwoFingerOperate implements Operate {
     const [a, b] = positions;
     const dist = Vector.dist(a, b);
     const scale = dist / this.oldDist;
-    this.ViewObject.setDeltaScale(scale);
     const v = Vector.sub(a, b);
     const angle = Math.atan2(v.y, v.x) - this.oldAngle;
-    this.ViewObject.setAngle(angle);
+    // this.ViewObject.setDeltaScale(scale);
+    // this.ViewObject.setAngle(angle);
+    this.ViewObject.handleChangeScaleByTouch(scale,angle);
     this.oldDist = dist;
   }
 }
