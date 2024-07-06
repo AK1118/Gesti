@@ -634,7 +634,7 @@ rect1.installMultipleButtons([
 ]);
 controller.load(rect1);
 
-new Array(1000).fill(0).forEach((_) => {
+new Array(10).fill(0).forEach((_) => {
   controller.load(
     new Rectangle({
       width: s2.fullWidth * 0.1,

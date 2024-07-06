@@ -86,12 +86,6 @@ abstract class ImageToolkitBase {
    * 清扫细微到不可见的对象
    * @param item
    */
-  private cleaning(item: ViewObject) {
-    // if (item && item.rect) {
-    //   const { width, height } = item.rect.size;
-    //   if (width <= 3 && height <= 3) item.unMount();
-    // }
-  }
   public getCanvasRect(): Rect {
     return this.canvasRect;
   }
@@ -102,13 +96,14 @@ abstract class ImageToolkitBase {
   private preRenderFinished: boolean = true;
   private lowerCompileLayer: CompileRenderLayer = new CompileRenderLayer();
   private upperCompileLayer: CompileRenderLayer = new CompileRenderLayer();
+  private middleCompileLayer: CompileRenderLayer = new CompileRenderLayer();
   private preRenderDate: number = +new Date();
   get canRender(): boolean {
     const nowDate = +new Date();
-    return nowDate - this.preRenderDate > (1000/90);
+    return nowDate - this.preRenderDate > 1000 / 90;
   }
   public render() {
-    if(!this.canRender) return;
+    if (!this.canRender) return;
     /**
      * 在使用绘制对象时，根据值来判断是否禁止重绘
      */
@@ -138,8 +133,10 @@ abstract class ImageToolkitBase {
     this.layers.forEach((item: ViewObject, ndx: number) => {
       if (!item.disabled) {
         //扫除
-        this.cleaning(item);
-        if (item.selected) item.render(this.paint);
+        if (item.selected) {
+          this.middleCompileLayer.updateFrame();
+          this.middleCompileLayer.render(this.paint);
+        }
         this.paint.drawSync();
         this.currentViewObjectState[ndx] = 1;
       } else if (this.currentViewObjectState[ndx] == 1) {
@@ -153,16 +150,15 @@ abstract class ImageToolkitBase {
     this.upperCompileLayer.render(this.paint);
     this.focusedViewObject?.performRenderSelected(this.paint);
     this.paint.restore();
-    this.preRenderDate=+new Date();
+    this.preRenderDate = +new Date();
   }
-  private performRender(){
-
-  }
+  private performRender() {}
   protected markNeedsCompileLayer(): void {
     const view = this.focusedViewObject;
     const canvasSize = this.getCanvasRect().size;
     this.lowerCompileLayer.update(canvasSize.width, canvasSize.height);
     this.upperCompileLayer.update(canvasSize.width, canvasSize.height);
+    this.middleCompileLayer.update(canvasSize.width, canvasSize.height);
     this.handleCompileLayers(view);
   }
   protected handleCompileLayers(currentView: ViewObject) {
@@ -180,6 +176,9 @@ abstract class ImageToolkitBase {
     this.upperCompileLayer.performCompileRender(
       this.getUpperLayers(currentNdx)
     );
+    if (currentView) {
+      this.middleCompileLayer.performCompileRender([currentView]);
+    }
   }
   private getLowerLayers(currentNdx: number) {
     return this.layers.slice(0, currentNdx);
@@ -203,6 +202,9 @@ class CompileRenderLayer {
   private canvas: OffscreenCanvas;
   private painter: Painter;
   private initialized: boolean = false;
+  private width: number = 0;
+  private height: number = 0;
+  private layers: Array<ViewObject> = [];
   public update(
     width: number = this.canvas.width,
     height: number = this.canvas.height
@@ -213,6 +215,8 @@ class CompileRenderLayer {
     ) as OffscreenCanvasRenderingContext2D;
     this.painter = new Painter(g);
     this.initialized = true;
+    this.width = width;
+    this.height = height;
   }
   render(paint: Painter) {
     if (!this.initialized) return;
@@ -230,7 +234,15 @@ class CompileRenderLayer {
     layers.forEach((_) => {
       _.render(this.painter);
     });
+    this.layers = layers;
     console.log("合成", layers.length);
+  }
+  //清除画布，再次渲染当前帧
+  public updateFrame() {
+    if (!this.initialized || this.layers.length === 0) return;
+    console.log("清空");
+    this.painter.clearRect(0, 0, this.width, this.height);
+    this.performCompileRender(this.layers);
   }
 }
 export default ImageToolkitBase;
